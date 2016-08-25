@@ -556,10 +556,10 @@ module glutils {
 
         mesh['text'] = text;
         var backgroundMargin = 10;
-        var canvas = document.createElement("canvas");
-        // var canvas = document.getElementById("textCanvas");
+        var txtCanvas = document.createElement("canvas");
+        // var textcanvas = document.getElementById("textCanvas");
         
-        // var context = txtCanvas.getContext("2d");
+        var context = txtCanvas.getContext("2d");
 
         var SIZE = 30;
         context.font = SIZE + "pt Helvetica";
@@ -589,6 +589,7 @@ module glutils {
         mesh.geometry.needsUpdate = true;
         mesh.geometry.verticesNeedUpdate = true;
         mesh.needsUpdate = true;
+
     }
 
     

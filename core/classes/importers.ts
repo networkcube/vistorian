@@ -60,9 +60,8 @@ module networkcube{
             }
 
             $.get(url, (linkData)=>{
-                // for (var i = 1; i < linkData.length; i++) {
-                linkData = linkData.split('\n');
-                    
+                var linkData = Papa.parse(linkData, {}).data;
+
                 // get references to tables
                 var nodeTable: any[] = [];
                 
@@ -76,27 +75,36 @@ module networkcube{
                 var id_target: number;
                 var name: string;
 
+                var linkTable:any[] = []
+                var newLinkSchema:networkcube.LinkSchema = new networkcube.LinkSchema(0,1,2);
+                // fill new link schema
+                var colCount = 3
+                for(var prop in linkSchema){
+                    if(prop != 'source' && prop != 'target')
+                    newLinkSchema[prop] = colCount++;
+                }
+
                 // Create node table
                 // skip first row, as 1st row contains header information
                 linkData.shift();
-
+                
+                var linkRow;
                 for (var i = 0; i < linkData.length; i++) {
                     if(linkData[i].length == 0){
-                        linkData.splice(i,1);
-                        i--;
                         continue;
                     }
-                    linkData[i] = linkData[i].split(delimiter)
-                    if(linkData[i].length == 0){
-                        linkData.splice(i,1);
-                        i--;
-                        continue;
-                    }
+                    linkRow = new Array(colCount)
+                    if(linkSchema.id == undefined)
+                        linkRow[0] = linkTable.length;
+                    else
+                        linkRow[0] = linkData[i][linkSchema.id];
+                    
+                    // remove whitespace in table entries
 
-                    // remove whitespace
                     for(var j=0 ; j <linkData[i].length ; j++){
                          linkData[i][j] = linkData[i][j].trim();
                     }
+
                     // sources
                     name = linkData[i][linkSchema.source];
                     if (names.indexOf(name) == -1) {
@@ -112,35 +120,31 @@ module networkcube{
                     id_target = names.indexOf(name);
 
                     // replace node names by node indices
-                    linkData[i][linkSchema.source] = id_source
-                    linkData[i][linkSchema.target] = id_target
+                    linkRow[newLinkSchema.source] = id_source
+                    linkRow[newLinkSchema.target] = id_target
 
                     // format time
                     if(linkSchema.time != undefined){
-                        linkData[i][linkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat())
+                        linkRow[newLinkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat())
                     }
-
-                    // add edge id if not there
-                    if(linkSchema.id == undefined){  
-                        linkData[i].push(i)
+                    // copy remaining attributes (linkType, weight, etc..)
+                    for(var prop in linkSchema){
+                        if(prop != 'source' && prop != 'target' && prop != 'time'){
+                            linkRow[prop] = linkData[i][prop];
+                        }
                     }
-                }
-
-                if(linkSchema.id == undefined){
-                    // add last index as id
-                    linkSchema.id = linkData[0].length-1;
-                }  
+                    linkTable.push(linkRow)
+                }                
                 
-                
-                // create node table
+                // create node table from node name list
                 for(var i=0 ; i < names.length ; i++){
                     nodeTable.push([i, names[i]])
                 }
-                console.log('URL>>', url)
+
                 var dataSet = new DataSet({
                     nodeTable: nodeTable,
-                    linkTable: linkData,
-                    linkSchema: linkSchema,
+                    linkTable: linkTable,
+                    linkSchema: newLinkSchema,
                     nodeSchema: nodeSchema,
                     name: url
                 })
