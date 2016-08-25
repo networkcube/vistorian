@@ -1,3 +1,11 @@
 body{
 	font-family: 'Helvetica Neue', sans-serif;	
 }
+div#main{
+	margin: auto;
+	width: 500px;
+}
+#footer{
+	margin-top: 400px;
+	font-size: 7pt;
+}
