@@ -617,6 +617,7 @@ declare module networkcube {
     }
 }
 declare module networkcube {
+    function findTemplate(nodes: networkcube.Node[], template: networkcube.MotifTemplate, config?: Object): void;
     function findClusters(nodes: any, config?: Object): any[];
     function findCliques(nodes: any, config?: Object): any[];
     function findFullEgoNetwork(nodes: Node[], config?: Object): Motif[];

@@ -11618,6 +11618,24 @@ var networkcube;
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
+    function findTemplate(nodes, template, config) {
+        var nodeCount = template.nodes.length;
+        var linkCount = template.links.length;
+        var n;
+        var links;
+        var candidateNodes = [];
+        for (var i = 0; i < nodes.length; i++) {
+            links = nodes[i].links().toArray();
+            for (var j = 0; j < nodeCount; j++) {
+                for (var k = 0; k < linkCount; k++) {
+                    if (template.links[k][0] == template.nodes[j])
+                        for (var l = 0; l < linkCount; l++) {
+                        }
+                }
+            }
+        }
+    }
+    networkcube.findTemplate = findTemplate;
     function findClusters(nodes, config) {
         if (nodes.length == 0)
             return [];
@@ -13599,7 +13617,7 @@ var glutils;
             config.color = '#000000';
         mesh['text'] = text;
         var backgroundMargin = 10;
-        var context = txtCanvas.getContext("2d");
+        var canvas = document.createElement("canvas");
         var SIZE = 30;
         context.font = SIZE + "pt Helvetica";
         var WIDTH = context.measureText(text).width;
