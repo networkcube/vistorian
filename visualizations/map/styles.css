@@ -1,0 +1,100 @@
+body{
+    cursor: pointer;
+}
+
+/*NODES*/
+
+.nodeLabelBackground {
+  fill: #fff;
+  opacity: .9;
+}
+
+.nodeCircle {
+    cursor: default;
+    stroke-width: 1;
+    stroke:#ffffff;
+}
+
+.nodeCircle.highlighted{
+    stroke-width: 3;
+    stroke:#000000;    
+}
+
+
+
+.nodeLabel{
+	font-size: 12pt;
+    font-weight: 200;
+}
+
+.displacementCircle{
+    fill:none;
+    stroke: #000;
+    stroke-width: 1;
+    opacity: .2;
+} 
+
+/*LINKS*/
+
+
+/*LOCATIONS*/
+
+.locationMarker > circle{
+    stroke-width: 1px;
+    stroke: #555;
+    fill: none;
+}
+
+.locationMarker > text{
+    fill: #000;
+    font-family: 'Helvetivca', sans-serif;
+}
+
+/*NODE - LOCATION LABELS*/
+  
+div.locListItem p {
+    line-height: 5pt;
+}
+
+p.locpara{
+    font-weight: bold;
+}
+ 
+p.nodeListItem {
+    margin-left: 15px;
+    line-height: 5pt;
+} 
+  
+.controlLabel{
+    font-size: 9pt;
+} 
+
+
+.hidden {
+    opacity:0;
+    transition:opacity 300ms;
+
+}
+
+.shown{
+    opacity:1;
+    transition:opacity 300ms;
+}
+
+#locationsPanel {
+    border: 2px solid black;
+    background:rgba(255,255,255,0.5);
+    position:absolute;
+    padding: 5px;
+}
+
+
+/* HTML */
+
+#headDiv{
+
+}
+
+#legendDiv{
+}
+

@@ -1,0 +1,135 @@
+﻿/*************** HTML **********/
+
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+iframe {
+    position: absolute;
+    border: 0px solid gray
+
+}
+
+.viewlink{
+    color: #fff;
+    margin-left:5px;
+    text-decoration: none;
+}
+
+
+/*************** D3 **********/
+
+
+/*.timeseries {
+    fill : #006699;
+    stroke: none;
+}
+
+.timeseries_selected {
+    fill : red;
+    opacity: 0.7;
+    stroke: none;
+}*/
+
+/*
+.timeseries:hover {
+    fill : #FFCA51;
+    stroke: none;
+}*/
+
+.linkcontainers {
+    stroke: none;
+}
+
+/*.linkcontainers:hover {
+    stroke: none;
+    fill: steelblue;
+    opacity:0.1;
+}
+
+.linkcontainers:active {
+    stroke: blue;
+    fill: red;
+    opacity:0.1;
+}*/
+
+.bookmarkCategory {
+    display: block;
+    margin-top: 10px;
+}
+
+.bookmarkEntry {
+    display: block;
+}
+
+.bookmarkLabel {
+    font-size: 12 px;
+    font-weight: normal;
+    font-family: 'Segoe UI', sans-serif;
+    border: 0px;
+    background: transparent;
+    margin-left: 5px;
+}
+
+.bookmarkColor {
+    border:0px solid black;
+    height: 15px;
+    margin-left:5px;
+}
+
+.bookmarkItem {
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 40px;
+    font-family: 'Segoe UI', sans-serif;
+    border: 0px;
+    background: transparent;
+}
+
+.boundingBoxLinks {
+    stroke          : #293d66;
+    stroke-dasharray: 5px 2px;
+    stroke-width    : 1px;
+    fill            : transparent;
+}
+
+.boundingBoxCells {
+    stroke          : #293d66;
+    stroke-dasharray: 5px 2px;
+    stroke-width    : 1px;
+    fill            : transparent;
+}
+
+/*.cells {
+    fill : black;
+    stroke : none;
+}
+
+.cells:hover {
+    fill : red;
+    stroke : none;
+}*/
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #808080;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  fill: black;
+  fill-opacity: .2;
+  shape-rendering: crispEdges;
+}
+
+/*input[type='range']::-ms-fill-lower{
+    background-color: #293d66;
+}*/
+
+input[type='range']::-ms-track {
+    color: transparent;
+}

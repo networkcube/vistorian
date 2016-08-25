@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../styles.css">
+<link rel="stylesheet" type="text/css" href="styles.css">
+<script src="../../../networkcube/core/lib/jquery.js"></script>
+<script src="../../../networkcube/core/networkcube.js"></script>
+</head>
+<title></title>
+<body>
+
+	<div id="searchDiv">
+		<input id="searchField" type="text" name="searchInput" value="Search ..."/>
+		<input id="searchButton" type="button" name="searchButton" value="Find" onclick="startSearch()"/>
+		<ul id="searchResults">
+		</ul>
+	</div>
+
+	<script src="bookmarkbrowser.js"></script>
+
+	<script>
+		function startSearch(){
+			console.log('startSearch');
+			var term = document.getElementById('searchField').value;
+			networkcube.search(term);			
+		}	
+	</script>	
+
+</body>
+</html>
+

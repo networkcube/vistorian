@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <!-- enable HTML 5 and other advanced features -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+    <!-- prevent system zooming on this page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Brain View</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="../../styles.css">
+
+    <!-- SCRIPTS -->
+</head>
+
+<body style="overflow: hidden" id="maindiv">
+    <div id="menubar">
+        <button type="button" onclick="setFrontLook()">Front</button>
+        <button type="button" onclick="setTopLook()">Top</button>
+        <button type="button" onclick="setSideLook()">Side</button>
+        <input type="checkbox" checked="true" id="brainModel" onclick="showBrain()"> show brain</input>
+    </div>
+
+    <div id="footerbar" style='height:58px;'>
+        <div style='float:left;'>
+            correlation<br> <input type="checkbox" id="invertFilter"> inverse filter
+        </div>
+    </div>
+    <!--<script src="../../../networkcube/core/lib/jquery.js"></script>-->
+    <script src="../../../networkcube/core/networkcube.js"></script>
+    <script src="../utils/animations.js"></script>
+    <script src="lib/d3.min.js"></script>
+    <script src="lib/three.js"></script>
+    <script src="lib/OBJLoader.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    <script src="../widgets/widgets.js"></script>
+    <script src="brainView.js"></script>
+
+    <!-- div id="outer" style="margin: 20px; position: relative; border: 0px solid blue" >
+
+        <div id="sliderPanel" style="height:40px;">
+            <span id="timeValue" style="position: absolute; width: 20px;">0</span>
+            <span id="timeSlider" style="margin-top: 20px; width: 220px; display: inline-block;"></span>
+        </div>
+
+
+        <div id="nodelinkArea" style="background: white">
+        </div>
+
+        links <span id="linkSlider" style="margin-top: 20px; width: 200px; display: inline-block;"></span>
+    </div -->
+</body>
+
+</html>

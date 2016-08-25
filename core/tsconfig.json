@@ -1,0 +1,42 @@
+{
+    "version": "1.5.0-alpha",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outFile": "./networkcube.js",
+        "sourceMap": true,
+        "watch": true
+    },
+    "files": [
+        "./lib/jquery.ts",
+        "./lib/d3.min.ts",
+        "./lib/netClustering.ts",
+        "./lib/chroma.min.ts",
+        "./lib/lz-string.min.ts",
+        "./lib/moment.ts",
+        "./lib/setOps.ts",
+        "./lib/papaparse.ts",
+        "./lib/science.ts",
+        "./lib/reorder.ts",
+        "./lib/BSpline.ts",
+        "./classes/datamanager.ts",
+        "./classes/motifs.ts",
+        "./classes/analytics.ts",
+        "./classes/importers.ts",
+        "./classes/colors.ts",
+        "./classes/dynamicgraph.ts",
+        "./classes/messenger.ts",
+        "./classes/queries.ts",
+        "./classes/utils.ts",
+        "./classes/ordering.ts",
+        "./classes/search.ts",
+        "./classes/main.ts",
+        "./helper/glutils.ts"
+    ]
+}

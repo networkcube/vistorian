@@ -1,0 +1,31 @@
+.nodeLabelBackground {
+  stroke: #eee;
+  stroke-width: 1;
+  fill: #fff;
+  opacity: 1;
+}
+
+.nodeLabel{
+	font-size: 8pt;
+    font-family: Helvetica, sans-serif;
+    font-weight: 100;
+    text-anchor: middle;
+}
+.nodeLabelLink{
+    stroke: #ddd;
+    stroke-width: 1px;
+    stroke-dasharray: 3,3;
+}
+
+
+
+/* HTML */
+
+
+#headDiv{
+
+}
+
+#legendDiv{
+}
+

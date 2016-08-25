@@ -1,0 +1,18 @@
+{
+    "version": "1.5.0-alpha",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "out": "./bookmarkbrowser.js",
+        "watch": true
+    },
+    "files": [
+        "./bookmarkbrowser.ts"
+    ]
+}

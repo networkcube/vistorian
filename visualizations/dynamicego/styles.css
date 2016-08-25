@@ -1,0 +1,51 @@
+/*TIME*/
+
+.timeLabel{
+	font-family: 'Helvetiva Neue', sans-serif;	
+	font-size: 8pt;
+}
+
+/*NODES*/
+
+.nodeLabel{
+	font-family: 'Helvetiva Neue', sans-serif;	
+	font-size: 8pt;
+    text-anchor: end;
+}
+
+.egolabel{
+	fill: #000;
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+.rowBar{
+    stroke-width: 1;
+    z-index: 100;
+}
+
+.rowBar-even{
+    fill:#f2f2f2;
+}
+.rowBar-odd{
+    fill: none;
+}
+
+/*LINKS*/
+
+.arc{
+	fill:none;		
+	stroke:#000;
+	stroke-width:1;
+    opacity: .5;
+	marker-end: url(#end-arrow);
+}
+
+.linkAnchor{
+    stroke:none;
+}
+
+
+
+
+

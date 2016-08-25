@@ -1,0 +1,16 @@
+tr{
+    vertical-align: top;
+}
+
+
+.layoutLeft{
+    width: 300px;
+}
+
+
+.nodeLabel{
+    font-family: 'Helvetica', sans-serif;
+    font-weight: 100;
+    cursor:pointer;
+}
+

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../../styles.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="lib/three.js"></script>
+    <script src="lib/numeric-1.2.6.min.js"></script>
+    <script src="../../../networkcube/core/lib/jquery.js"></script>
+    <script src="../../../networkcube/core/networkcube.js"></script>
+    <script src="fonts/helvetiker_bold.typeface.js"></script>
+    <script src="fonts/helvetiker_regular.typeface.js"></script>
+    <script src="../utils/animations.js"></script>
+    <script src="../widgets/widgets.js"></script>
+</head>
+<title></title>
+
+<body>
+    <div>
+        Zoom:
+        <input id="rowHeightInput" type="range" name="cellSizeBox" min="3" max="50" onchange="updateRowHeight()" value="20" />
+    </div>
+    <div id="timelineDiv">
+    </div>
+    <div id="visDiv">
+        <svg id="visSvg">
+            <foreignObject id="visCanvasFO">
+            </foreignObject>
+        </svg>
+    </div>
+    </div>
+    <script type="x-shader/x-vertex" id="vertexshader">
+        attribute vec3 customColor; attribute float alpha; varying vec3 vColor; void main() { vColor = customColor; gl_Position =
+        projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        varying vec3 vColor; void main() { gl_FragColor = vec4( vColor, 1); // gl_FragColor = vec4( vColor, 1); }
+    </script>
+    <script src="linkwave.js"></script>
+</body>
+
+</html>
