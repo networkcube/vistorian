@@ -11938,7 +11938,7 @@ var networkcube;
             return;
         }
         $.get(url, function (linkData) {
-            linkData = linkData.split('\n');
+            var linkData = Papa.parse(linkData, {}).data;
             var nodeTable = [];
             var names = [];
             var nodeTimes = [];
@@ -11947,19 +11947,24 @@ var networkcube;
             var id_source;
             var id_target;
             var name;
+            var linkTable = [];
+            var newLinkSchema = new networkcube.LinkSchema(0, 1, 2);
+            var colCount = 3;
+            for (var prop in linkSchema) {
+                if (prop != 'source' && prop != 'target')
+                    newLinkSchema[prop] = colCount++;
+            }
             linkData.shift();
+            var linkRow;
             for (var i = 0; i < linkData.length; i++) {
                 if (linkData[i].length == 0) {
-                    linkData.splice(i, 1);
-                    i--;
                     continue;
                 }
-                linkData[i] = linkData[i].split(delimiter);
-                if (linkData[i].length == 0) {
-                    linkData.splice(i, 1);
-                    i--;
-                    continue;
-                }
+                linkRow = new Array(colCount);
+                if (linkSchema.id == undefined)
+                    linkRow[0] = linkTable.length;
+                else
+                    linkRow[0] = linkData[i][linkSchema.id];
                 for (var j = 0; j < linkData[i].length; j++) {
                     linkData[i][j] = linkData[i][j].trim();
                 }
@@ -11973,26 +11978,25 @@ var networkcube;
                     names.push(name);
                 }
                 id_target = names.indexOf(name);
-                linkData[i][linkSchema.source] = id_source;
-                linkData[i][linkSchema.target] = id_target;
+                linkRow[newLinkSchema.source] = id_source;
+                linkRow[newLinkSchema.target] = id_target;
                 if (linkSchema.time != undefined) {
-                    linkData[i][linkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat());
+                    linkRow[newLinkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat());
                 }
-                if (linkSchema.id == undefined) {
-                    linkData[i].push(i);
+                for (var prop in linkSchema) {
+                    if (prop != 'source' && prop != 'target' && prop != 'time') {
+                        linkRow[prop] = linkData[i][prop];
+                    }
                 }
-            }
-            if (linkSchema.id == undefined) {
-                linkSchema.id = linkData[0].length - 1;
+                linkTable.push(linkRow);
             }
             for (var i = 0; i < names.length; i++) {
                 nodeTable.push([i, names[i]]);
             }
-            console.log('URL>>', url);
             var dataSet = new networkcube.DataSet({
                 nodeTable: nodeTable,
-                linkTable: linkData,
-                linkSchema: linkSchema,
+                linkTable: linkTable,
+                linkSchema: newLinkSchema,
                 nodeSchema: nodeSchema,
                 name: url
             });
@@ -13617,7 +13621,8 @@ var glutils;
             config.color = '#000000';
         mesh['text'] = text;
         var backgroundMargin = 10;
-        var canvas = document.createElement("canvas");
+        var txtCanvas = document.createElement("canvas");
+        var context = txtCanvas.getContext("2d");
         var SIZE = 30;
         context.font = SIZE + "pt Helvetica";
         var WIDTH = context.measureText(text).width;
