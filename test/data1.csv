@@ -1,43 +1,19 @@
-Nom1,Lieu,Qualification,Nom2,Lieux,Autres lieux,Etude Notaire,Cote ADLA,Nature acte,Date
-Hubert Antheaume,"St Nicolas, Nantes",Friends ,"Jacques Yvon, sr des Landes","Léogane, Ile St Domingue",,Delalande,4/2E/624,société,03/08/1973
-Marie Boucher,"St Nicolas, Nantes",Friends ,Hubert Antheaume,"St Nicolas, Nantes",,Delalande,4/2E/626,procompte,06/08/1975
-Marie Boucher,"St Nicolas, Nantes",Family,Hubert Antheaume,"St Nicolas, Nantes",,Delalande,4/2E/626,procompte,06/08/1975
-Marie Boucher,"St Nicolas, Nantes",Family,Roze Boucher,"St Nicolas, Nantes",,Delalande,4/2E/626,Quittance,15/09/1971
-Marie Boucher,Paris,Friends ,Roze Boucher,"St Nicolas, Nantes",,Delalande,4/2E/626,Quittance,15/09/1971
-Marie Boucher,Paris,Friends ,Hubert Antheaume,Paris,,Delalande,4/2E/626,Quittance,15/09/1971
-? Vallet,Ile St Domingue,Work,? Bec de Fort,,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Friends,Joseph Labelle,"Léogane, Ile St Domingue",,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Family,? Vallet,Ile Guadeloupe,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Family,Joseph Vallet,Brest,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Friends,Jean Michel,,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Friends,Jacques Allain,,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Friends,Hubert Antheaume,"St Nicolas, Nantes",La Rochelle,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Work ,Guillaume Gray le jeune,,,Delalande,4/2E/627,Déclaration,01/01/1976
-? Vallet,Ile St Domingue,Work ,Madeleine Gassau,La Rochelle,,Delalande,4/2E/627,Déclaration,01/01/1976
-Madeleine Gassau,"St Nicolas, Nantes",Family,Renexent Vanarsen,"St Nicolas, Nantes",,Delalande,4/2E/627,Déclaration,01/01/1976
-Renée Maheur,St Eustache Paris,Work,Marie Paulet,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Renée Maheur,St Eustache Paris,Friends,Isabelle Maheu,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Renée Maheur,St Eustache Paris,Family,Isabelle Maheu,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie Paulet,St Eustache Paris,Family,Marie-Anne de Lamarche,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Renée Maheur,St Eustache Paris,Friends,Hubert Antheaume,Ile St Domingue,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie Paulet,St Eustache Paris,Friends,Marie-Anne de Lamarche,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie Paulet,St Eustache Paris,Friends,Hubert Antheaume,Ile St Domingue,,Delalande,4/2E/627,Procuration,12/06/1976
-Isabelle Maheu,St Eustache Paris,Work,Hubert Antheaume,Ile St Domingue,,Delalande,4/2E/627,Procuration,12/06/1976
-Isabelle Maheu,St Eustache Paris,Family,Georges Maheu,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Renée Maheur,St Eustache Paris,Family,Georges Maheu,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie-Anne de Lamarche,St Eustache Paris,Work,Hubert Antheaume,Ile St Domingue,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie-Anne de Lamarche,St Eustache Paris,Family,Pierre de Lamarche,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Pierre de Lamarche,St Eustache Paris,Family,Marie Paulet,St Eustache Paris,,Delalande,4/2E/627,Procuration,12/06/1976
-Marie-Anne de Lamarche,St Eustache Paris,Work,Michel Villette,"St Nicolas, Nantes",,Delalande,4/2E/627,Engagement,31/07/1976
-Marie-Anne de Lamarche,St Eustache Paris,Family,Pierre de Lamarche,St Eustache Paris,,Delalande,4/2E/627,Engagement,31/07/1976
-Pierre de Lamarche,St Eustache Paris,Family,Marie Paulet,St Eustache Paris,,Delalande,4/2E/627,Engagement,31/07/1976
-Marie Paulet,St Eustache Paris,Family,Marie-Anne de Lamarche,St Eustache Paris,,Delalande,4/2E/627,Engagement,31/07/1976
-Michel Villette,"St Nicolas, Nantes",Friends ,Hubert Antheaume,"St Nicolas, Nantes",,Delalande,4/2E/627,Engagement,31/07/1976
-Hubert Antheaume,"St Nicolas, Nantes",Friends ,"Jacques Yvon, sr des Landes","Léogane, Ile St Domingue",,Delalande,4/2E/627,Engagement,31/07/1976
-Marie-Anne de Lamarche,"St Eustache, Paris",Work,"Jacques Yvon, sr des Landes","Léogane, Ile St Domingue",,Delalande,4/2E/627,Engagement,31/07/1976
-Robert Bussiere,Orléans,Friends ,Christophe Provost,Orléans,,Delalande,4/2E/627,Déclaration,18/09/1976
-Christophe Provost,Orléans,Friends ,Hubert Antheaume,"St Nicolas, Nantes",,Delalande,4/2E/627,Déclaration,18/09/1976
-Robert Bussière,Orléans,Friends ,Hubert Antheaume,"St Nicolas, Nantes",,Delalande,4/2E/627,Déclaration,18/09/1976
-Robert Bussière,Orléans,Friends ,Paul Bonneau,Orléans,,Delalande,4/2E/627,Déclaration,18/09/1976
-Christophe Provost,Orléans,Friends ,Paul Bonneau,Orléans,,Delalande,4/2E/627,Déclaration,18/09/1976
-Hubert Antheaume,"St Nicolas, Nantes",Friends ,Michel Villette,"St Nicolas, Nantes","Ile St Domingue, Ile St Christophe, Ile de la Martinique, Ile de la Guadeloupe",Delalande,4/2E/627,société,03/12/1976
+SOURCE, TARGET, LINKTYPE, DATE
+A, B, 1, 1957
+A, G, 2, 1957
+B, D, 1, 1958
+B, E, 2, 1959
+B, F, 3, 1959
+B, G, 3, 1959
+B, H, 3, 1959
+C, A, 4, 1957
+C, F, 4, 1958
+C, H, 4, 1957
+D, B, 1, 1956
+D, G, 3, 1957
+D, G, 2, 1956
+E, D, 1, 1957
+F, B, 4, 1957
+F, B, 2, 1958
+G, H, 2, 1959
+H, F, 1, 1959

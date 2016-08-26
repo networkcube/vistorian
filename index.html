@@ -5,13 +5,21 @@
     <meta charset="utf-8" content="X-Content-Type-Options=nosniff"/>
     <title>networkcube</title>
     <link rel="stylesheet" href="styles.css" type="text/css" />
-    <script src="/core/networkcube.js"></script>
+    <script src="core/networkcube.js"></script>
 </head>
 <body>
     <div id="main" height="100%">
     
       <h1>Networkcube</h1>
-      
+        <p>A light visualization platform for multivariate-dynamic networks</p>
+        <p>Find the code, wiki, and contact information online:
+
+        <a href="https://github.com/networkcube/networkcube">https://github.com/networkcube/
+        networkcube</a>
+        </p>
+
+        <h2>Demo</h2>
+
     		<p>Click on one of the buttons to show a the visualization for the test data set.</p>
     		<input type="button" value="Nodelink" onclick="loadNodelink()"/>
     		<input type="button" value="Matrix" onclick="loadMatrix()"/>
@@ -38,25 +46,25 @@
    	var SESSION = 'ncube-test'
    	var testData
 
-   	networkcube.loadLinkTable('data1.csv', 
+   	networkcube.loadLinkTable('test/data1.csv', 
    		function(data){
    			// import data
    			networkcube.importData(SESSION, data)
    			testData = data;
-   		}, {source:0, target:3, linkType:2, time:9}, ',', 'DD/MM/YYYY')
+   		}, {source:0, target:1, linkType:2, time:3}, ',', 'YYYY')
   
 
    	function loadNodelink(){
 	   	// create tab
-		networkcube.openVisualizationTab(SESSION, '../visualizations/nodelink', testData.name)
+		networkcube.openVisualizationTab(SESSION, 'visualizations/nodelink', testData.name)
    	}
    	function loadMatrix(){
 	   	// create tab
-		networkcube.openVisualizationTab(SESSION, '../visualizations/matrix', testData.name)
+		networkcube.openVisualizationTab(SESSION, 'visualizations/matrix', testData.name)
    	}
    	function loadDynamicEgo(){
 	   	// create tab
-		networkcube.openVisualizationTab(SESSION, '../visualizations/dynamicego', testData.name)
+		networkcube.openVisualizationTab(SESSION, 'visualizations/dynamicego', testData.name)
    	}
 
 
