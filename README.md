@@ -22,6 +22,11 @@ Networkcube has been used in the following projects:
 * Vistorian (http://vistorian.net): A visualization platform for the social network visualization.
 * ConnectoScope: A visualization platform for brain connectivity in neuroscience
 
+## Using Networkcube in your projects
+
+`<script src="https://networkcube.github.io/networkcube/core/networkcube.js"/>`
+
+
 ## Components
 
 The Networkcube framework conists of the following components and features: 
