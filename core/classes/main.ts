@@ -3,14 +3,9 @@
 /// <reference path="./utils.ts" />
 /// <reference path="../scripts/jquery.d.ts" />
 
-/**
- * That's the main interface the programmer with the function he requires
- * to create a visualization.
- * TODO: hide the rest of network cube's functionality in classes:
- * - messanger
- * - utils
- */
-
+/** A collection of Networkcube's  global function availeble
+ * through networkcube.myFunc()
+ * */
 module networkcube {
 
     // must agree with var of same name in DynamicGraph.initDynamicGraph()
@@ -40,7 +35,6 @@ module networkcube {
     }
  
     // DATA
-
     /**
      * Imports a data set into network cube.
      * @param  {string}  session [description]
