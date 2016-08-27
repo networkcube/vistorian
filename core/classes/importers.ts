@@ -61,6 +61,7 @@ module networkcube{
 
             $.get(url, (linkData)=>{
                 var linkData = Papa.parse(linkData, {}).data;
+              console.log(linkData);
 
                 // get references to tables
                 var nodeTable: any[] = [];
@@ -90,7 +91,7 @@ module networkcube{
                 
                 var linkRow;
                 for (var i = 0; i < linkData.length; i++) {
-                    if(linkData[i].length == 0){
+                    if(linkData[i].length == 0 || linkData[i][0].length == 0){
                         continue;
                     }
                     linkRow = new Array(colCount)
@@ -123,16 +124,22 @@ module networkcube{
                     linkRow[newLinkSchema.source] = id_source
                     linkRow[newLinkSchema.target] = id_target
 
+                    // format weight
+                    if(linkSchema.weight != undefined){
+                        linkRow[newLinkSchema.weight] = Number(linkData[i][linkSchema.weight]);
+                    }
                     // format time
                     if(linkSchema.time != undefined){
                         linkRow[newLinkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat())
                     }
                     // copy remaining attributes (linkType, weight, etc..)
                     for(var prop in linkSchema){
-                        if(prop != 'source' && prop != 'target' && prop != 'time'){
-                            linkRow[prop] = linkData[i][prop];
+                        if(prop != 'source' && prop != 'target' && prop != 'time' && prop != 'weight' ){
+                          linkRow[newLinkSchema[prop]] = linkData[i][linkSchema[prop]];
                         }
                     }
+                    console.log('=P =P ', linkSchema);
+                    console.log('=P =P ', linkRow);
                     linkTable.push(linkRow)
                 }                
                 
