@@ -46,12 +46,12 @@
    	var SESSION = 'ncube-test'
    	var testData
 
-   	networkcube.loadLinkTable('test/data1.csv', 
+   	networkcube.loadLinkTable('test/data1_weight.csv', 
    		function(data){
    			// import data
    			networkcube.importData(SESSION, data)
    			testData = data;
-   		}, {source:0, target:1, linkType:2, time:3}, ',', 'YYYY')
+   		}, {source:0, target:1, linkType:2, time:3, weight:4}, ',', 'YYYY')
   
 
    	function loadNodelink(){
