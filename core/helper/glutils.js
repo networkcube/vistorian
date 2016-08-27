@@ -1,567 +1,583 @@
 var glutils;
 (function (glutils) {
-    var circleVertexShader = '\
-        <script type="x-shader/x-vertex" id="vertexshader">\
-            attribute vec3 customColor;\
-            attribute vec3 customPosition;\
-            varying vec3 vColor;\
-            void main() {\
-                vColor = customColor;\
-                gl_Position = customPosition;;
-})(glutils || (glutils = {}));
-/script>';
-var circleFragmentShader = '\
-        <script type="x-shader/x-fragment" id="fragmentshader">\
-            varying vec3 vColor;\
-            void main() {\
-                gl_FragColor = vec4( vColor, 1);\
-            }\
-        </script>';
-var circleShaderAttributes = {
-    customColor: { type: 'c', value: [] },
-    customPosition: { type: 'p', value: [] }
-};
-var circleShaderMaterial = new THREE.ShaderMaterial({
-    attributes: circleShaderAttributes,
-    vertexShader: circleVertexShader,
-    fragmentShader: circleFragmentShader,
-    blending: THREE.NormalBlending,
-    depthTest: true,
-    transparent: true,
-    side: THREE.DoubleSide,
-    linewidth: 1
-});
-function makeAlphaBuffer(array, stretch) {
-    var buffer = new Float32Array(array.length * stretch);
-    for (var i = 0; i < array.length; i++) {
-        for (var j = 0; j < stretch; j++) {
-            buffer[i * stretch + j] = array[i];
+    function makeAlphaBuffer(array, stretch) {
+        var buffer = new Float32Array(array.length * stretch);
+        for (var i = 0; i < array.length; i++) {
+            for (var j = 0; j < stretch; j++) {
+                buffer[i * stretch + j] = array[i];
+            }
+        }
+        return buffer;
+    }
+    glutils.makeAlphaBuffer = makeAlphaBuffer;
+    function addBufferedHatchedRect(vertexArray, x, y, z, width, height, colorArray, c) {
+        var HATCH_NUM = 3;
+        var LINE_WIDTH = 1;
+        var hatchWidth = width / HATCH_NUM;
+        width = width / 2;
+        height = height / 2;
+        var startX = x + width;
+        var startY = y - height;
+        for (var i = 1; i <= HATCH_NUM; i++) {
+            vertexArray.push([startX - hatchWidth * i, startY, z], [startX - hatchWidth * i + LINE_WIDTH, startY, z], [startX, startY + hatchWidth * i + LINE_WIDTH, z], [startX, startY + hatchWidth * i + LINE_WIDTH, z], [startX, startY + hatchWidth * i, z], [startX - hatchWidth * i, startY, z]);
+            colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
         }
     }
-    return buffer;
-}
-exports.makeAlphaBuffer = makeAlphaBuffer;
-function addBufferedHatchedRect(vertexArray, x, y, z, width, height, colorArray, c) {
-    var HATCH_NUM = 3;
-    var LINE_WIDTH = 1;
-    var hatchWidth = width / HATCH_NUM;
-    width = width / 2;
-    height = height / 2;
-    var startX = x + width;
-    var startY = y - height;
-    for (var i = 1; i <= HATCH_NUM; i++) {
-        vertexArray.push([startX - hatchWidth * i, startY, z], [startX - hatchWidth * i + LINE_WIDTH, startY, z], [startX, startY + hatchWidth * i + LINE_WIDTH, z], [startX, startY + hatchWidth * i + LINE_WIDTH, z], [startX, startY + hatchWidth * i, z], [startX - hatchWidth * i, startY, z]);
+    glutils.addBufferedHatchedRect = addBufferedHatchedRect;
+    function addBufferedRect(vertexArray, x, y, z, width, height, colorArray, c) {
+        width = width / 2;
+        height = height / 2;
+        vertexArray.push([x - width, y - height, z], [x + width, y - height, z], [x + width, y + height, z], [x + width, y + height, z], [x - width, y + height, z], [x - width, y - height, z]);
         colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
     }
-}
-exports.addBufferedHatchedRect = addBufferedHatchedRect;
-function addBufferedRect(vertexArray, x, y, z, width, height, colorArray, c) {
-    width = width / 2;
-    height = height / 2;
-    vertexArray.push([x - width, y - height, z], [x + width, y - height, z], [x + width, y + height, z], [x + width, y + height, z], [x - width, y + height, z], [x - width, y - height, z]);
-    colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
-}
-exports.addBufferedRect = addBufferedRect;
-function addBufferedDiamond(vertexArray, x, y, z, width, height, colorArray, c) {
-    width = width / 2;
-    height = height / 2;
-    vertexArray.push([x - width, y, z], [x, y - height, z], [x + width, y, z], [x + width, y, z], [x, y + height, z], [x - width, y, z]);
-    colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
-}
-exports.addBufferedDiamond = addBufferedDiamond;
-function createRectFrame(w, h, color, lineThickness) {
-    w = w / 2;
-    h = h / 2;
-    var geom = new THREE.Geometry();
-    geom.vertices = [
-        new THREE.Vector3(-w, -h, 0),
-        new THREE.Vector3(-w, h, 0),
-        new THREE.Vector3(w, h, 0),
-        new THREE.Vector3(w, -h, 0),
-        new THREE.Vector3(-w, -h, 0)
-    ];
-    var material = new THREE.LineBasicMaterial({
-        color: color,
-        linewidth: lineThickness,
-    });
-    return new THREE.Line(geom, material);
-}
-exports.createRectFrame = createRectFrame;
-function createDiagonalCross(w, h, color, lineThickness) {
-    w = w / 2;
-    h = h / 2;
-    var geom = new THREE.Geometry();
-    geom.vertices = [
-        new THREE.Vector3(-w, -h, 0),
-        new THREE.Vector3(-w, h, 0),
-        new THREE.Vector3(w, h, 0),
-        new THREE.Vector3(w, -h, 0),
-        new THREE.Vector3(-w, -h, 0),
-        new THREE.Vector3(w, h, 0),
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(-w, h, 0),
-        new THREE.Vector3(w, -h, 0)
-    ];
-    var material = new THREE.LineBasicMaterial({
-        color: color,
-        linewidth: lineThickness,
-    });
-    return new THREE.Line(geom, material);
-}
-exports.createDiagonalCross = createDiagonalCross;
-function makeBuffer3f(array) {
-    var buffer = new Float32Array(array.length * 3);
-    for (var i = 0; i < array.length; i++) {
-        buffer[i * 3 + 0] = array[i][0];
-        buffer[i * 3 + 1] = array[i][1];
-        buffer[i * 3 + 2] = array[i][2];
+    glutils.addBufferedRect = addBufferedRect;
+    function addBufferedDiamond(vertexArray, x, y, z, width, height, colorArray, c) {
+        width = width / 2;
+        height = height / 2;
+        vertexArray.push([x - width, y, z], [x, y - height, z], [x + width, y, z], [x + width, y, z], [x, y + height, z], [x - width, y, z]);
+        colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
     }
-    return buffer;
-}
-exports.makeBuffer3f = makeBuffer3f;
-function makeBuffer4f(array) {
-    var buffer = new Float32Array(array.length * 4);
-    for (var i = 0; i < array.length; i++) {
-        buffer[i * 4 + 0] = array[i][0];
-        buffer[i * 4 + 1] = array[i][1];
-        buffer[i * 4 + 2] = array[i][2];
-        buffer[i * 4 + 3] = array[i][3];
+    glutils.addBufferedDiamond = addBufferedDiamond;
+    function createRectFrame(w, h, color, lineThickness) {
+        w = w / 2;
+        h = h / 2;
+        var geom = new THREE.Geometry();
+        geom.vertices = [
+            new THREE.Vector3(-w, -h, 0),
+            new THREE.Vector3(-w, h, 0),
+            new THREE.Vector3(w, h, 0),
+            new THREE.Vector3(w, -h, 0),
+            new THREE.Vector3(-w, -h, 0)
+        ];
+        var material = new THREE.LineBasicMaterial({
+            color: color,
+            linewidth: lineThickness,
+        });
+        return new THREE.Line(geom, material);
     }
-    return buffer;
-}
-exports.makeBuffer4f = makeBuffer4f;
-function updateBuffer(buffer, array, size) {
-    for (var i = 0; i < array.length; i++) {
-        for (var j = 0; j < size; j++) {
-            buffer[i * size + j] = array[i][j];
+    glutils.createRectFrame = createRectFrame;
+    function createDiagonalCross(w, h, color, lineThickness) {
+        w = w / 2;
+        h = h / 2;
+        var geom = new THREE.Geometry();
+        geom.vertices = [
+            new THREE.Vector3(-w, -h, 0),
+            new THREE.Vector3(-w, h, 0),
+            new THREE.Vector3(w, h, 0),
+            new THREE.Vector3(w, -h, 0),
+            new THREE.Vector3(-w, -h, 0),
+            new THREE.Vector3(w, h, 0),
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(-w, h, 0),
+            new THREE.Vector3(w, -h, 0)
+        ];
+        var material = new THREE.LineBasicMaterial({
+            color: color,
+            linewidth: lineThickness,
+        });
+        return new THREE.Line(geom, material);
+    }
+    glutils.createDiagonalCross = createDiagonalCross;
+    function makeBuffer3f(array) {
+        var buffer = new Float32Array(array.length * 3);
+        for (var i = 0; i < array.length; i++) {
+            buffer[i * 3 + 0] = array[i][0];
+            buffer[i * 3 + 1] = array[i][1];
+            buffer[i * 3 + 2] = array[i][2];
         }
+        return buffer;
     }
-}
-exports.updateBuffer = updateBuffer;
-function createText(string, x, y, z, size, color, weight, align) {
-    if (weight === void 0) { weight = 'normal'; }
-    if (align === void 0) { align = 'left'; }
-    var textGeom = new THREE.TextGeometry(string, {
-        size: size,
-        height: 1,
-        weight: weight,
-        curveSegments: 1,
-        font: 'helvetiker'
-    });
-    var textMaterial = new THREE.MeshBasicMaterial({ color: color });
-    var label = new THREE.Mesh(textGeom, textMaterial);
-    if (align == 'right') {
-        label.geometry.computeBoundingBox();
-        var bounds = label.geometry.boundingBox;
-        x -= bounds.max.x - bounds.min.x;
+    glutils.makeBuffer3f = makeBuffer3f;
+    function makeBuffer4f(array) {
+        var buffer = new Float32Array(array.length * 4);
+        for (var i = 0; i < array.length; i++) {
+            buffer[i * 4 + 0] = array[i][0];
+            buffer[i * 4 + 1] = array[i][1];
+            buffer[i * 4 + 2] = array[i][2];
+            buffer[i * 4 + 3] = array[i][3];
+        }
+        return buffer;
     }
-    label.position.set(x, y, z);
-    return label;
-}
-exports.createText = createText;
-function getMousePos(canvas, x, y) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: x - rect.left,
-        y: y - rect.top
-    };
-}
-exports.getMousePos = getMousePos;
-var WebGL = (function () {
-    function WebGL() {
-    }
-    WebGL.prototype.render = function () {
-        this.renderer.render(this.scene, this.camera);
-    };
-    WebGL.prototype.enableZoom = function (b) {
-        if (b) {
-            window.addEventListener("mousewheel", mouseWheel, false);
-            function mouseWheel(event) {
-                event.preventDefault();
-                webgl.camera.zoom += event.wheelDelta / 1000;
-                webgl.camera.zoom = Math.max(0.1, webgl.camera.zoom);
-                webgl.camera.updateProjectionMatrix();
-                webgl.render();
+    glutils.makeBuffer4f = makeBuffer4f;
+    function updateBuffer(buffer, array, size) {
+        for (var i = 0; i < array.length; i++) {
+            for (var j = 0; j < size; j++) {
+                buffer[i * size + j] = array[i][j];
             }
         }
-        else {
-            window.addEventListener("mousewheel", mouseWheel, false);
-        }
-    };
-    WebGL.prototype.enablePanning = function (b) {
-        this.interactor.isPanEnabled = b;
-    };
-    WebGL.prototype.enableHorizontalPanning = function (b) {
-        this.interactor.isHorizontalPanEnabled = b;
-    };
-    return WebGL;
-})();
-exports.WebGL = WebGL;
-var webgl;
-function initWebGL(parentId, width, height, params) {
-    webgl = new WebGL();
-    webgl.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 1000);
-    webgl.scene = new THREE.Scene();
-    webgl.scene.add(webgl.camera);
-    webgl.camera.position.z = 100;
-    webgl.renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        preserveDrawingBuffer: true
-    });
-    webgl.renderer.setSize(width, height);
-    webgl.renderer.setClearColor(0xffffff, 1);
-    webgl.canvas = webgl.renderer.domElement;
-    $("#" + parentId).append(webgl.canvas);
-    webgl.interactor = new WebGLInteractor(webgl.scene, webgl.canvas, webgl.camera);
-    var light = new THREE.PointLight(0x000000, 1, 100);
-    light.position.set(0, 0, 1000);
-    webgl.scene.add(light);
-    return webgl;
-}
-exports.initWebGL = initWebGL;
-function setWebGL(scene, camera, renderer, canvas) {
-    webgl = new WebGL();
-    webgl.camera = camera;
-    webgl.scene = scene;
-    webgl.renderer = renderer;
-}
-exports.setWebGL = setWebGL;
-function selectAll() {
-    return new glutils.WebGLElementQuery();
-}
-exports.selectAll = selectAll;
-var WebGLElementQuery = (function () {
-    function WebGLElementQuery() {
-        this.dataElements = [];
-        this.visualElements = [];
-        this.children = [];
-        this.x = [];
-        this.y = [];
-        this.z = [];
-        this.scene = webgl.scene;
     }
-    WebGLElementQuery.prototype.data = function (arr) {
-        this.dataElements = arr.slice(0);
-        return this;
-    };
-    WebGLElementQuery.prototype.append = function (shape) {
-        var elements = [];
-        switch (shape) {
-            case 'circle':
-                elements = createCircles(this.dataElements, this.scene);
-                break;
-            case 'path':
-                elements = createPaths(this.dataElements, this.scene);
-                break;
-            case 'line':
-                elements = createLines(this.dataElements, this.scene);
-                break;
-            case 'rect':
-                elements = createRectangles(this.dataElements, this.scene);
-                break;
-            case 'text':
-                elements = createWebGLText(this.dataElements, this.scene);
-                break;
-            case 'polygon':
-                elements = createPolygons(this.dataElements, this.scene);
-                break;
-            default: console.error('Shape', shape, 'does not exist.');
+    glutils.updateBuffer = updateBuffer;
+    function createText(string, x, y, z, size, color, weight, align) {
+        if (weight === void 0) { weight = 'normal'; }
+        if (align === void 0) { align = 'left'; }
+        var textGeom = new THREE.TextGeometry(string, {
+            size: size,
+            height: 1,
+            weight: weight,
+            curveSegments: 1,
+            font: 'helvetiker'
+        });
+        var textMaterial = new THREE.MeshBasicMaterial({ color: color });
+        var label = new THREE.Mesh(textGeom, textMaterial);
+        if (align == 'right') {
+            label.geometry.computeBoundingBox();
+            var bounds = label.geometry.boundingBox;
+            x -= bounds.max.x - bounds.min.x;
         }
-        for (var i = 0; i < elements.length; i++) {
-            this.x.push(0);
-            this.y.push(0);
-            this.z.push(0);
+        label.position.set(x, y, z);
+        return label;
+    }
+    glutils.createText = createText;
+    function getMousePos(canvas, x, y) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: x - rect.left,
+            y: y - rect.top
+        };
+    }
+    glutils.getMousePos = getMousePos;
+    var txtCanvas = document.createElement("canvas");
+    var WebGL = (function () {
+        function WebGL() {
+            txtCanvas = document.createElement("canvas");
+            txtCanvas.setAttribute('id', 'textCanvas');
         }
-        this.shape = shape;
-        this.visualElements = elements;
-        return this;
-    };
-    WebGLElementQuery.prototype.push = function (e) {
-        this.dataElements.push(e);
-        return this;
-    };
-    WebGLElementQuery.prototype.getData = function (i) {
-        return this.dataElements[this.visualElements.indexOf(i)];
-    };
-    WebGLElementQuery.prototype.getVisual = function (i) {
-        return this.visualElements[this.dataElements.indexOf(i)];
-    };
-    Object.defineProperty(WebGLElementQuery.prototype, "length", {
-        get: function () {
-            return this.dataElements.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    WebGLElementQuery.prototype.filter = function (f) {
-        var arr = [];
-        var visArr = [];
-        for (var i = 0; i < this.dataElements.length; i++) {
-            if (f(this.dataElements[i], i)) {
-                arr.push(this.dataElements[i]);
-                visArr.push(this.visualElements[i]);
-            }
-        }
-        var q = new WebGLElementQuery()
-            .data(arr);
-        q.visualElements = visArr;
-        return q;
-    };
-    WebGLElementQuery.prototype.attr = function (name, v) {
-        var l = this.visualElements.length;
-        for (var i = 0; i < l; i++) {
-            this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
-            if (this.visualElements[i].hasOwnProperty('wireframe')) {
-                this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
-            }
-        }
-        return this;
-    };
-    WebGLElementQuery.prototype.style = function (name, v) {
-        var l = this.visualElements.length;
-        for (var i = 0; i < l; i++) {
-            setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
-        }
-        return this;
-    };
-    WebGLElementQuery.prototype.text = function (v) {
-        var l = this.visualElements.length;
-        for (var i = 0; i < l; i++) {
-            setText(this.visualElements[i], v instanceof Function ? v(this.dataElements[i], i) : v);
-        }
-        return this;
-    };
-    WebGLElementQuery.prototype.on = function (event, f) {
-        switch (event) {
-            case 'mouseover':
-                this.mouseOverHandler = f;
-                break;
-            case 'mousemove':
-                this.mouseMoveHandler = f;
-                break;
-            case 'mouseout':
-                this.mouseOutHandler = f;
-                break;
-            case 'mousedown':
-                this.mouseDownHandler = f;
-                break;
-            case 'mouseup':
-                this.mouseUpHandler = f;
-                break;
-            case 'click':
-                this.clickHandler = f;
-                break;
-        }
-        webgl.interactor.register(this, event);
-        return this;
-    };
-    WebGLElementQuery.prototype.call = function (method, dataElement, event) {
-        var i = this.dataElements.indexOf(dataElement);
-        switch (method) {
-            case 'mouseover':
-                this.mouseOverHandler(dataElement, i, event);
-                break;
-            case 'mousemove':
-                this.mouseMoveHandler(dataElement, i, event);
-                break;
-            case 'mouseout':
-                this.mouseOutHandler(dataElement, i, event);
-                break;
-            case 'mousedown':
-                this.mouseDownHandler(dataElement, i, event);
-                break;
-            case 'mouseup':
-                this.mouseUpHandler(dataElement, i, event);
-                break;
-            case 'click':
-                this.clickHandler(dataElement, i, event);
-                break;
-        }
-        return this;
-    };
-    WebGLElementQuery.prototype.setAttr = function (element, attr, v, index) {
-        switch (attr) {
-            case 'x':
-                element.position.x = v;
-                this.x[index] = v;
-                break;
-            case 'y':
-                element.position.y = v;
-                this.y[index] = v;
-                break;
-            case 'z':
-                element.position.z = v;
-                this.z[index] = v;
-                break;
-            case 'x1':
-                setX1(element, v);
-                break;
-            case 'y1':
-                setY1(element, v);
-                break;
-            case 'x2':
-                setX2(element, v);
-                break;
-            case 'y2':
-                setY2(element, v);
-                break;
-            case 'r':
-                element.scale.set(v, v, v);
-                break;
-            case 'width':
-                element.scale.setX(v);
-                break;
-            case 'height':
-                element.scale.setY(v);
-                break;
-            case 'depth':
-                element.scale.setZ(v);
-                break;
-            case 'd':
-                createPath(element, v);
-                break;
-            case 'points':
-                createPolygon(element, v);
-                break;
-            case 'rotation':
-                element.rotation.z = v * Math.PI / 180;
-                break;
-            case 'scaleX':
-                element.scale.x = v;
-                break;
-            case 'scaleY':
-                element.scale.y = v;
-                break;
-            default: console.error('Attribute', attr, 'does not exist.');
-        }
-        element.geometry.verticesNeedUpdate = true;
-        element.geometry.elementsNeedUpdate = true;
-        element.geometry.lineDistancesNeedUpdate = true;
-    };
-    WebGLElementQuery.prototype.removeAll = function () {
-        for (var i = 0; i < this.visualElements.length; i++) {
-            if (this.visualElements[i].wireframe)
-                this.scene.remove(this.visualElements[i].wireframe);
-            this.scene.remove(this.visualElements[i]);
-        }
-    };
-    return WebGLElementQuery;
-})();
-exports.WebGLElementQuery = WebGLElementQuery;
-function setStyle(element, attr, v, query) {
-    switch (attr) {
-        case 'fill':
-            if (query.shape == 'text')
-                setText(element, element['text'], { color: v });
-            else
-                element.material.color = new THREE.Color(v);
-            break;
-        case 'stroke':
-            if (element.hasOwnProperty('wireframe')) {
-                element.wireframe.material.color = new THREE.Color(v);
+        WebGL.prototype.render = function () {
+            this.renderer.render(this.scene, this.camera);
+        };
+        WebGL.prototype.enableZoom = function (b) {
+            if (b) {
+                window.addEventListener("mousewheel", mouseWheel, false);
+                function mouseWheel(event) {
+                    event.preventDefault();
+                    webgl.camera.zoom += event.wheelDelta / 1000;
+                    webgl.camera.zoom = Math.max(0.1, webgl.camera.zoom);
+                    webgl.camera.updateProjectionMatrix();
+                    webgl.render();
+                }
             }
             else {
-                element.material.color = new THREE.Color(v);
+                window.addEventListener("mousewheel", mouseWheel, false);
             }
-            break;
-        case 'opacity':
-            element.material.opacity = v;
-            if (element.hasOwnProperty('wireframe'))
-                element.wireframe.material.opacity = v;
-            break;
-        case 'stroke-width':
-            if (element.hasOwnProperty('wireframe'))
-                element.wireframe.material.linewidth = v;
-            else
-                element.material.linewidth = v;
-            break;
-        case 'font-size':
-            element.scale.x = v / 30;
-            element.scale.y = v / 30;
+        };
+        WebGL.prototype.enablePanning = function (b) {
+            this.interactor.isPanEnabled = b;
+        };
+        WebGL.prototype.enableHorizontalPanning = function (b) {
+            this.interactor.isHorizontalPanEnabled = b;
+        };
+        return WebGL;
+    })();
+    glutils.WebGL = WebGL;
+    var webgl;
+    function initWebGL(parentId, width, height, params) {
+        webgl = new WebGL();
+        webgl.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 1000);
+        webgl.scene = new THREE.Scene();
+        webgl.scene.add(webgl.camera);
+        webgl.camera.position.z = 100;
+        webgl.renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            preserveDrawingBuffer: true
+        });
+        webgl.renderer.setSize(width, height);
+        webgl.renderer.setClearColor(0xffffff, 1);
+        webgl.canvas = webgl.renderer.domElement;
+        $("#" + parentId).append(webgl.canvas);
+        webgl.interactor = new WebGLInteractor(webgl.scene, webgl.canvas, webgl.camera);
+        var light = new THREE.PointLight(0x000000, 1, 100);
+        light.position.set(0, 0, 1000);
+        webgl.scene.add(light);
+        return webgl;
+    }
+    glutils.initWebGL = initWebGL;
+    function setWebGL(scene, camera, renderer, canvas) {
+        webgl = new WebGL();
+        webgl.camera = camera;
+        webgl.scene = scene;
+        webgl.renderer = renderer;
+    }
+    glutils.setWebGL = setWebGL;
+    function selectAll() {
+        return new glutils.WebGLElementQuery();
+    }
+    glutils.selectAll = selectAll;
+    var WebGLElementQuery = (function () {
+        function WebGLElementQuery() {
+            this.dataElements = [];
+            this.visualElements = [];
+            this.children = [];
+            this.x = [];
+            this.y = [];
+            this.z = [];
+            this.IS_SHADER = false;
+            this.scene = webgl.scene;
+        }
+        WebGLElementQuery.prototype.data = function (arr) {
+            this.dataElements = arr.slice(0);
+            return this;
+        };
+        WebGLElementQuery.prototype.append = function (shape) {
+            var elements = [];
+            switch (shape) {
+                case 'circle':
+                    elements = createCircles(this.dataElements, this.scene);
+                    break;
+                case 'path':
+                    elements = createPaths(this.dataElements, this.scene);
+                    break;
+                case 'line':
+                    elements = createLines(this.dataElements, this.scene);
+                    break;
+                case 'rect':
+                    elements = createRectangles(this.dataElements, this.scene);
+                    break;
+                case 'text':
+                    elements = createWebGLText(this.dataElements, this.scene);
+                    break;
+                case 'polygon':
+                    elements = createPolygons(this.dataElements, this.scene);
+                    break;
+                default: console.error('Shape', shape, 'does not exist.');
+            }
+            for (var i = 0; i < elements.length; i++) {
+                this.x.push(0);
+                this.y.push(0);
+                this.z.push(0);
+            }
+            this.shape = shape;
+            this.visualElements = elements;
+            return this;
+        };
+        WebGLElementQuery.prototype.push = function (e) {
+            this.dataElements.push(e);
+            return this;
+        };
+        WebGLElementQuery.prototype.getData = function (i) {
+            return this.dataElements[this.visualElements.indexOf(i)];
+        };
+        WebGLElementQuery.prototype.getVisual = function (i) {
+            return this.visualElements[this.dataElements.indexOf(i)];
+        };
+        Object.defineProperty(WebGLElementQuery.prototype, "length", {
+            get: function () {
+                return this.dataElements.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        WebGLElementQuery.prototype.filter = function (f) {
+            var arr = [];
+            var visArr = [];
+            for (var i = 0; i < this.dataElements.length; i++) {
+                if (f(this.dataElements[i], i)) {
+                    arr.push(this.dataElements[i]);
+                    visArr.push(this.visualElements[i]);
+                }
+            }
+            var q = new WebGLElementQuery()
+                .data(arr);
+            q.visualElements = visArr;
+            return q;
+        };
+        WebGLElementQuery.prototype.attr = function (name, v) {
+            var l = this.visualElements.length;
+            for (var i = 0; i < l; i++) {
+                this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+                if (this.visualElements[i].hasOwnProperty('wireframe')) {
+                    this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+                }
+            }
+            return this;
+        };
+        WebGLElementQuery.prototype.style = function (name, v) {
+            var l = this.visualElements.length;
+            for (var i = 0; i < l; i++) {
+                setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
+            }
+            return this;
+        };
+        WebGLElementQuery.prototype.text = function (v) {
+            var l = this.visualElements.length;
+            for (var i = 0; i < l; i++) {
+                setText(this.visualElements[i], v instanceof Function ? v(this.dataElements[i], i) : v);
+            }
+            return this;
+        };
+        WebGLElementQuery.prototype.on = function (event, f) {
+            switch (event) {
+                case 'mouseover':
+                    this.mouseOverHandler = f;
+                    break;
+                case 'mousemove':
+                    this.mouseMoveHandler = f;
+                    break;
+                case 'mouseout':
+                    this.mouseOutHandler = f;
+                    break;
+                case 'mousedown':
+                    this.mouseDownHandler = f;
+                    break;
+                case 'mouseup':
+                    this.mouseUpHandler = f;
+                    break;
+                case 'click':
+                    this.clickHandler = f;
+                    break;
+            }
+            webgl.interactor.register(this, event);
+            return this;
+        };
+        WebGLElementQuery.prototype.call = function (method, dataElement, event) {
+            var i = this.dataElements.indexOf(dataElement);
+            switch (method) {
+                case 'mouseover':
+                    this.mouseOverHandler(dataElement, i, event);
+                    break;
+                case 'mousemove':
+                    this.mouseMoveHandler(dataElement, i, event);
+                    break;
+                case 'mouseout':
+                    this.mouseOutHandler(dataElement, i, event);
+                    break;
+                case 'mousedown':
+                    this.mouseDownHandler(dataElement, i, event);
+                    break;
+                case 'mouseup':
+                    this.mouseUpHandler(dataElement, i, event);
+                    break;
+                case 'click':
+                    this.clickHandler(dataElement, i, event);
+                    break;
+            }
+            return this;
+        };
+        WebGLElementQuery.prototype.setAttr = function (element, attr, v, index) {
+            switch (attr) {
+                case 'x':
+                    element.position.x = v;
+                    this.x[index] = v;
+                    break;
+                case 'y':
+                    element.position.y = v;
+                    this.y[index] = v;
+                    break;
+                case 'z':
+                    element.position.z = v;
+                    this.z[index] = v;
+                    break;
+                case 'x1':
+                    setX1(element, v);
+                    break;
+                case 'y1':
+                    setY1(element, v);
+                    break;
+                case 'x2':
+                    setX2(element, v);
+                    break;
+                case 'y2':
+                    setY2(element, v);
+                    break;
+                case 'r':
+                    element.scale.set(v, v, v);
+                    break;
+                case 'width':
+                    element.scale.setX(v);
+                    break;
+                case 'height':
+                    element.scale.setY(v);
+                    break;
+                case 'depth':
+                    element.scale.setZ(v);
+                    break;
+                case 'd':
+                    createPath(element, v);
+                    break;
+                case 'points':
+                    createPolygon(element, v);
+                    break;
+                case 'rotation':
+                    element.rotation.z = v * Math.PI / 180;
+                    break;
+                case 'scaleX':
+                    element.scale.x = v;
+                    break;
+                case 'scaleY':
+                    element.scale.y = v;
+                    break;
+                default: console.error('Attribute', attr, 'does not exist.');
+            }
             element.geometry.verticesNeedUpdate = true;
-            break;
-        default: console.error('Style', attr, 'does not exist.');
+            element.geometry.elementsNeedUpdate = true;
+            element.geometry.lineDistancesNeedUpdate = true;
+        };
+        WebGLElementQuery.prototype.removeAll = function () {
+            for (var i = 0; i < this.visualElements.length; i++) {
+                if (this.visualElements[i].wireframe)
+                    this.scene.remove(this.visualElements[i].wireframe);
+                this.scene.remove(this.visualElements[i]);
+            }
+        };
+        return WebGLElementQuery;
+    })();
+    glutils.WebGLElementQuery = WebGLElementQuery;
+    function setStyle(element, attr, v, query) {
+        switch (attr) {
+            case 'fill':
+                if (query.shape == 'text')
+                    setText(element, element['text'], { color: v });
+                else
+                    element.material.color = new THREE.Color(v);
+                break;
+            case 'stroke':
+                if (element.hasOwnProperty('wireframe')) {
+                    element.wireframe.material.color = new THREE.Color(v);
+                }
+                else {
+                    element.material.color = new THREE.Color(v);
+                }
+                break;
+            case 'opacity':
+                element.material.opacity = v;
+                if (element.hasOwnProperty('wireframe'))
+                    element.wireframe.material.opacity = v;
+                break;
+            case 'stroke-width':
+                if (element.hasOwnProperty('wireframe'))
+                    element.wireframe.material.linewidth = v;
+                else
+                    element.material.linewidth = v;
+                break;
+            case 'font-size':
+                element.scale.x = v / 30;
+                element.scale.y = v / 30;
+                element.geometry.verticesNeedUpdate = true;
+                break;
+            default: console.error('Style', attr, 'does not exist.');
+        }
+        element.material.needsUpdate = true;
+        if (element.hasOwnProperty('wireframe'))
+            element.wireframe.material.needsUpdate = true;
     }
-    element.material.needsUpdate = true;
-    if (element.hasOwnProperty('wireframe'))
-        element.wireframe.material.needsUpdate = true;
-}
-var txtCanvas;
-var textCtx;
-function setText(mesh, text, parConfig) {
-    var config = parConfig;
-    if (config == undefined) {
-        config = {};
+    var textCtx;
+    function setText(mesh, text, parConfig) {
+        var config = parConfig;
+        if (config == undefined) {
+            config = {};
+        }
+        if (config.color == undefined)
+            config.color = '#000000';
+        mesh['text'] = text;
+        var backgroundMargin = 10;
+        var txtCanvas = document.createElement("canvas");
+        var context = txtCanvas.getContext("2d");
+        var SIZE = 30;
+        context.font = SIZE + "pt Helvetica";
+        var WIDTH = context.measureText(text).width;
+        txtCanvas.width = WIDTH;
+        txtCanvas.height = SIZE;
+        context.textAlign = "left";
+        context.textBaseline = "middle";
+        context.fillStyle = config.color;
+        context.font = SIZE + "pt Helvetica";
+        context.fillText(text, 0, txtCanvas.height / 2);
+        var tex = new THREE.Texture(txtCanvas);
+        tex.flipY = true;
+        tex.needsUpdate = true;
+        mesh.material.map = tex;
+        mesh.material.transparent = true;
+        mesh.material.needsUpdate = true;
+        mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
+        mesh.geometry.needsUpdate = true;
+        mesh.geometry.verticesNeedUpdate = true;
+        mesh.needsUpdate = true;
     }
-    if (config.color == undefined)
-        config.color = '#000000';
-    mesh['text'] = text;
-    var backgroundMargin = 10;
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d");
-    var SIZE = 30;
-    context.font = SIZE + "pt Helvetica";
-    var WIDTH = context.measureText(text).width;
-    canvas.width = WIDTH;
-    canvas.height = SIZE;
-    context.textAlign = "left";
-    context.textBaseline = "middle";
-    context.fillStyle = config.color;
-    context.font = SIZE + "pt Helvetica";
-    context.fillText(text, 0, canvas.height / 2);
-    var tex = new THREE.Texture(canvas);
-    tex.flipY = true;
-    tex.needsUpdate = true;
-    mesh.material.map = tex;
-    mesh.material.transparent = true;
-    mesh.material.needsUpdate = true;
-    mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
-    mesh.geometry.needsUpdate = true;
-    mesh.geometry.verticesNeedUpdate = true;
-    mesh.needsUpdate = true;
-}
-function setX1(mesh, v) {
-    mesh.geometry.vertices[0].x = v;
-}
-function setY1(mesh, v) {
-    mesh.geometry.vertices[0].y = v;
-}
-function setX2(mesh, v) {
-    mesh.geometry.vertices[1].x = v;
-}
-function setY2(mesh, v) {
-    mesh.geometry.vertices[1].y = v;
-}
-function createG(dataElements, scene) {
-    var visualElements = [];
-    for (var i = 0; i < dataElements.length; i++) {
-        visualElements.push(new GroupElement());
+    function setX1(mesh, v) {
+        mesh.geometry.vertices[0].x = v;
     }
-    return visualElements;
-}
-var GroupElement = (function () {
-    function GroupElement() {
-        this.position = { x: 0, y: 0, z: 0 };
-        this.children = [];
+    function setY1(mesh, v) {
+        mesh.geometry.vertices[0].y = v;
     }
-    return GroupElement;
-})();
+    function setX2(mesh, v) {
+        mesh.geometry.vertices[1].x = v;
+    }
+    function setY2(mesh, v) {
+        mesh.geometry.vertices[1].y = v;
+    }
+    function createG(dataElements, scene) {
+        var visualElements = [];
+        for (var i = 0; i < dataElements.length; i++) {
+            visualElements.push(new GroupElement());
+        }
+        return visualElements;
+    }
+    var GroupElement = (function () {
+        function GroupElement() {
+            this.position = { x: 0, y: 0, z: 0 };
+            this.children = [];
+        }
+        return GroupElement;
+    })();
+    function createCirclesNoShader(dataElements, scene) {
+        var material;
+        var geometry;
+        var visualElements = [];
+        var c;
+        for (var i = 0; i < dataElements.length; i++) {
+            material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true });
+            geometry = new THREE.CircleGeometry(1, 10);
+            geometry.dynamic = true;
+            c = new THREE.Mesh(geometry, material);
+            visualElements.push(c);
+            c.position.set(0, 0, 1);
+            c.scale.set(10, 10, 1);
+            scene.add(c);
+        }
+        return visualElements;
+    }
+    var circleVertexShader = '\
+        uniform vec2 u_resolution;\
+        attribute vec2 a_position;\
+        attribute vec2 a_center;\
+        attribute float a_radius;\
+        \
+        varying vec2 center;\
+        varying vec2 resolution;\
+        varying float radius;\
+        \
+        void main() {\
+            vec2 clipspace = a_position / u_resolution * 2.0 - 1.0;\
+            gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);\
+            \
+            radius = a_radius;\
+            center = a_center;\
+            resolution = u_resolution;\
+        }\
+    ';
+    var circleFragmentShader = '\
+        precision mediump float;\
+        \
+        varying vec2 center;\
+        varying vec2 resolution;\
+        varying float radius;\
+        \
+        void main() {\
+            vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\
+            \
+            float x = gl_FragCoord.x;\
+            float y = resolution[1] - gl_FragCoord.y;\
+            \
+            float dx = center[0] - x;\
+            float dy = center[1] - y;\
+            float distance = sqrt(dx*dx + dy*dy);\
+            \
+            if ( distance < radius )\
+                gl_FragColor = vec4(1.0, 0.5, 0.0, 1.0); \
+            else\   ;
+    gl_FragColor = color0;
+})(glutils || (glutils = {}));
+';
 function createCircles(dataElements, scene) {
-    var material;
-    var geometry;
-    var visualElements = [];
-    var c;
-    for (var i = 0; i < dataElements.length; i++) {
-        material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true });
-        geometry = new THREE.CircleGeometry(1, 10);
-        geometry.dynamic = true;
-        c = new THREE.Mesh(geometry, material);
-        visualElements.push(c);
-        c.position.set(0, 0, 1);
-        c.scale.set(10, 10, 1);
-        scene.add(c);
-    }
-    return visualElements;
 }
 function createRectangles(dataElements, scene) {
     var material;
@@ -582,7 +598,7 @@ function createRectangles(dataElements, scene) {
         scene.add(c);
         geometry = new THREE.Geometry();
         geometry.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, -1, 0), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0));
-        var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 0 }));
+        var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 1 }));
         c['wireframe'] = wireframe;
         wireframe.position.set(0, 0, 1.1);
         scene.add(wireframe);

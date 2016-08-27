@@ -12,7 +12,6 @@ var ROW_HEIGHT = 13;
 var COL_WIDTH = 10;
 var LINK_OPACITY = .2;
 var NODE_OPACITY = .6;
-var TABLE_TOP = 100;
 var LINK_ANCHOR_RADIUS = 3;
 var ANCHOR_END_DIAMETER = 3;
 var ANCHOR_START_DIAMETER = 2;
@@ -23,6 +22,8 @@ var CIRCLE_SEGMENTS = 7;
 var SCROLL_CHUNK = 2;
 var TIME_TICK_GAP_MAX = 12;
 var TIMELABEL_OPACITY = .3;
+var MARGIN_TOP = 70;
+var TABLE_TOP = 50;
 var svg;
 var nodeYPosFunction = d3.scale.linear();
 var timeXFunction = d3.scale.linear();
@@ -34,6 +35,7 @@ var arcs;
 var tickTimes = [];
 var timeLabels;
 var timeLabelHoverFields;
+var egoNode;
 var isShownNoneEgoLinks = true;
 var yearOffset = 0;
 var timeStartId = times[0].id();
@@ -50,17 +52,17 @@ var lineFunction = d3.svg.line()
     .x(function (d) { return d.x; })
     .y(function (d) { return d.y; })
     .interpolate("basis");
-var height = nodes.length * ROW_HEIGHT + 150;
+var HEIGHT = window.innerHeight;
 $('#visDiv').append('<svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg>');
 d3.select('#visCanvasFO')
     .attr('x', TABLE_LEFT)
-    .attr('y', 100)
+    .attr('y', MARGIN_TOP)
     .attr('width', WIDTH)
-    .attr('height', height);
-var webgl = glutils.initWebGL('visCanvasFO', WIDTH, height);
+    .attr('height', HEIGHT);
+var webgl = glutils.initWebGL('visCanvasFO', WIDTH, HEIGHT);
 webgl.enablePanning(false);
 webgl.camera.position.x = WIDTH / 2;
-webgl.camera.position.y = -height / 2;
+webgl.camera.position.y = -HEIGHT / 2;
 webgl.camera.position.z = 1000;
 window.addEventListener("mousewheel", mouseWheelHandler, false);
 $('#menu').append('\
@@ -94,11 +96,8 @@ function createNodes() {
         .enter()
         .append('text')
         .attr('x', TABLE_LEFT)
-        .attr('y', function (d) { return TABLE_TOP + nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT; })
-        .text(function (d) {
-        console.log('text');
-        return d.label() + ' (' + d.neighbors().size() + ')';
-    })
+        .attr('y', function (d) { return MARGIN_TOP + nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT - 5; })
+        .text(function (d) { return d.label() + ' (' + d.neighbors().size() + ')'; })
         .attr('class', 'nodeLabel')
         .style('font-weight', NODE_LABEL_WEIGHT)
         .style('fill', NODE_LABEL_COLOR)
@@ -422,7 +421,7 @@ function updateNodes() {
 function updateNodePositions(duration) {
     d3.selectAll('.nodeLabel')
         .transition().duration(duration)
-        .attr('y', function (d) { return TABLE_TOP + nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT; })
+        .attr('y', function (d) { return MARGIN_TOP + nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT - 5; })
         .style('opacity', function (n) { return currentNodeOrder[n.id()] >= nodesScrollStart ? n == egoNode ? 1 : NODE_OPACITY : 0; });
 }
 function updateLinkPositions() {
@@ -462,12 +461,15 @@ function updateTimes() {
 }
 function mouseWheelHandler(event) {
     event.preventDefault();
-    if (nodesScrollStart >= nodes.length - 1 && event.wheelDelta < 0
-        || nodesScrollStart <= 0 && event.wheelDelta > 0) {
+    if (event.wheelDelta == 0
+        || nodesScrollStart >= nodes.length - 5 && event.wheelDelta < 0
+        || nodesScrollStart == 0 && event.wheelDelta > 0) {
         return;
     }
+    console.log('event.wheelDelta', event.wheelDelta);
     var dir = event.wheelDelta > 0 ? -1 : 1;
     nodesScrollStart += SCROLL_CHUNK * dir;
+    nodesScrollStart = Math.max(0, Math.min(nodes.length - 1, nodesScrollStart));
     nodeYPosFunction.domain([nodesScrollStart, nodes.length - 1])
         .range([TABLE_TOP + ROW_HEIGHT, TABLE_TOP + ROW_HEIGHT * (nodes.length - nodesScrollStart)]);
     rowBars
@@ -530,7 +532,6 @@ function makeArcPath(link) {
     }
     return glutils.curve(points);
 }
-var egoNode;
 function showEgoNetwork(n) {
     if (egoNode == n) {
         egoNode = undefined;

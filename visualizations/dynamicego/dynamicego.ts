@@ -1,7 +1,6 @@
 /// <reference path="../../core/networkcube.d.ts"/>
 /// <reference path="../widgets/widgets.d.ts" />
 
-
 // DATA
 var dgraph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
 networkcube.setDefaultEventListener(updateEventHandler);
@@ -21,7 +20,6 @@ var ROW_HEIGHT = 13;
 var COL_WIDTH = 10;
 var LINK_OPACITY= .2
 var NODE_OPACITY= .6
-var TABLE_TOP = 100;
 var LINK_ANCHOR_RADIUS = 3;
 var ANCHOR_END_DIAMETER = 3;
 var ANCHOR_START_DIAMETER = 2;
@@ -32,6 +30,8 @@ var CIRCLE_SEGMENTS = 7;
 var SCROLL_CHUNK = 2;
 var TIME_TICK_GAP_MAX = 12;
 var TIMELABEL_OPACITY = .3;
+var MARGIN_TOP = 70;
+var TABLE_TOP = 50;
 
 
 
@@ -49,6 +49,7 @@ var arcs:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
 var tickTimes = []
 var timeLabels:glutils.WebGLElementQuery<networkcube.Time,THREE.Mesh>;
 var timeLabelHoverFields;
+var egoNode:networkcube.Node;
 
 // STATES
 var isShownNoneEgoLinks = true;
@@ -74,14 +75,14 @@ var lineFunction = d3.svg.line()
 // UI SETUP
 
 
-var height = nodes.length * ROW_HEIGHT + 150;
+var HEIGHT = window.innerHeight;
 $('#visDiv').append('<svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg>');
 // $('#visCanvasFO').append(canvas);
 d3.select('#visCanvasFO')
     .attr('x', TABLE_LEFT)
-    .attr('y', 100)
+    .attr('y', MARGIN_TOP)
     .attr('width', WIDTH)
-    .attr('height', height)
+    .attr('height', HEIGHT)
     
     
 /////////////
@@ -91,10 +92,10 @@ d3.select('#visCanvasFO')
 // var vertexShaderProgram = "attribute vec4 customColor;varying vec4 vColor;void main() {vColor = customColor;gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );}";
 // var fragmentShaderProgram = "varying vec4 vColor;void main() {gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);}";
 
-var webgl = glutils.initWebGL('visCanvasFO', WIDTH, height);
+var webgl = glutils.initWebGL('visCanvasFO', WIDTH, HEIGHT);
 webgl.enablePanning(false);
 webgl.camera.position.x = WIDTH/2;
-webgl.camera.position.y = -height/2;
+webgl.camera.position.y = -HEIGHT/2;
 webgl.camera.position.z = 1000;
 
 
@@ -152,10 +153,8 @@ function createNodes(){
         .enter()
         .append('text')
             .attr('x', TABLE_LEFT)
-            .attr('y', (d)=>TABLE_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT)
-            .text((d)=>{
-                console.log('text')
-                return d.label() + ' ('+d.neighbors().size()+')';})
+            .attr('y', (d)=>MARGIN_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT-5)
+            .text((d)=>{ return d.label() + ' ('+d.neighbors().size()+')';})
             .attr('class', 'nodeLabel')
             .style('font-weight', NODE_LABEL_WEIGHT)
             .style('fill', NODE_LABEL_COLOR)
@@ -542,7 +541,7 @@ function updateNodes()
 function updateNodePositions(duration:number){
     d3.selectAll('.nodeLabel')
         .transition().duration(duration)
-        .attr('y', (d)=>TABLE_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT)
+        .attr('y', (d)=>MARGIN_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT -5)
         // .style('opacity', (n)=>currentNodeOrder[n.id()]>=nodesScrollStart?1:0)
         .style('opacity', (n)=>currentNodeOrder[n.id()]>=nodesScrollStart?n==egoNode?1:NODE_OPACITY:0)
 
@@ -593,13 +592,18 @@ function updateTimes(){
 function mouseWheelHandler(event){
     event.preventDefault();
 
-    if(nodesScrollStart >= nodes.length-1 && event.wheelDelta < 0
-    || nodesScrollStart <= 0 && event.wheelDelta > 0){
+    if(
+        event.wheelDelta == 0
+    || nodesScrollStart >= nodes.length-5 && event.wheelDelta < 0
+    || nodesScrollStart == 0 && event.wheelDelta > 0){
         return;
     }
+    console.log('event.wheelDelta', event.wheelDelta)
 
     var dir = event.wheelDelta>0?-1:1;
     nodesScrollStart += SCROLL_CHUNK * dir
+    nodesScrollStart = Math.max(0,Math.min(nodes.length-1, nodesScrollStart))
+    
     nodeYPosFunction.domain([nodesScrollStart, nodes.length-1])
         .range([TABLE_TOP+ROW_HEIGHT, TABLE_TOP+ROW_HEIGHT*(nodes.length - nodesScrollStart)])
 
@@ -677,7 +681,6 @@ function makeArcPath(link:networkcube.Link):Object[]{
 }
 
 
-var egoNode;
 function showEgoNetwork(n:networkcube.Node){
     if(egoNode == n){
         egoNode = undefined;
