@@ -61,7 +61,6 @@ module networkcube{
 
             $.get(url, (linkData)=>{
                 var linkData = Papa.parse(linkData, {}).data;
-              console.log(linkData);
 
                 // get references to tables
                 var nodeTable: any[] = [];
@@ -138,8 +137,6 @@ module networkcube{
                           linkRow[newLinkSchema[prop]] = linkData[i][linkSchema[prop]];
                         }
                     }
-                    console.log('=P =P ', linkSchema);
-                    console.log('=P =P ', linkRow);
                     linkTable.push(linkRow)
                 }                
                 
