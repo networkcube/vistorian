@@ -1,3 +1,25 @@
 body{
 	font-family: 'Helvetica Neue', sans-serif;	
 }
+
+h1{
+	font-weight: 200;
+	font-family: 'Comfortaa', 'Helvetica Neue', sans-serif;	
+}
+}
+h2{
+	font-weight: 200;
+}
+
+p{
+	font-weight: 300;
+}
+
+div#main{
+	margin: auto;
+	width: 500px;
+}
+#footer{
+	margin-top: 400px;
+	font-size: 7pt;
+}
