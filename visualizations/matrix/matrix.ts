@@ -89,17 +89,17 @@ var plotMargin = calculatePlotMargin();
 
 // PREPARE MENU
 $('body').append('<div id="networkcube-matrix-menu"></div>');
-$('#menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>')
-$("#menu").append('<br/>');
-$("#menu").append('<label>Label ordering:</label>');
-var orderingMenu = $("#menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>')
+$('#networkcube-matrix-menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>')
+$("#networkcube-matrix-menu").append('<br/>');
+$("#networkcube-matrix-menu").append('<label>Label ordering:</label>');
+var orderingMenu = $("#networkcube-matrix-menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>')
 $('#labelOrdering').append('<option value="none">---</option>');
 $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
 $('#labelOrdering').append('<option value="reverse-alpha">Reverse Alphanumerical</option>');
 $('#labelOrdering').append('<option value="degree">Node degree</option>');
 $('#labelOrdering').append('<option value="similarity">Similarity</option>');
 
-$('#menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
+$('#networkcube-matrix-menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
 
 
 $('#dataName').text(dgraph.name);
@@ -311,7 +311,7 @@ var cellLabel = glutils.selectAll()
         .style('font-size', 12)
 
 $('#networkcube-matrix-visCanvasFO').append(canvas);
-d3.select('#vnetworkcube-matrix-isCanvasFO')
+d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
     .attr('y', plotMargin.top)
     .attr('width', totalWidth + plotMargin.left)
@@ -352,7 +352,7 @@ function updateAll(updateOptions: UpdateOptions): void {
         // bbach: removed since distracting.
         plotMargin = calculatePlotMargin();
         // update the location of the links canvas
-        d3.select('#networkcube-matrix- visCanvasFO')
+        d3.select('#networkcube-matrix-visCanvasFO')
             .attr('x', plotMargin.left)
             .attr('y', plotMargin.top);
     }
