@@ -9,7 +9,7 @@ var NMargin = (function () {
         this.top = v;
     }
     return NMargin;
-})();
+}());
 var vizWidth;
 var vizHeight;
 var urlVars = networkcube.getUrlVars();
@@ -31,17 +31,17 @@ var longestLabelNode = dgraph.nodes().toArray().reduce(function (p, v, i, arr) {
 });
 var labelLength = longestLabelNode ? longestLabelNode.label().length : 8;
 var plotMargin = calculatePlotMargin();
-$('body').append('<div id="menu"></div>');
-$('#menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>');
-$("#menu").append('<br/>');
-$("#menu").append('<label>Label ordering:</label>');
-var orderingMenu = $("#menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>');
+$('body').append('<div id="networkcube-matrix-menu"></div>');
+$('#networkcube-matrix-menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>');
+$("#networkcube-matrix-menu").append('<br/>');
+$("#networkcube-matrix-menu").append('<label>Label ordering:</label>');
+var orderingMenu = $("#networkcube-matrix-menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>');
 $('#labelOrdering').append('<option value="none">---</option>');
 $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
 $('#labelOrdering').append('<option value="reverse-alpha">Reverse Alphanumerical</option>');
 $('#labelOrdering').append('<option value="degree">Node degree</option>');
 $('#labelOrdering').append('<option value="similarity">Similarity</option>');
-$('#menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
+$('#networkcube-matrix-menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
 $('#dataName').text(dgraph.name);
 networkcube.setDefaultEventListener(updateEvent);
 networkcube.addEventListener('timeRange', timeRangeHandler);
@@ -53,8 +53,8 @@ window.addEventListener("mousewheel", function (e) {
         cellsize /= Math.abs(event.wheelDelta / 100);
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
 }, false);
-$('body').append('<div id="timelineDiv"></div>');
-var timeSvg = d3.select('#timelineDiv')
+$('body').append('<div id="networkcube-matrix-timelineDiv"></div>');
+var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
     .append('svg')
     .attr('width', vizWidth)
     .attr('height', 50);
@@ -62,8 +62,8 @@ var timeSlider = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
 var totalWidth = Math.max(Math.max(cellsize * dgraph.nodes().length + 50, window.innerWidth), window.innerHeight);
-$('body').append('<div id="visDiv"><svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg></div>');
-var svg = d3.select('#visSvg')
+$('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
+var svg = d3.select('#networkcube-matrix-visSvg')
     .attr('width', totalWidth + plotMargin.left)
     .attr('height', totalWidth + plotMargin.top);
 nodeOrder = dgraph.nodes().ids();
@@ -129,8 +129,8 @@ var cellLabel = glutils.selectAll()
     .style('opacity', 0)
     .attr('z', 2)
     .style('font-size', 12);
-$('#visCanvasFO').append(canvas);
-d3.select('#visCanvasFO')
+$('#networkcube-matrix-visCanvasFO').append(canvas);
+d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
     .attr('y', plotMargin.top)
     .attr('width', totalWidth + plotMargin.left)
@@ -158,7 +158,7 @@ function calculatePlotMargin() {
 function updateAll(updateOptions) {
     if ((updateOptions & UpdateOptions.PlotLocation) == UpdateOptions.PlotLocation) {
         plotMargin = calculatePlotMargin();
-        d3.select('#visCanvasFO')
+        d3.select('#networkcube-matrix-visCanvasFO')
             .attr('x', plotMargin.left)
             .attr('y', plotMargin.top);
     }

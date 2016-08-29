@@ -1,3 +1,8 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 !function (a, b) { "object" == typeof module && "object" == typeof module.exports ? module.exports = a.document ? b(a, !0) : function (a) { if (!a.document)
     throw new Error("jQuery requires a window with a document"); return b(a); } : b(a); }("undefined" != typeof window ? window : this, function (a, b) {
     var c = [], d = c.slice, e = c.concat, f = c.push, g = c.indexOf, h = {}, i = h.toString, j = h.hasOwnProperty, k = {}, l = "1.11.1", m = function (a, b) { return new m.fn.init(a, b); }, n = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, o = /^-ms-/, p = /-([\da-z])/gi, q = function (a, b) { return b.toUpperCase(); };
@@ -8783,7 +8788,7 @@ var networkcube;
             return (this.width == 0) && (this.height == 0);
         };
         return Box;
-    })();
+    }());
     networkcube.Box = Box;
     function inBox(x, y, box) {
         return (x > box.x1
@@ -8821,7 +8826,7 @@ var networkcube;
             this.locations = [];
         }
         return ElementCompound;
-    })();
+    }());
     networkcube.ElementCompound = ElementCompound;
     var IDCompound = (function () {
         function IDCompound() {
@@ -8832,7 +8837,7 @@ var networkcube;
             this.locationIds = [];
         }
         return IDCompound;
-    })();
+    }());
     networkcube.IDCompound = IDCompound;
     function cloneCompound(compound) {
         var result = new IDCompound();
@@ -8983,11 +8988,6 @@ var networkcube;
     }
     networkcube.formatTimeAtGranularity = formatTimeAtGranularity;
 })(networkcube || (networkcube = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var networkcube;
 (function (networkcube) {
     var BasicElement = (function () {
@@ -9058,7 +9058,7 @@ var networkcube;
             return false;
         };
         return BasicElement;
-    })();
+    }());
     networkcube.BasicElement = BasicElement;
     var Time = (function (_super) {
         __extends(Time, _super);
@@ -9072,7 +9072,7 @@ var networkcube;
             return new LinkQuery(this.attr('links'), this.g);
         };
         return Time;
-    })(BasicElement);
+    }(BasicElement));
     networkcube.Time = Time;
     var Node = (function (_super) {
         __extends(Node, _super);
@@ -9171,7 +9171,7 @@ var networkcube;
             return new LinkQuery(finalLinks, this.g);
         };
         return Node;
-    })(BasicElement);
+    }(BasicElement));
     networkcube.Node = Node;
     var Link = (function (_super) {
         __extends(Link, _super);
@@ -9209,7 +9209,7 @@ var networkcube;
             return new TimeQuery(this.attr('presence'), this.g);
         };
         return Link;
-    })(BasicElement);
+    }(BasicElement));
     networkcube.Link = Link;
     var NodePair = (function (_super) {
         __extends(NodePair, _super);
@@ -9236,7 +9236,7 @@ var networkcube;
             return false;
         };
         return NodePair;
-    })(BasicElement);
+    }(BasicElement));
     networkcube.NodePair = NodePair;
     var Location = (function (_super) {
         __extends(Location, _super);
@@ -9251,7 +9251,7 @@ var networkcube;
         Location.prototype.z = function () { return this.attr('z'); };
         Location.prototype.radius = function () { return this.attr('radius'); };
         return Location;
-    })(BasicElement);
+    }(BasicElement));
     networkcube.Location = Location;
     var ScalarTimeSeries = (function () {
         function ScalarTimeSeries() {
@@ -9298,7 +9298,7 @@ var networkcube;
             return a;
         };
         return ScalarTimeSeries;
-    })();
+    }());
     networkcube.ScalarTimeSeries = ScalarTimeSeries;
     var ArrayTimeSeries = (function () {
         function ArrayTimeSeries() {
@@ -9348,7 +9348,7 @@ var networkcube;
             return a;
         };
         return ArrayTimeSeries;
-    })();
+    }());
     networkcube.ArrayTimeSeries = ArrayTimeSeries;
     var Query = (function () {
         function Query(elements) {
@@ -9415,7 +9415,7 @@ var networkcube;
             return new Query(intersection);
         };
         return Query;
-    })();
+    }());
     networkcube.Query = Query;
     var NumberQuery = (function (_super) {
         __extends(NumberQuery, _super);
@@ -9468,7 +9468,7 @@ var networkcube;
             return this._elements[index];
         };
         return NumberQuery;
-    })(Query);
+    }(Query));
     networkcube.NumberQuery = NumberQuery;
     var StringQuery = (function () {
         function StringQuery(elements) {
@@ -9508,7 +9508,7 @@ var networkcube;
             return this._elements.slice(0);
         };
         return StringQuery;
-    })();
+    }());
     networkcube.StringQuery = StringQuery;
     var GraphElementQuery = (function (_super) {
         __extends(GraphElementQuery, _super);
@@ -9588,7 +9588,7 @@ var networkcube;
             return this;
         };
         return GraphElementQuery;
-    })(Query);
+    }(Query));
     networkcube.GraphElementQuery = GraphElementQuery;
     var NodeQuery = (function (_super) {
         __extends(NodeQuery, _super);
@@ -9681,7 +9681,7 @@ var networkcube;
             return new NodeQuery(this.generic_removeDuplicates()._elements, this.g);
         };
         return NodeQuery;
-    })(GraphElementQuery);
+    }(GraphElementQuery));
     networkcube.NodeQuery = NodeQuery;
     var LinkQuery = (function (_super) {
         __extends(LinkQuery, _super);
@@ -9787,7 +9787,7 @@ var networkcube;
             return new LinkQuery(this.generic_removeDuplicates()._elements, this.g);
         };
         return LinkQuery;
-    })(GraphElementQuery);
+    }(GraphElementQuery));
     networkcube.LinkQuery = LinkQuery;
     var NodePairQuery = (function (_super) {
         __extends(NodePairQuery, _super);
@@ -9857,7 +9857,7 @@ var networkcube;
             return new NodePairQuery(this.generic_removeDuplicates()._elements, this.g);
         };
         return NodePairQuery;
-    })(GraphElementQuery);
+    }(GraphElementQuery));
     networkcube.NodePairQuery = NodePairQuery;
     var TimeQuery = (function (_super) {
         __extends(TimeQuery, _super);
@@ -9939,7 +9939,7 @@ var networkcube;
             return new TimeQuery(this.generic_intersection(q)._elements, this.g);
         };
         return TimeQuery;
-    })(GraphElementQuery);
+    }(GraphElementQuery));
     networkcube.TimeQuery = TimeQuery;
     var LocationQuery = (function (_super) {
         __extends(LocationQuery, _super);
@@ -10009,7 +10009,7 @@ var networkcube;
             return new LocationQuery(this.generic_removeDuplicates()._elements, this.g);
         };
         return LocationQuery;
-    })(GraphElementQuery);
+    }(GraphElementQuery));
     networkcube.LocationQuery = LocationQuery;
     function getBulkAttributes(attrName, ids, type, g, t1, t2) {
         var a = [];
@@ -10048,7 +10048,7 @@ var networkcube;
             console.log('nodes:', this.nodes.length, 'links:', this.links.length);
         };
         return Motif;
-    })();
+    }());
     networkcube.Motif = Motif;
     var MotifTemplate = (function () {
         function MotifTemplate(nodes, links) {
@@ -10058,7 +10058,7 @@ var networkcube;
             this.links = links.slice(0);
         }
         return MotifTemplate;
-    })();
+    }());
     networkcube.MotifTemplate = MotifTemplate;
     var MotifSequence = (function () {
         function MotifSequence() {
@@ -10068,7 +10068,7 @@ var networkcube;
             this.motifs.push(m);
         };
         return MotifSequence;
-    })();
+    }());
     networkcube.MotifSequence = MotifSequence;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -11178,7 +11178,7 @@ var networkcube;
         DynamicGraph.prototype.getMinGranularity = function () { return this.gran_min; };
         DynamicGraph.prototype.getMaxGranularity = function () { return this.gran_max; };
         return DynamicGraph;
-    })();
+    }());
     networkcube.DynamicGraph = DynamicGraph;
     var Selection = (function () {
         function Selection(id, acceptedType) {
@@ -11195,7 +11195,7 @@ var networkcube;
             return this.acceptedType == type;
         };
         return Selection;
-    })();
+    }());
     networkcube.Selection = Selection;
     var AttributeArray = (function () {
         function AttributeArray() {
@@ -11209,7 +11209,7 @@ var networkcube;
             configurable: true
         });
         return AttributeArray;
-    })();
+    }());
     networkcube.AttributeArray = AttributeArray;
     var NodeArray = (function (_super) {
         __extends(NodeArray, _super);
@@ -11230,7 +11230,7 @@ var networkcube;
             this.nodeType = [];
         }
         return NodeArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.NodeArray = NodeArray;
     var LinkArray = (function (_super) {
         __extends(LinkArray, _super);
@@ -11248,7 +11248,7 @@ var networkcube;
             this.attributes = new Object;
         }
         return LinkArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.LinkArray = LinkArray;
     var NodePairArray = (function (_super) {
         __extends(NodePairArray, _super);
@@ -11261,7 +11261,7 @@ var networkcube;
             this.filter = [];
         }
         return NodePairArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.NodePairArray = NodePairArray;
     var TimeArray = (function (_super) {
         __extends(TimeArray, _super);
@@ -11275,7 +11275,7 @@ var networkcube;
             this.links = [];
         }
         return TimeArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.TimeArray = TimeArray;
     var LinkTypeArray = (function (_super) {
         __extends(LinkTypeArray, _super);
@@ -11287,7 +11287,7 @@ var networkcube;
             this.filter = [];
         }
         return LinkTypeArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.LinkTypeArray = LinkTypeArray;
     var NodeTypeArray = (function (_super) {
         __extends(NodeTypeArray, _super);
@@ -11299,7 +11299,7 @@ var networkcube;
             this.filter = [];
         }
         return NodeTypeArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.NodeTypeArray = NodeTypeArray;
     var LocationArray = (function (_super) {
         __extends(LocationArray, _super);
@@ -11315,7 +11315,7 @@ var networkcube;
             this.radius = [];
         }
         return LocationArray;
-    })(AttributeArray);
+    }(AttributeArray));
     networkcube.LocationArray = LocationArray;
     var LinkType = (function () {
         function LinkType(id, name, color) {
@@ -11324,7 +11324,7 @@ var networkcube;
             this.color = color;
         }
         return LinkType;
-    })();
+    }());
     networkcube.LinkType = LinkType;
     var NodeType = (function () {
         function NodeType(id, name, color) {
@@ -11333,7 +11333,7 @@ var networkcube;
             this.color = color;
         }
         return NodeType;
-    })();
+    }());
     networkcube.NodeType = NodeType;
     var Ordering = (function () {
         function Ordering(name, order) {
@@ -11342,7 +11342,7 @@ var networkcube;
             this.order = order;
         }
         return Ordering;
-    })();
+    }());
     networkcube.Ordering = Ordering;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -11514,7 +11514,7 @@ var networkcube;
             return true;
         };
         return DataManager;
-    })();
+    }());
     networkcube.DataManager = DataManager;
     function getDefaultNodeSchema() {
         return new NodeSchema(0);
@@ -11552,14 +11552,14 @@ var networkcube;
             console.log('[n3] data set created', this);
         }
         return DataSet;
-    })();
+    }());
     networkcube.DataSet = DataSet;
     var TableSchema = (function () {
         function TableSchema(name) {
             this.name = name;
         }
         return TableSchema;
-    })();
+    }());
     networkcube.TableSchema = TableSchema;
     var NodeSchema = (function (_super) {
         __extends(NodeSchema, _super);
@@ -11568,7 +11568,7 @@ var networkcube;
             this.id = id;
         }
         return NodeSchema;
-    })(TableSchema);
+    }(TableSchema));
     networkcube.NodeSchema = NodeSchema;
     var LinkSchema = (function (_super) {
         __extends(LinkSchema, _super);
@@ -11582,7 +11582,7 @@ var networkcube;
             this.id = id;
         }
         return LinkSchema;
-    })(TableSchema);
+    }(TableSchema));
     networkcube.LinkSchema = LinkSchema;
     var LocationSchema = (function (_super) {
         __extends(LocationSchema, _super);
@@ -11613,7 +11613,7 @@ var networkcube;
                 this.radius = radius;
         }
         return LocationSchema;
-    })(TableSchema);
+    }(TableSchema));
     networkcube.LocationSchema = LocationSchema;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -11957,7 +11957,7 @@ var networkcube;
             linkData.shift();
             var linkRow;
             for (var i = 0; i < linkData.length; i++) {
-                if (linkData[i].length == 0) {
+                if (linkData[i].length == 0 || linkData[i][0].length == 0) {
                     continue;
                 }
                 linkRow = new Array(colCount);
@@ -11980,12 +11980,15 @@ var networkcube;
                 id_target = names.indexOf(name);
                 linkRow[newLinkSchema.source] = id_source;
                 linkRow[newLinkSchema.target] = id_target;
+                if (linkSchema.weight != undefined) {
+                    linkRow[newLinkSchema.weight] = Number(linkData[i][linkSchema.weight]);
+                }
                 if (linkSchema.time != undefined) {
                     linkRow[newLinkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat());
                 }
                 for (var prop in linkSchema) {
-                    if (prop != 'source' && prop != 'target' && prop != 'time') {
-                        linkRow[prop] = linkData[i][prop];
+                    if (prop != 'source' && prop != 'target' && prop != 'time' && prop != 'weight') {
+                        linkRow[newLinkSchema[prop]] = linkData[i][linkSchema[prop]];
                     }
                 }
                 linkTable.push(linkRow);
@@ -12609,7 +12612,7 @@ var networkcube;
             return word.indexOf(this.pattern) > -1;
         };
         return StringContainsFilter;
-    })();
+    }());
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
@@ -12643,7 +12646,7 @@ var networkcube;
         function MessageHandler() {
         }
         return MessageHandler;
-    })();
+    }());
     var messageHandler = new MessageHandler();
     var previousMessageId = -1;
     function addEventListener(messageType, handler) {
@@ -12664,7 +12667,7 @@ var networkcube;
             this.type = type;
         }
         return Message;
-    })();
+    }());
     networkcube.Message = Message;
     function sendMessage(type, body) {
         var m = new Message(type);
@@ -12696,7 +12699,7 @@ var networkcube;
             this.idCompound = idCompound;
         }
         return HighlightMessage;
-    })(Message);
+    }(Message));
     networkcube.HighlightMessage = HighlightMessage;
     function selection(action, compound, selectionId) {
         var g = networkcube.getDynamicGraph();
@@ -12717,7 +12720,7 @@ var networkcube;
             this.selectionId = selectionId;
         }
         return SelectionMessage;
-    })(Message);
+    }(Message));
     networkcube.SelectionMessage = SelectionMessage;
     function timeRange(start, end, single, propagate) {
         var m = new TimeRangeMessage(start, end, single);
@@ -12738,7 +12741,7 @@ var networkcube;
             this.singleId = single.id();
         }
         return TimeRangeMessage;
-    })(Message);
+    }(Message));
     networkcube.TimeRangeMessage = TimeRangeMessage;
     function createSelection(type, name) {
         var g = networkcube.getDynamicGraph();
@@ -12756,7 +12759,7 @@ var networkcube;
             this.selection = b;
         }
         return CreateSelectionMessage;
-    })(Message);
+    }(Message));
     networkcube.CreateSelectionMessage = CreateSelectionMessage;
     function setCurrentSelection(b) {
         var g = networkcube.getDynamicGraph();
@@ -12771,7 +12774,7 @@ var networkcube;
             this.selectionId = b.id;
         }
         return SetCurrentSelectionIdMessage;
-    })(Message);
+    }(Message));
     networkcube.SetCurrentSelectionIdMessage = SetCurrentSelectionIdMessage;
     function showSelectionColor(selection, showColor) {
         var m = new ShowSelectionColorMessage(selection, showColor);
@@ -12786,7 +12789,7 @@ var networkcube;
             this.showColor = showColor;
         }
         return ShowSelectionColorMessage;
-    })(Message);
+    }(Message));
     networkcube.ShowSelectionColorMessage = ShowSelectionColorMessage;
     function filterSelection(selection, filter) {
         var m = new FilterSelectionMessage(selection, filter);
@@ -12801,7 +12804,7 @@ var networkcube;
             this.filter = filter;
         }
         return FilterSelectionMessage;
-    })(Message);
+    }(Message));
     networkcube.FilterSelectionMessage = FilterSelectionMessage;
     function swapPriority(s1, s2) {
         var m = new SelectionPriorityMessage(s1, s2, s2.priority, s1.priority);
@@ -12818,7 +12821,7 @@ var networkcube;
             this.priority2 = p2;
         }
         return SelectionPriorityMessage;
-    })(Message);
+    }(Message));
     networkcube.SelectionPriorityMessage = SelectionPriorityMessage;
     function deleteSelection(selection) {
         var m = new DeleteSelectionMessage(selection);
@@ -12832,7 +12835,7 @@ var networkcube;
             this.selectionId = selection.id;
         }
         return DeleteSelectionMessage;
-    })(Message);
+    }(Message));
     networkcube.DeleteSelectionMessage = DeleteSelectionMessage;
     function setSelectionColor(s, color) {
         distributeMessage(new SelectionColorMessage(s, color));
@@ -12846,7 +12849,7 @@ var networkcube;
             this.color = color;
         }
         return SelectionColorMessage;
-    })(Message);
+    }(Message));
     function search(term, type) {
         var idCompound = networkcube.searchForTerm(term, networkcube.getDynamicGraph(), type);
         distributeMessage(new SearchResultMessage(term, idCompound));
@@ -12860,7 +12863,7 @@ var networkcube;
             this.searchTerm = searchTerm;
         }
         return SearchResultMessage;
-    })(Message);
+    }(Message));
     networkcube.SearchResultMessage = SearchResultMessage;
     var MESSAGE_KEY = 'networkcube_message';
     localStorage[MESSAGE_KEY] = undefined;
@@ -13003,7 +13006,7 @@ var networkcube;
         function OrderingConfiguration() {
         }
         return OrderingConfiguration;
-    })();
+    }());
     networkcube.OrderingConfiguration = OrderingConfiguration;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -13318,7 +13321,7 @@ var glutils;
             this.interactor.isHorizontalPanEnabled = b;
         };
         return WebGL;
-    })();
+    }());
     glutils.WebGL = WebGL;
     var webgl;
     function initWebGL(parentId, width, height, params) {
@@ -13570,7 +13573,7 @@ var glutils;
             }
         };
         return WebGLElementQuery;
-    })();
+    }());
     glutils.WebGLElementQuery = WebGLElementQuery;
     function setStyle(element, attr, v, query) {
         switch (attr) {
@@ -13669,7 +13672,7 @@ var glutils;
             this.children = [];
         }
         return GroupElement;
-    })();
+    }());
     function createCirclesNoShader(dataElements, scene) {
         var material;
         var geometry;
@@ -14023,7 +14026,7 @@ var glutils;
             }
         };
         return WebGLInteractor;
-    })();
+    }());
     glutils.WebGLInteractor = WebGLInteractor;
     function mouseToWorldCoordinates(mouseX, mouseY) {
         var rect = webgl.canvas.getBoundingClientRect();
@@ -14082,7 +14085,7 @@ var glutils;
             }
         };
         return CheckBox;
-    })();
+    }());
     glutils.CheckBox = CheckBox;
 })(glutils || (glutils = {}));
 var THREEx = THREEx || {};

@@ -51,7 +51,6 @@ var glutils;
         ];
         var material = new THREE.LineBasicMaterial({
             color: color,
-            linewidth: lineThickness,
         });
         return new THREE.Line(geom, material);
     }
@@ -167,7 +166,7 @@ var glutils;
             this.interactor.isHorizontalPanEnabled = b;
         };
         return WebGL;
-    })();
+    }());
     glutils.WebGL = WebGL;
     var webgl;
     function initWebGL(parentId, width, height, params) {
@@ -221,7 +220,7 @@ var glutils;
             var elements = [];
             switch (shape) {
                 case 'circle':
-                    elements = createCircles(this.dataElements, this.scene);
+                    elements = createCirclesNoShader(this.dataElements, this.scene);
                     break;
                 case 'path':
                     elements = createPaths(this.dataElements, this.scene);
@@ -419,7 +418,7 @@ var glutils;
             }
         };
         return WebGLElementQuery;
-    })();
+    }());
     glutils.WebGLElementQuery = WebGLElementQuery;
     function setStyle(element, attr, v, query) {
         switch (attr) {
@@ -482,6 +481,7 @@ var glutils;
         context.font = SIZE + "pt Helvetica";
         context.fillText(text, 0, txtCanvas.height / 2);
         var tex = new THREE.Texture(txtCanvas);
+        tex.minFilter = THREE.LinearFilter;
         tex.flipY = true;
         tex.needsUpdate = true;
         mesh.material.map = tex;
@@ -517,7 +517,7 @@ var glutils;
             this.children = [];
         }
         return GroupElement;
-    })();
+    }());
     function createCirclesNoShader(dataElements, scene) {
         var material;
         var geometry;
@@ -535,447 +535,404 @@ var glutils;
         }
         return visualElements;
     }
-    var circleVertexShader = '\
-        uniform vec2 u_resolution;\
-        attribute vec2 a_position;\
-        attribute vec2 a_center;\
-        attribute float a_radius;\
-        \
-        varying vec2 center;\
-        varying vec2 resolution;\
-        varying float radius;\
-        \
-        void main() {\
-            vec2 clipspace = a_position / u_resolution * 2.0 - 1.0;\
-            gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);\
-            \
-            radius = a_radius;\
-            center = a_center;\
-            resolution = u_resolution;\
-        }\
-    ';
-    var circleFragmentShader = '\
-        precision mediump float;\
-        \
-        varying vec2 center;\
-        varying vec2 resolution;\
-        varying float radius;\
-        \
-        void main() {\
-            vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\
-            \
-            float x = gl_FragCoord.x;\
-            float y = resolution[1] - gl_FragCoord.y;\
-            \
-            float dx = center[0] - x;\
-            float dy = center[1] - y;\
-            float distance = sqrt(dx*dx + dy*dy);\
-            \
-            if ( distance < radius )\
-                gl_FragColor = vec4(1.0, 0.5, 0.0, 1.0); \
-            else\   ;
-    gl_FragColor = color0;
-})(glutils || (glutils = {}));
-';
-function createCircles(dataElements, scene) {
-}
-function createRectangles(dataElements, scene) {
-    var material;
-    var geometry;
-    var visualElements = [];
-    var c;
-    for (var i = 0; i < dataElements.length; i++) {
-        var rectShape = new THREE.Shape();
-        rectShape.moveTo(0, 0);
-        rectShape.lineTo(0, -1);
-        rectShape.lineTo(1, -1);
-        rectShape.lineTo(1, 0);
-        rectShape.lineTo(0, 0);
-        geometry = new THREE.ShapeGeometry(rectShape);
-        c = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true }));
-        c.position.set(0, 0, 1);
-        visualElements.push(c);
-        scene.add(c);
-        geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, -1, 0), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0));
-        var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 1 }));
-        c['wireframe'] = wireframe;
-        wireframe.position.set(0, 0, 1.1);
-        scene.add(wireframe);
-    }
-    return visualElements;
-}
-function createPaths(dataElements, scene) {
-    var material;
-    var geometry;
-    var visualElements = [];
-    var c, p;
-    for (var i = 0; i < dataElements.length; i++) {
-        geometry = new THREE.Geometry();
-        c = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true }));
-        c.position.set(0, 0, 0);
-        visualElements.push(c);
-        scene.add(c);
-    }
-    return visualElements;
-}
-function createPolygons(dataElements, scene) {
-    var material;
-    var geometry;
-    var visualElements = [];
-    var c, p;
-    for (var i = 0; i < dataElements.length; i++) {
-        geometry = new THREE.Geometry();
-        c = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, side: THREE.DoubleSide }));
-        c.doubleSided = true;
-        c.position.set(0, 0, 0);
-        visualElements.push(c);
-        scene.add(c);
-    }
-    return visualElements;
-}
-function createLines(dataElements, scene) {
-    var material;
-    var geometry;
-    var visualElements = [];
-    var c, p;
-    for (var i = 0; i < dataElements.length; i++) {
-        geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(-10, 0, 0), new THREE.Vector3(0, 10, 0));
-        c = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true }));
-        c.position.set(0, 0, 0);
-        visualElements.push(c);
-        scene.add(c);
-    }
-    return visualElements;
-}
-function createWebGLText(dataElements, scene) {
-    var visualElements = [];
-    var mesh;
-    for (var i = 0; i < dataElements.length; i++) {
-        mesh = new THREE.Mesh(new THREE.PlaneGeometry(1000, 100), new THREE.MeshBasicMaterial());
-        mesh.doubleSided = true;
-        visualElements.push(mesh);
-        scene.add(mesh);
-    }
-    return visualElements;
-}
-function createPath(mesh, points) {
-    mesh.geometry.vertices = [];
-    for (var i = 0; i < points.length; i++) {
-        mesh.geometry.vertices.push(new THREE.Vector3(points[i].x, points[i].y, 0));
-    }
-    mesh.geometry.verticesNeedUpdate = true;
-}
-function createPolygon(mesh, points) {
-    var vectors = [];
-    var shape = new THREE.Shape(points);
-    mesh.geometry = new THREE.ShapeGeometry(shape);
-    mesh.geometry.verticesNeedUpdate = true;
-}
-var WebGLInteractor = (function () {
-    function WebGLInteractor(scene, canvas, camera) {
-        var _this = this;
-        this.mouse = [];
-        this.mouseStart = [];
-        this.mouseDown = false;
-        this.cameraStart = [];
-        this.panOffset = [];
-        this.lastIntersectedSelections = [];
-        this.lastIntersectedElements = [];
-        this.isPanEnabled = true;
-        this.isHorizontalPanEnabled = true;
-        this.isLassoEnabled = true;
-        this.lassoPoints = [];
-        this.mouseOverSelections = [];
-        this.mouseMoveSelections = [];
-        this.mouseOutSelections = [];
-        this.mouseDownSelections = [];
-        this.mouseUpSelections = [];
-        this.clickSelections = [];
-        this.scene = scene;
-        this.canvas = canvas;
-        this.camera = camera;
-        this.mouse = [0, 0];
-        canvas.addEventListener('mousemove', function (e) {
-            _this.mouseMoveHandler(e);
-        });
-        canvas.addEventListener('mousedown', function (e) {
-            _this.mouseDownHandler(e);
-        });
-        canvas.addEventListener('mouseup', function (e) {
-            _this.mouseUpHandler(e);
-        });
-        canvas.addEventListener('click', function (e) {
-            _this.clickHandler(e);
-        });
-    }
-    WebGLInteractor.prototype.register = function (selection, method) {
-        switch (method) {
-            case 'mouseover':
-                this.mouseOverSelections.push(selection);
-                break;
-            case 'mousemove':
-                this.mouseMoveSelections.push(selection);
-                break;
-            case 'mouseout':
-                this.mouseOutSelections.push(selection);
-                break;
-            case 'mousedown':
-                this.mouseDownSelections.push(selection);
-                break;
-            case 'mouseup':
-                this.mouseUpSelections.push(selection);
-                break;
-            case 'click':
-                this.clickSelections.push(selection);
-                break;
+    function createRectangles(dataElements, scene) {
+        var material;
+        var geometry;
+        var visualElements = [];
+        var c;
+        for (var i = 0; i < dataElements.length; i++) {
+            var rectShape = new THREE.Shape();
+            rectShape.moveTo(0, 0);
+            rectShape.lineTo(0, -1);
+            rectShape.lineTo(1, -1);
+            rectShape.lineTo(1, 0);
+            rectShape.lineTo(0, 0);
+            geometry = new THREE.ShapeGeometry(rectShape);
+            c = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true }));
+            c.position.set(0, 0, 1);
+            visualElements.push(c);
+            scene.add(c);
+            geometry = new THREE.Geometry();
+            geometry.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, -1, 0), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0));
+            var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 1 }));
+            c['wireframe'] = wireframe;
+            wireframe.position.set(0, 0, 1.1);
+            scene.add(wireframe);
         }
-    };
-    WebGLInteractor.prototype.addEventListener = function (eventName, f) {
-        if (eventName == 'lassoStart')
-            this.lassoStartHandler = f;
-        if (eventName == 'lassoEnd')
-            this.lassoEndHandler = f;
-        if (eventName == 'lassoMove')
-            this.lassoMoveHandler = f;
-    };
-    WebGLInteractor.prototype.mouseMoveHandler = function (e) {
-        this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
-        if (this.isLassoEnabled && e.which == 2) {
-            this.lassoPoints.push(this.mouse);
-            if (this.lassoMoveHandler)
-                this.lassoMoveHandler(this.lassoPoints);
+        return visualElements;
+    }
+    function createPaths(dataElements, scene) {
+        var material;
+        var geometry;
+        var visualElements = [];
+        var c, p;
+        for (var i = 0; i < dataElements.length; i++) {
+            geometry = new THREE.Geometry();
+            c = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true }));
+            c.position.set(0, 0, 0);
+            visualElements.push(c);
+            scene.add(c);
         }
-        else {
-            var intersectedVisualElements = [];
-            for (var i = 0; i < this.lastIntersectedSelections.length; i++) {
-                for (var j = 0; j < this.lastIntersectedElements[i].length; j++) {
-                    this.lastIntersectedSelections[i].call('mouseout', this.lastIntersectedElements[i][j]);
-                }
-            }
+        return visualElements;
+    }
+    function createPolygons(dataElements, scene) {
+        var material;
+        var geometry;
+        var visualElements = [];
+        var c, p;
+        for (var i = 0; i < dataElements.length; i++) {
+            geometry = new THREE.Geometry();
+            c = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, side: THREE.DoubleSide }));
+            c.doubleSided = true;
+            c.position.set(0, 0, 0);
+            visualElements.push(c);
+            scene.add(c);
+        }
+        return visualElements;
+    }
+    function createLines(dataElements, scene) {
+        var material;
+        var geometry;
+        var visualElements = [];
+        var c, p;
+        for (var i = 0; i < dataElements.length; i++) {
+            geometry = new THREE.Geometry();
+            geometry.vertices.push(new THREE.Vector3(-10, 0, 0), new THREE.Vector3(0, 10, 0));
+            c = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true }));
+            c.position.set(0, 0, 0);
+            visualElements.push(c);
+            scene.add(c);
+        }
+        return visualElements;
+    }
+    function createWebGLText(dataElements, scene) {
+        var visualElements = [];
+        var mesh;
+        for (var i = 0; i < dataElements.length; i++) {
+            mesh = new THREE.Mesh(new THREE.PlaneGeometry(1000, 100), new THREE.MeshBasicMaterial());
+            mesh.doubleSided = true;
+            visualElements.push(mesh);
+            scene.add(mesh);
+        }
+        return visualElements;
+    }
+    function createPath(mesh, points) {
+        mesh.geometry.vertices = [];
+        for (var i = 0; i < points.length; i++) {
+            mesh.geometry.vertices.push(new THREE.Vector3(points[i].x, points[i].y, 0));
+        }
+        mesh.geometry.verticesNeedUpdate = true;
+    }
+    function createPolygon(mesh, points) {
+        var vectors = [];
+        var shape = new THREE.Shape(points);
+        mesh.geometry = new THREE.ShapeGeometry(shape);
+        mesh.geometry.verticesNeedUpdate = true;
+    }
+    var WebGLInteractor = (function () {
+        function WebGLInteractor(scene, canvas, camera) {
+            var _this = this;
+            this.mouse = [];
+            this.mouseStart = [];
+            this.mouseDown = false;
+            this.cameraStart = [];
+            this.panOffset = [];
             this.lastIntersectedSelections = [];
             this.lastIntersectedElements = [];
-            var nothingIntersected = true;
-            for (var i = 0; i < this.mouseOverSelections.length; i++) {
-                intersectedVisualElements = this.intersect(this.mouseOverSelections[i], this.mouse[0], this.mouse[1]);
-                if (intersectedVisualElements.length > 0) {
-                    this.lastIntersectedElements.push(intersectedVisualElements);
-                    this.lastIntersectedSelections.push(this.mouseOverSelections[i]);
-                }
-                for (var j = 0; j < intersectedVisualElements.length; j++) {
-                    this.mouseOverSelections[i].call('mouseover', intersectedVisualElements[j], e);
-                }
-                if (intersectedVisualElements.length > 0)
-                    nothingIntersected = false;
-            }
-            for (var i = 0; i < this.mouseMoveSelections.length; i++) {
-                intersectedVisualElements = this.intersect(this.mouseMoveSelections[i], this.mouse[0], this.mouse[1]);
-                for (var j = 0; j < intersectedVisualElements.length; j++) {
-                    this.mouseMoveSelections[i].call('mousemove', intersectedVisualElements[j], e);
-                }
-                if (intersectedVisualElements.length > 0)
-                    nothingIntersected = false;
-            }
-            if (nothingIntersected && this.mouseDown) {
-                if (this.isPanEnabled) {
-                    this.panOffset = [e.clientX - this.mouseStart[0], e.clientY - this.mouseStart[1]];
-                    if (this.isHorizontalPanEnabled)
-                        webgl.camera.position.x = this.cameraStart[0] - this.panOffset[0] / webgl.camera.zoom;
-                    webgl.camera.position.y = this.cameraStart[1] + this.panOffset[1] / webgl.camera.zoom;
-                    webgl.render();
-                }
-            }
+            this.isPanEnabled = true;
+            this.isHorizontalPanEnabled = true;
+            this.isLassoEnabled = true;
+            this.lassoPoints = [];
+            this.mouseOverSelections = [];
+            this.mouseMoveSelections = [];
+            this.mouseOutSelections = [];
+            this.mouseDownSelections = [];
+            this.mouseUpSelections = [];
+            this.clickSelections = [];
+            this.scene = scene;
+            this.canvas = canvas;
+            this.camera = camera;
+            this.mouse = [0, 0];
+            canvas.addEventListener('mousemove', function (e) {
+                _this.mouseMoveHandler(e);
+            });
+            canvas.addEventListener('mousedown', function (e) {
+                _this.mouseDownHandler(e);
+            });
+            canvas.addEventListener('mouseup', function (e) {
+                _this.mouseUpHandler(e);
+            });
+            canvas.addEventListener('click', function (e) {
+                _this.clickHandler(e);
+            });
         }
-    };
-    WebGLInteractor.prototype.clickHandler = function (e) {
-        this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
-        var intersectedVisualElements = [];
-        for (var i = 0; i < this.clickSelections.length; i++) {
-            intersectedVisualElements = this.intersect(this.clickSelections[i], this.mouse[0], this.mouse[1]);
-            for (var j = 0; j < intersectedVisualElements.length; j++) {
-                this.clickSelections[i].call('click', intersectedVisualElements[j], e);
-            }
-        }
-        this.mouseDown = false;
-    };
-    WebGLInteractor.prototype.mouseDownHandler = function (e) {
-        this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
-        this.mouseStart = [e.clientX, e.clientY];
-        this.cameraStart = [webgl.camera.position.x, webgl.camera.position.y];
-        this.mouseDown = true;
-        var intersectedVisualElements = [];
-        for (var i = 0; i < this.mouseDownSelections.length; i++) {
-            intersectedVisualElements = this.intersect(this.mouseDownSelections[i], this.mouse[0], this.mouse[1]);
-            for (var j = 0; j < intersectedVisualElements.length; j++) {
-                this.mouseDownSelections[i].call('mousedown', intersectedVisualElements[j], e);
-            }
-        }
-        this.lassoPoints = [];
-        this.lassoPoints.push(this.mouse);
-        if (this.lassoStartHandler && e.which == 2) {
-            this.lassoStartHandler(this.lassoPoints);
-        }
-    };
-    WebGLInteractor.prototype.mouseUpHandler = function (e) {
-        this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
-        var intersectedVisualElements = [];
-        for (var i = 0; i < this.mouseUpSelections.length; i++) {
-            intersectedVisualElements = this.intersect(this.mouseUpSelections[i], this.mouse[0], this.mouse[1]);
-            for (var j = 0; j < intersectedVisualElements.length; j++) {
-                this.mouseUpSelections[i].call('mouseup', intersectedVisualElements[j], e);
-            }
-        }
-        this.mouseDown = false;
-        if (this.lassoEndHandler && e.which == 2) {
-            this.lassoEndHandler(this.lassoPoints);
-        }
-    };
-    WebGLInteractor.prototype.intersect = function (selection, mousex, mousey) {
-        switch (selection.shape) {
-            case 'circle':
-                return this.intersectCircle(selection);
-                break;
-            case 'rect':
-                return this.intersectRect(selection);
-                break;
-            case 'path':
-                return this.intersectPath(selection);
-                break;
-            case 'text':
-                return this.intersectRect(selection);
-                break;
-        }
-        return [];
-    };
-    WebGLInteractor.prototype.intersectCircle = function (selection) {
-        var intersectedElements = [];
-        var d;
-        var e;
-        for (var i = 0; i < selection.visualElements.length; i++) {
-            e = selection.visualElements[i];
-            d = Math.sqrt(Math.pow(this.mouse[0] - e.position.x, 2) + Math.pow(this.mouse[1] - e.position.y, 2));
-            if (d <= e.scale.x)
-                intersectedElements.push(selection.dataElements[i]);
-        }
-        return intersectedElements;
-    };
-    WebGLInteractor.prototype.intersectRect = function (selection) {
-        var intersectedElements = [];
-        var d;
-        var e;
-        for (var i = 0; i < selection.visualElements.length; i++) {
-            e = selection.visualElements[i];
-            if (this.mouse[0] >= e.position.x && this.mouse[0] <= e.position.x + e.geometry.vertices[0].x * e.scale.x
-                && this.mouse[1] <= e.position.y && this.mouse[1] >= e.position.y + e.geometry.vertices[1].y * e.scale.y)
-                intersectedElements.push(selection.dataElements[i]);
-        }
-        return intersectedElements;
-    };
-    WebGLInteractor.prototype.intersectPath = function (selection) {
-        var intersectedElements = [];
-        var e;
-        var v1, v2;
-        var x, y;
-        var found = false;
-        for (var i = 0; i < selection.visualElements.length; i++) {
-            e = selection.visualElements[i];
-            for (var j = 1; j < e.geometry.vertices.length; j++) {
-                v1 = e.geometry.vertices[j - 1];
-                v2 = e.geometry.vertices[j];
-                if (distToSegmentSquared({ x: this.mouse[0], y: this.mouse[1] }, v1, v2) < 3) {
-                    intersectedElements.push(selection.dataElements[i]);
-                    found = true;
+        WebGLInteractor.prototype.register = function (selection, method) {
+            switch (method) {
+                case 'mouseover':
+                    this.mouseOverSelections.push(selection);
                     break;
+                case 'mousemove':
+                    this.mouseMoveSelections.push(selection);
+                    break;
+                case 'mouseout':
+                    this.mouseOutSelections.push(selection);
+                    break;
+                case 'mousedown':
+                    this.mouseDownSelections.push(selection);
+                    break;
+                case 'mouseup':
+                    this.mouseUpSelections.push(selection);
+                    break;
+                case 'click':
+                    this.clickSelections.push(selection);
+                    break;
+            }
+        };
+        WebGLInteractor.prototype.addEventListener = function (eventName, f) {
+            if (eventName == 'lassoStart')
+                this.lassoStartHandler = f;
+            if (eventName == 'lassoEnd')
+                this.lassoEndHandler = f;
+            if (eventName == 'lassoMove')
+                this.lassoMoveHandler = f;
+        };
+        WebGLInteractor.prototype.mouseMoveHandler = function (e) {
+            this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
+            if (this.isLassoEnabled && e.which == 2) {
+                this.lassoPoints.push(this.mouse);
+                if (this.lassoMoveHandler)
+                    this.lassoMoveHandler(this.lassoPoints);
+            }
+            else {
+                var intersectedVisualElements = [];
+                for (var i = 0; i < this.lastIntersectedSelections.length; i++) {
+                    for (var j = 0; j < this.lastIntersectedElements[i].length; j++) {
+                        this.lastIntersectedSelections[i].call('mouseout', this.lastIntersectedElements[i][j]);
+                    }
+                }
+                this.lastIntersectedSelections = [];
+                this.lastIntersectedElements = [];
+                var nothingIntersected = true;
+                for (var i = 0; i < this.mouseOverSelections.length; i++) {
+                    intersectedVisualElements = this.intersect(this.mouseOverSelections[i], this.mouse[0], this.mouse[1]);
+                    if (intersectedVisualElements.length > 0) {
+                        this.lastIntersectedElements.push(intersectedVisualElements);
+                        this.lastIntersectedSelections.push(this.mouseOverSelections[i]);
+                    }
+                    for (var j = 0; j < intersectedVisualElements.length; j++) {
+                        this.mouseOverSelections[i].call('mouseover', intersectedVisualElements[j], e);
+                    }
+                    if (intersectedVisualElements.length > 0)
+                        nothingIntersected = false;
+                }
+                for (var i = 0; i < this.mouseMoveSelections.length; i++) {
+                    intersectedVisualElements = this.intersect(this.mouseMoveSelections[i], this.mouse[0], this.mouse[1]);
+                    for (var j = 0; j < intersectedVisualElements.length; j++) {
+                        this.mouseMoveSelections[i].call('mousemove', intersectedVisualElements[j], e);
+                    }
+                    if (intersectedVisualElements.length > 0)
+                        nothingIntersected = false;
+                }
+                if (nothingIntersected && this.mouseDown) {
+                    if (this.isPanEnabled) {
+                        this.panOffset = [e.clientX - this.mouseStart[0], e.clientY - this.mouseStart[1]];
+                        if (this.isHorizontalPanEnabled)
+                            webgl.camera.position.x = this.cameraStart[0] - this.panOffset[0] / webgl.camera.zoom;
+                        webgl.camera.position.y = this.cameraStart[1] + this.panOffset[1] / webgl.camera.zoom;
+                        webgl.render();
+                    }
                 }
             }
-            if (found)
-                break;
-        }
-        return intersectedElements;
-        function sqr(x) {
-            return x * x;
-        }
-        function dist2(v, w) {
-            return sqr(v.x - w.x) + sqr(v.y - w.y);
-        }
-        function distToSegmentSquared(p, v, w) {
-            var l2 = dist2(v, w);
-            if (l2 == 0)
-                return dist2(p, v);
-            var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-            if (t < 0)
-                return dist2(p, v);
-            if (t > 1)
-                return dist2(p, w);
-            return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
-        }
-        function distToSegment(p, v, w) {
-            return Math.sqrt(distToSegmentSquared(p, v, w));
-        }
-    };
-    return WebGLInteractor;
-})();
-exports.WebGLInteractor = WebGLInteractor;
-function mouseToWorldCoordinates(mouseX, mouseY) {
-    var rect = webgl.canvas.getBoundingClientRect();
-    var x = webgl.camera.position.x + webgl.camera.left / webgl.camera.zoom + (mouseX - rect.left) / webgl.camera.zoom;
-    var y = webgl.camera.position.y + webgl.camera.top / webgl.camera.zoom - (mouseY - rect.top) / webgl.camera.zoom;
-    return [x, y];
-}
-exports.mouseToWorldCoordinates = mouseToWorldCoordinates;
-function curve(points) {
-    var arrayPoints = [];
-    for (var i = 0; i < points.length; i++) {
-        if (!isNaN(points[i].x))
-            arrayPoints.push([points[i].x, points[i].y]);
+        };
+        WebGLInteractor.prototype.clickHandler = function (e) {
+            this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
+            var intersectedVisualElements = [];
+            for (var i = 0; i < this.clickSelections.length; i++) {
+                intersectedVisualElements = this.intersect(this.clickSelections[i], this.mouse[0], this.mouse[1]);
+                for (var j = 0; j < intersectedVisualElements.length; j++) {
+                    this.clickSelections[i].call('click', intersectedVisualElements[j], e);
+                }
+            }
+            this.mouseDown = false;
+        };
+        WebGLInteractor.prototype.mouseDownHandler = function (e) {
+            this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
+            this.mouseStart = [e.clientX, e.clientY];
+            this.cameraStart = [webgl.camera.position.x, webgl.camera.position.y];
+            this.mouseDown = true;
+            var intersectedVisualElements = [];
+            for (var i = 0; i < this.mouseDownSelections.length; i++) {
+                intersectedVisualElements = this.intersect(this.mouseDownSelections[i], this.mouse[0], this.mouse[1]);
+                for (var j = 0; j < intersectedVisualElements.length; j++) {
+                    this.mouseDownSelections[i].call('mousedown', intersectedVisualElements[j], e);
+                }
+            }
+            this.lassoPoints = [];
+            this.lassoPoints.push(this.mouse);
+            if (this.lassoStartHandler && e.which == 2) {
+                this.lassoStartHandler(this.lassoPoints);
+            }
+        };
+        WebGLInteractor.prototype.mouseUpHandler = function (e) {
+            this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
+            var intersectedVisualElements = [];
+            for (var i = 0; i < this.mouseUpSelections.length; i++) {
+                intersectedVisualElements = this.intersect(this.mouseUpSelections[i], this.mouse[0], this.mouse[1]);
+                for (var j = 0; j < intersectedVisualElements.length; j++) {
+                    this.mouseUpSelections[i].call('mouseup', intersectedVisualElements[j], e);
+                }
+            }
+            this.mouseDown = false;
+            if (this.lassoEndHandler && e.which == 2) {
+                this.lassoEndHandler(this.lassoPoints);
+            }
+        };
+        WebGLInteractor.prototype.intersect = function (selection, mousex, mousey) {
+            switch (selection.shape) {
+                case 'circle':
+                    return this.intersectCircle(selection);
+                    break;
+                case 'rect':
+                    return this.intersectRect(selection);
+                    break;
+                case 'path':
+                    return this.intersectPath(selection);
+                    break;
+                case 'text':
+                    return this.intersectRect(selection);
+                    break;
+            }
+            return [];
+        };
+        WebGLInteractor.prototype.intersectCircle = function (selection) {
+            var intersectedElements = [];
+            var d;
+            var e;
+            for (var i = 0; i < selection.visualElements.length; i++) {
+                e = selection.visualElements[i];
+                d = Math.sqrt(Math.pow(this.mouse[0] - e.position.x, 2) + Math.pow(this.mouse[1] - e.position.y, 2));
+                if (d <= e.scale.x)
+                    intersectedElements.push(selection.dataElements[i]);
+            }
+            return intersectedElements;
+        };
+        WebGLInteractor.prototype.intersectRect = function (selection) {
+            var intersectedElements = [];
+            var d;
+            var e;
+            for (var i = 0; i < selection.visualElements.length; i++) {
+                e = selection.visualElements[i];
+                if (this.mouse[0] >= e.position.x && this.mouse[0] <= e.position.x + e.geometry.vertices[0].x * e.scale.x
+                    && this.mouse[1] <= e.position.y && this.mouse[1] >= e.position.y + e.geometry.vertices[1].y * e.scale.y)
+                    intersectedElements.push(selection.dataElements[i]);
+            }
+            return intersectedElements;
+        };
+        WebGLInteractor.prototype.intersectPath = function (selection) {
+            var intersectedElements = [];
+            var e;
+            var v1, v2;
+            var x, y;
+            var found = false;
+            for (var i = 0; i < selection.visualElements.length; i++) {
+                e = selection.visualElements[i];
+                for (var j = 1; j < e.geometry.vertices.length; j++) {
+                    v1 = e.geometry.vertices[j - 1];
+                    v2 = e.geometry.vertices[j];
+                    if (distToSegmentSquared({ x: this.mouse[0], y: this.mouse[1] }, v1, v2) < 3) {
+                        intersectedElements.push(selection.dataElements[i]);
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    break;
+            }
+            return intersectedElements;
+            function sqr(x) {
+                return x * x;
+            }
+            function dist2(v, w) {
+                return sqr(v.x - w.x) + sqr(v.y - w.y);
+            }
+            function distToSegmentSquared(p, v, w) {
+                var l2 = dist2(v, w);
+                if (l2 == 0)
+                    return dist2(p, v);
+                var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+                if (t < 0)
+                    return dist2(p, v);
+                if (t > 1)
+                    return dist2(p, w);
+                return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
+            }
+            function distToSegment(p, v, w) {
+                return Math.sqrt(distToSegmentSquared(p, v, w));
+            }
+        };
+        return WebGLInteractor;
+    }());
+    glutils.WebGLInteractor = WebGLInteractor;
+    function mouseToWorldCoordinates(mouseX, mouseY) {
+        var rect = webgl.canvas.getBoundingClientRect();
+        var x = webgl.camera.position.x + webgl.camera.left / webgl.camera.zoom + (mouseX - rect.left) / webgl.camera.zoom;
+        var y = webgl.camera.position.y + webgl.camera.top / webgl.camera.zoom - (mouseY - rect.top) / webgl.camera.zoom;
+        return [x, y];
     }
-    var spline = new BSpline(arrayPoints, 3);
-    var curvePoints = [];
-    for (var t = 0; t <= 1; t += 0.01) {
-        var p = spline.calcAt(t);
-        curvePoints.push({ x: p[0], y: p[1] });
-    }
-    return curvePoints;
-}
-exports.curve = curve;
-var CheckBox = (function () {
-    function CheckBox() {
-        var _this = this;
-        this.selected = false;
-        this.frame = selectAll()
-            .data([0])
-            .append('circle')
-            .attr('r', 5)
-            .style('fill', '#fff')
-            .style('stroke', '#000000')
-            .on('click', function () {
-            _this.selected = !_this.selected;
-            _this.circle.style('opacity', _this.selected ? 1 : 0);
-            if (_this.changeCallBack != undefined)
-                _this.changeCallBack();
-        });
-        this.circle = selectAll()
-            .data([0]);
-    }
-    CheckBox.prototype.attr = function (attrName, value) {
-        switch (attrName) {
-            case 'x':
-                this.frame.attr('x', value);
-                return this;
-            case 'y':
-                this.frame.attr('y', value);
-                return this;
+    glutils.mouseToWorldCoordinates = mouseToWorldCoordinates;
+    function curve(points) {
+        var arrayPoints = [];
+        for (var i = 0; i < points.length; i++) {
+            if (!isNaN(points[i].x))
+                arrayPoints.push([points[i].x, points[i].y]);
         }
-    };
-    CheckBox.prototype.on = function (eventType, fn) {
-        switch (eventType) {
-            case 'change': this.changeCallBack = fn;
+        var spline = new BSpline(arrayPoints, 3);
+        var curvePoints = [];
+        for (var t = 0; t <= 1; t += 0.01) {
+            var p = spline.calcAt(t);
+            curvePoints.push({ x: p[0], y: p[1] });
         }
-    };
-    return CheckBox;
-})();
-exports.CheckBox = CheckBox;
+        return curvePoints;
+    }
+    glutils.curve = curve;
+    var CheckBox = (function () {
+        function CheckBox() {
+            var _this = this;
+            this.selected = false;
+            this.frame = selectAll()
+                .data([0])
+                .append('circle')
+                .attr('r', 5)
+                .style('fill', '#fff')
+                .style('stroke', '#000000')
+                .on('click', function () {
+                _this.selected = !_this.selected;
+                _this.circle.style('opacity', _this.selected ? 1 : 0);
+                if (_this.changeCallBack != undefined)
+                    _this.changeCallBack();
+            });
+            this.circle = selectAll()
+                .data([0]);
+        }
+        CheckBox.prototype.attr = function (attrName, value) {
+            switch (attrName) {
+                case 'x':
+                    this.frame.attr('x', value);
+                    return this;
+                case 'y':
+                    this.frame.attr('y', value);
+                    return this;
+            }
+        };
+        CheckBox.prototype.on = function (eventType, fn) {
+            switch (eventType) {
+                case 'change': this.changeCallBack = fn;
+            }
+        };
+        return CheckBox;
+    }());
+    glutils.CheckBox = CheckBox;
+})(glutils || (glutils = {}));
 var THREEx = THREEx || {};
 THREEx.DynamicTexture = function (width, height) {
     var canvas = document.createElement('canvas');
