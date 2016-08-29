@@ -203,6 +203,7 @@
                     }
                     networkcube.selection('add', <networkcube.ElementCompound>{nodes: [d]});
                 }) 
+                
 
                 
         // node labels 
@@ -213,7 +214,7 @@
                 .text((d)=> d.label())  
                 .style('font-size', 12)
                 .style('opacity', 0)    
-
+                
                         
         // node label backgrounds
         nodeLabelBackgrounds = glutils.selectAll()
@@ -226,6 +227,7 @@
                 .attr('height', (d,i)=> getLabelHeight(d))
                 .style('fill', '#eeeee6')
                 .style('opacity', 0)  
+                
                 
 
         // CREATE LINKS
@@ -251,7 +253,9 @@
                         }
                     }
                     networkcube.selection('add', <networkcube.ElementCompound>{links: [d]});                        
-                }) 
+                })
+                                 
+                 
 
         // updateLinks();
         // updateNodes();
@@ -265,20 +269,24 @@
         visualNodes
             .attr('x', (d,i)=> d.x)
             .attr('y', (d,i)=> -d.y)
+                             
 
         nodeLabels
             .attr('x', (d,i)=> d.x)
             .attr('y', (d,i)=> -d.y)
-            
+                             
+
         nodeLabelBackgrounds
             .attr('x', (d,i)=> d.x -getLabelWidth(d)/2)
             .attr('y', (d,i)=> -d.y +getLabelHeight(d)/2)
-        
+                             
+
         // update link positions
         calculateCurvedLinks();        
         visualLinks
             .attr('d', (d)=> d.path)
-        
+                             
+
         // update nodelabel visibility after layout update.
         updateLabelVisibility();    
             
@@ -417,6 +425,8 @@
     function updateNodeSize(){
         visualNodes
             .attr('r', (n)=>getNodeRadius(n))
+                             
+
     }
     
     function updateNodes(){
@@ -439,13 +449,17 @@
                 else
                     return 1;
             }) 
+                             
+            
             
         nodeLabels
             .style('opacity', (e) => e.isHighlighted() 
                                 ||  e.links().highlighted().length > 0
                                 ||  hiddenLabels.indexOf(e)==-1 
                                 ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? 1 : 0)          
+                                ? 1 : 0)    
+                                                 
+      
             // .attr('z', (e) => e.isHighlighted() 
             //                     ||  e.links().highlighted().length > 0
             //                     ||  hiddenLabels.indexOf(e)==-1 
@@ -457,7 +471,7 @@
                                 ||  e.links().highlighted().length > 0
                                 ||  hiddenLabels.indexOf(e)==-1 
                                 ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? LABELBACKGROUND_OPACITY : 0)          
+                                ? LABELBACKGROUND_OPACITY : 0)  
             // .attr('z', (e) => e.isHighlighted() 
             //                     ||  e.links().highlighted().length > 0
             //                     ||  hiddenLabels.indexOf(e)==-1 
@@ -474,6 +488,7 @@
                     color = COLOR_DEFAULT_NODE;
                 return color;
             })
+                             
 
     }
     
@@ -499,6 +514,8 @@
                 var w = linkWeightScale(d.weights(time_start, time_end).mean());    
                 return d.isHighlighted()?w*2 : w;        
             })
+                             
+
     }
     
     function calculateCurvedLinks(){
@@ -562,6 +579,8 @@
                 .style('fill', '#ff9999')
                 .attr('x', (d)=>d[0])
                 .attr('y', (d)=>d[1])
+                                 
+
 
         webgl.render();
     }

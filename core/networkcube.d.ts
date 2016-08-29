@@ -108,8 +108,8 @@ declare module networkcube {
     class Time extends BasicElement {
         constructor(id: number, dynamicGraph: DynamicGraph);
         time(): Moment;
+        label(): String;
         unixTime(): number;
-        granularity(): string;
         links(): LinkQuery;
     }
     class Node extends BasicElement {
@@ -494,7 +494,8 @@ declare module networkcube {
     }
     class TimeArray extends AttributeArray {
         id: number[];
-        time: Moment[];
+        momentTime: Moment[];
+        label: string[];
         unixTime: number[];
         selections: Selection[][];
         filter: boolean[];
@@ -769,6 +770,7 @@ declare module glutils {
     function makeAlphaBuffer(array: number[], stretch: number): Float32Array;
     function addBufferedHatchedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
     function addBufferedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
+    function addBufferedCirlce(vertexArray: number[][], x: number, y: number, z: number, radius: number, colorArray: number[][], c: number[]): void;
     function addBufferedDiamond(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
     function createRectFrame(w: number, h: number, color: number, lineThickness: number): THREE.Line;
     function createDiagonalCross(w: number, h: number, color: number, lineThickness: number): THREE.Line;
@@ -787,6 +789,7 @@ declare module glutils {
         canvas: any;
         geometry: THREE.BufferGeometry;
         interactor: WebGLInteractor;
+        elementQueries: WebGLElementQuery[];
         constructor();
         render(): void;
         enableZoom(b?: boolean): void;
@@ -799,6 +802,7 @@ declare module glutils {
     class WebGLElementQuery<T, S> {
         dataElements: T[];
         visualElements: S[];
+        mesh: THREE.Mesh;
         children: Object[];
         scene: THREE.Scene;
         mouseOverHandler: Function;
@@ -810,7 +814,14 @@ declare module glutils {
         x: number[];
         y: number[];
         z: number[];
+        r: number[];
+        fill: number[];
+        stroke: number[];
+        strokewidth: number[];
+        opacity: number[];
         shape: string;
+        updateAttributes: boolean;
+        updateStyle: boolean;
         IS_SHADER: boolean;
         constructor();
         data(arr: T[]): WebGLElementQuery<T, S>;
@@ -822,6 +833,7 @@ declare module glutils {
         filter(f: Function): WebGLElementQuery<T, S>;
         attr(name: string, v: any): WebGLElementQuery<T, S>;
         style(name: string, v: any): WebGLElementQuery<T, S>;
+        set(): WebGLElementQuery<T, S>;
         text(v: any): WebGLElementQuery<T, S>;
         on(event: string, f: Function): WebGLElementQuery<T, S>;
         call(method: string, dataElement: T, event: any): WebGLElementQuery<T, S>;

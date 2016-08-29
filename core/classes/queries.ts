@@ -145,16 +145,15 @@ module networkcube {
         // SPECIFIC ATTRIBUTE QUERIES
 
         /** @returns the moment object associated to this time object. */
-        time(): Moment { return this.attr('time'); }
+        time(): Moment { return this.attr('momentTime'); }
+
+        label():String {return this.attr('label')}
 
         /** @returns the unix time for this time object. */
         unixTime(): number { return this.attr('unixTime'); }
 
         /** @returns a string label for this object. */
         // label(): String { return this.attr('label') + ''; }
-
-        /** @returns the temporal granularity for this time object. */
-        granularity(): string { return this.attr('granularity'); }
         
         links():LinkQuery{
             // var links:number[] = [];

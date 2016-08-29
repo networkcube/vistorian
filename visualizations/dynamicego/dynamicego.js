@@ -33,7 +33,6 @@ var startAnchors;
 var endAnchors;
 var arcs;
 var tickTimes = [];
-var timeLabels;
 var timeLabelHoverFields;
 var egoNode;
 var isShownNoneEgoLinks = true;
@@ -123,19 +122,6 @@ function createNodes() {
 }
 function createTimes() {
     var _this = this;
-    timeLabels = glutils.selectAll()
-        .data(times)
-        .append('text')
-        .attr('x', function (d, i) { return _this.timeXFunction(i); })
-        .attr('y', function (d) { return -TABLE_TOP + getTimeFormatted(d).length * 8 / 2; })
-        .attr('z', 1)
-        .style('fill', function (d) { return NODE_LABEL_COLOR; })
-        .attr('rotation', 90)
-        .style('font-size', 10)
-        .style('opacity', 0)
-        .text(function (d) {
-        return getTimeFormatted(d);
-    });
     timeLabelHoverFields = glutils.selectAll()
         .data(times)
         .append('rect')
@@ -239,11 +225,6 @@ function timeRangeHandler(m) {
         .attr('x', function (l, i) { return timeXFunction(l.times().toArray()[0].id()); })
         .style('opacity', function (l, i) { return timeXFunction(l.times().toArray()[0].id()) < 5 ? 0 : 1; });
     updateLinks();
-    timeLabels
-        .attr('x', function (d, i) { return timeXFunction(d.id()); })
-        .style('opacity', function (d) { return d.id() < timeStartId || d.id() > timeEndId ? 0 : TIMELABEL_OPACITY; });
-    timeLabelHoverFields
-        .attr('x', function (d, i) { return timeXFunction(d.id()) - 6; });
     updateTimeGranularity();
     webgl.render();
 }
@@ -443,21 +424,6 @@ function updateLinkPositions() {
         .attr('d', function (l) { return makeArcPath(l); });
 }
 function updateTimes() {
-    timeLabels
-        .style('fill', function (d) { return d.isHighlighted()
-        || d.links().highlighted().size() > 0
-        || d.links().sources().highlighted().size() > 0
-        || d.links().targets().highlighted().size() > 0
-        ? '#000' : NODE_LABEL_COLOR; })
-        .style('opacity', function (d) {
-        return d.id() >= timeStartId
-            && d.id() <= timeEndId
-            && (d.links().highlighted().size() > 0
-                || d.isHighlighted())
-            || tickTimes.indexOf(d) > -1
-            ? 1 :
-            d.links().highlighted().size() == 0 ? TIMELABEL_OPACITY : 0;
-    });
 }
 function mouseWheelHandler(event) {
     event.preventDefault();

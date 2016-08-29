@@ -9065,9 +9065,9 @@ var networkcube;
         function Time(id, dynamicGraph) {
             _super.call(this, id, 'time', dynamicGraph);
         }
-        Time.prototype.time = function () { return this.attr('time'); };
+        Time.prototype.time = function () { return this.attr('momentTime'); };
+        Time.prototype.label = function () { return this.attr('label'); };
         Time.prototype.unixTime = function () { return this.attr('unixTime'); };
-        Time.prototype.granularity = function () { return this.attr('granularity'); };
         Time.prototype.links = function () {
             return new LinkQuery(this.attr('links'), this.g);
         };
@@ -10254,19 +10254,19 @@ var networkcube;
                 console.log('No timeArrays');
                 this.timeArrays = new TimeArray();
             }
-            else if ('time' in this.timeArrays && 'unixTime' in this.timeArrays) {
-                var ta = this.timeArrays['time'];
+            else if ('momentTime' in this.timeArrays && 'unixTime' in this.timeArrays) {
+                var ta = this.timeArrays['momentTime'];
                 for (var i = 0; i < ta.length; i++) {
                     ta[i] = moment.utc(this.timeArrays['unixTime'][i]);
                 }
             }
             else if ('unixTime' in this.timeArrays) {
                 console.log('No time in timeArrays');
-                this.timeArrays['time'] = this.timeArrays['unixTime'].map(moment.utc);
+                this.timeArrays['momentTime'] = this.timeArrays['unixTime'].map(moment.utc);
             }
             else {
                 console.log('No time or unixTime in timeArrays');
-                this.timeArrays['time'] = [];
+                this.timeArrays['momentTime'] = [];
             }
             this.linkTypeArrays = dataMgr.getFromStorage(this.name, this.linkTypeArrays_NAME, DynamicGraph.linkTypeArrayReviver);
             this.nodeTypeArrays = dataMgr.getFromStorage(this.name, this.nodeTypeArrays_NAME, DynamicGraph.nodeTypeArrayReviver);
@@ -10404,23 +10404,25 @@ var networkcube;
             this.name = data.name;
             this.gran_min = 0;
             this.gran_max = 0;
-            console.log('data.linkSchema.time', data.linkSchema.time, networkcube.isValidIndex(data.linkSchema.time));
             if (networkcube.isValidIndex(data.linkSchema.time)) {
                 var timeLabels = [];
                 var timeLabel;
-                var timeArray = [];
+                var unixTimes = [];
                 var unixTime;
                 for (var i = 0; i < data.linkTable.length; i++) {
                     timeLabel = data.linkTable[i][data.linkSchema.time];
-                    unixTime = parseInt(moment(timeLabel, 'YYYY-MM-DD hh:mm:ss').format('x'));
-                    if (timeArray.indexOf(unixTime) == -1) {
-                        timeArray.push(unixTime);
+                    unixTime = parseInt(moment(timeLabel, TIME_FORMAT).format('x'));
+                    if (unixTime == undefined)
+                        continue;
+                    if (unixTimes.indexOf(unixTime) == -1) {
+                        unixTimes.push(unixTime);
                     }
                 }
-                timeArray.sort(networkcube.sortNumber);
+                console.log('unixTimes', unixTimes, unixTimes.length);
+                unixTimes.sort(networkcube.sortNumber);
                 var diff = 99999999999999;
-                for (var i = 0; i < timeArray.length - 2; i++) {
-                    diff = Math.min(diff, timeArray[i + 1] - timeArray[i]);
+                for (var i = 0; i < unixTimes.length - 2; i++) {
+                    diff = Math.min(diff, unixTimes[i + 1] - unixTimes[i]);
                 }
                 var diff_min = diff;
                 if (diff >= 1000)
@@ -10443,7 +10445,7 @@ var networkcube;
                     this.gran_min = 9;
                 if (diff >= 1000 * 60 * 60 * 24 * 30 * 12 * 1000)
                     this.gran_min = 10;
-                diff = timeArray[timeArray.length - 1] - timeArray[0];
+                diff = unixTimes[unixTimes.length - 1] - unixTimes[0];
                 this.gran_max = 0;
                 if (diff >= 1000)
                     this.gran_max = 1;
@@ -10467,26 +10469,23 @@ var networkcube;
                     this.gran_max = 10;
                 console.log('[Dynamic Graph] Minimal granularity', networkcube.GRANULARITY[this.gran_min]);
                 console.log('[Dynamic Graph] Maximal granularity', networkcube.GRANULARITY[this.gran_max]);
-                var start = moment(timeArray[0] + '', 'x').startOf(networkcube.GRANULARITY[this.gran_min]);
-                var end = moment(timeArray[timeArray.length - 1] + '', 'x').startOf(networkcube.GRANULARITY[this.gran_min]);
-                var numTimes = Math.ceil(Math.abs(start.diff(end, networkcube.GRANULARITY[this.gran_min] + 's')));
-                var curr_t = start;
-                this._times = [];
-                for (var i = 0; i <= numTimes + 2; i++) {
+                for (var i = 0; i < unixTimes.length; i++) {
                     this.timeArrays.id.push(i);
-                    this.timeArrays.time.push(moment(curr_t));
-                    this.timeArrays.unixTime.push(parseInt(curr_t.format('x')));
+                    this.timeArrays.momentTime.push(moment(unixTimes[i]));
+                    this.timeArrays.label.push(this.timeArrays.momentTime[i].format(TIME_FORMAT));
+                    this.timeArrays.unixTime.push(unixTimes[i]);
                     this.timeArrays.selections.push([]);
                     this.timeArrays.filter.push(false);
                     this.timeArrays.links.push([]);
                     this._times.push(new networkcube.Time(i, this));
-                    curr_t = start.add(1, networkcube.GRANULARITY[this.gran_min] + 's');
                 }
                 console.log('#TIMES:', this._times.length);
+                console.log('   minTime', this.timeArrays.label[0]);
+                console.log('   maxTime', this.timeArrays.label[this.timeArrays.length - 1]);
             }
-            else {
+            if (this.timeArrays.length == 0) {
                 this.timeArrays.id.push(0);
-                this.timeArrays.time.push(moment(0));
+                this.timeArrays.momentTime.push(moment(0));
                 this.timeArrays.unixTime.push(0);
                 this.timeArrays.selections.push([]);
                 this.timeArrays.filter.push(false);
@@ -10553,6 +10552,8 @@ var networkcube;
                 else {
                     time = this._times[0];
                 }
+                if (time == undefined)
+                    time = this._times[0];
                 if (networkcube.isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
                     if (locId == null || locId == undefined)
@@ -10611,6 +10612,8 @@ var networkcube;
                 else {
                     timeId = 0;
                 }
+                if (timeId == undefined)
+                    timeId = 0;
                 time = this._times[timeId];
                 this.linkArrays.presence[linkId].push(timeId);
                 if (networkcube.isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) {
@@ -11056,12 +11059,13 @@ var networkcube;
         DynamicGraph.prototype.getTimeIdForUnixTime = function (unixTime) {
             var timeId;
             for (timeId = 0; timeId < this.timeArrays.length; timeId++) {
-                if (unixTime < this.timeArrays.unixTime[timeId]) {
-                    timeId--;
+                if (unixTime == this.timeArrays.unixTime[timeId]) {
+                    timeId;
                     return timeId;
                 }
             }
-            return this.timeArrays.length - 1;
+            console.error('Time object for unix time', unixTime, 'not found!');
+            return undefined;
         };
         DynamicGraph.prototype.addNodeOrdering = function (name, order) {
             for (var i = 0; i < this.nodeOrders.length; i++) {
@@ -11268,7 +11272,8 @@ var networkcube;
         function TimeArray() {
             _super.apply(this, arguments);
             this.id = [];
-            this.time = [];
+            this.momentTime = [];
+            this.label = [];
             this.unixTime = [];
             this.selections = [];
             this.filter = [];
@@ -13183,6 +13188,15 @@ var glutils;
         colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
     }
     glutils.addBufferedRect = addBufferedRect;
+    function addBufferedCirlce(vertexArray, x, y, z, radius, colorArray, c) {
+        var segments = 11;
+        var angle = Math.PI / (segments / 2);
+        for (var i = 0; i < segments; i++) {
+            vertexArray.push([x + Math.cos(i * angle) * radius, y + Math.sin(i * angle) * radius, z], [x + Math.cos((i + 1) * angle) * radius, y + Math.sin((i + 1) * angle) * radius, z], [x, y, z]);
+            colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
+        }
+    }
+    glutils.addBufferedCirlce = addBufferedCirlce;
     function addBufferedDiamond(vertexArray, x, y, z, width, height, colorArray, c) {
         width = width / 2;
         height = height / 2;
@@ -13290,10 +13304,16 @@ var glutils;
     var txtCanvas = document.createElement("canvas");
     var WebGL = (function () {
         function WebGL() {
+            this.elementQueries = [];
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
         }
         WebGL.prototype.render = function () {
+            for (var i = 0; i < this.elementQueries.length; i++) {
+                if (this.elementQueries[i].updateAttributes || this.elementQueries[i].updateStyle) {
+                    this.elementQueries[i].set();
+                }
+            }
             this.renderer.render(this.scene, this.camera);
         };
         WebGL.prototype.enableZoom = function (b) {
@@ -13350,7 +13370,9 @@ var glutils;
     }
     glutils.setWebGL = setWebGL;
     function selectAll() {
-        return new glutils.WebGLElementQuery();
+        var q = new glutils.WebGLElementQuery();
+        webgl.elementQueries.push(q);
+        return q;
     }
     glutils.selectAll = selectAll;
     var WebGLElementQuery = (function () {
@@ -13361,6 +13383,13 @@ var glutils;
             this.x = [];
             this.y = [];
             this.z = [];
+            this.r = [];
+            this.fill = [];
+            this.stroke = [];
+            this.strokewidth = [];
+            this.opacity = [];
+            this.updateAttributes = false;
+            this.updateStyle = false;
             this.IS_SHADER = false;
             this.scene = webgl.scene;
         }
@@ -13372,7 +13401,7 @@ var glutils;
             var elements = [];
             switch (shape) {
                 case 'circle':
-                    elements = createCirclesNoShader(this.dataElements, this.scene);
+                    createCirclesWithBuffers(this, this.scene);
                     break;
                 case 'path':
                     elements = createPaths(this.dataElements, this.scene);
@@ -13391,10 +13420,12 @@ var glutils;
                     break;
                 default: console.error('Shape', shape, 'does not exist.');
             }
-            for (var i = 0; i < elements.length; i++) {
-                this.x.push(0);
-                this.y.push(0);
-                this.z.push(0);
+            if (!this.IS_SHADER) {
+                for (var i = 0; i < elements.length; i++) {
+                    this.x.push(0);
+                    this.y.push(0);
+                    this.z.push(0);
+                }
             }
             this.shape = shape;
             this.visualElements = elements;
@@ -13433,19 +13464,59 @@ var glutils;
         };
         WebGLElementQuery.prototype.attr = function (name, v) {
             var l = this.visualElements.length;
-            for (var i = 0; i < l; i++) {
-                this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
-                if (this.visualElements[i].hasOwnProperty('wireframe')) {
-                    this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+            if (this.IS_SHADER) {
+                for (var i = 0; i < this.dataElements.length; i++) {
+                    this[name][i] = v instanceof Function ? v(this.dataElements[i], i) : v;
                 }
             }
+            else {
+                for (var i = 0; i < l; i++) {
+                    this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+                    if (this.visualElements[i].hasOwnProperty('wireframe')) {
+                        this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+                    }
+                }
+            }
+            this.updateAttributes = true;
             return this;
         };
         WebGLElementQuery.prototype.style = function (name, v) {
             var l = this.visualElements.length;
-            for (var i = 0; i < l; i++) {
-                setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
+            if (this.IS_SHADER) {
+                name = name.replace('-', '');
+                for (var i = 0; i < this.dataElements.length; i++) {
+                    this[name][i] = v instanceof Function ? v(this.dataElements[i], i) : v;
+                }
             }
+            else {
+                for (var i = 0; i < l; i++) {
+                    setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
+                }
+            }
+            this.updateStyle = true;
+            return this;
+        };
+        WebGLElementQuery.prototype.set = function () {
+            if (!this.IS_SHADER)
+                return this;
+            var l = this.visualElements.length;
+            var vertexPositionBuffer = [];
+            var vertexColorBuffer = [];
+            var c;
+            if (this.shape == 'circle') {
+                for (var i = 0; i < this.dataElements.length; i++) {
+                    c = new THREE.Color(this.fill[i]);
+                    addBufferedCirlce(vertexPositionBuffer, this.x[i], this.y[i], this.z[i], this.r[i], vertexColorBuffer, [c.r, c.g, c.b, this.opacity[i]]);
+                }
+            }
+            var geometry = this.mesh.geometry;
+            geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f(vertexPositionBuffer), 3));
+            geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f(vertexColorBuffer), 4));
+            geometry.needsUpdate = true;
+            geometry.verticesNeedUpdate = true;
+            this.mesh.material.needsUpdate = true;
+            this.updateAttributes = false;
+            this.updateStyle = false;
             return this;
         };
         WebGLElementQuery.prototype.text = function (v) {
@@ -13686,6 +13757,57 @@ var glutils;
             scene.add(c);
         }
         return visualElements;
+    }
+    var vertexShaderProgram = "\
+        attribute vec4 customColor;\
+        varying vec4 vColor;\
+        void main() {\
+            vColor = customColor;\
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );\
+        }";
+    var fragmentShaderProgram = "\
+        varying vec4 vColor;\
+        void main() {\
+            gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);\
+        }";
+    function createCirclesWithBuffers(query, scene) {
+        var dataElements = query.dataElements;
+        query.IS_SHADER = true;
+        var attributes = {
+            customColor: { type: 'c', value: [] }
+        };
+        var shaderMaterial = new THREE.ShaderMaterial({
+            attributes: attributes,
+            vertexShader: vertexShaderProgram,
+            fragmentShader: fragmentShaderProgram,
+            linewidth: 2
+        });
+        shaderMaterial.blending = THREE.NormalBlending;
+        shaderMaterial.depthTest = true;
+        shaderMaterial.transparent = true;
+        shaderMaterial.side = THREE.DoubleSide;
+        var visualElements = [];
+        var c;
+        var vertexPositionBuffer = [];
+        var vertexColorBuffer = [];
+        var geometry = new THREE.BufferGeometry();
+        for (var i = 0; i < dataElements.length; i++) {
+            query.x.push(0);
+            query.y.push(0);
+            query.z.push(0);
+            query.r.push(0);
+            query.fill.push('0x000000');
+            query.stroke.push('0x000000');
+            query.strokewidth.push(1);
+            query.opacity.push(1);
+        }
+        geometry = new THREE.BufferGeometry();
+        geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f([]), 3));
+        geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f([]), 4));
+        query.mesh = new THREE.Mesh(geometry, shaderMaterial);
+        query.mesh.position.set(0, 0, 1);
+        scene.add(query.mesh);
+        return query;
     }
     function createRectangles(dataElements, scene) {
         var material;

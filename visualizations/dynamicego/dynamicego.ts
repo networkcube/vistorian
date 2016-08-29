@@ -47,7 +47,7 @@ var startAnchors:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
 var endAnchors:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
 var arcs:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
 var tickTimes = []
-var timeLabels:glutils.WebGLElementQuery<networkcube.Time,THREE.Mesh>;
+// var timeLabels:glutils.WebGLElementQuery<networkcube.Time,THREE.Mesh>;
 var timeLabelHoverFields;
 var egoNode:networkcube.Node;
 
@@ -185,19 +185,19 @@ function createNodes(){
 
 function createTimes(){
           
-    timeLabels = glutils.selectAll()
-        .data(times)
-        .append('text')
-            .attr('x', (d,i)=> this.timeXFunction(i))
-            .attr('y', (d)=> -TABLE_TOP + getTimeFormatted(d).length*8/2)
-            .attr('z', 1)
-            .style('fill', (d)=>NODE_LABEL_COLOR)
-            .attr('rotation', 90)
-            .style('font-size',10)
-            .style('opacity',0)
-            .text((d:networkcube.Time)=>{
-                return getTimeFormatted(d);
-            })
+    // timeLabels = glutils.selectAll()
+    //     .data(times)
+    //     .append('text')
+    //         .attr('x', (d,i)=> this.timeXFunction(i))
+    //         .attr('y', (d)=> -TABLE_TOP + getTimeFormatted(d).length*8/2)
+    //         .attr('z', 1)
+    //         .style('fill', (d)=>NODE_LABEL_COLOR)
+    //         .attr('rotation', 90)
+    //         .style('font-size',10)
+    //         .style('opacity',0)
+    //         .text((d:networkcube.Time)=>{
+    //             return getTimeFormatted(d);
+    //         })
     
     timeLabelHoverFields = glutils.selectAll()
         .data(times)
@@ -343,11 +343,11 @@ function timeRangeHandler(m:networkcube.TimeRangeMessage){
     
     // update time positions and visibility
     
-    timeLabels
-        .attr('x', (d,i) => timeXFunction(d.id()))
-        .style('opacity', (d)=> d.id()<timeStartId || d.id()>timeEndId ? 0:TIMELABEL_OPACITY)
-    timeLabelHoverFields
-        .attr('x', (d,i) => timeXFunction(d.id())-6)
+    // timeLabels
+    //     .attr('x', (d,i) => timeXFunction(d.id()))
+    //     .style('opacity', (d)=> d.id()<timeStartId || d.id()>timeEndId ? 0:TIMELABEL_OPACITY)
+    // timeLabelHoverFields
+    //     .attr('x', (d,i) => timeXFunction(d.id())-6)
     
     // need to change granularity? 
     // var num_ticks = Math.floor((WIDTH-TABLE_LEFT-TABLE_RIGHT) / cell_width);
@@ -570,21 +570,21 @@ function updateLinkPositions(){
 
 function updateTimes(){
 
-    timeLabels
-        .style('fill', (d)=>d.isHighlighted()
-            || d.links().highlighted().size() > 0 
-            || d.links().sources().highlighted().size() > 0  
-            || d.links().targets().highlighted().size() > 0  
-            ?'#000':NODE_LABEL_COLOR)
-        .style('opacity', (d)=>
-            d.id()>=timeStartId
-            && d.id()<= timeEndId
-            && (d.links().highlighted().size() > 0 
-            || d.isHighlighted())
-            || tickTimes.indexOf(d) > -1
-            ?1:
-                d.links().highlighted().size() == 0?TIMELABEL_OPACITY:0
-        )
+    // timeLabels
+    //     .style('fill', (d)=>d.isHighlighted()
+    //         || d.links().highlighted().size() > 0 
+    //         || d.links().sources().highlighted().size() > 0  
+    //         || d.links().targets().highlighted().size() > 0  
+    //         ?'#000':NODE_LABEL_COLOR)
+    //     .style('opacity', (d)=>
+    //         d.id()>=timeStartId
+    //         && d.id()<= timeEndId
+    //         && (d.links().highlighted().size() > 0 
+    //         || d.isHighlighted())
+    //         || tickTimes.indexOf(d) > -1
+    //         ?1:
+    //             d.links().highlighted().size() == 0?TIMELABEL_OPACITY:0
+    //     )
 }
 
 

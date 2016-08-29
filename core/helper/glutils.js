@@ -31,6 +31,15 @@ var glutils;
         colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
     }
     glutils.addBufferedRect = addBufferedRect;
+    function addBufferedCirlce(vertexArray, x, y, z, radius, colorArray, c) {
+        var segments = 12;
+        var angle = Math.PI / (segments / 2);
+        for (var i = 0; i < segments; i++) {
+            vertexArray.push([x + Math.cos(i * angle) * radius, y + Math.sin(i * angle) * radius, z], [x + Math.cos((i + 1) * angle) * radius, y + Math.sin((i + 1) * angle) * radius, z], [x, y, z]);
+            colorArray.push([c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]], [c[0], c[1], c[2], c[3]]);
+        }
+    }
+    glutils.addBufferedCirlce = addBufferedCirlce;
     function addBufferedDiamond(vertexArray, x, y, z, width, height, colorArray, c) {
         width = width / 2;
         height = height / 2;
@@ -51,7 +60,6 @@ var glutils;
         ];
         var material = new THREE.LineBasicMaterial({
             color: color,
-            linewidth: lineThickness,
         });
         return new THREE.Line(geom, material);
     }
@@ -210,6 +218,8 @@ var glutils;
             this.x = [];
             this.y = [];
             this.z = [];
+            this.r = [];
+            this.color = [];
             this.IS_SHADER = false;
             this.scene = webgl.scene;
         }
@@ -221,7 +231,7 @@ var glutils;
             var elements = [];
             switch (shape) {
                 case 'circle':
-                    elements = createCircles(this.dataElements, this.scene);
+                    createCirclesWithBuffers(this, this.scene);
                     break;
                 case 'path':
                     elements = createPaths(this.dataElements, this.scene);
@@ -240,10 +250,12 @@ var glutils;
                     break;
                 default: console.error('Shape', shape, 'does not exist.');
             }
-            for (var i = 0; i < elements.length; i++) {
-                this.x.push(0);
-                this.y.push(0);
-                this.z.push(0);
+            if (!this.IS_SHADER) {
+                for (var i = 0; i < elements.length; i++) {
+                    this.x.push(0);
+                    this.y.push(0);
+                    this.z.push(0);
+                }
             }
             this.shape = shape;
             this.visualElements = elements;
@@ -282,302 +294,319 @@ var glutils;
         };
         WebGLElementQuery.prototype.attr = function (name, v) {
             var l = this.visualElements.length;
-            for (var i = 0; i < l; i++) {
-                this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
-                if (this.visualElements[i].hasOwnProperty('wireframe')) {
-                    this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+            if (this.IS_SHADER) {
+                for (var i = 0; i < this.dataElements.length; i++) {
+                    this[name][i] = v instanceof Function ? v(this.dataElements[i], i) : v;
                 }
-            }
-            return this;
-        };
-        WebGLElementQuery.prototype.style = function (name, v) {
-            var l = this.visualElements.length;
-            for (var i = 0; i < l; i++) {
-                setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
-            }
-            return this;
-        };
-        WebGLElementQuery.prototype.text = function (v) {
-            var l = this.visualElements.length;
-            for (var i = 0; i < l; i++) {
-                setText(this.visualElements[i], v instanceof Function ? v(this.dataElements[i], i) : v);
-            }
-            return this;
-        };
-        WebGLElementQuery.prototype.on = function (event, f) {
-            switch (event) {
-                case 'mouseover':
-                    this.mouseOverHandler = f;
-                    break;
-                case 'mousemove':
-                    this.mouseMoveHandler = f;
-                    break;
-                case 'mouseout':
-                    this.mouseOutHandler = f;
-                    break;
-                case 'mousedown':
-                    this.mouseDownHandler = f;
-                    break;
-                case 'mouseup':
-                    this.mouseUpHandler = f;
-                    break;
-                case 'click':
-                    this.clickHandler = f;
-                    break;
-            }
-            webgl.interactor.register(this, event);
-            return this;
-        };
-        WebGLElementQuery.prototype.call = function (method, dataElement, event) {
-            var i = this.dataElements.indexOf(dataElement);
-            switch (method) {
-                case 'mouseover':
-                    this.mouseOverHandler(dataElement, i, event);
-                    break;
-                case 'mousemove':
-                    this.mouseMoveHandler(dataElement, i, event);
-                    break;
-                case 'mouseout':
-                    this.mouseOutHandler(dataElement, i, event);
-                    break;
-                case 'mousedown':
-                    this.mouseDownHandler(dataElement, i, event);
-                    break;
-                case 'mouseup':
-                    this.mouseUpHandler(dataElement, i, event);
-                    break;
-                case 'click':
-                    this.clickHandler(dataElement, i, event);
-                    break;
-            }
-            return this;
-        };
-        WebGLElementQuery.prototype.setAttr = function (element, attr, v, index) {
-            switch (attr) {
-                case 'x':
-                    element.position.x = v;
-                    this.x[index] = v;
-                    break;
-                case 'y':
-                    element.position.y = v;
-                    this.y[index] = v;
-                    break;
-                case 'z':
-                    element.position.z = v;
-                    this.z[index] = v;
-                    break;
-                case 'x1':
-                    setX1(element, v);
-                    break;
-                case 'y1':
-                    setY1(element, v);
-                    break;
-                case 'x2':
-                    setX2(element, v);
-                    break;
-                case 'y2':
-                    setY2(element, v);
-                    break;
-                case 'r':
-                    element.scale.set(v, v, v);
-                    break;
-                case 'width':
-                    element.scale.setX(v);
-                    break;
-                case 'height':
-                    element.scale.setY(v);
-                    break;
-                case 'depth':
-                    element.scale.setZ(v);
-                    break;
-                case 'd':
-                    createPath(element, v);
-                    break;
-                case 'points':
-                    createPolygon(element, v);
-                    break;
-                case 'rotation':
-                    element.rotation.z = v * Math.PI / 180;
-                    break;
-                case 'scaleX':
-                    element.scale.x = v;
-                    break;
-                case 'scaleY':
-                    element.scale.y = v;
-                    break;
-                default: console.error('Attribute', attr, 'does not exist.');
-            }
-            element.geometry.verticesNeedUpdate = true;
-            element.geometry.elementsNeedUpdate = true;
-            element.geometry.lineDistancesNeedUpdate = true;
-        };
-        WebGLElementQuery.prototype.removeAll = function () {
-            for (var i = 0; i < this.visualElements.length; i++) {
-                if (this.visualElements[i].wireframe)
-                    this.scene.remove(this.visualElements[i].wireframe);
-                this.scene.remove(this.visualElements[i]);
             }
         };
         return WebGLElementQuery;
     })();
     glutils.WebGLElementQuery = WebGLElementQuery;
-    function setStyle(element, attr, v, query) {
-        switch (attr) {
-            case 'fill':
-                if (query.shape == 'text')
-                    setText(element, element['text'], { color: v });
-                else
-                    element.material.color = new THREE.Color(v);
-                break;
-            case 'stroke':
-                if (element.hasOwnProperty('wireframe')) {
-                    element.wireframe.material.color = new THREE.Color(v);
-                }
-                else {
-                    element.material.color = new THREE.Color(v);
-                }
-                break;
-            case 'opacity':
-                element.material.opacity = v;
-                if (element.hasOwnProperty('wireframe'))
-                    element.wireframe.material.opacity = v;
-                break;
-            case 'stroke-width':
-                if (element.hasOwnProperty('wireframe'))
-                    element.wireframe.material.linewidth = v;
-                else
-                    element.material.linewidth = v;
-                break;
-            case 'font-size':
-                element.scale.x = v / 30;
-                element.scale.y = v / 30;
-                element.geometry.verticesNeedUpdate = true;
-                break;
-            default: console.error('Style', attr, 'does not exist.');
+    {
+        for (var i = 0; i < l; i++) {
+            this.setAttr(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+            if (this.visualElements[i].hasOwnProperty('wireframe')) {
+                this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function ? v(this.dataElements[i], i) : v, i);
+            }
         }
-        element.material.needsUpdate = true;
-        if (element.hasOwnProperty('wireframe'))
-            element.wireframe.material.needsUpdate = true;
     }
-    var textCtx;
-    function setText(mesh, text, parConfig) {
-        var config = parConfig;
-        if (config == undefined) {
-            config = {};
-        }
-        if (config.color == undefined)
-            config.color = '#000000';
-        mesh['text'] = text;
-        var backgroundMargin = 10;
-        var txtCanvas = document.createElement("canvas");
-        var context = txtCanvas.getContext("2d");
-        var SIZE = 30;
-        context.font = SIZE + "pt Helvetica";
-        var WIDTH = context.measureText(text).width;
-        txtCanvas.width = WIDTH;
-        txtCanvas.height = SIZE;
-        context.textAlign = "left";
-        context.textBaseline = "middle";
-        context.fillStyle = config.color;
-        context.font = SIZE + "pt Helvetica";
-        context.fillText(text, 0, txtCanvas.height / 2);
-        var tex = new THREE.Texture(txtCanvas);
-        tex.flipY = true;
-        tex.needsUpdate = true;
-        mesh.material.map = tex;
-        mesh.material.transparent = true;
-        mesh.material.needsUpdate = true;
-        mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
-        mesh.geometry.needsUpdate = true;
-        mesh.geometry.verticesNeedUpdate = true;
-        mesh.needsUpdate = true;
-    }
-    function setX1(mesh, v) {
-        mesh.geometry.vertices[0].x = v;
-    }
-    function setY1(mesh, v) {
-        mesh.geometry.vertices[0].y = v;
-    }
-    function setX2(mesh, v) {
-        mesh.geometry.vertices[1].x = v;
-    }
-    function setY2(mesh, v) {
-        mesh.geometry.vertices[1].y = v;
-    }
-    function createG(dataElements, scene) {
-        var visualElements = [];
-        for (var i = 0; i < dataElements.length; i++) {
-            visualElements.push(new GroupElement());
-        }
-        return visualElements;
-    }
-    var GroupElement = (function () {
-        function GroupElement() {
-            this.position = { x: 0, y: 0, z: 0 };
-            this.children = [];
-        }
-        return GroupElement;
-    })();
-    function createCirclesNoShader(dataElements, scene) {
-        var material;
-        var geometry;
-        var visualElements = [];
-        var c;
-        for (var i = 0; i < dataElements.length; i++) {
-            material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true });
-            geometry = new THREE.CircleGeometry(1, 10);
-            geometry.dynamic = true;
-            c = new THREE.Mesh(geometry, material);
-            visualElements.push(c);
-            c.position.set(0, 0, 1);
-            c.scale.set(10, 10, 1);
-            scene.add(c);
-        }
-        return visualElements;
-    }
-    var circleVertexShader = '\
-        uniform vec2 u_resolution;\
-        attribute vec2 a_position;\
-        attribute vec2 a_center;\
-        attribute float a_radius;\
-        \
-        varying vec2 center;\
-        varying vec2 resolution;\
-        varying float radius;\
-        \
-        void main() {\
-            vec2 clipspace = a_position / u_resolution * 2.0 - 1.0;\
-            gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);\
-            \
-            radius = a_radius;\
-            center = a_center;\
-            resolution = u_resolution;\
-        }\
-    ';
-    var circleFragmentShader = '\
-        precision mediump float;\
-        \
-        varying vec2 center;\
-        varying vec2 resolution;\
-        varying float radius;\
-        \
-        void main() {\
-            vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\
-            \
-            float x = gl_FragCoord.x;\
-            float y = resolution[1] - gl_FragCoord.y;\
-            \
-            float dx = center[0] - x;\
-            float dy = center[1] - y;\
-            float distance = sqrt(dx*dx + dy*dy);\
-            \
-            if ( distance < radius )\
-                gl_FragColor = vec4(1.0, 0.5, 0.0, 1.0); \
-            else\   ;
-    gl_FragColor = color0;
+    return this;
 })(glutils || (glutils = {}));
-';
-function createCircles(dataElements, scene) {
+style(name, string, v, any);
+WebGLElementQuery < T, S > {
+    var: l = this.visualElements.length,
+    if: function () { }, this: .IS_SHADER };
+{
+    for (var i = 0; i < this.dataElements.length; i++) {
+        this[name][i] = v instanceof Function ? v(this.dataElements[i], i) : v;
+    }
+}
+for (var i = 0; i < l; i++) {
+    setStyle(this.visualElements[i], name, v instanceof Function ? v(this.dataElements[i], i) : v, this);
+}
+return this;
+set();
+WebGLElementQuery < T, S > {
+    if: function () { } };
+!this.IS_SHADER;
+return this;
+var l = this.visualElements.length;
+var vertexPositionBuffer = [];
+var vertexColorBuffer = [];
+if (this.shape == 'circle') {
+    for (var i = 0; i < this.dataElements.length; i++) {
+        addBufferedCirlce(vertexPositionBuffer, this.x[i], this.y[i], this.z[i], 10, vertexColorBuffer, this.color[i]);
+    }
+}
+var geometry = this.mesh.geometry;
+geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f(vertexPositionBuffer), 3));
+geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f(vertexColorBuffer), 4));
+geometry.needsUpdate = true;
+geometry.verticesNeedUpdate = true;
+this.mesh.material.needsUpdate = true;
+return this;
+text(v, any);
+WebGLElementQuery < T, S > {
+    var: l = this.visualElements.length,
+    for: function () { }, var: i = 0, i: function () { } }++;
+{
+    setText(this.visualElements[i], v instanceof Function ? v(this.dataElements[i], i) : v);
+}
+return this;
+on(event, string, f, Function);
+WebGLElementQuery < T, S > {
+    switch: function (event) { },
+    case: 'mouseover', this: .mouseOverHandler = f, break: ,
+    case: 'mousemove', this: .mouseMoveHandler = f, break: ,
+    case: 'mouseout', this: .mouseOutHandler = f, break: ,
+    case: 'mousedown', this: .mouseDownHandler = f, break: ,
+    case: 'mouseup', this: .mouseUpHandler = f, break: ,
+    case: 'click', this: .clickHandler = f, break: 
+};
+webgl.interactor.register(this, event);
+return this;
+call(method, string, dataElement, T, event);
+WebGLElementQuery < T, S > {
+    var: i = this.dataElements.indexOf(dataElement),
+    switch: function (method) { },
+    case: 'mouseover', this: .mouseOverHandler(dataElement, i, event), break: ,
+    case: 'mousemove', this: .mouseMoveHandler(dataElement, i, event), break: ,
+    case: 'mouseout', this: .mouseOutHandler(dataElement, i, event), break: ,
+    case: 'mousedown', this: .mouseDownHandler(dataElement, i, event), break: ,
+    case: 'mouseup', this: .mouseUpHandler(dataElement, i, event), break: ,
+    case: 'click', this: .clickHandler(dataElement, i, event), break: 
+};
+return this;
+setAttr(element, THREE.Mesh, attr, string, v, any, index, number);
+{
+    switch (attr) {
+        case 'x':
+            element.position.x = v;
+            this.x[index] = v;
+            break;
+        case 'y':
+            element.position.y = v;
+            this.y[index] = v;
+            break;
+        case 'z':
+            element.position.z = v;
+            this.z[index] = v;
+            break;
+        case 'x1':
+            setX1(element, v);
+            break;
+        case 'y1':
+            setY1(element, v);
+            break;
+        case 'x2':
+            setX2(element, v);
+            break;
+        case 'y2':
+            setY2(element, v);
+            break;
+        case 'r':
+            element.scale.set(v, v, v);
+            break;
+        case 'width':
+            element.scale.setX(v);
+            break;
+        case 'height':
+            element.scale.setY(v);
+            break;
+        case 'depth':
+            element.scale.setZ(v);
+            break;
+        case 'd':
+            createPath(element, v);
+            break;
+        case 'points':
+            createPolygon(element, v);
+            break;
+        case 'rotation':
+            element.rotation.z = v * Math.PI / 180;
+            break;
+        case 'scaleX':
+            element.scale.x = v;
+            break;
+        case 'scaleY':
+            element.scale.y = v;
+            break;
+        default: console.error('Attribute', attr, 'does not exist.');
+    }
+    element.geometry.verticesNeedUpdate = true;
+    element.geometry.elementsNeedUpdate = true;
+    element.geometry.lineDistancesNeedUpdate = true;
+}
+removeAll();
+{
+    for (var i = 0; i < this.visualElements.length; i++) {
+        if (this.visualElements[i].wireframe)
+            this.scene.remove(this.visualElements[i].wireframe);
+        this.scene.remove(this.visualElements[i]);
+    }
+}
+function setStyle(element, attr, v, query) {
+    switch (attr) {
+        case 'fill':
+            if (query.shape == 'text')
+                setText(element, element['text'], { color: v });
+            else
+                element.material.color = new THREE.Color(v);
+            break;
+        case 'stroke':
+            if (element.hasOwnProperty('wireframe')) {
+                element.wireframe.material.color = new THREE.Color(v);
+            }
+            else {
+                element.material.color = new THREE.Color(v);
+            }
+            break;
+        case 'opacity':
+            element.material.opacity = v;
+            if (element.hasOwnProperty('wireframe'))
+                element.wireframe.material.opacity = v;
+            break;
+        case 'stroke-width':
+            if (element.hasOwnProperty('wireframe'))
+                element.wireframe.material.linewidth = v;
+            else
+                element.material.linewidth = v;
+            break;
+        case 'font-size':
+            element.scale.x = v / 30;
+            element.scale.y = v / 30;
+            element.geometry.verticesNeedUpdate = true;
+            break;
+        default: console.error('Style', attr, 'does not exist.');
+    }
+    element.material.needsUpdate = true;
+    if (element.hasOwnProperty('wireframe'))
+        element.wireframe.material.needsUpdate = true;
+}
+var textCtx;
+function setText(mesh, text, parConfig) {
+    var config = parConfig;
+    if (config == undefined) {
+        config = {};
+    }
+    if (config.color == undefined)
+        config.color = '#000000';
+    mesh['text'] = text;
+    var backgroundMargin = 10;
+    var txtCanvas = document.createElement("canvas");
+    var context = txtCanvas.getContext("2d");
+    var SIZE = 30;
+    context.font = SIZE + "pt Helvetica";
+    var WIDTH = context.measureText(text).width;
+    txtCanvas.width = WIDTH;
+    txtCanvas.height = SIZE;
+    context.textAlign = "left";
+    context.textBaseline = "middle";
+    context.fillStyle = config.color;
+    context.font = SIZE + "pt Helvetica";
+    context.fillText(text, 0, txtCanvas.height / 2);
+    var tex = new THREE.Texture(txtCanvas);
+    tex.minFilter = THREE.LinearFilter;
+    tex.flipY = true;
+    tex.needsUpdate = true;
+    mesh.material.map = tex;
+    mesh.material.transparent = true;
+    mesh.material.needsUpdate = true;
+    mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
+    mesh.geometry.needsUpdate = true;
+    mesh.geometry.verticesNeedUpdate = true;
+    mesh.needsUpdate = true;
+}
+function setX1(mesh, v) {
+    mesh.geometry.vertices[0].x = v;
+}
+function setY1(mesh, v) {
+    mesh.geometry.vertices[0].y = v;
+}
+function setX2(mesh, v) {
+    mesh.geometry.vertices[1].x = v;
+}
+function setY2(mesh, v) {
+    mesh.geometry.vertices[1].y = v;
+}
+function createG(dataElements, scene) {
+    var visualElements = [];
+    for (var i = 0; i < dataElements.length; i++) {
+        visualElements.push(new GroupElement());
+    }
+    return visualElements;
+}
+var GroupElement = (function () {
+    function GroupElement() {
+        this.position = { x: 0, y: 0, z: 0 };
+        this.children = [];
+    }
+    return GroupElement;
+})();
+function createCirclesNoShader(dataElements, scene) {
+    var material;
+    var geometry;
+    var visualElements = [];
+    var c;
+    for (var i = 0; i < dataElements.length; i++) {
+        material = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true });
+        geometry = new THREE.CircleGeometry(1, 10);
+        geometry.dynamic = true;
+        c = new THREE.Mesh(geometry, material);
+        visualElements.push(c);
+        c.position.set(0, 0, 1);
+        c.scale.set(10, 10, 1);
+        scene.add(c);
+    }
+    return visualElements;
+}
+var vertexShaderProgram = "\
+        attribute vec4 customColor;\
+        varying vec4 vColor;\
+        void main() {\
+            vColor = customColor;\
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );\
+        }";
+var fragmentShaderProgram = "\
+        varying vec4 vColor;\
+        void main() {\
+            gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);\
+        }";
+function createCirclesWithBuffers(query, scene) {
+    var dataElements = query.dataElements;
+    query.IS_SHADER = true;
+    var attributes = {
+        customColor: { type: 'c', value: [] }
+    };
+    var shaderMaterial = new THREE.ShaderMaterial({
+        attributes: attributes,
+        vertexShader: vertexShaderProgram,
+        fragmentShader: fragmentShaderProgram,
+        linewidth: 2
+    });
+    shaderMaterial.blending = THREE.NormalBlending;
+    shaderMaterial.depthTest = true;
+    shaderMaterial.transparent = true;
+    shaderMaterial.side = THREE.DoubleSide;
+    var visualElements = [];
+    var c;
+    var vertexPositionBuffer = [];
+    var vertexColorBuffer = [];
+    var geometry = new THREE.BufferGeometry();
+    for (var i = 0; i < dataElements.length; i++) {
+        addBufferedCirlce(vertexPositionBuffer, Math.random() * 100, Math.random() * 100, 0, 2, vertexColorBuffer, [0, 0, 1, .5]);
+        query.x.push(0);
+        query.y.push(0);
+        query.z.push(0);
+    }
+    geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f(vertexPositionBuffer), 3));
+    geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f(vertexColorBuffer), 4));
+    query.mesh = new THREE.Mesh(geometry, shaderMaterial);
+    query.mesh.position.set(0, 0, 1);
+    scene.add(query.mesh);
+    return query;
 }
 function createRectangles(dataElements, scene) {
     var material;

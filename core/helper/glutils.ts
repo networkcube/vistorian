@@ -65,6 +65,23 @@ module glutils {
         );
     }
 
+    export function addBufferedCirlce(vertexArray: number[][], x: number, y: number, z: number, radius: number, colorArray: number[][], c: number[]) {
+        var segments = 11;
+        var angle = Math.PI / (segments / 2)
+        for(var i=0 ; i < segments ; i++){
+            vertexArray.push(
+                [x + Math.cos(i*angle) * radius, y + Math.sin(i*angle) *radius, z],
+                [x + Math.cos((i+1)*angle) * radius, y + Math.sin((i+1)*angle) *radius, z],
+                [x, y, z]
+            )
+            colorArray.push(
+                [c[0], c[1], c[2], c[3]],
+                [c[0], c[1], c[2], c[3]],
+                [c[0], c[1], c[2], c[3]]
+            )  
+        }
+    }
+
     export function addBufferedDiamond(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]) {
         width = width / 2;
         height = height / 2;
@@ -211,6 +228,8 @@ module glutils {
         geometry:THREE.BufferGeometry;
         interactor:WebGLInteractor;
 
+        elementQueries:WebGLElementQuery[] = []
+
         constructor(){
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
@@ -219,11 +238,20 @@ module glutils {
         render(){
             // var d = new Date();
             // var begin = d.getTime()
+
+            // check which webgl groups must be updated
+            for(var i=0 ; i < this.elementQueries.length ; i++){
+                if(this.elementQueries[i].updateAttributes || this.elementQueries[i].updateStyle){
+                    this.elementQueries[i].set();
+                }
+            }
+
             this.renderer.render(this.scene, this.camera)
             // d = new Date();
             // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
         }
 
+        
 
 
         ///////////////////////
@@ -313,7 +341,9 @@ module glutils {
     /// SELECTIONS in the style of D3
     
     export function selectAll():WebGLElementQuery<any,any>{
-        return new glutils.WebGLElementQuery();
+        var q = new glutils.WebGLElementQuery();
+        webgl.elementQueries.push(q)
+        return q;
     }
     
     
@@ -321,6 +351,7 @@ module glutils {
     export class WebGLElementQuery<T,S>{
         dataElements:T[] = [];
         visualElements:S[] = [];
+        mesh:THREE.Mesh;
         children:Object[] = []
         scene:THREE.Scene;
         mouseOverHandler:Function;
@@ -329,11 +360,23 @@ module glutils {
         mouseDownHandler:Function;
         mouseUpHandler:Function;
         clickHandler:Function;
+
+        // attribute arrays
         x:number[] = [];
         y:number[] = [];
         z:number[] = [];
-        
+        r:number[] = [];
+
+        // style arrays
+        fill:number[] = [];
+        stroke:number[] = [];
+        strokewidth:number[] = [];
+        opacity:number[] = []
+
         shape:string;
+
+        updateAttributes:boolean = false
+        updateStyle:boolean = false
 
         IS_SHADER:boolean = false
               
@@ -349,7 +392,8 @@ module glutils {
         append(shape:string):WebGLElementQuery<T,S>{
             var elements = []
             switch(shape){
-                case 'circle': elements = createCirclesNoShader(this.dataElements, this.scene); break
+                // case 'circle': elements = createCirclesNoShader(this.dataElements, this.scene); break
+                case 'circle': createCirclesWithBuffers(this, this.scene); break
                 // case 'circle': elements = createCircles(this.dataElements, this.scene); break
                 // case 'g': elements = createG(this.dataElements, this.scene); break
                 case 'path': elements = createPaths(this.dataElements, this.scene); break
@@ -361,10 +405,12 @@ module glutils {
             }
 
             // init position arrays
-            for(var i=0 ; i <elements.length ; i++){
-                this.x.push(0);
-                this.y.push(0);
-                this.z.push(0);
+            if(!this.IS_SHADER){
+                for(var i=0 ; i <elements.length ; i++){
+                    this.x.push(0);
+                    this.y.push(0);
+                    this.z.push(0);
+                }
             }
 
             this.shape = shape;
@@ -405,31 +451,65 @@ module glutils {
         // geometric attributes
         attr(name:string, v:any):WebGLElementQuery<T,S>{
             var l = this.visualElements.length;
-            // if(this.IS_SHADER){
-            //     if(name == 'x'){
-            //         var vertexPositionBuffer = []
-            //         for(var i=0 ; i < this.dataElements.length ; i++){
-            //             vertexPositionBuffer = vertexPositionBuffer.concat([v instanceof Function?v(this.dataElements[i], i):v,0,0])
-            //         }
-            //         geometry.setAttribute( 'position', new THREE.BufferAttribute( vertexPositionBuffer,3 ));
-            //     }
-            // }else{
+            if(this.IS_SHADER){
+                for(var i=0 ; i < this.dataElements.length ; i++){
+                    this[name][i] = v instanceof Function?v(this.dataElements[i], i):v
+                }
+            }else{
                 for(var i=0 ; i <l ; i++){ 
                     this.setAttr(this.visualElements[i], name, v instanceof Function?v(this.dataElements[i], i):v, i);
                     if(this.visualElements[i].hasOwnProperty('wireframe')){
                         this.setAttr(this.visualElements[i].wireframe, name, v instanceof Function?v(this.dataElements[i], i):v, i);                        
                     }
                 }
-            // }
+            }
+            this.updateAttributes = true;
             return this;
         }
 
         // style attributes
         style(name:string, v:any):WebGLElementQuery<T,S>{
             var l = this.visualElements.length;
-            for(var i=0 ; i<l ; i++){ 
-                setStyle(this.visualElements[i], name, v instanceof Function?v(this.dataElements[i], i):v, this);
+            if(this.IS_SHADER){
+                name = name.replace('-','');
+                for(var i=0 ; i < this.dataElements.length ; i++){
+                    this[name][i] = v instanceof Function?v(this.dataElements[i], i):v
+                }
+            }else{
+                for(var i=0 ; i<l ; i++){ 
+                    setStyle(this.visualElements[i], name, v instanceof Function?v(this.dataElements[i], i):v, this);
+                }
             }
+            this.updateStyle = true;
+            return this;
+        }
+
+        // called after all visual attributes have been set
+        // method that passes updated values to the shaders 
+        set():WebGLElementQuery<T,S>{
+            if(!this.IS_SHADER)
+                return this;
+
+            var l = this.visualElements.length;
+            var vertexPositionBuffer = []
+            var vertexColorBuffer = []
+            var c
+            if(this.shape == 'circle'){
+                for(var i=0 ; i < this.dataElements.length ; i++){
+                    c = new THREE.Color(this.fill[i])
+                    addBufferedCirlce(vertexPositionBuffer, this.x[i],this.y[i], this.z[i], this.r[i] , vertexColorBuffer, [c.r, c.g, c.b, this.opacity[i]])
+                }
+            }
+            var geometry = this.mesh.geometry;
+            geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f(vertexPositionBuffer), 3));
+            geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f(vertexColorBuffer), 4));
+            geometry.needsUpdate = true;
+            geometry.verticesNeedUpdate = true;
+            this.mesh.material.needsUpdate = true;
+            
+            this.updateAttributes = false;
+            this.updateStyle = false;
+
             return this;
         }
         
@@ -653,6 +733,73 @@ module glutils {
         }
         return visualElements;
     }
+
+    // SHADERS
+    var vertexShaderProgram = "\
+        attribute vec4 customColor;\
+        varying vec4 vColor;\
+        void main() {\
+            vColor = customColor;\
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );\
+        }";
+
+
+    var fragmentShaderProgram = "\
+        varying vec4 vColor;\
+        void main() {\
+            gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);\
+        }";
+    
+    function createCirclesWithBuffers(query:WebGLElementQuery, scene:THREE.Scene){
+        var dataElements = query.dataElements;
+        query.IS_SHADER = true;     
+        var attributes = {
+            customColor: { type: 'c', value: [] }
+        }
+        var shaderMaterial: THREE.ShaderMaterial = new THREE.ShaderMaterial({
+            attributes: attributes,
+            vertexShader: vertexShaderProgram,
+            fragmentShader: fragmentShaderProgram,
+            linewidth: 2
+        });
+        shaderMaterial.blending = THREE.NormalBlending;
+        shaderMaterial.depthTest = true;
+        shaderMaterial.transparent = true;
+        shaderMaterial.side = THREE.DoubleSide;
+
+        
+        var visualElements = []
+        var c;   
+        var vertexPositionBuffer = []
+        var vertexColorBuffer = []
+        var geometry = new THREE.BufferGeometry();
+        for(var i=0 ; i < dataElements.length ; i++){
+            // addBufferedCirlce(vertexPositionBuffer, Math.random()*10,Math.random()*10,0,2, vertexColorBuffer, [0,0,1,.5] )
+            query.x.push(0)
+            query.y.push(0)
+            query.z.push(0)
+            query.r.push(0)
+            query.fill.push('0x000000')
+            query.stroke.push('0x000000')
+            query.strokewidth.push(1)
+            query.opacity.push(1)
+        }
+        geometry = new THREE.BufferGeometry();
+
+        // CREATE + ADD MESH
+        geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f([]), 3));
+
+        geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f([]), 4));
+        query.mesh = new THREE.Mesh(geometry, shaderMaterial);
+        query.mesh.position.set(0,0,1)
+        
+        scene.add(query.mesh);
+        return query;
+    }
+
+
+
+
     // create circles using vertex shaders
 
         // attach shaders to current body
