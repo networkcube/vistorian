@@ -89,17 +89,17 @@ var plotMargin = calculatePlotMargin();
 
 // PREPARE MENU
 $('body').append('<div id="networkcube-matrix-menu"></div>');
-$('#menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>')
-$("#menu").append('<br/>');
-$("#menu").append('<label>Label ordering:</label>');
-var orderingMenu = $("#menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>')
+$('#networkcube-matrix-menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>')
+$("#networkcube-matrix-menu").append('<br/>');
+$("#networkcube-matrix-menu").append('<label>Label ordering:</label>');
+var orderingMenu = $("#networkcube-matrix-menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>')
 $('#labelOrdering').append('<option value="none">---</option>');
 $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
 $('#labelOrdering').append('<option value="reverse-alpha">Reverse Alphanumerical</option>');
 $('#labelOrdering').append('<option value="degree">Node degree</option>');
 $('#labelOrdering').append('<option value="similarity">Similarity</option>');
 
-$('#menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
+$('#networkcube-matrix-menu').append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
 
 
 $('#dataName').text(dgraph.name);
@@ -109,18 +109,18 @@ networkcube.setDefaultEventListener(updateEvent)
 networkcube.addEventListener('timeRange', timeRangeHandler);
 
 
-window.addEventListener("mousewheel", (e)=>{
-    event.preventDefault();
-    if(event.wheelDelta > 0)
-        cellsize *= Math.abs(event.wheelDelta/100);
-    else
-        cellsize /= Math.abs(event.wheelDelta/100);
-        
-    updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
-    
-}, false);
-
-
+//window.addEventListener("mousewheel", (e)=>{
+//    event.preventDefault();
+//    if(event.wheelDelta > 0)
+//        cellsize *= Math.abs(event.wheelDelta/100);
+//    else
+//        cellsize /= Math.abs(event.wheelDelta/100);
+//        
+//    updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
+//    
+//}, false);
+//
+//
 
 
 // SVG STUFF
@@ -134,12 +134,13 @@ var timeSlider: any = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth = Math.max(Math.max(cellsize * dgraph.nodes().length + 50, window.innerWidth), window.innerHeight);
+var totalWidth =  window.innerWidth; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
+var totalHeight = window.innerHeight; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
 
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
     .attr('width', totalWidth + plotMargin.left)
-    .attr('height', totalWidth + plotMargin.top);
+    .attr('height', totalHeight + plotMargin.top);
 
 
 nodeOrder = dgraph.nodes().ids();
@@ -311,7 +312,7 @@ var cellLabel = glutils.selectAll()
         .style('font-size', 12)
 
 $('#networkcube-matrix-visCanvasFO').append(canvas);
-d3.select('#vnetworkcube-matrix-isCanvasFO')
+d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
     .attr('y', plotMargin.top)
     .attr('width', totalWidth + plotMargin.left)
@@ -335,7 +336,7 @@ enum UpdateOptions {
     Links = 1 << 1,
     Geometry = 1 << 2,
     NodeOrdering = Nodes | Geometry | Links | 1 << 3,
-    PlotLocation = Nodes | Geometry | Links | 1 << 4,
+    PlotLocation = Nodes |  Links | 1 << 4,
     Standard = Geometry | Links | Nodes,
     All = 0xffff
 }
@@ -352,9 +353,10 @@ function updateAll(updateOptions: UpdateOptions): void {
         // bbach: removed since distracting.
         plotMargin = calculatePlotMargin();
         // update the location of the links canvas
-        d3.select('#networkcube-matrix- visCanvasFO')
+        d3.select('#networkcube-matrix-visCanvasFO')
             .attr('x', plotMargin.left)
             .attr('y', plotMargin.top);
+        updatePlot();
     }
 
     if ((updateOptions & UpdateOptions.NodeOrdering) == UpdateOptions.NodeOrdering)
@@ -553,6 +555,43 @@ function updateGeometry() {
         guidelines.push(m)
     }
     
+
+}
+
+view = d3.select(renderer.domElement);
+
+var width = canvasWidth;
+var height= canvasWidth;
+
+zoom = d3.behavior.zoom().scaleExtent([0.2, 4]).on('zoom', function() {
+  var x, y, z, _ref;
+  z = zoom.scale();
+  _ref = zoom.translate(), x = _ref[0], y = _ref[1];
+console.log("zoom", z);
+console.log("tr", _ref);
+  return window.requestAnimationFrame(function() {
+    x = -x + width / 2;
+    y = y - height / 2;
+    camera.position.set(x, y, 100);
+    camera.zoom = z;
+    camera.position.set(x/z, y/z, 100);
+    camera.updateProjectionMatrix();
+    cellsize = z*12;
+    updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
+    
+    return render();
+  });
+});
+
+view.call(zoom);
+
+function updatePlot() {
+var cx = camera.position.x;
+  var cy = camera.position.y;
+  console.log(cx, cy);
+  var factor = cellsize/12;
+  //camera.zoom = factor;
+  //camera.updateProjectionMatrix();
 
 }
 
