@@ -134,8 +134,8 @@ var timeSlider: any = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth =  window.innerWidth; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
-var totalHeight = window.innerHeight; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
+var totalWidth =  window.innerWidth - plotMargin.left; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
+var totalHeight = window.innerHeight - plotMargin.top; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
 
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
@@ -167,8 +167,7 @@ nodeOrder = dgraph.nodes().ids();
 //     })
 //     .on('mouseout', (d, i) => {
 //         networkcube.highlight('reset');
-//     })
-//     .on('click', (d, i) => {
+//     })Height   .on('click', (d, i) => {
 //         var selections = d.getSelections();
 //         var currentSelection = this.dgraph.getCurrentSelection();
 //         for (var j = 0; j < selections.length; j++) {
@@ -247,28 +246,29 @@ var crosses = [];
 scene = new THREE.Scene();
 
 // var canvasWidth = cellsize * dgraph.nodes().length + 50;
-var canvasWidth = totalWidth + plotMargin.left;
+var canvasWidth = totalWidth;
     // .attr('width', totalWidth + plotMargin.left)
     // .attr('height', totalWidth + plotMargin.top);
 
+var canvasHeight = totalHeight;
 
 
 // camera
 camera = new THREE.OrthographicCamera(
     canvasWidth / -2,
     canvasWidth / 2,
-    canvasWidth / 2,
-    canvasWidth / -2,
+    canvasHeight/ 2,
+    canvasHeight / -2,
     0, 1000)
 
 scene.add(camera);
 camera.position.x = canvasWidth / 2;
-camera.position.y = -canvasWidth / 2;
+camera.position.y = -canvasHeight / 2;
 camera.position.z = 100;
 
 // renderer
 renderer = new THREE.WebGLRenderer({ antialias: true })
-renderer.setSize(canvasWidth, canvasWidth)
+renderer.setSize(canvasWidth, canvasHeight)
 renderer.setClearColor(0xffffff, 1);
 
 // raycaster
@@ -315,9 +315,14 @@ $('#networkcube-matrix-visCanvasFO').append(canvas);
 d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
     .attr('y', plotMargin.top)
-    .attr('width', totalWidth + plotMargin.left)
-    .attr('height', totalWidth + plotMargin.top);
+    .attr('width', totalWidth )
+    .attr('height', totalHeight);
 
+var view = d3.select(canvas);
+zoom = d3.behavior.zoom()
+        .scaleExtent([0.2, 4])
+        .on('zoom', zoomed);
+view.call(zoom);
 
 
 // geometry and mesh
@@ -558,20 +563,15 @@ function updateGeometry() {
 
 }
 
-view = d3.select(renderer.domElement);
-
-var width = canvasWidth;
-var height= canvasWidth;
-
-zoom = d3.behavior.zoom().scaleExtent([0.2, 4]).on('zoom', function() {
+function zoomed() {
   var x, y, z, _ref;
   z = zoom.scale();
   _ref = zoom.translate(), x = _ref[0], y = _ref[1];
-console.log("zoom", z);
-console.log("tr", _ref);
+  console.log("zoom", z);
+  console.log("tr", _ref);
   return window.requestAnimationFrame(function() {
-    x = -x + width / 2;
-    y = y - height / 2;
+    x = -x + canvasWidth / 2;
+    y = y - canvasHeight / 2;
     camera.position.set(x, y, 100);
     camera.zoom = z;
     camera.position.set(x/z, y/z, 100);
@@ -583,13 +583,17 @@ console.log("tr", _ref);
   });
 });
 
-view.call(zoom);
 
 function updatePlot() {
 var cx = camera.position.x;
   var cy = camera.position.y;
   console.log(cx, cy);
-  var factor = cellsize/12;
+  //var z = cellsize/12;
+  //  camera.position.set(0, 0, 100);
+  //  camera.zoom = z;
+  //  camera.position.set(cx/z, cy/z, 100);
+  //  camera.updateProjectionMatrix();
+  //  cellsize = z*12;
   //camera.zoom = factor;
   //camera.updateProjectionMatrix();
 
@@ -809,6 +813,8 @@ function timeRangeHandler(m: networkcube.TimeRangeMessage) {
 function updateCellSize() {
     
     cellsize = parseInt((<HTMLInputElement>document.getElementById("cellSizeBox")).value);
+    zoom.scale(cellsize/12)
+        .event(view);
 
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
 }

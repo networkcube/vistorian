@@ -53,8 +53,8 @@ var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
 var timeSlider = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth = window.innerWidth;
-var totalHeight = window.innerHeight;
+var totalWidth = window.innerWidth - plotMargin.left;
+var totalHeight = window.innerHeight - plotMargin.top;
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
     .attr('width', totalWidth + plotMargin.left)
@@ -82,14 +82,15 @@ shaderMaterial.transparent = true;
 shaderMaterial.side = THREE.DoubleSide;
 var crosses = [];
 scene = new THREE.Scene();
-var canvasWidth = totalWidth + plotMargin.left;
-camera = new THREE.OrthographicCamera(canvasWidth / -2, canvasWidth / 2, canvasWidth / 2, canvasWidth / -2, 0, 1000);
+var canvasWidth = totalWidth;
+var canvasHeight = totalHeight;
+camera = new THREE.OrthographicCamera(canvasWidth / -2, canvasWidth / 2, canvasHeight / 2, canvasHeight / -2, 0, 1000);
 scene.add(camera);
 camera.position.x = canvasWidth / 2;
-camera.position.y = -canvasWidth / 2;
+camera.position.y = -canvasHeight / 2;
 camera.position.z = 100;
 renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(canvasWidth, canvasWidth);
+renderer.setSize(canvasWidth, canvasHeight);
 renderer.setClearColor(0xffffff, 1);
 var raycaster = new THREE.Raycaster();
 var canvas = renderer.domElement;
@@ -126,8 +127,13 @@ $('#networkcube-matrix-visCanvasFO').append(canvas);
 d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
     .attr('y', plotMargin.top)
-    .attr('width', totalWidth + plotMargin.left)
-    .attr('height', totalWidth + plotMargin.top);
+    .attr('width', totalWidth)
+    .attr('height', totalHeight);
+var view = d3.select(canvas);
+zoom = d3.behavior.zoom()
+    .scaleExtent([0.2, 4])
+    .on('zoom', zoomed);
+view.call(zoom);
 geometry = new THREE.BufferGeometry();
 var vertexColors = [];
 var cellHighlightFrames = networkcube.array(undefined, dgraph.links().length);
@@ -295,18 +301,15 @@ function updateGeometry() {
         guidelines.push(m);
     }
 }
-view = d3.select(renderer.domElement);
-var width = canvasWidth;
-var height = canvasWidth;
-zoom = d3.behavior.zoom().scaleExtent([0.2, 4]).on('zoom', function () {
+function zoomed() {
     var x, y, z, _ref;
     z = zoom.scale();
     _ref = zoom.translate(), x = _ref[0], y = _ref[1];
     console.log("zoom", z);
     console.log("tr", _ref);
     return window.requestAnimationFrame(function () {
-        x = -x + width / 2;
-        y = y - height / 2;
+        x = -x + canvasWidth / 2;
+        y = y - canvasHeight / 2;
         camera.position.set(x, y, 100);
         camera.zoom = z;
         camera.position.set(x / z, y / z, 100);
@@ -315,13 +318,12 @@ zoom = d3.behavior.zoom().scaleExtent([0.2, 4]).on('zoom', function () {
         updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
         return render();
     });
-});
-view.call(zoom);
+}
+;
 function updatePlot() {
     var cx = camera.position.x;
     var cy = camera.position.y;
     console.log(cx, cy);
-    var factor = cellsize / 12;
 }
 function updateNodes() {
     var _this = this;
@@ -480,6 +482,8 @@ function timeRangeHandler(m) {
 }
 function updateCellSize() {
     cellsize = parseInt(document.getElementById("cellSizeBox").value);
+    zoom.scale(cellsize / 12)
+        .event(view);
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
 }
 var links;
