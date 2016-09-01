@@ -58,8 +58,8 @@ var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
 var timeSlider = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth = window.innerWidth - plotMargin.left - 20;
-var totalHeight = window.innerHeight - plotMargin.top - 120;
+var totalWidth = window.innerWidth - plotMargin.left - 10;
+var totalHeight = window.innerHeight - plotMargin.top - 110;
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
     .attr('width', totalWidth + plotMargin.left)
@@ -87,8 +87,8 @@ shaderMaterial.transparent = true;
 shaderMaterial.side = THREE.DoubleSide;
 var crosses = [];
 scene = new THREE.Scene();
-var canvasWidth = totalWidth - plotMargin.left;
-var canvasHeight = totalHeight - plotMargin.top;
+var canvasWidth = totalWidth;
+var canvasHeight = totalHeight;
 camera = new THREE.OrthographicCamera(canvasWidth / -2, canvasWidth / 2, canvasHeight / 2, canvasHeight / -2, 0, 1000);
 scene.add(camera);
 camera.position.x = canvasWidth / 2;
@@ -341,7 +341,7 @@ function updateNodes() {
         .data(leftNodes);
     var leftLabelPosition = function (nodeId) { return plotMargin.top + leftLabelOffset + cellsize * (nodeOrder[nodeId] - firstLeftVisible) + cellsize; };
     labelsLeft.enter().append('text')
-        .attr('id', function (d, i) { return 'nodeLabel_left_' + i; })
+        .attr('id', function (d, i) { return 'nodeLabel_left_' + d.id(); })
         .attr('class', 'labelsLeft nodeLabel')
         .attr('text-anchor', 'end')
         .attr('x', plotMargin.left - 10)
@@ -365,6 +365,7 @@ function updateNodes() {
     });
     labelsLeft.exit().remove();
     labelsLeft
+        .attr('id', function (d, i) { return 'nodeLabel_left_' + d.id(); })
         .text(function (d, i) { return d.label(); })
         .attr('x', plotMargin.left - 10)
         .attr('y', function (d, i) {
@@ -376,7 +377,7 @@ function updateNodes() {
         .data(topNodes);
     var topLabelPosition = function (nodeId) { return plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - firstTopVisible) + cellsize; };
     labelsTop.enter().append('text')
-        .attr('id', function (d, i) { return 'nodeLabel_top_' + i; })
+        .attr('id', function (d, i) { return 'nodeLabel_top_' + d.id(); })
         .attr('class', 'labelsTop nodeLabel')
         .text(function (d, i) { return d.label(); })
         .attr('x', function (d, i) { return topLabelPosition(d.id()); })
@@ -401,6 +402,7 @@ function updateNodes() {
     });
     labelsTop.exit().remove();
     labelsTop
+        .attr('id', function (d, i) { return 'nodeLabel_top_' + d.id(); })
         .text(function (d, i) { return d.label(); })
         .attr('x', function (d, i) {
         return topLabelPosition(d.id());
@@ -552,7 +554,6 @@ function mouseMoveHandler(e) {
         }
     }
     else {
-        console.log("mouse Down");
         var box = new networkcube.Box(mx, my, mouseDownPos.x, mouseDownPos.y);
         for (var i = 0; i < links.length; i++) {
             l = links[i];

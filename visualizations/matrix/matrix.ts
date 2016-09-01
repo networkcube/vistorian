@@ -138,8 +138,8 @@ var timeSlider: any = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth =  window.innerWidth - plotMargin.left - 20; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
-var totalHeight = window.innerHeight - plotMargin.top - 120; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
+var totalWidth =  window.innerWidth - plotMargin.left - 10; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
+var totalHeight = window.innerHeight - plotMargin.top -110 ; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
 
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
@@ -250,11 +250,11 @@ var crosses = [];
 scene = new THREE.Scene();
 
 // var canvasWidth = cellsize * dgraph.nodes().length + 50;
-var canvasWidth = totalWidth - plotMargin.left;
+var canvasWidth = totalWidth;
     // .attr('width', totalWidth + plotMargin.left)
     // .attr('height', totalWidth + plotMargin.top);
 
-var canvasHeight = totalHeight - plotMargin.top;
+var canvasHeight = totalHeight;
 
 
 // camera
@@ -293,7 +293,6 @@ canvas.addEventListener('mouseup', (e) => {
 canvas.addEventListener('click', (e) => {
     this.clickHandler(e);
 })
-
 
 // init glutils renderer for D3 wrapper
 glutils.setWebGL(scene, camera, renderer, canvas);
@@ -611,9 +610,8 @@ function updateNodes() {
         .data(leftNodes);
 
     var leftLabelPosition = nodeId => plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[nodeId] - firstLeftVisible) + cellsize; 
-
     labelsLeft.enter().append('text')
-        .attr('id', (d, i) => { return 'nodeLabel_left_' + i; })
+        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
         .attr('class', 'labelsLeft nodeLabel')
         .attr('text-anchor', 'end')
         .attr('x', plotMargin.left - 10)
@@ -639,6 +637,7 @@ function updateNodes() {
     labelsLeft.exit().remove();
 
     labelsLeft
+        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
         .text((d, i) => { return d.label(); })
         .attr('x', plotMargin.left - 10)
         .attr('y', (d, i) => {
@@ -654,7 +653,7 @@ function updateNodes() {
     var topLabelPosition = nodeId => plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - firstTopVisible) + cellsize; 
 
     labelsTop.enter().append('text')
-        .attr('id', (d, i) => { return 'nodeLabel_top_' + i; })
+        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
         .attr('class', 'labelsTop nodeLabel')
         .text((d, i) => { return d.label(); })
         .attr('x', (d, i) => { return topLabelPosition(d.id())  })
@@ -680,6 +679,7 @@ function updateNodes() {
 
     labelsTop.exit().remove();
     labelsTop
+        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
         .text((d, i) => { return d.label(); })
         .attr('x', (d, i) => {
             return topLabelPosition(d.id()); 
@@ -704,6 +704,7 @@ function updateNodes() {
             return 100;
         })
         .style('font-size', cellsize);
+
 
     var highlightedLinks = dgraph.links().highlighted().toArray();
     for (var i = 0; i < highlightedLinks.length; i++) {
@@ -893,7 +894,6 @@ function mouseMoveHandler(e) {
             }
         }
     } else { // mouseDown
-      console.log("mouse Down");
           // get links under lasso rectangle
           var box: networkcube.Box = new networkcube.Box(mx, my, mouseDownPos.x, mouseDownPos.y)
           for (var i = 0; i < links.length; i++) {
