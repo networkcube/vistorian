@@ -64,10 +64,10 @@ var nodeOrder: number[] = [];
 // }
 
 
-var firstLeftVisible: number = 0; // first left label completely visible
-var firstTopVisible: number = 0; // first top label completely visible
-var leftLabelOffset: number = 0; // first left label completely visible
-var topLabelOffset: number = 0; // first top label completely visible
+var firstLeftVisible: number = 0; // index of first left label completely visible
+var firstTopVisible: number = 0; // index of first top label completely visible
+var leftLabelOffset: number = 0; // left label offset
+var topLabelOffset: number = 0; // top label offset 
 
 var guidelines = []
 
@@ -131,14 +131,14 @@ networkcube.addEventListener('timeRange', timeRangeHandler);
 $('body').append('<div id="networkcube-matrix-timelineDiv"></div>');
 var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
     .append('svg')
-    .attr('width', vizWidth)
+    .attr('width', vizWidth-20)
     .attr('height', 50)
 
 var timeSlider: any = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth =  window.innerWidth - plotMargin.left; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
+var totalWidth =  window.innerWidth - plotMargin.left - 20; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
 var totalHeight = window.innerHeight - plotMargin.top - 120; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
 
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
@@ -250,7 +250,7 @@ var crosses = [];
 scene = new THREE.Scene();
 
 // var canvasWidth = cellsize * dgraph.nodes().length + 50;
-var canvasWidth = totalWidth;
+var canvasWidth = totalWidth - plotMargin.left;
     // .attr('width', totalWidth + plotMargin.left)
     // .attr('height', totalWidth + plotMargin.top);
 
@@ -566,10 +566,9 @@ function updateGeometry() {
 }
 
 function zoomed() {
-  var x: number, y: number, z: number, _ref: number[];
-  z = zoom.scale();
-  _ref = zoom.translate(), x = _ref[0], y = _ref[1];
-  //return window.requestAnimationFrame(function() {
+    var x: number, y: number, z: number, _ref: number[];
+    z = zoom.scale();
+    _ref = zoom.translate(), x = _ref[0], y = _ref[1];
     x = -x + canvasWidth / 2;
     y = y - canvasHeight / 2;
     camera.position.set(x, y, 100);
@@ -579,7 +578,6 @@ function zoomed() {
     cellsize = z * initialCellSize;
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
     return render();
-  //});
 }
 
 
@@ -590,7 +588,7 @@ function updatePlot() {
       .attr('x', plotMargin.left)
       .attr('y', plotMargin.top);
 
-  document.getElementById("cellSizeBox").value = cellsize;
+  $("#cellSizeBox").val(cellsize);
 
   var _ref :number[];
   _ref = zoom.translate();
@@ -612,12 +610,14 @@ function updateNodes() {
     var labelsLeft = svg.selectAll('.labelsLeft')
         .data(leftNodes);
 
+    var leftLabelPosition = nodeId => plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[nodeId] - firstLeftVisible) + cellsize; 
+
     labelsLeft.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_left_' + i; })
         .attr('class', 'labelsLeft nodeLabel')
         .attr('text-anchor', 'end')
         .attr('x', plotMargin.left - 10)
-        .attr('y', (d, i) => { return plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[d.id()] - firstLeftVisible) + cellsize; })
+        .attr('y', (d, i) => { return leftLabelPosition(d.id())})
         .on('mouseover', (d, i) => {
             networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: [d] });
         })
@@ -642,7 +642,7 @@ function updateNodes() {
         .text((d, i) => { return d.label(); })
         .attr('x', plotMargin.left - 10)
         .attr('y', (d, i) => {
-            return plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[d.id()]- firstLeftVisible) + cellsize;
+            return leftLabelPosition(d.id()); 
         });
 
     var topNodes = dgraph.nodes().visible().toArray();
@@ -651,11 +651,13 @@ function updateNodes() {
     var labelsTop = svg.selectAll('.labelsTop')
         .data(topNodes);
 
+    var topLabelPosition = nodeId => plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - firstTopVisible) + cellsize; 
+
     labelsTop.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_top_' + i; })
         .attr('class', 'labelsTop nodeLabel')
         .text((d, i) => { return d.label(); })
-        .attr('x', (d, i) => { return plotMargin.left + topLabelOffset + cellsize * (nodeOrder[d.id()] - firstTopVisible) + cellsize; })
+        .attr('x', (d, i) => { return topLabelPosition(d.id())  })
         .attr('y', plotMargin.left - 10)
         .attr('transform', (d, i) => { return 'rotate(-90, ' + (plotMargin.top + cellsize * i + cellsize) + ', ' + (plotMargin.left - 10) + ')' })
         .on('mouseover', (d, i) => {
@@ -680,7 +682,7 @@ function updateNodes() {
     labelsTop
         .text((d, i) => { return d.label(); })
         .attr('x', (d, i) => {
-            return plotMargin.left + topLabelOffset +  cellsize * (nodeOrder[d.id()] - firstTopVisible) + cellsize;
+            return topLabelPosition(d.id()); 
         })
         .attr('y', plotMargin.top - 10)
         .attr('transform', (d, i) => { return 'rotate(-90, ' + (plotMargin.top + topLabelOffset + cellsize * (nodeOrder[d.id()]-firstTopVisible) + cellsize) + ', ' + (plotMargin.left - 10) + ')' })
@@ -728,7 +730,6 @@ function updateNodes() {
 }
 
 
-var linkLabel
 function updateLinks() {
     //console.log("updateLinks()");
 
@@ -821,8 +822,9 @@ function timeRangeHandler(m: networkcube.TimeRangeMessage) {
 }
 
 function updateCellSize() {
-    cellsize = parseInt((<HTMLInputElement>document.getElementById("cellSizeBox")).value);
-    zoom.scale(cellsize/initialCellSize).event(view);
+    cellsize = parseInt($("#cellSizeBox").val());
+    var z = cellsize/initialCellSize;
+    zoom.scale(z).event(view);
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
 }
 
@@ -891,34 +893,39 @@ function mouseMoveHandler(e) {
             }
         }
     } else { // mouseDown
-
-        // get links under lasso rectangle
-        var box: networkcube.Box = new networkcube.Box(mx, my, mouseDownPos.x, mouseDownPos.y)
-        for (var i = 0; i < links.length; i++) {
-            l = links[i];
-            if (networkcube.inBox(l.x, l.y, box)) {
-                hoveredLinks.push(l);
-            }
-        }
-        for (var i = 0; i < links.length; i++) {
-            l = links[i];
-            if (networkcube.inBox(l.y, l.x, box)) {
-                hoveredLinks.push(l);
-            }
-        }
+      console.log("mouse Down");
+          // get links under lasso rectangle
+          var box: networkcube.Box = new networkcube.Box(mx, my, mouseDownPos.x, mouseDownPos.y)
+          for (var i = 0; i < links.length; i++) {
+              l = links[i];
+              if (networkcube.inBox(l.x, l.y, box)) {
+                  hoveredLinks.push(l);
+              }
+          }
+          for (var i = 0; i < links.length; i++) {
+              l = links[i];
+              if (networkcube.inBox(l.y, l.x, box)) {
+                  hoveredLinks.push(l);
+              }
+          }
     }
 
+
+    var z = zoom.scale();
 
     if (hoveredLinks.length > 0 && !networkcube.isSame(hoveredLinks, previousHoveredLinks)) {
         console.log('999')
         cellLabel
-            .attr('x', mx + 40)
+            .attr('x', mx + 40/z)
             .attr('y', -my)
             .style('opacity', 1)
             .text(getCellWeightLabel(hoveredLinks[0]))
+            .style('font-size', initialCellSize/z)
         cellLabelBackground
-            .attr('x', mx + 10)
-            .attr('y', -my + 11)
+            .attr('x', mx + 10/z)
+            .attr('y', -my + 11/z)
+            .attr("width",70/z)
+            .attr("height",22/z)
             .style('opacity', .8)
             
         networkcube.highlight('set', <networkcube.ElementCompound>{ links: hoveredLinks });
@@ -930,8 +937,11 @@ function mouseMoveHandler(e) {
 
 
 function mouseDownHandler(e) {
+  //if (e.shiftKey) {
     mouseDown = true;
     mouseDownPos = glutils.getMousePos(canvas, e.clientX, e.clientY);
+    mouseDownPos = transformToOriginal(mouseDownPos);
+  //}
 }
 
 function mouseUpHandler(e) {
