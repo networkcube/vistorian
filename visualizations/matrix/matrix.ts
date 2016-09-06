@@ -66,6 +66,7 @@ var nodeOrder: number[] = [];
 
 var firstLeftVisible: number = 0; // index of first left label completely visible
 var firstTopVisible: number = 0; // index of first top label completely visible
+var bbox = {x0: 0, x1: 0, y0: 0, y1: 0};
 var leftLabelOffset: number = 0; // left label offset
 var topLabelOffset: number = 0; // top label offset 
 
@@ -138,13 +139,13 @@ var timeSlider: any = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth =  window.innerWidth - plotMargin.left - 10; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
-var totalHeight = window.innerHeight - plotMargin.top -110 ; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
+var totalWidth =  window.innerWidth - 10; // Math.min(cellsize * dgraph.nodes().length + 50, window.innerWidth);
+var totalHeight = window.innerHeight -110 ; //Math.min(cellsize * dgraph.nodes().length + 50, window.innerHeight);
 
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
-    .attr('width', totalWidth + plotMargin.left)
-    .attr('height', totalHeight + plotMargin.top);
+    .attr('width', totalWidth )
+    .attr('height', totalHeight);
 
 
 nodeOrder = dgraph.nodes().ids();
@@ -250,11 +251,8 @@ var crosses = [];
 scene = new THREE.Scene();
 
 // var canvasWidth = cellsize * dgraph.nodes().length + 50;
-var canvasWidth = totalWidth;
-    // .attr('width', totalWidth + plotMargin.left)
-    // .attr('height', totalWidth + plotMargin.top);
-
-var canvasHeight = totalHeight;
+var canvasWidth = totalWidth - plotMargin.left;
+var canvasHeight = totalHeight - plotMargin.top;
 
 
 // camera
@@ -579,24 +577,34 @@ function zoomed() {
     return render();
 }
 
+function visibleBox(w: number, h: number, cs: number, ref: number[] ){
+  var box = {x0: 0, x1: 0, y0: 0, y1: 0};
+  box.x0 = -Math.floor(ref[0]/cs);
+  box.y0 = -Math.floor(ref[1]/cs);
+  box.x1 = box.x0 + Math.floor(w/cs);
+  box.y1 = box.y0 + Math.floor(h/cs);
+  return box;
+}
 
 function updatePlot() {
-  plotMargin = calculatePlotMargin();
-  // update the location of the links canvas
-  d3.select('#networkcube-matrix-visCanvasFO')
-      .attr('x', plotMargin.left)
-      .attr('y', plotMargin.top);
+  //plotMargin = calculatePlotMargin();
+  //// update the location of the links canvas
+  //d3.select('#networkcube-matrix-visCanvasFO')
+  //    .attr('x', plotMargin.left)
+      //.attr('y', plotMargin.top);
+  
+  //canvasWidth = totalWidth - plotMargin.left;
+  //canvasHeight = totalHeight - plotMargin.top;
+  //renderer.setSize(canvasWidth, canvasHeight)
 
   $("#cellSizeBox").val(cellsize);
 
-  var _ref :number[];
-  _ref = zoom.translate();
+  var _ref =  zoom.translate();
 
-  firstTopVisible =  -Math.floor(_ref[0]/cellsize);
-  firstLeftVisible = -Math.floor(_ref[1]/cellsize);
+  bbox = visibleBox(canvasWidth, canvasHeight, cellsize, _ref);
 
-  topLabelOffset =  (_ref[0]/cellsize + firstTopVisible)*cellsize;
-  leftLabelOffset = (_ref[1]/cellsize + firstLeftVisible)*cellsize;
+  topLabelOffset =  (_ref[0]/cellsize + bbox.x0)*cellsize;
+  leftLabelOffset = (_ref[1]/cellsize + bbox.y0)*cellsize;
   
 }
 
@@ -604,12 +612,13 @@ function updateNodes() {
     var color;
 
     var leftNodes = dgraph.nodes().visible().toArray();
-    leftNodes = leftNodes.filter( d => nodeOrder[d.id()] >= firstLeftVisible);
+    leftNodes = leftNodes.filter( d => nodeOrder[d.id()] >= bbox.y0 && nodeOrder[d.id()] <= bbox.y1);
 
     var labelsLeft = svg.selectAll('.labelsLeft')
         .data(leftNodes);
 
-    var leftLabelPosition = nodeId => plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[nodeId] - firstLeftVisible) + cellsize; 
+    var leftLabelPosition = nodeId => plotMargin.top + leftLabelOffset +  cellsize * (nodeOrder[nodeId] - bbox.y0) + cellsize; 
+
     labelsLeft.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
         .attr('class', 'labelsLeft nodeLabel')
@@ -645,12 +654,14 @@ function updateNodes() {
         });
 
     var topNodes = dgraph.nodes().visible().toArray();
-    topNodes = topNodes.filter( d => nodeOrder[d.id()] >= firstTopVisible);
+    topNodes = topNodes.filter( d => nodeOrder[d.id()] >= bbox.x0 && nodeOrder[d.id()] <= bbox.x1);
+    console.log(leftNodes.length);
+    console.log(topNodes.length);
     
     var labelsTop = svg.selectAll('.labelsTop')
         .data(topNodes);
 
-    var topLabelPosition = nodeId => plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - firstTopVisible) + cellsize; 
+    var topLabelPosition = nodeId => plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - bbox.x0) + cellsize; 
 
     labelsTop.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
@@ -685,7 +696,7 @@ function updateNodes() {
             return topLabelPosition(d.id()); 
         })
         .attr('y', plotMargin.top - 10)
-        .attr('transform', (d, i) => { return 'rotate(-90, ' + (plotMargin.top + topLabelOffset + cellsize * (nodeOrder[d.id()]-firstTopVisible) + cellsize) + ', ' + (plotMargin.left - 10) + ')' })
+        .attr('transform', (d, i) => { return 'rotate(-90, ' + (plotMargin.top + topLabelOffset + cellsize * (nodeOrder[d.id()]- bbox.x0) + cellsize) + ', ' + (plotMargin.left - 10) + ')' })
 
     svg.selectAll('.nodeLabel')
         .style('fill', function(d) {
@@ -937,15 +948,17 @@ function mouseMoveHandler(e) {
 
 
 function mouseDownHandler(e) {
-  //if (e.shiftKey) {
+  if (e.shiftKey) {
+    view.on('mousedown.zoom',null);
     mouseDown = true;
     mouseDownPos = glutils.getMousePos(canvas, e.clientX, e.clientY);
     mouseDownPos = transformToOriginal(mouseDownPos);
-  //}
+  }
 }
 
 function mouseUpHandler(e) {
     mouseDown = false;
+    view.call(zoom);
 
     if (!networkcube.isSame(hoveredLinks, previousHoveredLinks)) {
         if (hoveredLinks.length > 0) {

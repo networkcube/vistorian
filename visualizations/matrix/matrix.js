@@ -22,6 +22,7 @@ var endTime = dgraph.endTime;
 var nodeOrder = [];
 var firstLeftVisible = 0;
 var firstTopVisible = 0;
+var bbox = { x0: 0, x1: 0, y0: 0, y1: 0 };
 var leftLabelOffset = 0;
 var topLabelOffset = 0;
 var guidelines = [];
@@ -58,12 +59,12 @@ var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
 var timeSlider = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
-var totalWidth = window.innerWidth - plotMargin.left - 10;
-var totalHeight = window.innerHeight - plotMargin.top - 110;
+var totalWidth = window.innerWidth - 10;
+var totalHeight = window.innerHeight - 110;
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
-    .attr('width', totalWidth + plotMargin.left)
-    .attr('height', totalHeight + plotMargin.top);
+    .attr('width', totalWidth)
+    .attr('height', totalHeight);
 nodeOrder = dgraph.nodes().ids();
 var vertexShaderProgram = "attribute vec4 customColor;varying vec4 vColor;void main() {vColor = customColor;gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );}";
 var fragmentShaderProgram = "varying vec4 vColor;void main() {gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);}";
@@ -87,8 +88,8 @@ shaderMaterial.transparent = true;
 shaderMaterial.side = THREE.DoubleSide;
 var crosses = [];
 scene = new THREE.Scene();
-var canvasWidth = totalWidth;
-var canvasHeight = totalHeight;
+var canvasWidth = totalWidth - plotMargin.left;
+var canvasHeight = totalHeight - plotMargin.top;
 camera = new THREE.OrthographicCamera(canvasWidth / -2, canvasWidth / 2, canvasHeight / 2, canvasHeight / -2, 0, 1000);
 scene.add(camera);
 camera.position.x = canvasWidth / 2;
@@ -319,27 +320,29 @@ function zoomed() {
     updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
     return render();
 }
+function visibleBox(w, h, cs, ref) {
+    var box = { x0: 0, x1: 0, y0: 0, y1: 0 };
+    box.x0 = -Math.floor(ref[0] / cs);
+    box.y0 = -Math.floor(ref[1] / cs);
+    box.x1 = box.x0 + Math.floor(w / cs);
+    box.y1 = box.y0 + Math.floor(h / cs);
+    return box;
+}
 function updatePlot() {
-    plotMargin = calculatePlotMargin();
-    d3.select('#networkcube-matrix-visCanvasFO')
-        .attr('x', plotMargin.left)
-        .attr('y', plotMargin.top);
     $("#cellSizeBox").val(cellsize);
-    var _ref;
-    _ref = zoom.translate();
-    firstTopVisible = -Math.floor(_ref[0] / cellsize);
-    firstLeftVisible = -Math.floor(_ref[1] / cellsize);
-    topLabelOffset = (_ref[0] / cellsize + firstTopVisible) * cellsize;
-    leftLabelOffset = (_ref[1] / cellsize + firstLeftVisible) * cellsize;
+    var _ref = zoom.translate();
+    bbox = visibleBox(canvasWidth, canvasHeight, cellsize, _ref);
+    topLabelOffset = (_ref[0] / cellsize + bbox.x0) * cellsize;
+    leftLabelOffset = (_ref[1] / cellsize + bbox.y0) * cellsize;
 }
 function updateNodes() {
     var _this = this;
     var color;
     var leftNodes = dgraph.nodes().visible().toArray();
-    leftNodes = leftNodes.filter(function (d) { return nodeOrder[d.id()] >= firstLeftVisible; });
+    leftNodes = leftNodes.filter(function (d) { return nodeOrder[d.id()] >= bbox.y0 && nodeOrder[d.id()] <= bbox.y1; });
     var labelsLeft = svg.selectAll('.labelsLeft')
         .data(leftNodes);
-    var leftLabelPosition = function (nodeId) { return plotMargin.top + leftLabelOffset + cellsize * (nodeOrder[nodeId] - firstLeftVisible) + cellsize; };
+    var leftLabelPosition = function (nodeId) { return plotMargin.top + leftLabelOffset + cellsize * (nodeOrder[nodeId] - bbox.y0) + cellsize; };
     labelsLeft.enter().append('text')
         .attr('id', function (d, i) { return 'nodeLabel_left_' + d.id(); })
         .attr('class', 'labelsLeft nodeLabel')
@@ -372,10 +375,12 @@ function updateNodes() {
         return leftLabelPosition(d.id());
     });
     var topNodes = dgraph.nodes().visible().toArray();
-    topNodes = topNodes.filter(function (d) { return nodeOrder[d.id()] >= firstTopVisible; });
+    topNodes = topNodes.filter(function (d) { return nodeOrder[d.id()] >= bbox.x0 && nodeOrder[d.id()] <= bbox.x1; });
+    console.log(leftNodes.length);
+    console.log(topNodes.length);
     var labelsTop = svg.selectAll('.labelsTop')
         .data(topNodes);
-    var topLabelPosition = function (nodeId) { return plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - firstTopVisible) + cellsize; };
+    var topLabelPosition = function (nodeId) { return plotMargin.left + topLabelOffset + cellsize * (nodeOrder[nodeId] - bbox.x0) + cellsize; };
     labelsTop.enter().append('text')
         .attr('id', function (d, i) { return 'nodeLabel_top_' + d.id(); })
         .attr('class', 'labelsTop nodeLabel')
@@ -408,7 +413,7 @@ function updateNodes() {
         return topLabelPosition(d.id());
     })
         .attr('y', plotMargin.top - 10)
-        .attr('transform', function (d, i) { return 'rotate(-90, ' + (plotMargin.top + topLabelOffset + cellsize * (nodeOrder[d.id()] - firstTopVisible) + cellsize) + ', ' + (plotMargin.left - 10) + ')'; });
+        .attr('transform', function (d, i) { return 'rotate(-90, ' + (plotMargin.top + topLabelOffset + cellsize * (nodeOrder[d.id()] - bbox.x0) + cellsize) + ', ' + (plotMargin.left - 10) + ')'; });
     svg.selectAll('.nodeLabel')
         .style('fill', function (d) {
         color = undefined;
@@ -590,12 +595,16 @@ function mouseMoveHandler(e) {
     }
 }
 function mouseDownHandler(e) {
-    mouseDown = true;
-    mouseDownPos = glutils.getMousePos(canvas, e.clientX, e.clientY);
-    mouseDownPos = transformToOriginal(mouseDownPos);
+    if (e.shiftKey) {
+        view.on('mousedown.zoom', null);
+        mouseDown = true;
+        mouseDownPos = glutils.getMousePos(canvas, e.clientX, e.clientY);
+        mouseDownPos = transformToOriginal(mouseDownPos);
+    }
 }
 function mouseUpHandler(e) {
     mouseDown = false;
+    view.call(zoom);
     if (!networkcube.isSame(hoveredLinks, previousHoveredLinks)) {
         if (hoveredLinks.length > 0) {
             if (!hoveredLinks[0].isSelected()) {
