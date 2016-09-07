@@ -498,7 +498,6 @@ module networkcube {
                         unixTimes.push(unixTime);
                     }
                 }
-                console.log('unixTimes', unixTimes, unixTimes.length)
                 // obtain granularity
                 unixTimes.sort(sortNumber)
                 // console.log('>> timeArray:', timeArray)
@@ -610,6 +609,24 @@ module networkcube {
             console.assert(data.nodeTable.length == 0 || isValidIndex(data.nodeSchema.id),
                 'either there is no nodeTable data, or we have a schema for the nodetable');
 
+            var nodeUserProperties = []
+            // Get user-properties on links, if exist
+            for(var prop in data.nodeSchema){
+                if(data.nodeSchema.hasOwnProperty(prop)
+                && prop != 'id'
+                && prop != 'label'
+                && prop != 'time'
+                && prop != 'name'
+                && prop != 'nodeType'
+                && prop != 'location'
+                && prop != 'constructor'){
+                    // console.log('user-prop found for nodes', prop)
+                    nodeUserProperties.push(prop);
+                    // create property
+                    this.nodeArrays[prop] = [] 
+                }
+            }
+
             for (var i = 0; i < data.nodeTable.length; i++) {
                 row = data.nodeTable[i];
 
@@ -672,6 +689,13 @@ module networkcube {
                     this.nodeArrays.nodeType[nodeId_table] = typeName;
                     data.nodeTable[i][data.nodeSchema.nodeType] = typeId;
                 }
+
+                // gather user-properties: 
+                for( var p=0 ; p < nodeUserProperties.length ; p++){
+                    prop = nodeUserProperties[p];
+                    this.nodeArrays[prop].push(row[data.nodeSchema[prop]]);
+                }
+
 
                 // see if temporal information is available
                 // if(data.nodeSchema.time && data.nodeSchema.time > -1){
@@ -742,6 +766,27 @@ module networkcube {
             var linkId: number;
             var typeName: string;
             var typeId: number;
+
+            var linkUserProperties = []
+            // Get user-properties on links, if exist
+            for(var prop in data.linkSchema){
+                if(data.linkSchema.hasOwnProperty(prop)
+                && prop != 'id'
+                && prop != 'linkType'
+                && prop != 'time'
+                && prop != 'name'
+                && prop != 'source'
+                && prop != 'target'
+                && prop != 'weight'
+                && prop != 'directed'){
+                    // console.log('user-prop found for links', prop)
+                    linkUserProperties.push(prop);
+                    // create property
+                    this.linkArrays[prop] = [] 
+                }
+            }
+            console.log('linkUserProperties', linkUserProperties)
+
 
             console.assert(data.linkTable.length == 0 || (
                 isValidIndex(data.linkSchema.id)
@@ -872,9 +917,13 @@ module networkcube {
                     // this.linkArrays.linkType[i] = typeId;
                     // console.log('this.linkArrays.type[i]', i, this.linkArrays.type[i]);
                 }
-            }
-            console.log('links:', this.linkArrays.weights.length)
 
+                // gather user-properties: 
+                for( var p=0 ; p < linkUserProperties.length ; p++){
+                    prop = linkUserProperties[p];
+                    this.linkArrays[prop].push(row[data.linkSchema[prop]]);
+                }
+            }
 
             // For every time, store a pointer to all its links: 
             // var allLinks = links().toArray();

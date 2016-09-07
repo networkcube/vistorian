@@ -766,3 +766,132 @@ declare module networkcube {
         Data = 2,
     }
 }
+declare module glutils {
+    function makeAlphaBuffer(array: number[], stretch: number): Float32Array;
+    function addBufferedHatchedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
+    function addBufferedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
+    function addBufferedCirlce(vertexArray: number[][], x: number, y: number, z: number, radius: number, colorArray: number[][], c: number[]): void;
+    function addBufferedDiamond(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
+    function createRectFrame(w: number, h: number, color: number, lineThickness: number): THREE.Line;
+    function createDiagonalCross(w: number, h: number, color: number, lineThickness: number): THREE.Line;
+    function makeBuffer3f(array: number[][]): Float32Array;
+    function makeBuffer4f(array: number[][]): Float32Array;
+    function updateBuffer(buffer: number[], array: number[][], size: number): void;
+    function createText(string: string, x: number, y: number, z: number, size: number, color: any, weight?: string, align?: string): THREE.Mesh;
+    function getMousePos(canvas: any, x: any, y: any): {
+        x: number;
+        y: number;
+    };
+    class WebGL {
+        scene: THREE.Scene;
+        camera: THREE.OrthographicCamera;
+        renderer: THREE.WebGLRenderer;
+        canvas: any;
+        geometry: THREE.BufferGeometry;
+        interactor: WebGLInteractor;
+        elementQueries: WebGLElementQuery[];
+        constructor();
+        render(): void;
+        enableZoom(b?: boolean): void;
+        enablePanning(b: boolean): void;
+        enableHorizontalPanning(b: boolean): void;
+    }
+    function initWebGL(parentId: string, width: number, height: number, params?: Object): WebGL;
+    function setWebGL(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.Renderer, canvas: any): void;
+    function selectAll(): WebGLElementQuery<any, any>;
+    class WebGLElementQuery<T, S> {
+        dataElements: T[];
+        visualElements: S[];
+        mesh: THREE.Mesh;
+        children: Object[];
+        scene: THREE.Scene;
+        mouseOverHandler: Function;
+        mouseMoveHandler: Function;
+        mouseOutHandler: Function;
+        mouseDownHandler: Function;
+        mouseUpHandler: Function;
+        clickHandler: Function;
+        x: number[];
+        y: number[];
+        z: number[];
+        r: number[];
+        fill: number[];
+        stroke: number[];
+        strokewidth: number[];
+        opacity: number[];
+        shape: string;
+        updateAttributes: boolean;
+        updateStyle: boolean;
+        IS_SHADER: boolean;
+        constructor();
+        data(arr: T[]): WebGLElementQuery<T, S>;
+        append(shape: string): WebGLElementQuery<T, S>;
+        push(e: any): WebGLElementQuery<T, S>;
+        getData(i: S): T;
+        getVisual(i: T): S;
+        length: number;
+        filter(f: Function): WebGLElementQuery<T, S>;
+        attr(name: string, v: any): WebGLElementQuery<T, S>;
+        style(name: string, v: any): WebGLElementQuery<T, S>;
+        set(): WebGLElementQuery<T, S>;
+        text(v: any): WebGLElementQuery<T, S>;
+        on(event: string, f: Function): WebGLElementQuery<T, S>;
+        call(method: string, dataElement: T, event: any): WebGLElementQuery<T, S>;
+        setAttr(element: THREE.Mesh, attr: string, v: any, index: number): void;
+        removeAll(): void;
+    }
+    class WebGLInteractor {
+        scene: any;
+        canvas: any;
+        camera: any;
+        raycaster: any;
+        mouse: any[];
+        mouseStart: any[];
+        mouseDown: boolean;
+        cameraStart: any[];
+        panOffset: any[];
+        lastIntersectedSelections: any[];
+        lastIntersectedElements: any[];
+        isPanEnabled: boolean;
+        isHorizontalPanEnabled: boolean;
+        isLassoEnabled: boolean;
+        lassoPoints: any[];
+        lassoStartHandler: Function;
+        lassoMoveHandler: Function;
+        lassoEndHandler: Function;
+        mouseOverSelections: WebGLElementQuery<any, any>[];
+        mouseMoveSelections: WebGLElementQuery<any, any>[];
+        mouseOutSelections: WebGLElementQuery<any, any>[];
+        mouseDownSelections: WebGLElementQuery<any, any>[];
+        mouseUpSelections: WebGLElementQuery<any, any>[];
+        clickSelections: WebGLElementQuery<any, any>[];
+        constructor(scene: THREE.Scene, canvas: HTMLCanvasElement, camera: THREE.Camera);
+        register(selection: WebGLElementQuery<any, any>, method: string): void;
+        addEventListener(eventName: String, f: Function): void;
+        mouseMoveHandler(e: any): void;
+        clickHandler(e: any): void;
+        mouseDownHandler(e: any): void;
+        mouseUpHandler(e: any): void;
+        intersect(selection: WebGLElementQuery<any, any>, mousex: any, mousey: any): any[];
+        intersectCircle(selection: WebGLElementQuery<any, any>): any[];
+        intersectRect(selection: WebGLElementQuery<any, any>): any[];
+        intersectPath(selection: WebGLElementQuery<any, any>): any[];
+    }
+    function mouseToWorldCoordinates(mouseX: any, mouseY: any): any[];
+    function curve(points: any[]): any[];
+    class CheckBox {
+        selected: boolean;
+        changeCallBack: Function;
+        circle: any;
+        frame: any;
+        constructor();
+        attr(attrName: string, value: any): glutils.CheckBox;
+        on(eventType: string, fn: Function): void;
+    }
+}
+declare var THREEx: any;
+declare module geometry {
+    function length(v1: any): number;
+    function normalize(v: number[]): number[];
+    function setLength(v: number[], l: number): number[];
+}
