@@ -598,7 +598,6 @@ function mouseWheelHandler(event){
     || nodesScrollStart == 0 && event.wheelDelta > 0){
         return;
     }
-    console.log('event.wheelDelta', event.wheelDelta)
 
     var dir = event.wheelDelta>0?-1:1;
     nodesScrollStart += SCROLL_CHUNK * dir

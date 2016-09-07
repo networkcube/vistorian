@@ -199,7 +199,7 @@ module networkcube {
         // storage primitives /////////////////////////////////////
         //
         saveToStorage<T>(dataName: string, valueName: string, value: T, replacer?: (key: string, value: any) => any) {
-            console.log('saveToStorage', dataName, valueName, value);
+            // console.log('saveToStorage', dataName, valueName, value);
             // console.log('saveNodeTable', value, this.session + this.SEP + dataname + this.SEP + valueName);
             if (value == undefined) {
                 console.log('attempting to save undefined value. aborting', dataName, valueName);
@@ -213,7 +213,7 @@ module networkcube {
             else
                 stringToSave = stringifyResult;
 
-            console.log('storing ' + dataName + ', ' + valueName + '. length=' + stringToSave.length);
+            // console.log('storing ' + dataName + ', ' + valueName + '. length=' + stringToSave.length);
             localStorage[this.sessionDataPrefix + this.SEP
                 + this.session
                 + this.SEP + dataName
