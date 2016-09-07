@@ -12091,13 +12091,12 @@ var networkcube;
         });
     }
     networkcube.loadXML = loadXML;
-    function loadJson(url, callBack) {
+    function loadJson(url, callBack, dataName) {
         var d;
         var url = url;
         var dataset;
         var callBack = callBack;
         d3.json(url, function (data) {
-            console.log('data:', data);
             if (!data)
                 return;
             var links = data.links;
@@ -12112,12 +12111,42 @@ var networkcube;
             var link;
             var linkSchema = { id: 0, source: 1, target: 2, weight: 3 };
             var weight;
+            var linkUserProps = [];
+            var prop;
+            for (var i = 0; i < links.length; i++) {
+                link = links[i];
+                for (prop in link) {
+                    if (link.hasOwnProperty(prop)
+                        && prop != 'id'
+                        && prop != 'linkType'
+                        && prop != 'time'
+                        && prop != 'name'
+                        && prop != 'source'
+                        && prop != 'target'
+                        && prop != 'weight'
+                        && prop != 'directed') {
+                        if (linkSchema[prop] == undefined) {
+                            linkUserProps.push(prop);
+                            linkSchema[prop] = 3 + linkUserProps.length;
+                        }
+                    }
+                }
+            }
             for (var i = 0; i < links.length; i++) {
                 link = links[i];
                 weight = 1;
                 if (link.weight != undefined)
                     weight = link.weight;
                 line = [i, link.source, link.target, weight];
+                for (var p = 0; p < linkUserProps.length; p++) {
+                    prop = linkUserProps[p];
+                    if (link[prop] == undefined) {
+                        line.push(undefined);
+                    }
+                    else {
+                        line.push(link[prop]);
+                    }
+                }
                 linkTable.push(line);
             }
             var nodes = data.nodes;
@@ -12128,7 +12157,27 @@ var networkcube;
             var locationTable = [];
             var locationSchema = { id: 0, longitude: 1, latitude: 2 };
             var locationEntry = [];
-            var nodeSchema = { id: 0, label: 1, nodeType: 2 };
+            var nodeSchema = { id: 0, label: 1 };
+            var nodeUserProperties = [];
+            for (var i = 0; i < nodes.length; i++) {
+                node = nodes[i];
+                for (prop in node) {
+                    if (link.hasOwnProperty(prop)
+                        && prop != 'id'
+                        && prop != 'label'
+                        && prop != 'time'
+                        && prop != 'name'
+                        && prop != 'nodeType'
+                        && prop != 'location'
+                        && prop != 'constructor') {
+                        if (nodeSchema[prop] == undefined) {
+                            console.log('node user-prop found', prop);
+                            nodeUserProperties.push(prop);
+                            nodeSchema[prop] = 1 + nodeUserProperties.length;
+                        }
+                    }
+                }
+            }
             for (var i = 0; i < nodes.length; i++) {
                 node = nodes[i];
                 line = [i];
@@ -12136,27 +12185,26 @@ var networkcube;
                     line.push(node.name);
                 }
                 else if (node.label) {
-                    line.push(node.name);
+                    line.push(node.label);
                 }
                 else {
                     line.push('' + i);
                 }
-                if (node.group) {
-                    line.push(node.group);
-                }
-                else {
-                    line.push('0');
-                }
-                if (node.lng && node.lat) {
-                    locationTable.push([locationTable.length, node.lng, node.lat]);
-                    nodeSchema['location'] = 3;
-                    line.push(locationTable.length - 1);
+                for (var p = 0; p < nodeUserProperties.length; p++) {
+                    prop = nodeUserProperties[p];
+                    if (node[prop] == undefined) {
+                        line.push(undefined);
+                    }
+                    else {
+                        line.push(node[prop]);
+                    }
                 }
                 nodeTable.push(line);
             }
-            console.log('>>locationTable', locationTable);
+            if (dataName == undefined)
+                dataName = url.split('=')[0];
             callBack(new networkcube.DataSet({
-                name: url.split('=')[0],
+                name: dataName,
                 nodeTable: nodeTable,
                 locationTable: locationTable,
                 linkTable: linkTable,
