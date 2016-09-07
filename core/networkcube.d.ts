@@ -632,7 +632,7 @@ declare module networkcube {
     function loadDyson(url: string, callback: Function): void;
     function loadLinkTable(url: string, callBack: Function, linkSchema: networkcube.LinkSchema, delimiter: string, timeFormat?: string): void;
     function loadXML(url: string, callBack: Function): void;
-    function loadJson(url: string, callBack: Function): void;
+    function loadJson(url: string, callBack: Function, dataName?: string): void;
     function loadJsonList(url: string, callBack: Function): void;
     function loadNCube(url: string, callBack: Function): void;
     function loadPajek(url: string, callBack: Function): void;
