@@ -12162,7 +12162,7 @@ var networkcube;
             for (var i = 0; i < nodes.length; i++) {
                 node = nodes[i];
                 for (prop in node) {
-                    if (link.hasOwnProperty(prop)
+                    if (node.hasOwnProperty(prop)
                         && prop != 'id'
                         && prop != 'label'
                         && prop != 'time'

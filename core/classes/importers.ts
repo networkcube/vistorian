@@ -294,8 +294,8 @@ module networkcube{
                 //     line.push(locationTable.length-1)
                 // }   
                 for(prop in node){
-                    // console.log('link prop: ', prop)
-                    if(link.hasOwnProperty(prop)
+                    // console.log('node prop: ', prop)
+                    if(node.hasOwnProperty(prop)
                     && prop != 'id'
                     && prop != 'label'
                     && prop != 'time'
