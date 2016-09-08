@@ -255,7 +255,7 @@ module networkcube{
                     line.push(node.name)
                 }else
                 if(node.label){
-                    line.push(node.name)
+                    line.push(node.label)
                 }else{
                     line.push(''+i)
                 }
