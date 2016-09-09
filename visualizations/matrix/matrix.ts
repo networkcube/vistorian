@@ -6,7 +6,6 @@
 /// <reference path="../widgets/widgets.d.ts" />
 
 
-
 var COLOR_HIGHLIGHT = 0x000000;
 var COLOR_SELECTION = 0xff0000;
 var COLOR_CELL_DEFAULT = 0x000000;
@@ -279,16 +278,16 @@ var raycaster: THREE.Raycaster = new THREE.Raycaster()
 // position canvas element containing cells
 var canvas = renderer.domElement;
 // set canvas listeners
-canvas.addEventListener('mousemove', (e) => {
+canvas.addEventListener('mousemove', (e: Event) => {
     this.mouseMoveHandler(e);
 })
-canvas.addEventListener('mousedown', (e) => {
+canvas.addEventListener('mousedown', (e :Event) => {
     this.mouseDownHandler(e);
 })
-canvas.addEventListener('mouseup', (e) => {
+canvas.addEventListener('mouseup', (e: Event) => {
     this.mouseUpHandler(e);
 })
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('click', (e: Event) => {
     this.clickHandler(e);
 })
 
@@ -320,7 +319,7 @@ d3.select('#networkcube-matrix-visCanvasFO')
     .attr('height', totalHeight);
 
 var view = d3.select(canvas);
-zoom = d3.behavior.zoom()
+var zoom = d3.behavior.zoom()
         .scaleExtent([0.2, 4])
         .on('zoom', zoomed);
 view.call(zoom);
@@ -379,8 +378,7 @@ function updateAll(updateOptions: UpdateOptions): void {
 function updateGeometry() {
     var savedCellSize = cellsize;
     cellsize = initialCellSize;
-    //console.log('updateGeometry');
-    d = [];
+    //console.log('updateGeometry') = [];
     var vertexPositions: number[][] = [];
     vertexColors = [];
 

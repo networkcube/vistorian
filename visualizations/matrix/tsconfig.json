@@ -13,6 +13,7 @@
         "watch": true
     },
     "files": [
-        "./matrix.ts"
+        /*"./matrix.ts",*/
+        "./matrix_zp.ts"
     ]
 }
