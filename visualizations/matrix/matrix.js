@@ -38,7 +38,11 @@ var longestLabelNode = dgraph.nodes().toArray().reduce(function (p, v, i, arr) {
 var labelLength = longestLabelNode ? longestLabelNode.label().length : 8;
 var plotMargin = calculatePlotMargin();
 $('body').append('<div id="networkcube-matrix-menu"></div>');
+<<<<<<< HEAD
 $('#networkcube-matrix-menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="' + initialCellSize + '"/>');
+=======
+$('#networkcube-matrix-menu').append('Zoom:  <input id="cellSizeBox" type="range" name="cellSizeBox" min="3" max="20" onchange="updateCellSize()" value="12"/>');
+>>>>>>> dev
 $("#networkcube-matrix-menu").append('<br/>');
 $("#networkcube-matrix-menu").append('<label>Label ordering:</label>');
 var orderingMenu = $("#networkcube-matrix-menu").append('<select id="labelOrdering" onchange="reorderHandler()"></select>');
@@ -51,6 +55,17 @@ $('#networkcube-matrix-menu').append('<input value="Re-run" type="button" onclic
 $('#dataName').text(dgraph.name);
 networkcube.setDefaultEventListener(updateEvent);
 networkcube.addEventListener('timeRange', timeRangeHandler);
+<<<<<<< HEAD
+=======
+window.addEventListener("mousewheel", function (e) {
+    event.preventDefault();
+    if (event.wheelDelta > 0)
+        cellsize *= Math.abs(event.wheelDelta / 100);
+    else
+        cellsize /= Math.abs(event.wheelDelta / 100);
+    updateAll(UpdateOptions.PlotLocation | UpdateOptions.Nodes);
+}, false);
+>>>>>>> dev
 $('body').append('<div id="networkcube-matrix-timelineDiv"></div>');
 var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
     .append('svg')
@@ -59,12 +74,20 @@ var timeSvg = d3.select('#networkcube-matrix-timelineDiv')
 var timeSlider = new TimeSlider(dgraph, vizWidth);
 timeSlider.appendTo(timeSvg);
 var linkWeightScale = d3.scale.linear().range([0.1, 1]);
+<<<<<<< HEAD
 var totalWidth = window.innerWidth - 10;
 var totalHeight = window.innerHeight - 110;
 $('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
 var svg = d3.select('#networkcube-matrix-visSvg')
     .attr('width', totalWidth)
     .attr('height', totalHeight);
+=======
+var totalWidth = Math.max(Math.max(cellsize * dgraph.nodes().length + 50, window.innerWidth), window.innerHeight);
+$('body').append('<div id="networkcube-matrix-visDiv"><svg id="networkcube-matrix-visSvg"><foreignObject id="networkcube-matrix-visCanvasFO"></foreignObject></svg></div>');
+var svg = d3.select('#networkcube-matrix-visSvg')
+    .attr('width', totalWidth + plotMargin.left)
+    .attr('height', totalWidth + plotMargin.top);
+>>>>>>> dev
 nodeOrder = dgraph.nodes().ids();
 var vertexShaderProgram = "attribute vec4 customColor;varying vec4 vColor;void main() {vColor = customColor;gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );}";
 var fragmentShaderProgram = "varying vec4 vColor;void main() {gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);}";
@@ -128,7 +151,11 @@ var cellLabel = glutils.selectAll()
     .append('text')
     .style('opacity', 0)
     .attr('z', 2)
+<<<<<<< HEAD
     .style('font-size', initialCellSize);
+=======
+    .style('font-size', 12);
+>>>>>>> dev
 $('#networkcube-matrix-visCanvasFO').append(canvas);
 d3.select('#networkcube-matrix-visCanvasFO')
     .attr('x', plotMargin.left)
@@ -162,7 +189,14 @@ function calculatePlotMargin() {
 }
 function updateAll(updateOptions) {
     if ((updateOptions & UpdateOptions.PlotLocation) == UpdateOptions.PlotLocation) {
+<<<<<<< HEAD
         updatePlot();
+=======
+        plotMargin = calculatePlotMargin();
+        d3.select('#networkcube-matrix-visCanvasFO')
+            .attr('x', plotMargin.left)
+            .attr('y', plotMargin.top);
+>>>>>>> dev
     }
     if ((updateOptions & UpdateOptions.NodeOrdering) == UpdateOptions.NodeOrdering)
         reorderWorker();

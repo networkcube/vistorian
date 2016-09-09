@@ -100,7 +100,7 @@ module glutils {
 
         var material: THREE.LineBasicMaterial = new THREE.LineBasicMaterial({
             color: color,
-            linewidth: lineThickness,
+            // linewidth: lineThickness,
         });
 
         return new THREE.Line(geom, material);
@@ -350,6 +350,7 @@ module glutils {
             var elements = []
             switch(shape){
                 case 'circle': elements = createCirclesNoShader(this.dataElements, this.scene); break
+                // case 'circle': elements = createCircles(this.dataElements, this.scene); break
                 // case 'g': elements = createG(this.dataElements, this.scene); break
                 case 'path': elements = createPaths(this.dataElements, this.scene); break
                 case 'line': elements = createLines(this.dataElements, this.scene); break
@@ -577,6 +578,7 @@ module glutils {
         
 
         var tex = new THREE.Texture(txtCanvas);
+        tex.minFilter = THREE.LinearFilter
         tex.flipY = true;
         tex.needsUpdate = true;
 
@@ -655,25 +657,27 @@ module glutils {
 
         // attach shaders to current body
     // var circleVertexShader = '\
-    //     attribute vec3 customColor;\
-    //     varying vec3 vColor;\
+    //     uniform vec3 color;\
+    //     varying vec3 vColor; \
     //     void main() {\
-    //         vColor = customColor;\
-    //         gl_Position = vec4( position, 1.0 );\
+    //         vColor = color;\
+    //         gl_PointSize = 10.0;\
+    //         gl_Position = vec4(position ,1.0);\
     //     }'
 
     // var circleFragmentShader = '\
     //     varying vec3 vColor;\
     //     void main() {\
-    //         gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.5);\
+    //         gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.1);\
     //     }'
 
     // function createCircles(dataElements:any[], scene:THREE.Scene){
-    //     var circleShaderAttributes = {
-    //         customColor: { type: 'c', value: [] }
+    //     var circleShaderUniforms = {
+    //         color: { type: 'c', value: new THREE.Color( 0xff0000 )  }
     //     }
     //     var circleShaderMaterial = new THREE.ShaderMaterial({
-    //         attributes: circleShaderAttributes,
+    //         // attributes: circleShaderAttributes,
+    //         uniforms: circleShaderUniforms,
     //         vertexShader: circleVertexShader,
     //         fragmentShader: circleFragmentShader,
     //         blending: THREE.NormalBlending,
@@ -686,23 +690,56 @@ module glutils {
     //     var visualElements = []
     //     var c;   
     //     var vertexPositionBuffer = []
-    //     var vertexColorBuffer = []
+    //     // var vertexColorBuffer = []
     //     var geometry = new THREE.BufferGeometry();
     //     for(var i=0 ; i < dataElements.length ; i++){
     //         // geometry.vertices.push(new THREE.Vector3(Math.random(), -Math.random(),0))
-    //         vertexPositionBuffer.push([Math.random(), -Math.random(),0])
-    //         vertexColorBuffer.push([0,1,0])
+    //         vertexPositionBuffer.push([Math.random()*  300, -Math.random()* 300, 0.2])
+    //         // vertexColorBuffer.push([0,1,0])
     //     }
     //     // console.log('vertexPositionBuffer', vertexPositionBuffer, vertexPositionBuffer.length)
     //     // console.log('vertexColorBuffer', vertexColorBuffer, vertexColorBuffer.length)
     //     // var shaderMaterial = new THREE.ShaderMaterial();
     //     geometry.addAttribute( 'position', new THREE.BufferAttribute( vertexPositionBuffer, 1));
-    //     geometry.addAttribute( 'customColor', new THREE.BufferAttribute( vertexColorBuffer, 1));
+    //     // geometry.addAttribute( 'customColor', new THREE.BufferAttribute( vertexColorBuffer, 1));
     //     // geometry.dynamic = true;
     //     var mesh = new THREE.Mesh(geometry, circleShaderMaterial);
     //     visualElements.push(mesh);
     //     mesh.position.set(0,0,0)
     //     scene.add(mesh);    
+    //     return visualElements;
+    // }
+    // below code works somehow
+    // function createCircles(dataElements:any[], scene:THREE.Scene){
+    //     var circleShaderUniforms = {
+    //         color: { type: 'c', value: new THREE.Color( 0xff0000 )  }
+    //     }
+    //     var circleShaderMaterial = new THREE.ShaderMaterial({
+    //         // attributes: circleShaderAttributes,
+    //         uniforms: circleShaderUniforms,
+    //         vertexShader: circleVertexShader,
+    //         fragmentShader: circleFragmentShader,
+    //         blending: THREE.NormalBlending,
+    //         depthTest: true,
+    //         transparent: true,
+    //         side: THREE.DoubleSide,
+    //         // linewidth: 2
+    //     });
+    //     // this.IS_SHADER = true;
+    //     var visualElements = []
+    //     var c;   
+    //     // var vertexPositionBuffer = []
+    //     // var vertexColorBuffer = []
+    //     var geometry;
+    //      for(var i=0 ; i < dataElements.length ; i++){
+    //         geometry = new THREE.CircleGeometry(1, 1);
+    //         geometry.dynamic = true;
+    //         c = new THREE.Mesh( geometry, circleShaderMaterial );
+    //         visualElements.push(c);
+    //         c.position.set(0,0,1)
+    //         c.scale.set(1,1, 1)
+    //         scene.add(c);    
+    //     }
     //     return visualElements;
     // }
     
@@ -733,7 +770,7 @@ module glutils {
                 new THREE.Vector3(1,0,0),
                 new THREE.Vector3(0,0,0)
             );
-            var wireframe = new THREE.Line( geometry, new THREE.LineBasicMaterial( {color:0x000000, transparent:true, linewidth:0}) ) ;            
+            var wireframe = new THREE.Line( geometry, new THREE.LineBasicMaterial( {color:0x000000, transparent:true, linewidth:1}) ) ;            
             c['wireframe'] = wireframe;
             wireframe.position.set(0,0,1.1)
             scene.add(wireframe);

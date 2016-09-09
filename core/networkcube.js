@@ -13206,7 +13206,6 @@ var glutils;
         ];
         var material = new THREE.LineBasicMaterial({
             color: color,
-            linewidth: lineThickness,
         });
         return new THREE.Line(geom, material);
     }
@@ -13637,6 +13636,7 @@ var glutils;
         context.font = SIZE + "pt Helvetica";
         context.fillText(text, 0, txtCanvas.height / 2);
         var tex = new THREE.Texture(txtCanvas);
+        tex.minFilter = THREE.LinearFilter;
         tex.flipY = true;
         tex.needsUpdate = true;
         mesh.material.map = tex;
@@ -13709,7 +13709,7 @@ var glutils;
             scene.add(c);
             geometry = new THREE.Geometry();
             geometry.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, -1, 0), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0));
-            var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 0 }));
+            var wireframe = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, linewidth: 1 }));
             c['wireframe'] = wireframe;
             wireframe.position.set(0, 0, 1.1);
             scene.add(wireframe);
