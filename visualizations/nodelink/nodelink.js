@@ -25,6 +25,8 @@ var time_start = times[0];
 var time_end = times[times.length - 1];
 var nodes = dgraph.nodes().toArray();
 var nodesOrderedByDegree = dgraph.nodes().toArray().sort(function (n1, n2) { return n2.neighbors().length - n1.neighbors().length; });
+nodes.forEach(function (d, i) {
+});
 var nodePairs = dgraph.nodePairs();
 var links = dgraph.links().toArray();
 console.log('links', links.length);

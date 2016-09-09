@@ -9467,6 +9467,12 @@ var networkcube;
         NumberQuery.prototype.get = function (index) {
             return this._elements[index];
         };
+        NumberQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this._elements[i], i);
+            }
+            return this;
+        };
         return NumberQuery;
     })(Query);
     networkcube.NumberQuery = NumberQuery;
@@ -9506,6 +9512,12 @@ var networkcube;
         ;
         StringQuery.prototype.toArray = function () {
             return this._elements.slice(0);
+        };
+        StringQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this._elements[i], i);
+            }
+            return this;
         };
         return StringQuery;
     })();
@@ -9680,6 +9692,12 @@ var networkcube;
         NodeQuery.prototype.removeDuplicates = function () {
             return new NodeQuery(this.generic_removeDuplicates()._elements, this.g);
         };
+        NodeQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this.g.node(this._elements[i]), i);
+            }
+            return this;
+        };
         return NodeQuery;
     })(GraphElementQuery);
     networkcube.NodeQuery = NodeQuery;
@@ -9786,6 +9804,12 @@ var networkcube;
         LinkQuery.prototype.removeDuplicates = function () {
             return new LinkQuery(this.generic_removeDuplicates()._elements, this.g);
         };
+        LinkQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this.g.link(this._elements[i]), i);
+            }
+            return this;
+        };
         return LinkQuery;
     })(GraphElementQuery);
     networkcube.LinkQuery = LinkQuery;
@@ -9855,6 +9879,12 @@ var networkcube;
         };
         NodePairQuery.prototype.removeDuplicates = function () {
             return new NodePairQuery(this.generic_removeDuplicates()._elements, this.g);
+        };
+        NodePairQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this.g.nodePair(this._elements[i]), i);
+            }
+            return this;
         };
         return NodePairQuery;
     })(GraphElementQuery);
@@ -9938,6 +9968,12 @@ var networkcube;
         TimeQuery.prototype.intersection = function (q) {
             return new TimeQuery(this.generic_intersection(q)._elements, this.g);
         };
+        TimeQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this.g.time(this._elements[i]), i);
+            }
+            return this;
+        };
         return TimeQuery;
     })(GraphElementQuery);
     networkcube.TimeQuery = TimeQuery;
@@ -10007,6 +10043,12 @@ var networkcube;
         };
         LocationQuery.prototype.removeDuplicates = function () {
             return new LocationQuery(this.generic_removeDuplicates()._elements, this.g);
+        };
+        LocationQuery.prototype.forEach = function (f) {
+            for (var i = 0; i < this._elements.length; i++) {
+                f(this.g.location(this._elements[i]), i);
+            }
+            return this;
         };
         return LocationQuery;
     })(GraphElementQuery);

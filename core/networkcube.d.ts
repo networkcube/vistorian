@@ -194,6 +194,7 @@ declare module networkcube {
         sum(): number;
         toArray(): number[];
         get(index: number): number;
+        forEach(f: Function): NumberQuery;
     }
     class StringQuery {
         _elements: string[];
@@ -206,6 +207,7 @@ declare module networkcube {
         length: number;
         size(): number;
         toArray(): string[];
+        forEach(f: Function): StringQuery;
     }
     class GraphElementQuery extends Query {
         g: DynamicGraph;
@@ -240,6 +242,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): NodeQuery;
         intersection(q: NodeQuery): NodeQuery;
         removeDuplicates(): NodeQuery;
+        forEach(f: Function): NodeQuery;
     }
     class LinkQuery extends GraphElementQuery {
         elementType: string;
@@ -261,6 +264,7 @@ declare module networkcube {
         targets(): NodeQuery;
         intersection(q: LinkQuery): LinkQuery;
         removeDuplicates(): LinkQuery;
+        forEach(f: Function): LinkQuery;
     }
     class NodePairQuery extends GraphElementQuery {
         elementType: string;
@@ -278,6 +282,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): NodePairQuery;
         intersection(q: NodePairQuery): NodePairQuery;
         removeDuplicates(): NodePairQuery;
+        forEach(f: Function): NodePairQuery;
     }
     class TimeQuery extends GraphElementQuery {
         elementType: string;
@@ -296,6 +301,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): TimeQuery;
         unixTimes(): number[];
         intersection(q: TimeQuery): TimeQuery;
+        forEach(f: Function): TimeQuery;
     }
     class LocationQuery extends GraphElementQuery {
         elementType: string;
@@ -313,6 +319,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): LocationQuery;
         intersection(q: LocationQuery): LocationQuery;
         removeDuplicates(): LocationQuery;
+        forEach(f: Function): LocationQuery;
     }
     class Motif {
         nodes: Node[];
