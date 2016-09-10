@@ -64,8 +64,9 @@ function updateList(type, name) {
         .attr('transform', 'translate(' + INTENT + ',0)');
     d3.selectAll('.selectionDiv_' + type)
         .style('background-color', function (d) {
+        console.log('set background color', dgraph.currentSelection_id, d.id);
         if (dgraph.currentSelection_id == d.id)
-            return '#eeeeee';
+            return '#cccccc';
         return '#ffffff';
     });
     nodeGs.append('rect')
@@ -106,6 +107,7 @@ function updateList(type, name) {
         networkcube.filterSelection(d, !d.filter);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'up.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)
@@ -114,6 +116,7 @@ function updateList(type, name) {
             networkcube.swapPriority(d, d3.selectAll('.selectionDiv_' + d.acceptedType).data()[i - 1]);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'down.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)
@@ -122,6 +125,7 @@ function updateList(type, name) {
             networkcube.swapPriority(d, d3.selectAll('.selectionDiv_' + d.acceptedType).data()[i + 1]);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'delete.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)

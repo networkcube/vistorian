@@ -98,8 +98,9 @@ function updateList(type:string, name:string){
 			
 	d3.selectAll('.selectionDiv_'+type)
 		.style('background-color', function(d){
+			console.log('set background color', dgraph.currentSelection_id, d.id)
 			if(dgraph.currentSelection_id == d.id)
-				return '#eeeeee';
+				return '#cccccc';
 			return '#ffffff';
 		})
 		
@@ -146,6 +147,7 @@ function updateList(type:string, name:string){
 		})
 
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'up.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		
@@ -155,6 +157,7 @@ function updateList(type:string, name:string){
 		})
 
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'down.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		
@@ -164,6 +167,7 @@ function updateList(type:string, name:string){
 		})
 	
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'delete.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		

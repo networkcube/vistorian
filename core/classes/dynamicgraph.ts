@@ -1381,6 +1381,8 @@ module networkcube {
             }
         }
 
+        
+
         // SELFIX : delegate to dgraph
         addToAttributeArraysSelection(selection: Selection, type: string, id: number) {
             // check for priority of selections, then add where appropriate
@@ -1540,8 +1542,9 @@ module networkcube {
 
 
         setCurrentSelection(id: number) {
-            if (id < 2) // i.e. either default node or link selection..
-                return;  // ignore
+            // [bbach] why should we ignore them?
+            // if (id < 2) // i.e. either default node or link selection..
+            //     return;  // ignore
             console.log('[DynamicGraph] setCurrentSelectionId ', id)
             this.currentSelection_id = id;
         }

@@ -11076,8 +11076,6 @@ var networkcube;
             return this.highlightArrays[type + 'Ids'];
         };
         DynamicGraph.prototype.setCurrentSelection = function (id) {
-            if (id < 2)
-                return;
             console.log('[DynamicGraph] setCurrentSelectionId ', id);
             this.currentSelection_id = id;
         };
