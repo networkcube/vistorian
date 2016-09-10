@@ -170,12 +170,6 @@ function init() {
         .append('path')
         .attr('d', function (d) { return d.path; })
         .style('opacity', LINK_OPACITY)
-        .on('mouseover', function (d, i) {
-        networkcube.highlight('set', { links: [d] });
-    })
-        .on('mouseout', function (d) {
-        networkcube.highlight('reset');
-    })
         .on('click', function (d) {
         var selections = d.getSelections();
         var currentSelection = _this.dgraph.getCurrentSelection();

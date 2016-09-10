@@ -10,7 +10,7 @@
 <body>
 
 	<div id="searchDiv">
-		<input id="searchField" type="text" name="searchInput" value="Search ..."/>
+		<input id="searchField" type="text" name="searchInput" value="Search ..." onfocus="if (this.value == 'Search ...') {this.value = '';}"/>
 		<input id="searchButton" type="button" name="searchButton" value="Find" onclick="startSearch()"/>
 		<ul id="searchResults">
 		</ul>

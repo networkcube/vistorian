@@ -13918,6 +13918,7 @@ var glutils;
         var vertexPositionBuffer = [];
         var vertexColorBuffer = [];
         var geometry = new THREE.BufferGeometry();
+        addBufferedRect([], 0, 0, 0, 10, 10, [], [0, 0, 1, .5]);
         for (var i = 0; i < dataElements.length; i++) {
             query.x.push(0);
             query.y.push(0);
@@ -13928,7 +13929,6 @@ var glutils;
             query.strokewidth.push(1);
             query.opacity.push(1);
         }
-        geometry = new THREE.BufferGeometry();
         geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f([]), 3));
         geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f([]), 4));
         query.mesh = new THREE.Mesh(geometry, shaderMaterial);

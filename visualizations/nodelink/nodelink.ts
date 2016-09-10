@@ -237,12 +237,12 @@
                 .append('path')
                 .attr('d', (d)=> d.path)
                 .style('opacity', LINK_OPACITY)
-                .on('mouseover', (d,i)=>{
-                    networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
-                })
-                .on('mouseout', d=>{
-                    networkcube.highlight('reset')
-                })
+                // .on('mouseover', (d,i)=>{
+                //     networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
+                // })
+                // .on('mouseout', d=>{
+                //     networkcube.highlight('reset')
+                // })
                 .on('click', d=>{
                     var selections = d.getSelections();
                     var currentSelection = this.dgraph.getCurrentSelection();

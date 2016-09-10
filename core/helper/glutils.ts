@@ -773,6 +773,9 @@ module glutils {
         var vertexPositionBuffer = []
         var vertexColorBuffer = []
         var geometry = new THREE.BufferGeometry();
+        // geometry.vertices.push(new THREE.Vector3(10, -10,0))
+        addBufferedRect([], 0, 0, 0, 10, 10, [], [0,0,1,.5])
+
         for(var i=0 ; i < dataElements.length ; i++){
             // addBufferedCirlce(vertexPositionBuffer, Math.random()*10,Math.random()*10,0,2, vertexColorBuffer, [0,0,1,.5] )
             query.x.push(0)
@@ -784,7 +787,7 @@ module glutils {
             query.strokewidth.push(1)
             query.opacity.push(1)
         }
-        geometry = new THREE.BufferGeometry();
+        // geometry = new THREE.BufferGeometry();
 
         // CREATE + ADD MESH
         geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f([]), 3));
