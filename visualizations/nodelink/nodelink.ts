@@ -372,10 +372,10 @@
     /////////////////////
     
     function mouseOverNode(n){
-        networkcube.highlight('add', {nodes:[n]})
+        networkcube.highlight('set', {nodes:[n]})
     }
     function mouseOutNode(n){
-        networkcube.highlight('remove', {nodes:[n]})
+        networkcube.highlight('reset')
     }
     function mouseDownOnNode(n){
         mouseDownNode = n; 

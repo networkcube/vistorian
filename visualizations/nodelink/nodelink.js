@@ -263,10 +263,10 @@ function isHidingNode(n1, n2) {
     return n1w < n2.x && n1e > n2.x && n1n > n2.y && n1s < n2.y;
 }
 function mouseOverNode(n) {
-    networkcube.highlight('add', { nodes: [n] });
+    networkcube.highlight('set', { nodes: [n] });
 }
 function mouseOutNode(n) {
-    networkcube.highlight('remove', { nodes: [n] });
+    networkcube.highlight('reset');
 }
 function mouseDownOnNode(n) {
     mouseDownNode = n;

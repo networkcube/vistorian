@@ -144,11 +144,19 @@ function searchResultHandler(m) {
         row.append('<p class="searchResult">Links: <b>' + m.idCompound.linkIds.length + '</b> <u onclick="saveSearchResultAsSelection(\'link\')">(Save as selection)</u></p>');
 }
 function saveSearchResultAsSelection(type) {
-    console.log('>>saveSearchResultAsSelection');
     var s = networkcube.createSelection(type, searchMessage.searchTerm);
     var selectionIdCompound = new networkcube.IDCompound();
     selectionIdCompound[type + 'Ids'] = searchMessage.idCompound[type + 'Ids'];
     var temp = networkcube.makeElementCompound(selectionIdCompound, dgraph);
-    console.log('--');
-    window.setTimeout(function () { return networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id); }, 2000);
+    window.setTimeout(function () {
+        console.log('set selection', selectionIdCompound, s.id);
+        networkcube.highlight('reset');
+        window.setTimeout(function () {
+            networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id);
+        }, 1000);
+    }, 1000);
+}
+function clearSearchSelection() {
+    networkcube.highlight('reset');
+    $('#searchResults').empty();
 }

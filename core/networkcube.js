@@ -11091,16 +11091,18 @@ var networkcube;
             s.priority = priority;
         };
         DynamicGraph.prototype.createSelection = function (type) {
-            var b = new Selection(this.selections.length, type);
-            b.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
+            var s = new Selection(this.selections.length, type);
+            s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
-            this.selections.push(b);
-            return b;
+            this.selections.push(s);
+            console.log('Create new selection:', s.id);
+            return s;
         };
         DynamicGraph.prototype.deleteSelection = function (selectionId) {
             var s = this.getSelection(selectionId);
             var idCompound = new networkcube.IDCompound();
-            idCompound[s.acceptedType + 's'] = s.elementIds.slice(0);
+            idCompound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
+            console.log('Delete selection->remove elemeents', s.elementIds.slice(0));
             this.selection('remove', idCompound, s.id);
             this.selections.splice(this.selections.indexOf(s), 1);
         };

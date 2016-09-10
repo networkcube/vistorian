@@ -17,7 +17,6 @@ module networkcube {
     export var MESSAGE_SELECTION_PRIORITY = 'selectionPriority'
     export var MESSAGE_SEARCH_RESULT = 'searchResult';
 
-
     var MESSENGER_PROPAGATE: boolean = true;
 
 

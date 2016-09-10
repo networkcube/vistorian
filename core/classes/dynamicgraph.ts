@@ -1354,8 +1354,7 @@ module networkcube {
 
         // SELECT
         selection(action: string, idCompound: IDCompound, selectionId?: number) {
-            // console.log('current selection id', this.currentSelection_id);
-
+            
             if (selectionId == undefined)
                 selectionId = this.currentSelection_id;
 
@@ -1559,11 +1558,12 @@ module networkcube {
 
         // creates a selection for the passed type.
         createSelection(type: string): Selection {
-            var b = new Selection(this.selections.length, type);
-            b.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
+            var s = new Selection(this.selections.length, type);
+            s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
-            this.selections.push(b);
-            return b;
+            this.selections.push(s);
+            console.log('Create new selection:', s.id)
+            return s;
         }
 
         deleteSelection(selectionId: number): void {
@@ -1575,8 +1575,11 @@ module networkcube {
             //             compound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
             //             this.selection('remove', compound, s.id)
             // =======
+
+            // remove 
             var idCompound: IDCompound = new IDCompound();
-            idCompound[s.acceptedType + 's'] = s.elementIds.slice(0);
+            idCompound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
+            console.log('Delete selection->remove elemeents', s.elementIds.slice(0))
             this.selection('remove', idCompound, s.id)
             // >>>>>>> api
 

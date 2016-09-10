@@ -190,11 +190,22 @@ function searchResultHandler(m:networkcube.SearchResultMessage){
 }
 
 function saveSearchResultAsSelection(type:string){
-	console.log('>>saveSearchResultAsSelection')
 	var s:networkcube.Selection = networkcube.createSelection(type, searchMessage.searchTerm);
     var selectionIdCompound:networkcube.IDCompound = new networkcube.IDCompound();
     selectionIdCompound[type+'Ids'] = searchMessage.idCompound[type+'Ids']
     var temp = networkcube.makeElementCompound(selectionIdCompound, dgraph);
-    console.log('--')
-    window.setTimeout(()=>networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id), 2000);
+    window.setTimeout(()=>{
+		console.log('set selection', selectionIdCompound, s.id)
+		networkcube.highlight('reset');
+		window.setTimeout(()=>{
+			networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id);
+		}, 1000);
+
+	}, 1000);
+}
+
+// clear search field and highlighted nodes
+function clearSearchSelection(){
+	networkcube.highlight('reset');
+	$('#searchResults').empty();
 }
