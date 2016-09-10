@@ -363,7 +363,9 @@ function updateLinks() {
     })
         .style('opacity', function (d) {
         var visible = d.isVisible();
-        if (!visible)
+        if (!visible
+            || !d.source.isVisible()
+            || !d.target.isVisible())
             return 0;
         if (d.presentIn(time_start, time_end)) {
             return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ? 1 : LINK_OPACITY;
