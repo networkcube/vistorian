@@ -14191,33 +14191,32 @@ var glutils;
         WebGLInteractor.prototype.intersect = function (selection, mousex, mousey) {
             switch (selection.shape) {
                 case 'circle':
-                    return this.intersectCircle(selection);
+                    return this.intersectCircles(selection);
                     break;
                 case 'rect':
-                    return this.intersectRect(selection);
+                    return this.intersectRects(selection);
                     break;
                 case 'path':
-                    return this.intersectPath(selection);
+                    return this.intersectPaths(selection);
                     break;
                 case 'text':
-                    return this.intersectRect(selection);
+                    return this.intersectRects(selection);
                     break;
             }
             return [];
         };
-        WebGLInteractor.prototype.intersectCircle = function (selection) {
+        WebGLInteractor.prototype.intersectCircles = function (selection) {
+            console.log('intersect circles');
             var intersectedElements = [];
             var d;
-            var e;
-            for (var i = 0; i < selection.visualElements.length; i++) {
-                e = selection.visualElements[i];
-                d = Math.sqrt(Math.pow(this.mouse[0] - e.position.x, 2) + Math.pow(this.mouse[1] - e.position.y, 2));
-                if (d <= e.scale.x)
+            for (var i = 0; i < selection.dataElements.length; i++) {
+                d = Math.sqrt(Math.pow(this.mouse[0] - selection.x[i], 2) + Math.pow(this.mouse[1] - selection.y[i], 2));
+                if (d <= selection.r[i])
                     intersectedElements.push(selection.dataElements[i]);
             }
             return intersectedElements;
         };
-        WebGLInteractor.prototype.intersectRect = function (selection) {
+        WebGLInteractor.prototype.intersectRects = function (selection) {
             var intersectedElements = [];
             var d;
             var e;
@@ -14229,7 +14228,7 @@ var glutils;
             }
             return intersectedElements;
         };
-        WebGLInteractor.prototype.intersectPath = function (selection) {
+        WebGLInteractor.prototype.intersectPaths = function (selection) {
             var intersectedElements = [];
             var e;
             var v1, v2;

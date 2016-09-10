@@ -37,10 +37,6 @@
     var nodes:networkcube.Node[] = dgraph.nodes().toArray();
     var nodesOrderedByDegree = dgraph.nodes().toArray().sort((n1,n2)=> n2.neighbors().length - n1.neighbors().length);
     
-    nodes.forEach((d,i)=>{
-
-    })
-
     var nodePairs = dgraph.nodePairs();
     var links = dgraph.links().toArray();
     console.log('links', links.length)

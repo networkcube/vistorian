@@ -340,7 +340,7 @@ module glutils {
     
     /// SELECTIONS in the style of D3
     
-    export function selectAll():WebGLElementQuery<any,any>{
+    export function selectAll():WebGLElementQuery{
         var q = new glutils.WebGLElementQuery();
         webgl.elementQueries.push(q)
         return q;
@@ -348,9 +348,9 @@ module glutils {
     
     
     
-    export class WebGLElementQuery<T,S>{
-        dataElements:T[] = [];
-        visualElements:S[] = [];
+    export class WebGLElementQuery{
+        dataElements:Object[] = [];
+        visualElements:Object[] = [];
         mesh:THREE.Mesh;
         children:Object[] = []
         scene:THREE.Scene;
@@ -384,12 +384,12 @@ module glutils {
             this.scene = webgl.scene;
         }
         
-        data(arr:T[]):WebGLElementQuery<T,S>{
+        data(arr:Object[]):WebGLElementQuery{
             this.dataElements = arr.slice(0);
             return this;
         }
         
-        append(shape:string):WebGLElementQuery<T,S>{
+        append(shape:string):WebGLElementQuery{
             var elements = []
             switch(shape){
                 // case 'circle': elements = createCirclesNoShader(this.dataElements, this.scene); break
@@ -418,14 +418,14 @@ module glutils {
             return this;
         }
         
-        push(e:any):WebGLElementQuery<T,S>{
+        push(e:any):WebGLElementQuery{
             this.dataElements.push(e);
             return this;
         }
-        getData(i:S):T{
+        getData(i:any):any{
             return this.dataElements[this.visualElements.indexOf(i)];
         }
-        getVisual(i:T):S{
+        getVisual(i:any):any{
             return this.visualElements[this.dataElements.indexOf(i)];
         }
         
@@ -433,7 +433,7 @@ module glutils {
             return this.dataElements.length;
         }
         
-        filter(f:Function):WebGLElementQuery<T,S>{
+        filter(f:Function):WebGLElementQuery{
             var arr=[];
             var visArr = []
             for(var i=0 ; i<this.dataElements.length ; i++){
@@ -442,14 +442,14 @@ module glutils {
                     visArr.push(this.visualElements[i])
                 }
             }
-            var q = new WebGLElementQuery<T,S>()
+            var q = new WebGLElementQuery()
                 .data(arr);
             q.visualElements = visArr;
             return q;
         }
 
         // geometric attributes
-        attr(name:string, v:any):WebGLElementQuery<T,S>{
+        attr(name:string, v:any):WebGLElementQuery{
             var l = this.visualElements.length;
             if(this.IS_SHADER){
                 for(var i=0 ; i < this.dataElements.length ; i++){
@@ -468,7 +468,7 @@ module glutils {
         }
 
         // style attributes
-        style(name:string, v:any):WebGLElementQuery<T,S>{
+        style(name:string, v:any):WebGLElementQuery{
             var l = this.visualElements.length;
             if(this.IS_SHADER){
                 name = name.replace('-','');
@@ -486,7 +486,7 @@ module glutils {
 
         // called after all visual attributes have been set
         // method that passes updated values to the shaders 
-        set():WebGLElementQuery<T,S>{
+        set():WebGLElementQuery{
             if(!this.IS_SHADER)
                 return this;
 
@@ -513,7 +513,7 @@ module glutils {
             return this;
         }
         
-        text(v:any):WebGLElementQuery<T,S>{
+        text(v:any):WebGLElementQuery{
             var l = this.visualElements.length;
             for(var i=0 ; i<l ; i++){ 
                 setText(this.visualElements[i], v instanceof Function?v(this.dataElements[i], i):v);
@@ -522,7 +522,7 @@ module glutils {
         }
         
         // interaction
-        on(event:string, f:Function):WebGLElementQuery<T,S>{
+        on(event:string, f:Function):WebGLElementQuery{
             switch(event){
                 case 'mouseover': this.mouseOverHandler = f; break;
                 case 'mousemove': this.mouseMoveHandler = f; break;
@@ -535,7 +535,7 @@ module glutils {
             return this;
         }        
         
-        call(method:string, dataElement:T, event):WebGLElementQuery<T,S>{
+        call(method:string, dataElement:T, event):WebGLElementQuery{
             var i = this.dataElements.indexOf(dataElement);
             switch(method){
                 case 'mouseover': this.mouseOverHandler(dataElement, i, event); break;
@@ -589,7 +589,7 @@ module glutils {
 
 
     
-    function setStyle(element:any, attr:string, v:any, query:WebGLElementQuery<any, any>){ 
+    function setStyle(element:any, attr:string, v:any, query:WebGLElementQuery){ 
         switch(attr){
             case 'fill': 
                 if(query.shape == 'text')
@@ -1033,12 +1033,12 @@ module glutils {
         lassoMoveHandler:Function;
         lassoEndHandler:Function;
 
-        mouseOverSelections:WebGLElementQuery<any,any>[] = []
-        mouseMoveSelections:WebGLElementQuery<any,any>[] = []
-        mouseOutSelections:WebGLElementQuery<any,any>[] = []
-        mouseDownSelections:WebGLElementQuery<any,any>[] = []
-        mouseUpSelections:WebGLElementQuery<any,any>[] = []
-        clickSelections:WebGLElementQuery<any,any>[] = []
+        mouseOverSelections:WebGLElementQuery[] = []
+        mouseMoveSelections:WebGLElementQuery[] = []
+        mouseOutSelections:WebGLElementQuery[] = []
+        mouseDownSelections:WebGLElementQuery[] = []
+        mouseUpSelections:WebGLElementQuery[] = []
+        clickSelections:WebGLElementQuery[] = []
         
         constructor(scene:THREE.Scene, canvas:HTMLCanvasElement, camera:THREE.Camera){
             this.scene = scene;
@@ -1067,7 +1067,7 @@ module glutils {
             // })
         }
         
-        register(selection:WebGLElementQuery<any, any>, method:string){
+        register(selection:WebGLElementQuery, method:string){
             switch(method){
                 case 'mouseover': this.mouseOverSelections.push(selection); break;
                 case 'mousemove': this.mouseMoveSelections.push(selection); break;
@@ -1113,6 +1113,7 @@ module glutils {
                 
                 // call mouseover on all elements with a mouse over handler
                 for(var i = 0 ; i < this.mouseOverSelections.length ; i++){
+                    // If selecton is SHADER, check manually
                     intersectedVisualElements = this.intersect( this.mouseOverSelections[i], this.mouse[0], this.mouse[1]);
                     if(intersectedVisualElements.length > 0){
                         this.lastIntersectedElements.push(intersectedVisualElements);
@@ -1122,7 +1123,7 @@ module glutils {
                         this.mouseOverSelections[i].call('mouseover',intersectedVisualElements[j], e)
                     }
                     if(intersectedVisualElements.length > 0)
-                        nothingIntersected  = false;    
+                        nothingIntersected = false;    
                 }
                 
                 // call mousemove on all elements with a mouse move handler
@@ -1211,31 +1212,31 @@ module glutils {
 
 
                 
-        intersect(selection:WebGLElementQuery<any,any>, mousex, mousey):any[]{
+        intersect(selection:WebGLElementQuery, mousex, mousey):any[]{
             switch(selection.shape){
-                case 'circle': return this.intersectCircle(selection); break;
-                case 'rect': return this.intersectRect(selection); break;
-                case 'path': return this.intersectPath(selection); break;
-                case 'text': return this.intersectRect(selection); break;
+                case 'circle': return this.intersectCircles(selection); break;
+                case 'rect': return this.intersectRects(selection); break;
+                case 'path': return this.intersectPaths(selection); break;
+                case 'text': return this.intersectRects(selection); break;
             }
             return []    
         }
         
         // returns list of data elements 
-        intersectCircle(selection:WebGLElementQuery<any,any>):any[]{
+
+        intersectCircles(selection:WebGLElementQuery):any[]{
+            console.log('intersect circles')
             var intersectedElements = []
             var d;
-            var e;
-            for(var i = 0 ; i < selection.visualElements.length ; i++){
-                e = selection.visualElements[i];
-                d = Math.sqrt(Math.pow(this.mouse[0] - e.position.x, 2)+Math.pow(this.mouse[1] - e.position.y, 2))
-                if(d <= e.scale.x)  
+            for(var i = 0 ; i < selection.dataElements.length ; i++){
+                d = Math.sqrt(Math.pow(this.mouse[0] - selection.x[i], 2)+Math.pow(this.mouse[1] - selection.y[i], 2))
+                if(d <= selection.r[i])  
                     intersectedElements.push(selection.dataElements[i]);
             }
       
             return intersectedElements;
         }
-        intersectRect(selection:WebGLElementQuery<any,any>):any[]{
+        intersectRects(selection:WebGLElementQuery):any[]{
             var intersectedElements = []
             var d;
             var e;
@@ -1248,7 +1249,7 @@ module glutils {
             }
             return intersectedElements;
         }
-        intersectPath(selection:WebGLElementQuery<any,any>):any[]{
+        intersectPaths(selection:WebGLElementQuery):any[]{
             var intersectedElements = []
             var e;
             var v1, v2
