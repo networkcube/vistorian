@@ -6,7 +6,7 @@
     var LINK_OPACITY = .5;
     var LINK_WIDTH = 1.5;
     var OFFSET_LABEL = {x:0, y:10}
-    var LINK_GAP = 3;
+    var LINK_GAP = 2;
     var LAYOUT_TIMEOUT = 3000;
     var LABELBACKGROUND_OPACITY = 1;
     var LABELDISTANCE = 10;
@@ -39,9 +39,9 @@
     
     var nodePairs = dgraph.nodePairs();
     var links = dgraph.links().toArray();
-    console.log('links', links.length)
     var nodeLength = nodes.length;
     
+
     // states
     var mouseDownNode = undefined;
     var hiddenLabels = [];
@@ -237,12 +237,12 @@
                 .append('path')
                 .attr('d', (d)=> d.path)
                 .style('opacity', LINK_OPACITY)
-                // .on('mouseover', (d,i)=>{
-                //     networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
-                // })
-                // .on('mouseout', d=>{
-                //     networkcube.highlight('reset')
-                // })
+                .on('mouseover', (d,i)=>{
+                    networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
+                })
+                .on('mouseout', d=>{
+                    networkcube.highlight('reset')
+                })
                 .on('click', d=>{
                     var selections = d.getSelections();
                     var currentSelection = this.dgraph.getCurrentSelection();
@@ -267,19 +267,22 @@
         
         // update node positions
         visualNodes
-            .attr('x', (d,i)=> d.x)
+            .attr('x', (d,i)=>d.x)
             .attr('y', (d,i)=> -d.y)
                              
-
         nodeLabels
             .attr('x', (d,i)=> d.x)
             .attr('y', (d,i)=> -d.y)
-                             
 
         nodeLabelBackgrounds
             .attr('x', (d,i)=> d.x -getLabelWidth(d)/2)
             .attr('y', (d,i)=> -d.y +getLabelHeight(d)/2)
                              
+        // dgraph.links().forEach((d)=>{
+        //     console.log('d.source', d.source.x, d.source.y)
+        //     console.log('d.target', d.target.x, d.target.y)
+        // })
+
 
         // update link positions
         calculateCurvedLinks();        
@@ -531,24 +534,42 @@
                     {x: multiLink.target.x, y: -multiLink.target.y},
                     {x: multiLink.target.x, y: -multiLink.target.y}]
             }else{
-                dir = {
-                    x: multiLink.target.x - multiLink.source.x,
-                    y: multiLink.target.y - multiLink.source.y}
-                // normalize
-                offset = stretchVector([-dir.y, dir.x], LINK_GAP)
-                offset2 = stretchVector([dir.x, dir.y], LINK_GAP)
-
-                // calculate paths
                 links = multiLink.links().toArray();
-                for(var j=0 ; j<links.length ; j++){
-                    links[j]['path'] = [
-                        {x: multiLink.source.x, y: -multiLink.source.y},
-                        {x: multiLink.source.x + offset2[0] + (j-links.length/2 + .5) * offset[0],
-                         y: -(multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
-                        {x: multiLink.target.x - offset2[0] + (j-links.length/2 + .5) * offset[0],
-                         y: -(multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
-                        {x: multiLink.target.x, y: -multiLink.target.y}]
+                // Draw self-links as back-link
+                if(multiLink.source == multiLink.target){
+                    var minGap = getNodeRadius(multiLink.source)/2 + 4;
+                    for(var j=0 ; j<links.length ; j++){
+                        links[j]['path'] = [
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: -multiLink.source.y + minGap + (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y + minGap + (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                        ]
+                    }
+                // non-self links
+                }else{
+                    
+                    dir = {
+                        x: multiLink.target.x - multiLink.source.x,
+                        y: multiLink.target.y - multiLink.source.y}
+                    // normalize
+                    offset = stretchVector([-dir.y, dir.x], LINK_GAP)
+                    offset2 = stretchVector([dir.x, dir.y], LINK_GAP)
+
+                    // calculate paths
+                    for(var j=0 ; j<links.length ; j++){
+                        links[j]['path'] = [
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                            {x: multiLink.source.x + offset2[0] + (j-links.length/2 + .5) * offset[0],
+                            y: -(multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            {x: multiLink.target.x - offset2[0] + (j-links.length/2 + .5) * offset[0],
+                            y: -(multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            {x: multiLink.target.x, y: -multiLink.target.y}]
+                    }
+
                 }
+
             }
         }
     }

@@ -14206,7 +14206,6 @@ var glutils;
             return [];
         };
         WebGLInteractor.prototype.intersectCircles = function (selection) {
-            console.log('intersect circles');
             var intersectedElements = [];
             var d;
             for (var i = 0; i < selection.dataElements.length; i++) {

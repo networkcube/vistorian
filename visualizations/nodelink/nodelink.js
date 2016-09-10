@@ -5,7 +5,7 @@ var COLOR_HIGHLIGHT = '#ff8800';
 var LINK_OPACITY = .5;
 var LINK_WIDTH = 1.5;
 var OFFSET_LABEL = { x: 0, y: 10 };
-var LINK_GAP = 3;
+var LINK_GAP = 2;
 var LAYOUT_TIMEOUT = 3000;
 var LABELBACKGROUND_OPACITY = 1;
 var LABELDISTANCE = 10;
@@ -27,7 +27,6 @@ var nodes = dgraph.nodes().toArray();
 var nodesOrderedByDegree = dgraph.nodes().toArray().sort(function (n1, n2) { return n2.neighbors().length - n1.neighbors().length; });
 var nodePairs = dgraph.nodePairs();
 var links = dgraph.links().toArray();
-console.log('links', links.length);
 var nodeLength = nodes.length;
 var mouseDownNode = undefined;
 var hiddenLabels = [];
@@ -171,6 +170,12 @@ function init() {
         .append('path')
         .attr('d', function (d) { return d.path; })
         .style('opacity', LINK_OPACITY)
+        .on('mouseover', function (d, i) {
+        networkcube.highlight('set', { links: [d] });
+    })
+        .on('mouseout', function (d) {
+        networkcube.highlight('reset');
+    })
         .on('click', function (d) {
         var selections = d.getSelections();
         var currentSelection = _this.dgraph.getCurrentSelection();
@@ -391,20 +396,34 @@ function calculateCurvedLinks() {
                 { x: multiLink.target.x, y: -multiLink.target.y }];
         }
         else {
-            dir = {
-                x: multiLink.target.x - multiLink.source.x,
-                y: multiLink.target.y - multiLink.source.y };
-            offset = stretchVector([-dir.y, dir.x], LINK_GAP);
-            offset2 = stretchVector([dir.x, dir.y], LINK_GAP);
             links = multiLink.links().toArray();
-            for (var j = 0; j < links.length; j++) {
-                links[j]['path'] = [
-                    { x: multiLink.source.x, y: -multiLink.source.y },
-                    { x: multiLink.source.x + offset2[0] + (j - links.length / 2 + .5) * offset[0],
-                        y: -(multiLink.source.y + offset2[1] + (j - links.length / 2 + .5) * offset[1]) },
-                    { x: multiLink.target.x - offset2[0] + (j - links.length / 2 + .5) * offset[0],
-                        y: -(multiLink.target.y - offset2[1] + (j - links.length / 2 + .5) * offset[1]) },
-                    { x: multiLink.target.x, y: -multiLink.target.y }];
+            if (multiLink.source == multiLink.target) {
+                var minGap = getNodeRadius(multiLink.source) / 2 + 4;
+                for (var j = 0; j < links.length; j++) {
+                    links[j]['path'] = [
+                        { x: multiLink.source.x, y: -multiLink.source.y },
+                        { x: multiLink.source.x, y: -multiLink.source.y + minGap + (i * LINK_GAP) },
+                        { x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y + minGap + (i * LINK_GAP) },
+                        { x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y },
+                        { x: multiLink.source.x, y: -multiLink.source.y },
+                    ];
+                }
+            }
+            else {
+                dir = {
+                    x: multiLink.target.x - multiLink.source.x,
+                    y: multiLink.target.y - multiLink.source.y };
+                offset = stretchVector([-dir.y, dir.x], LINK_GAP);
+                offset2 = stretchVector([dir.x, dir.y], LINK_GAP);
+                for (var j = 0; j < links.length; j++) {
+                    links[j]['path'] = [
+                        { x: multiLink.source.x, y: -multiLink.source.y },
+                        { x: multiLink.source.x + offset2[0] + (j - links.length / 2 + .5) * offset[0],
+                            y: -(multiLink.source.y + offset2[1] + (j - links.length / 2 + .5) * offset[1]) },
+                        { x: multiLink.target.x - offset2[0] + (j - links.length / 2 + .5) * offset[0],
+                            y: -(multiLink.target.y - offset2[1] + (j - links.length / 2 + .5) * offset[1]) },
+                        { x: multiLink.target.x, y: -multiLink.target.y }];
+                }
             }
         }
     }

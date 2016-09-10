@@ -1225,7 +1225,6 @@ module glutils {
         // returns list of data elements 
 
         intersectCircles(selection:WebGLElementQuery):any[]{
-            console.log('intersect circles')
             var intersectedElements = []
             var d;
             for(var i = 0 ; i < selection.dataElements.length ; i++){
