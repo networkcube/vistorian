@@ -172,6 +172,7 @@ class MatrixVisualization{
     this.ncols = 0;
     this.scale = 1;
     this.tr= [0,0];
+    this.offset = [0, 0];
     this.guideLines = [];
     this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
     this.cellSelectionFrames = networkcube.array(undefined,  matrix.numberOfLinks());
@@ -268,15 +269,18 @@ class MatrixVisualization{
   }
 
   updateCellSize(value: number){
-    if(this.cellSize != value){
+    //if(this.cellSize != value){
       this.cellSize = Number(value);
       this.updateGuideLines();
-    }
+    //}
   }
 
   updateData(data:  {[id: number]: {[id: number]: networkcube.NodePair}}, 
-              nrows: number, ncols: number){
+              nrows: number, ncols: number,
+              offset: number[]
+            ){
     this.data = data;
+    this.offset = offset;
 
     if(nrows != this.nrows || ncols != this.ncols){
       this.nrows = nrows;
@@ -310,7 +314,7 @@ class MatrixVisualization{
 
   }
 
-  addCell(row: number, col: number, pair: networkcube.NodePair){
+  addCell(row: number, col: number, pair: networkcube.NodePair, offset: number[]){
     var links: networkcube.Link[];
     var e: networkcube.Link;
     var x, y, z: number;
@@ -335,8 +339,8 @@ class MatrixVisualization{
       color = new THREE.Color(webColor);
       alpha = this.linkWeightScale(Math.abs(meanWeight));
 
-      x = this.cellSize/2 + col * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
-      y = this.cellSize/2 + row * this.cellSize;
+      x = this.cellSize/2 + col * this.cellSize - this.cellSize / 2 + seg * j + seg / 2 + this.offset[0];
+      y = this.cellSize/2 + row * this.cellSize + this.offset[1];
       this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
       
       //x = this.cellSize/2 + row * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
@@ -390,26 +394,26 @@ class MatrixVisualization{
     
     var geometry1 = new THREE.Geometry();
     geometry1.vertices.push(
-        new THREE.Vector3( 0, 0, 0 ),
-        new THREE.Vector3( w, 0, 0)
+        new THREE.Vector3( this.offset[0], 0, 0 ),
+        new THREE.Vector3( w+this.offset[0], 0, 0)
     )
     var geometry2 = new THREE.Geometry();
     geometry2.vertices.push(
-        new THREE.Vector3( 0, 0, 0 ),
-        new THREE.Vector3( 0, -h , 0 )
+        new THREE.Vector3( 0, -this.offset[1], 0 ),
+        new THREE.Vector3( 0, -h-this.offset[1] , 0 )
     )
     var m;
     var mat = new THREE.LineBasicMaterial( {color: 0xeeeeee, linewidth:1} );
     var x,y;
-    for(var i=0 ; i <=h; i+=this.cellSize){
+    for(var i=0; i <=h; i+=this.cellSize){
         m = new THREE.Line(geometry1, mat)
-        m.position.set(0, -i, 0);
+        m.position.set(0, -i-this.offset[1], 0);
         this.scene.add(m);
         this.guideLines.push(m);
     }
     for(var i=0 ; i <=w; i+=this.cellSize){
         m = new THREE.Line(geometry2, mat);
-        m.position.set(i, 0, 0);
+        m.position.set(i+this.offset[0], 0, 0);
         this.scene.add(m);
         this.guideLines.push(m)
     }
@@ -443,7 +447,7 @@ class Matrix{
   public endTime: networkcube.Time;
   private nodeOrder: number[];
   private bbox: Box;
-  private _offset: number[];
+  private _tr: number[];
   private _scale: number;
   private _cellSize;
   private initialCellSize;
@@ -457,7 +461,8 @@ class Matrix{
     this.endTime = this.dgraph.endTime;
     this.nodeOrder = this._dgraph.nodes().ids();
     this.bbox = {x0: 0, x1: 0, y0: 0, y1: 0};
-    this._offset = [0, 0];
+    this._tr = [0, 0];
+    this.offset = [0, 0];
     this._scale = 1;
     this._cellSize = 12;
     this.initialCellSize = this._cellSize;;
@@ -475,9 +480,9 @@ class Matrix{
     return this._cellSize;
   }
 
-  set offset(offset){
-    if(this._offset == offset) return;
-    this._offset = offset;
+  set tr(tr){
+    if(this._tr == tr) return;
+    this._tr = tr;
     this.updateVisibleData();
   }
   
@@ -487,11 +492,10 @@ class Matrix{
     this.updateCellSize(this.initialCellSize*this._scale);
   }
 
-  setZoom(scale, offset){
+  setZoom(scale, tr){
     this._scale = scale;
-    this._offset = offset;
+    this._tr = tr;
     this.updateCellSize(this.initialCellSize*this._scale);
-    
   }
   
   dgraphName(){
@@ -577,10 +581,13 @@ class Matrix{
   }
 
   updateVisibleBox(){
-    this.bbox.x0 = -Math.floor(this._offset[0]/this._cellSize);
-    this.bbox.y0 = -Math.floor(this._offset[1]/this._cellSize);
+    this.bbox.x0 = -Math.floor(this._tr[0]/this._cellSize);
+    this.bbox.y0 = -Math.floor(this._tr[1]/this._cellSize);
     this.bbox.x1 = this.bbox.x0 + Math.floor(this.matrixVis.width/this._cellSize);
     this.bbox.y1 = this.bbox.y0 + Math.floor(this.matrixVis.height/this._cellSize);
+
+    this.offset[0] =  (this._tr[0]/this._cellSize + this.bbox.x0)*this._cellSize;
+    this.offset[1] = (this._tr[1]/this._cellSize + this.bbox.y0)*this._cellSize;
   }
 
   updateVisibleData(){
@@ -615,7 +622,7 @@ class Matrix{
         }
       }
     }
-    this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length);
+    this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.offset);
 
   }
 

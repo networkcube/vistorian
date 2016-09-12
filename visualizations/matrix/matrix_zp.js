@@ -112,6 +112,7 @@ var MatrixVisualization = (function () {
         this.ncols = 0;
         this.scale = 1;
         this.tr = [0, 0];
+        this.offset = [0, 0];
         this.guideLines = [];
         this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
         this.cellSelectionFrames = networkcube.array(undefined, matrix.numberOfLinks());
@@ -173,13 +174,12 @@ var MatrixVisualization = (function () {
         console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
     };
     MatrixVisualization.prototype.updateCellSize = function (value) {
-        if (this.cellSize != value) {
-            this.cellSize = Number(value);
-            this.updateGuideLines();
-        }
+        this.cellSize = Number(value);
+        this.updateGuideLines();
     };
-    MatrixVisualization.prototype.updateData = function (data, nrows, ncols) {
+    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, offset) {
         this.data = data;
+        this.offset = offset;
         if (nrows != this.nrows || ncols != this.ncols) {
             this.nrows = nrows;
             this.ncols = ncols;
@@ -202,7 +202,7 @@ var MatrixVisualization = (function () {
         this.scene.add(this.mesh);
         this.render();
     };
-    MatrixVisualization.prototype.addCell = function (row, col, pair) {
+    MatrixVisualization.prototype.addCell = function (row, col, pair, offset) {
         var links;
         var e;
         var x, y, z;
@@ -223,8 +223,8 @@ var MatrixVisualization = (function () {
             meanWeight = e.weights() ? e.weights(this.matrix.startTime, this.matrix.endTime).mean() : 1;
             color = new THREE.Color(webColor);
             alpha = this.linkWeightScale(Math.abs(meanWeight));
-            x = this.cellSize / 2 + col * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
-            y = this.cellSize / 2 + row * this.cellSize;
+            x = this.cellSize / 2 + col * this.cellSize - this.cellSize / 2 + seg * j + seg / 2 + this.offset[0];
+            y = this.cellSize / 2 + row * this.cellSize + this.offset[1];
             this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight > 0);
         }
     };
@@ -262,21 +262,21 @@ var MatrixVisualization = (function () {
         var w = this.ncols * this.cellSize;
         var h = this.nrows * this.cellSize;
         var geometry1 = new THREE.Geometry();
-        geometry1.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(w, 0, 0));
+        geometry1.vertices.push(new THREE.Vector3(this.offset[0], 0, 0), new THREE.Vector3(w + this.offset[0], 0, 0));
         var geometry2 = new THREE.Geometry();
-        geometry2.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -h, 0));
+        geometry2.vertices.push(new THREE.Vector3(0, -this.offset[1], 0), new THREE.Vector3(0, -h - this.offset[1], 0));
         var m;
         var mat = new THREE.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
         var x, y;
         for (var i = 0; i <= h; i += this.cellSize) {
             m = new THREE.Line(geometry1, mat);
-            m.position.set(0, -i, 0);
+            m.position.set(0, -i - this.offset[1], 0);
             this.scene.add(m);
             this.guideLines.push(m);
         }
         for (var i = 0; i <= w; i += this.cellSize) {
             m = new THREE.Line(geometry2, mat);
-            m.position.set(i, 0, 0);
+            m.position.set(i + this.offset[0], 0, 0);
             this.scene.add(m);
             this.guideLines.push(m);
         }
@@ -299,7 +299,8 @@ var Matrix = (function () {
         this.endTime = this.dgraph.endTime;
         this.nodeOrder = this._dgraph.nodes().ids();
         this.bbox = { x0: 0, x1: 0, y0: 0, y1: 0 };
-        this._offset = [0, 0];
+        this._tr = [0, 0];
+        this.offset = [0, 0];
         this._scale = 1;
         this._cellSize = 12;
         this.initialCellSize = this._cellSize;
@@ -323,11 +324,11 @@ var Matrix = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Matrix.prototype, "offset", {
-        set: function (offset) {
-            if (this._offset == offset)
+    Object.defineProperty(Matrix.prototype, "tr", {
+        set: function (tr) {
+            if (this._tr == tr)
                 return;
-            this._offset = offset;
+            this._tr = tr;
             this.updateVisibleData();
         },
         enumerable: true,
@@ -343,9 +344,9 @@ var Matrix = (function () {
         enumerable: true,
         configurable: true
     });
-    Matrix.prototype.setZoom = function (scale, offset) {
+    Matrix.prototype.setZoom = function (scale, tr) {
         this._scale = scale;
-        this._offset = offset;
+        this._tr = tr;
         this.updateCellSize(this.initialCellSize * this._scale);
     };
     Matrix.prototype.dgraphName = function () {
@@ -424,10 +425,12 @@ var Matrix = (function () {
         this.plotMargin.setMargin((this.labelLength * 0.5) * this.cellSize);
     };
     Matrix.prototype.updateVisibleBox = function () {
-        this.bbox.x0 = -Math.floor(this._offset[0] / this._cellSize);
-        this.bbox.y0 = -Math.floor(this._offset[1] / this._cellSize);
+        this.bbox.x0 = -Math.floor(this._tr[0] / this._cellSize);
+        this.bbox.y0 = -Math.floor(this._tr[1] / this._cellSize);
         this.bbox.x1 = this.bbox.x0 + Math.floor(this.matrixVis.width / this._cellSize);
         this.bbox.y1 = this.bbox.y0 + Math.floor(this.matrixVis.height / this._cellSize);
+        this.offset[0] = (this._tr[0] / this._cellSize + this.bbox.x0) * this._cellSize;
+        this.offset[1] = (this._tr[1] / this._cellSize + this.bbox.y0) * this._cellSize;
     };
     Matrix.prototype.updateVisibleData = function () {
         var _this = this;
@@ -464,7 +467,7 @@ var Matrix = (function () {
                 }
             }
         }
-        this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length);
+        this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.offset);
     };
     return Matrix;
 }());
