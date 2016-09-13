@@ -99,10 +99,7 @@ var MatrixVisualization = (function () {
             var z, tr;
             z = _this.zoom.scale();
             tr = _this.zoom.translate();
-            tr[0] = Math.min(0, tr[0]);
-            tr[1] = Math.min(0, tr[1]);
-            _this.zoom.translate(tr);
-            _this.matrix.setZoom(z, tr);
+            _this.updateTransform(z, tr);
         };
         this.width = width;
         this.height = height;
@@ -175,16 +172,14 @@ var MatrixVisualization = (function () {
     };
     MatrixVisualization.prototype.updateCellSize = function (value) {
         this.cellSize = Number(value);
-        this.updateGuideLines();
     };
-    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, offset) {
+    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset) {
         this.data = data;
         this.offset = offset;
-        if (nrows != this.nrows || ncols != this.ncols) {
-            this.nrows = nrows;
-            this.ncols = ncols;
-            this.updateGuideLines();
-        }
+        this.cellSize = cellSize;
+        this.nrows = nrows;
+        this.ncols = ncols;
+        this.updateGuideLines();
         this.vertexPositions = [];
         this.vertexColors = [];
         if (this.geometry) {
@@ -202,7 +197,7 @@ var MatrixVisualization = (function () {
         this.scene.add(this.mesh);
         this.render();
     };
-    MatrixVisualization.prototype.addCell = function (row, col, pair, offset) {
+    MatrixVisualization.prototype.addCell = function (row, col, pair) {
         var links;
         var e;
         var x, y, z;
@@ -223,7 +218,7 @@ var MatrixVisualization = (function () {
             meanWeight = e.weights() ? e.weights(this.matrix.startTime, this.matrix.endTime).mean() : 1;
             color = new THREE.Color(webColor);
             alpha = this.linkWeightScale(Math.abs(meanWeight));
-            x = this.cellSize / 2 + col * this.cellSize - this.cellSize / 2 + seg * j + seg / 2 + this.offset[0];
+            x = col * this.cellSize + seg * j + seg / 2 + this.offset[0];
             y = this.cellSize / 2 + row * this.cellSize + this.offset[1];
             this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight > 0);
         }
@@ -265,20 +260,26 @@ var MatrixVisualization = (function () {
         geometry1.vertices.push(new THREE.Vector3(this.offset[0], 0, 0), new THREE.Vector3(w + this.offset[0], 0, 0));
         var geometry2 = new THREE.Geometry();
         geometry2.vertices.push(new THREE.Vector3(0, -this.offset[1], 0), new THREE.Vector3(0, -h - this.offset[1], 0));
-        var m;
+        var m, pos;
         var mat = new THREE.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
         var x, y;
+        var j = 0;
         for (var i = 0; i <= h; i += this.cellSize) {
+            pos = j * this.cellSize + this.offset[1];
             m = new THREE.Line(geometry1, mat);
-            m.position.set(0, -i - this.offset[1], 0);
+            m.position.set(0, -pos, 0);
             this.scene.add(m);
             this.guideLines.push(m);
+            j++;
         }
+        j = 0;
         for (var i = 0; i <= w; i += this.cellSize) {
+            pos = j * this.cellSize + this.offset[0];
             m = new THREE.Line(geometry2, mat);
-            m.position.set(i + this.offset[0], 0, 0);
+            m.position.set(pos, 0, 0);
             this.scene.add(m);
             this.guideLines.push(m);
+            j++;
         }
     };
     MatrixVisualization.prototype.mouseMoveHandler = function (e) {
@@ -289,6 +290,13 @@ var MatrixVisualization = (function () {
     };
     MatrixVisualization.prototype.clickHandler = function (e) {
         console.log("click");
+    };
+    MatrixVisualization.prototype.updateTransform = function (z, tr) {
+        tr[0] = Math.min(0, tr[0]);
+        tr[1] = Math.min(0, tr[1]);
+        this.zoom.scale(z);
+        this.zoom.translate(tr);
+        this.matrix.updateTransform(z, tr);
     };
     return MatrixVisualization;
 }());
@@ -302,9 +310,8 @@ var Matrix = (function () {
         this._tr = [0, 0];
         this.offset = [0, 0];
         this._scale = 1;
-        this._cellSize = 12;
-        this.initialCellSize = this._cellSize;
-        ;
+        this.initialCellSize = 12;
+        this._cellSize = this.initialCellSize;
         this.hoveredLinks = [];
         this.longestLabelLength();
         this.plotMargin = new NMargin(0);
@@ -324,30 +331,16 @@ var Matrix = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Matrix.prototype, "tr", {
-        set: function (tr) {
-            if (this._tr == tr)
-                return;
-            this._tr = tr;
-            this.updateVisibleData();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Matrix.prototype, "scale", {
-        set: function (scale) {
-            if (this._scale == scale)
-                return;
-            this._scale = scale;
-            this.updateCellSize(this.initialCellSize * this._scale);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Matrix.prototype.setZoom = function (scale, tr) {
+    Matrix.prototype.updateCellSize = function (value) {
+        var scale = value / this.initialCellSize;
+        var tr = [this._tr[0] * scale, this._tr[1] * scale];
+        this.matrixVis.updateTransform(scale, tr);
+    };
+    Matrix.prototype.updateTransform = function (scale, tr) {
         this._scale = scale;
         this._tr = tr;
-        this.updateCellSize(this.initialCellSize * this._scale);
+        this._cellSize = this._scale * this.initialCellSize;
+        this.updateVisibleData();
     };
     Matrix.prototype.dgraphName = function () {
         return this._dgraph.name;
@@ -357,11 +350,6 @@ var Matrix = (function () {
     };
     Matrix.prototype.maxWeight = function () {
         return this._dgraph.links().weights().max();
-    };
-    Matrix.prototype.updateCellSize = function (value) {
-        this._cellSize = Number(value);
-        this.matrixVis.updateCellSize(this._cellSize);
-        this.updateVisibleData();
     };
     Matrix.prototype.reorderWorker = function (orderType) {
         if (orderType == 'alphanumerical') {
@@ -407,7 +395,7 @@ var Matrix = (function () {
     };
     Matrix.prototype.setVis = function (matrixVis) {
         this.matrixVis = matrixVis;
-        this.updateVisibleData();
+        this.updateTransform(1, [0, 0]);
     };
     Matrix.prototype.longestLabelLength = function () {
         if (this.dgraph) {
@@ -447,10 +435,11 @@ var Matrix = (function () {
         });
         var visibleData = {};
         var tmpHash = {};
-        var col;
+        var row, col;
         var node;
-        for (var row = 0; row < leftNodes.length; row++) {
-            node = leftNodes[row];
+        for (var i = 0; i < leftNodes.length; i++) {
+            node = leftNodes[i];
+            row = this.nodeOrder[node.id()] - this.bbox.y0;
             for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
                 var link = _a[_i];
                 if (true) {
@@ -467,7 +456,7 @@ var Matrix = (function () {
                 }
             }
         }
-        this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.offset);
+        this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset);
     };
     return Matrix;
 }());
