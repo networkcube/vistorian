@@ -34,6 +34,11 @@ interface Box{
   y1: number;
 }
 
+interface Pos{
+  x: number;
+  y: number;
+}
+
 class MatrixMenu{
   private elem: JQuery;
   private matrix: Matrix;
@@ -145,9 +150,14 @@ class MatrixVisualization{
   private cellSize: number;
   private scale: number;
   private tr: number[];
+  private offset: number[];
   private nrows: number;
   private ncols: number;
-  private offset: number[];
+  private linksPos: {[row: number]: {[col: number]: number[]}};
+  private mouseDown: Boolean;
+  private mouseDownPos: Pos;
+  private mouseDownCell: any;
+  private hoveredLinks: number;
   private canvas: HTMLCanvasElement;
   private view: D3.Selection;
   private zoom: D3.Behavior.Zoom;
@@ -177,6 +187,8 @@ class MatrixVisualization{
     this.tr = [0,0];
     this.offset = [0, 0];
     this.guideLines = [];
+    this.hoveredLinks = [];
+    this.mouseDownCell = {row: 0, col: 0};
     this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
     this.cellSelectionFrames = networkcube.array(undefined,  matrix.numberOfLinks());
     this.linkWeightScale = d3.scale.linear().range([0.1, 1])
@@ -192,7 +204,7 @@ class MatrixVisualization{
         .on('zoom', this.zoomed);
     this.view.call(this.zoom);
     this.initGeometry();
-    this.updateCellSize(this.matrix.cellSize);
+    this.cellSize = this.matrix.cellSize;
 
   }
   initWebGL(){
@@ -270,34 +282,35 @@ class MatrixVisualization{
     console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
   }
 
-  updateCellSize(value: number){
-    //if(this.cellSize != value){
-      this.cellSize = Number(value);
-    //}
-  }
-
   updateData(data:  {[id: number]: {[id: number]: networkcube.NodePair}},
               nrows: number, ncols: number,
               cellSize: number,
               offset: number[]
             ){
     this.data = data;
+    this.nrows = nrows;
+    this.ncols = ncols;
     this.offset = offset;
     this.cellSize = cellSize;
 
-    //if(nrows != this.nrows || ncols != this.ncols){
-      this.nrows = nrows;
-      this.ncols = ncols;
-      this.updateGuideLines();
-    //}
-    this.vertexPositions = [];
-    this.vertexColors = [];
 
     if (this.geometry) {
         this.scene.remove(this.mesh);
     }
+    for(var id of this.hoveredLinks){
+      if(this.cellHighlightFrames[id])
+        for(var frame of this.cellHighlightFrames[id])
+          this.scene.remove(frame);
+    }    
     
-    //this.linksPos = {};
+    this.updateGuideLines();
+    
+    this.vertexPositions = [];
+    this.vertexColors = [];
+    this.highlightFrames = [];
+    this.cellHighlightFrames = [];
+    this.linksPos = {};
+    
     for(var row in this.data){
         for( var col in data[row]){
            this.addCell(row, col, data[row][col]);
@@ -343,13 +356,16 @@ class MatrixVisualization{
       alpha = this.linkWeightScale(Math.abs(meanWeight));
 
       x = col * this.cellSize + seg * j + seg / 2 + this.offset[0];
-      y = this.cellSize/2 + row * this.cellSize + this.offset[1];
+      y = row * this.cellSize + this.cellSize/2 + this.offset[1];
       this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
+
+      if(!this.linksPos[row]) this.linksPos[row] = {};
+      if(!this.linksPos[row][col]) this.linksPos[row][col] = [];
+      this.linksPos[row][col].push(e.id());
       
       //x = this.cellSize/2 + row * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
       //y = this.cellSize/2 + col * this.cellSize;
       //this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
-    
     }
 
   }
@@ -374,7 +390,8 @@ class MatrixVisualization{
     frame.position.y = -y;
     frame.position.z = 10;
     highlightFrames.add(frame);
-    this.cellHighlightFrames[id] = highlightFrames;
+    if(!this.cellHighlightFrames[id]) this.cellHighlightFrames[id] = [];
+    this.cellHighlightFrames[id].push(highlightFrames);
 
     // selection frame
     frame = glutils.createRectFrame(w - 1, h - 1, COLOR_SELECTION, 2)
@@ -428,11 +445,74 @@ class MatrixVisualization{
     }
     
   } 
-  mouseMoveHandler(e: Event){
+
+  highlightLink(cell){
+    var row = cell.row;
+    var col = cell.col;
+    var id: number;
+    if(this.linksPos[row]){
+      if(this.linksPos[row][col]){
+        for(var id of this.linksPos[row][col]){
+          for(var frame of this.cellHighlightFrames[id])
+            this.scene.add(frame);
+          this.hoveredLinks.push(id);
+        }
+        this.render();
+      }
+    }
   }
-  mouseDownHandler(e: Event){
+
+  posToCell(pos: Pos){
+   var row = Math.round((pos.y-this.offset[1]-this.cellSize/2)/this.cellSize);
+   var col = Math.round((pos.x-this.offset[0]-this.cellSize/2)/this.cellSize);
+   return {row: row, col: col};
   }
-  mouseUpHandler(e: Event){
+
+  private mouseMoveHandler = (e: Event)=>{
+    var mpos: Pos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
+
+    for(var id of this.hoveredLinks){
+      if(this.cellHighlightFrames[id])
+        for(var frame of this.cellHighlightFrames[id])
+          this.scene.remove(frame);
+    }
+    this.hoveredLinks = [];
+
+    var cell = this.posToCell(mpos);
+
+    if (!this.mouseDown) {
+      this.highlightLink(cell);
+    }else{
+      var box: Box = {x0: 0, y0: 0, x1: 0, y1: 0};
+      box.x0 = Math.min(cell.col, this.mouseDownCell.col);
+      box.x1 = Math.max(cell.col, this.mouseDownCell.col);
+      box.y0 = Math.min(cell.row, this.mouseDownCell.row);
+      box.y1 = Math.max(cell.row, this.mouseDownCell.row);
+
+      for(var c=box.x0; c<=box.x1; c++){
+        for(var r=box.y0; r<=box.y1; r++){
+          var ch = {row: r, col: c};
+          this.highlightLink(ch);
+        }
+      }
+    }
+  }
+  private mouseDownHandler = (e: Event)=>{
+    if (e.shiftKey) {
+      this.view.on('mousedown.zoom',null);
+      this.mouseDown = true;
+      this.mouseDownPos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
+      this.mouseDownCell = this.posToCell(this.mouseDownPos); 
+    }
+  }
+  private mouseUpHandler = (e: Event)=>{
+    this.mouseDown = false;
+    this.view.call(this.zoom);
+      for(var id of this.hoveredLinks){
+          for(var frame of this.cellHighlightFrames[id])
+            this.scene.remove(frame);
+      }
+      this.hoveredLinks = [];
   }
   clickHandler(e: Event){
     console.log("click");
@@ -497,7 +577,7 @@ class Matrix{
 
   updateCellSize(value: number){
     var scale = value/this.initialCellSize;
-    var tr = [this._tr[0]*scale, this._tr[1]*scale];
+    var tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
     this.matrixVis.updateTransform(scale, tr);
   }
 
@@ -630,9 +710,14 @@ class Matrix{
                               leftNodes.length, topNodes.length,
                               this.cellSize,
                               this.offset);
-
   }
-
+  
+  timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
+    this.startTime = this._dgraph.time(m.startId);
+    this.endTime = this._dgraph.time(m.endId);
+    //timeSlider.set(this.startTime, this.endTime);
+    this.updateVisibleData();
+  }
   
 }
 
@@ -653,5 +738,6 @@ var bbox =  matrixLabels.foreignObject.node().getBBox();
 var matrixVis = new MatrixVisualization(bbox.width, bbox.height, matrixLabels.foreignObject,  matrix);
 
 matrix.setVis(matrixVis);
+networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 
 
