@@ -62,26 +62,103 @@ var MatrixTimeSlider = (function () {
     return MatrixTimeSlider;
 }());
 var MatrixLabels = (function () {
-    function MatrixLabels(width, height, elem, matrix) {
-        this.width = width;
-        this.height = height;
-        this.margin = matrix.plotMargin;
-        this.elem = elem;
+    function MatrixLabels(svg, margin, matrix) {
+        this.svg = svg;
         this.matrix = matrix;
+        this.margin = margin;
         this.init();
     }
     MatrixLabels.prototype.init = function () {
-        this.svg = d3.select(this.elem.get(0))
-            .append('svg')
-            .attr('id', 'networkcube-matrix-visSvg')
-            .attr('width', this.width)
-            .attr('height', this.height);
-        this._foreignObject = this.svg.append('foreignObject')
-            .attr('id', 'networkcube-matrix-visCanvasFO')
-            .attr('x', this.margin.left)
-            .attr('y', this.margin.top)
-            .attr('width', this.width - this.margin.left)
-            .attr('height', this.height - this.margin.top);
+    };
+    MatrixLabels.prototype.updateData = function (leftNodes, topNodes, cellSize, nodeOrder, leftLabelOffset, topLabelOffset, bbox) {
+        var _this = this;
+        var labelsLeft = this.svg.selectAll('.labelsLeft')
+            .data(leftNodes);
+        var leftLabelPosition = function (nodeId) { return _this.margin.top + leftLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize; };
+        labelsLeft.enter().append('text')
+            .attr('id', function (d, i) { return 'nodeLabel_left_' + d.id(); })
+            .attr('class', 'labelsLeft nodeLabel')
+            .attr('text-anchor', 'end')
+            .attr('x', this.margin.left - 10)
+            .attr('y', function (d, i) { return leftLabelPosition(d.id()); })
+            .on('mouseover', function (d, i) {
+            networkcube.highlight('set', { nodes: [d] });
+        })
+            .on('mouseout', function (d, i) {
+            networkcube.highlight('reset');
+        })
+            .on('click', function (d, i) {
+            var selections = d.getSelections();
+            var currentSelection = _this.dgraph.getCurrentSelection();
+            for (var j = 0; j < selections.length; j++) {
+                if (selections[j] == currentSelection) {
+                    networkcube.selection('remove', { nodes: [d] });
+                    return;
+                }
+            }
+            networkcube.selection('add', { nodes: [d] });
+        });
+        labelsLeft.exit().remove();
+        labelsLeft
+            .attr('id', function (d, i) { return 'nodeLabel_left_' + d.id(); })
+            .text(function (d, i) { return d.label(); })
+            .attr('x', this.margin.left - 10)
+            .attr('y', function (d, i) {
+            return leftLabelPosition(d.id());
+        });
+        var labelsTop = this.svg.selectAll('.labelsTop')
+            .data(topNodes);
+        var topLabelPosition = function (nodeId) { return _this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize; };
+        labelsTop.enter().append('text')
+            .attr('id', function (d, i) { return 'nodeLabel_top_' + d.id(); })
+            .attr('class', 'labelsTop nodeLabel')
+            .text(function (d, i) { return d.label(); })
+            .attr('x', function (d, i) { return topLabelPosition(d.id()); })
+            .attr('y', this.margin.left - 10)
+            .attr('transform', function (d, i) { return 'rotate(-90, ' + (_this.margin.top + cellSize * i + cellSize) + ', ' + (_this.margin.left - 10) + ')'; })
+            .on('mouseover', function (d, i) {
+            networkcube.highlight('set', { nodes: [d] });
+        })
+            .on('mouseout', function (d, i) {
+            networkcube.highlight('reset');
+        })
+            .on('click', function (d, i) {
+            var selections = d.getSelections();
+            var currentSelection = _this.dgraph.getCurrentSelection();
+            for (var j = 0; j < selections.length; j++) {
+                if (selections[j] == currentSelection) {
+                    networkcube.selection('remove', { nodes: [d] });
+                    return;
+                }
+            }
+            networkcube.selection('add', { nodes: [d] });
+        });
+        labelsTop.exit().remove();
+        labelsTop
+            .attr('id', function (d, i) { return 'nodeLabel_top_' + d.id(); })
+            .text(function (d, i) { return d.label(); })
+            .attr('x', function (d, i) {
+            return topLabelPosition(d.id());
+        })
+            .attr('y', this.margin.top - 10)
+            .attr('transform', function (d, i) { return 'rotate(-90, ' + (_this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()] - bbox.x0) + cellSize) + ', ' + (_this.margin.left - 10) + ')'; });
+        this.svg.selectAll('.nodeLabel')
+            .style('fill', function (d) {
+            color = undefined;
+            if (d.isSelected()) {
+                color = networkcube.getPriorityColor(d);
+            }
+            if (!color)
+                color = '#000000';
+            return color;
+        })
+            .style('font-weight', function (d) {
+            if (d.isHighlighted()) {
+                return 900;
+            }
+            return 100;
+        })
+            .style('font-size', cellSize);
     };
     Object.defineProperty(MatrixLabels.prototype, "foreignObject", {
         get: function () {
@@ -403,7 +480,7 @@ var Matrix = (function () {
         this._cellSize = this.initialCellSize;
         this.hoveredLinks = [];
         this.longestLabelLength();
-        this.plotMargin = new NMargin(0);
+        this.margin = new NMargin(0);
         this.calculatePlotMargin();
     }
     Object.defineProperty(Matrix.prototype, "dgraph", {
@@ -486,6 +563,9 @@ var Matrix = (function () {
         this.matrixVis = matrixVis;
         this.updateTransform(1, [0, 0]);
     };
+    Matrix.prototype.setLabels = function (matrixLabels) {
+        this.labelsVis = matrixLabels;
+    };
     Matrix.prototype.longestLabelLength = function () {
         if (this.dgraph) {
             var longestLabelNode = this.dgraph.nodes().toArray().reduce(function (p, v, i, arr) {
@@ -499,7 +579,7 @@ var Matrix = (function () {
         this.labelLength = longestLabelNode ? longestLabelNode.label().length : 8;
     };
     Matrix.prototype.calculatePlotMargin = function () {
-        this.plotMargin.setMargin((this.labelLength * 0.5) * this.cellSize);
+        this.margin.setMargin((this.labelLength * 0.5) * this.cellSize);
     };
     Matrix.prototype.updateVisibleBox = function () {
         this.bbox.x0 = -Math.floor(this._tr[0] / this._cellSize);
@@ -528,10 +608,10 @@ var Matrix = (function () {
         var node;
         for (var i = 0; i < leftNodes.length; i++) {
             node = leftNodes[i];
-            row = this.nodeOrder[node.id()] - this.bbox.y0;
-            for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
-                var link = _a[_i];
-                if (true) {
+            if (node.isVisible()) {
+                row = this.nodeOrder[node.id()] - this.bbox.y0;
+                for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
+                    var link = _a[_i];
                     tmpHash[link.nodePair().id()] = true;
                     var neighbor = link.source.id() == node.id() ? link.target : link.source;
                     if (neighbor.isVisible() &&
@@ -546,21 +626,36 @@ var Matrix = (function () {
             }
         }
         this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset);
+        if (this.labelsVis) {
+            this.labelsVis.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder, this.offset[0], this.offset[1], this.bbox);
+        }
     };
     return Matrix;
 }());
+var matrix = new Matrix();
 var vizWidth = window.innerWidth - 10;
 var vizHeight = window.innerHeight - 115;
 var appendToBody = function (domId) { return $('<div id=' + domId + '></div>').appendTo('body'); };
 var menuJQ = appendToBody("networkcube-matrix-menu");
 var tsJQ = appendToBody("networkcube-matrix-timelineDiv'");
 var labJQ = appendToBody("networkcube-matrix-visDiv");
-var matrix = new Matrix();
+var svg = d3.select(labJQ.get(0))
+    .append('svg')
+    .attr('id', 'networkcube-matrix-visSvg')
+    .attr('width', vizWidth)
+    .attr('height', vizHeight);
+var foreignObject = svg.append('foreignObject')
+    .attr('id', 'networkcube-matrix-visCanvasFO')
+    .attr('x', matrix.margin.left)
+    .attr('y', matrix.margin.top)
+    .attr('width', vizWidth - matrix.margin.left)
+    .attr('height', vizHeight - matrix.margin.top);
+var bbox = foreignObject.node().getBBox();
 var matrixMenu = new MatrixMenu(menuJQ, matrix);
 var matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
-var matrixLabels = new MatrixLabels(vizWidth, vizHeight, labJQ, matrix);
-var bbox = matrixLabels.foreignObject.node().getBBox();
-var matrixVis = new MatrixVisualization(bbox.width, bbox.height, matrixLabels.foreignObject, matrix);
+var matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
+var matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject, matrix);
+matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 //# sourceMappingURL=matrix_zp.js.map

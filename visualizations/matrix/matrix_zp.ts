@@ -105,35 +105,140 @@ class MatrixTimeSlider{
 }
 
 class MatrixLabels{
-  private elem: JQuery;
   private width: number;
   private height: number;
   private margin: NMargin;
   private matrix: Matrix;
-  public svg: any;
-  public _foreignObject: any;
-  constructor(width: number, height: number,
-              elem: JQuery, matrix: Matirx){
-    this.width = width;
-    this.height = height;
-    this.margin = matrix.plotMargin;
-    this.elem = elem;
+  public svg: D3.Selection;
+  constructor(svg: D3.Selection,
+              margin: NMargin,
+              matrix: Matrix){
+    this.svg = svg;
     this.matrix = matrix;
+    this.margin = margin;
     this.init();
   }
 
   init(){
-    this.svg = d3.select(this.elem.get(0))
-      .append('svg')
-      .attr('id', 'networkcube-matrix-visSvg')
-      .attr('width', this.width )
-      .attr('height', this.height);
-    this._foreignObject = this.svg.append('foreignObject')
-      .attr('id', 'networkcube-matrix-visCanvasFO')
-      .attr('x', this.margin.left)
-      .attr('y', this.margin.top)
-      .attr('width', this.width - this.margin.left )
-      .attr('height', this.height - this.margin.top);
+  }
+
+  updateData(leftNodes: networkcube.Node[], topNodes: networkcube.Node[],
+             cellSize: number, nodeOrder: number[],
+             leftLabelOffset: number, topLabelOffset: number,
+             bbox: Box){
+
+    var labelsLeft = this.svg.selectAll('.labelsLeft')
+        .data(leftNodes);
+
+    var leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize; 
+
+    labelsLeft.enter().append('text')
+        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
+        .attr('class', 'labelsLeft nodeLabel')
+        .attr('text-anchor', 'end')
+        .attr('x', this.margin.left - 10)
+        .attr('y', (d, i) => { return leftLabelPosition(d.id())})
+        .on('mouseover', (d, i) => {
+            networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: [d] });
+        })
+        .on('mouseout', (d, i) => {
+            networkcube.highlight('reset');
+        })
+        .on('click', (d, i) => {
+            var selections = d.getSelections();
+            var currentSelection = this.dgraph.getCurrentSelection();
+            for (var j = 0; j < selections.length; j++) {
+                if (selections[j] == currentSelection) {
+                    networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d] });
+                    return;
+                }
+            }
+            networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
+        });
+
+    labelsLeft.exit().remove();
+
+    labelsLeft
+        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
+        .text((d, i) => { return d.label(); })
+        .attr('x', this.margin.left - 10)
+        .attr('y', (d, i) => {
+            return leftLabelPosition(d.id()); 
+        });
+
+    var labelsTop = this.svg.selectAll('.labelsTop')
+        .data(topNodes);
+
+    var topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize; 
+
+    labelsTop.enter().append('text')
+        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
+        .attr('class', 'labelsTop nodeLabel')
+        .text((d, i) => { return d.label(); })
+        .attr('x', (d, i) => { return topLabelPosition(d.id())  })
+        .attr('y', this.margin.left - 10)
+        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + cellSize * i + cellSize) + ', ' + (this.margin.left - 10) + ')' })
+        .on('mouseover', (d, i) => {
+            networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: [d] });
+        })
+        .on('mouseout', (d, i) => {
+            networkcube.highlight('reset');
+        })
+        .on('click', (d, i) => {
+            var selections = d.getSelections();
+            var currentSelection = this.dgraph.getCurrentSelection();
+            for (var j = 0; j < selections.length; j++) {
+                if (selections[j] == currentSelection) {
+                    networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d] });
+                    return;
+                }
+            }
+            networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
+        });
+
+    labelsTop.exit().remove();
+    labelsTop
+        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
+        .text((d, i) => { return d.label(); })
+        .attr('x', (d, i) => {
+            return topLabelPosition(d.id()); 
+        })
+        .attr('y', this.margin.top - 10)
+        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' })
+
+    this.svg.selectAll('.nodeLabel')
+        .style('fill', function(d) {
+            color = undefined;
+            if (d.isSelected()) {
+                color = networkcube.getPriorityColor(d);
+            }
+            if (!color)
+                color = '#000000';
+            return color;
+        })
+        .style('font-weight', function(d) {
+            if (d.isHighlighted()) {
+                return 900;
+            }
+            return 100;
+        })
+        .style('font-size', cellSize);
+
+
+    //var highlightedLinks = dgraph.links().highlighted().toArray();
+    //for (var i = 0; i < highlightedLinks.length; i++) {
+    //    if (!highlightedLinks[i].isVisible())
+    //        continue;
+    //
+    //    d3.selectAll('#nodeLabel_left_' + highlightedLinks[i].source.id())
+    //        .style('font-weight', 900);
+    //    d3.selectAll('#nodeLabel_top_' + highlightedLinks[i].target.id())
+    //        .style('font-weight', 900);
+    //    d3.selectAll('#nodeLabel_top_' + highlightedLinks[i].source.id())
+    //        .style('font-weight', 900);
+    //    d3.selectAll('#nodeLabel_left_' + highlightedLinks[i].target.id())
+    //        .style('font-weight', 900);
+    //}
   }
 
   get foreignObject(){
@@ -176,7 +281,7 @@ class MatrixVisualization{
   
   private data:  {[id: number]: {[id: number]: networkcube.NodePair}};
   constructor(width: number, height: number, 
-              elem: HTMLElement, matrix: Matirx){
+              elem: HTMLElement, matrix: Matrix){
     this.width = width;
     this.height = height;
     this.elem = elem;
@@ -536,6 +641,7 @@ class MatrixVisualization{
 class Matrix{
 
   private matrixVis: MatrixVisualization;
+  private labelsVis: MatrixLabels;
   private _dgraph: networkcube.DynamicGraph;
   public startTime: networkcube.Time;
   public endTime: networkcube.Time;
@@ -548,7 +654,7 @@ class Matrix{
   private initialCellSize;
   private hoveredLinks: networkcube.Link[];
   private labelLength: number;
-  public plotMargin: NMargin;
+  public margin: NMargin;
 
   constructor(){
     this._dgraph = networkcube.getDynamicGraph();
@@ -563,7 +669,7 @@ class Matrix{
     this._cellSize = this.initialCellSize;
     this.hoveredLinks = [];
     this.longestLabelLength();
-    this.plotMargin = new NMargin(0);
+    this.margin = new NMargin(0);
     this.calculatePlotMargin();
   }
 
@@ -645,6 +751,9 @@ class Matrix{
     this.matrixVis = matrixVis;
     this.updateTransform(1, [0, 0]);
   }
+  setLabels(matrixLabels: MatrixLabels){
+    this.labelsVis = matrixLabels;
+  }
 
   longestLabelLength(){
     if(this.dgraph){
@@ -660,7 +769,7 @@ class Matrix{
     this.labelLength = longestLabelNode ? longestLabelNode.label().length : 8;
   }
   calculatePlotMargin(){
-    this.plotMargin.setMargin((this.labelLength * 0.5) * this.cellSize);
+    this.margin.setMargin((this.labelLength * 0.5) * this.cellSize);
   }
 
   updateVisibleBox(){
@@ -691,18 +800,20 @@ class Matrix{
 
     for(var i = 0; i<leftNodes.length; i++){
       node = leftNodes[i];
-      row = this.nodeOrder[node.id()] - this.bbox.y0;
-      for(var link of node.links().toArray()){
-        if(true){//!tmpHash[link.nodePair().id()]){
-          tmpHash[link.nodePair().id()] = true;
-          var neighbor = link.source.id() == node.id()?link.target: link.source;
-          if(neighbor.isVisible() &&
-             this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
-             this.nodeOrder[neighbor.id()] <= this.bbox.x1){
-            if(!visibleData[row])  visibleData[row] = {};
+      if(node.isVisible()){
+        row = this.nodeOrder[node.id()] - this.bbox.y0;
+        for(var link of node.links().toArray()){
+          //if(true){//!tmpHash[link.nodePair().id()]){
+            tmpHash[link.nodePair().id()] = true;
+            var neighbor = link.source.id() == node.id()?link.target: link.source;
+            if(neighbor.isVisible() &&
+               this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
+                 this.nodeOrder[neighbor.id()] <= this.bbox.x1){
+              if(!visibleData[row])  visibleData[row] = {};
             col = this.nodeOrder[neighbor.id()] - this.bbox.x0;
             visibleData[row][col] = link.nodePair();
-          }
+            }
+          //}
         }
       }
     }
@@ -710,8 +821,13 @@ class Matrix{
                               leftNodes.length, topNodes.length,
                               this.cellSize,
                               this.offset);
+
+    if(this.labelsVis){
+    this.labelsVis.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder,
+                              this.offset[0], this.offset[1], this.bbox);
+    }
   }
-  
+
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
     this.startTime = this._dgraph.time(m.startId);
     this.endTime = this._dgraph.time(m.endId);
@@ -721,6 +837,7 @@ class Matrix{
   
 }
 
+var matrix = new Matrix();
 
 var vizWidth: number = window.innerWidth - 10;
 var vizHeight: number = window.innerHeight - 115;
@@ -729,14 +846,25 @@ var menuJQ = appendToBody("networkcube-matrix-menu");
 var tsJQ = appendToBody("networkcube-matrix-timelineDiv'")
 var labJQ = appendToBody("networkcube-matrix-visDiv");
 
+var svg = d3.select(labJQ.get(0))
+  .append('svg')
+  .attr('id', 'networkcube-matrix-visSvg')
+  .attr('width', vizWidth)
+  .attr('height', vizHeight);
+var foreignObject = svg.append('foreignObject')
+  .attr('id', 'networkcube-matrix-visCanvasFO')
+  .attr('x', matrix.margin.left)
+  .attr('y', matrix.margin.top)
+  .attr('width', vizWidth - matrix.margin.left )
+  .attr('height', vizHeight - matrix.margin.top);
+var bbox =  foreignObject.node().getBBox();
 
-var matrix = new Matrix();
 var matrixMenu = new MatrixMenu(menuJQ, matrix);
 var matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
-var matrixLabels = new MatrixLabels(vizWidth, vizHeight, labJQ, matrix);
-var bbox =  matrixLabels.foreignObject.node().getBBox();
-var matrixVis = new MatrixVisualization(bbox.width, bbox.height, matrixLabels.foreignObject,  matrix);
+var matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
+var matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject,  matrix);
 
+matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 
