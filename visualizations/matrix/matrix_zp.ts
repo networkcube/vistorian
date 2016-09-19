@@ -7,10 +7,10 @@
 
 
 
-var COLOR_HIGHLIGHT = 0x000000;
-var COLOR_SELECTION = 0xff0000;
-var COLOR_CELL_DEFAULT = 0x000000;
-var COLOR_CELL_FILTER = 0xdddddd;
+let COLOR_HIGHLIGHT = 0x000000;
+let COLOR_SELECTION = 0xff0000;
+let COLOR_CELL_DEFAULT = 0x000000;
+let COLOR_CELL_FILTER = 0xdddddd;
 
 
 // FIXED VISUAL PARAMETERS
@@ -55,7 +55,7 @@ class MatrixMenu{
     $('#cellSizeBox').change(this.updateCellSize);
     this.elem.append('<br/>');
     this.elem.append('<label>Label ordering:</label>');
-    var orderingMenu = $("#networkcube-matrix-menu")
+    let orderingMenu = $("#networkcube-matrix-menu")
       .append('<select id="labelOrdering"></select>')
 
     $('#labelOrdering').change(this.reorderHandler);
@@ -70,11 +70,11 @@ class MatrixMenu{
     //$('#dataName').text(this.matrix.dgraphName());
   }
   updateCellSize(){
-    var value: number = $('#cellSizeBox').val();
+    let value: number = $('#cellSizeBox').val();
     matrix.updateCellSize(value);
   }
   reorderHandler(){
-    var orderType: string = $('#labelOrdering').val();
+    let orderType: string = $('#labelOrdering').val();
     matrix.reorderWorker(orderType);
   }
 }
@@ -98,7 +98,7 @@ class MatrixTimeSlider{
         .attr('width', this.width)
         .attr('height', this.height)
 
-    var timeSlider: any = new TimeSlider(matrix.dgraph, vizWidth);
+    let timeSlider: any = new TimeSlider(matrix.dgraph, vizWidth);
     timeSlider.appendTo(this.svg);
 
   }
@@ -109,6 +109,7 @@ class MatrixLabels{
   private height: number;
   private margin: NMargin;
   private matrix: Matrix;
+  private cellSize: number;
   public svg: D3.Selection;
   constructor(svg: D3.Selection,
               margin: NMargin,
@@ -116,6 +117,7 @@ class MatrixLabels{
     this.svg = svg;
     this.matrix = matrix;
     this.margin = margin;
+    this.cellSize = 0;
     this.init();
   }
 
@@ -127,10 +129,12 @@ class MatrixLabels{
              leftLabelOffset: number, topLabelOffset: number,
              bbox: Box){
 
-    var labelsLeft = this.svg.selectAll('.labelsLeft')
+    this.cellSize = cellSize;
+
+    let labelsLeft = this.svg.selectAll('.labelsLeft')
         .data(leftNodes);
 
-    var leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize; 
+    let leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize; 
 
     labelsLeft.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
@@ -145,15 +149,7 @@ class MatrixLabels{
             networkcube.highlight('reset');
         })
         .on('click', (d, i) => {
-            var selections = d.getSelections();
-            var currentSelection = this.dgraph.getCurrentSelection();
-            for (var j = 0; j < selections.length; j++) {
-                if (selections[j] == currentSelection) {
-                    networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d] });
-                    return;
-                }
-            }
-            networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
+          this.matrix.nodeClicked(d);
         });
 
     labelsLeft.exit().remove();
@@ -166,10 +162,10 @@ class MatrixLabels{
             return leftLabelPosition(d.id()); 
         });
 
-    var labelsTop = this.svg.selectAll('.labelsTop')
+    let labelsTop = this.svg.selectAll('.labelsTop')
         .data(topNodes);
 
-    var topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize; 
+    let topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize; 
 
     labelsTop.enter().append('text')
         .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
@@ -185,15 +181,7 @@ class MatrixLabels{
             networkcube.highlight('reset');
         })
         .on('click', (d, i) => {
-            var selections = d.getSelections();
-            var currentSelection = this.dgraph.getCurrentSelection();
-            for (var j = 0; j < selections.length; j++) {
-                if (selections[j] == currentSelection) {
-                    networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d] });
-                    return;
-                }
-            }
-            networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
+          this.matrix.nodeClicked(d);
         });
 
     labelsTop.exit().remove();
@@ -204,8 +192,12 @@ class MatrixLabels{
             return topLabelPosition(d.id()); 
         })
         .attr('y', this.margin.top - 10)
-        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' })
+        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' });
 
+        this.updateSelectedNodes();
+ }
+
+updateSelectedNodes(){
     this.svg.selectAll('.nodeLabel')
         .style('fill', function(d) {
             color = undefined;
@@ -217,16 +209,17 @@ class MatrixLabels{
             return color;
         })
         .style('font-weight', function(d) {
-            if (d.isHighlighted()) {
+            if (d.isHighlighted() ) {
                 return 900;
             }
             return 100;
         })
-        .style('font-size', cellSize);
+        .style('font-size', this.cellSize);
+}
 
 
-    //var highlightedLinks = dgraph.links().highlighted().toArray();
-    //for (var i = 0; i < highlightedLinks.length; i++) {
+    //let highlightedLinks = dgraph.links().highlighted().toArray();
+    //for (let i = 0; i < highlightedLinks.length; i++) {
     //    if (!highlightedLinks[i].isVisible())
     //        continue;
     //
@@ -239,12 +232,6 @@ class MatrixLabels{
     //    d3.selectAll('#nodeLabel_left_' + highlightedLinks[i].target.id())
     //        .style('font-weight', 900);
     //}
-  }
-
-  get foreignObject(){
-    return this._foreignObject;
-  }
-
 }
 
 class MatrixVisualization{
@@ -333,7 +320,7 @@ class MatrixVisualization{
     this.renderer.setClearColor(0xffffff, 1);
 
     // raycaster
-    var raycaster: THREE.Raycaster = new THREE.Raycaster()
+    let raycaster: THREE.Raycaster = new THREE.Raycaster()
 
     // position canvas element containing cells
     this.canvas = this.renderer.domElement;
@@ -349,20 +336,20 @@ class MatrixVisualization{
   }
 
   initGeometry(){
-    var vertexShaderProgram = `
+    let vertexShaderProgram = `
       attribute vec4 customColor;
       varying vec4 vColor;
       void main() {
         vColor = customColor;
         gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );
       }`;
-    var fragmentShaderProgram = `
+    let fragmentShaderProgram = `
       varying vec4 vColor;
       void main() {
         gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);
       }`;
     
-    var attributes = {
+    let attributes = {
         customColor: { type: 'c', value: [] }
     }
 
@@ -380,8 +367,8 @@ class MatrixVisualization{
     this.geometry = new THREE.BufferGeometry();
   }
   render() {
-    var d = new Date();
-    var begin = d.getTime()
+    let d = new Date();
+    let begin = d.getTime()
     this.renderer.render(this.scene, this.camera)
     d = new Date();
     console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
@@ -402,9 +389,9 @@ class MatrixVisualization{
     if (this.geometry) {
         this.scene.remove(this.mesh);
     }
-    for(var id of this.hoveredLinks){
+    for(let id of this.hoveredLinks){
       if(this.cellHighlightFrames[id])
-        for(var frame of this.cellHighlightFrames[id])
+        for(let frame of this.cellHighlightFrames[id])
           this.scene.remove(frame);
     }    
     
@@ -416,8 +403,8 @@ class MatrixVisualization{
     this.cellHighlightFrames = [];
     this.linksPos = {};
     
-    for(var row in this.data){
-        for( var col in data[row]){
+    for(let row in this.data){
+        for( let col in data[row]){
            this.addCell(row, col, data[row][col]);
         }
     }
@@ -436,24 +423,24 @@ class MatrixVisualization{
   }
 
   addCell(row: number, col: number, pair: networkcube.NodePair){
-    var links: networkcube.Link[];
-    var e: networkcube.Link;
-    var x, y, z: number;
-    var linkNum: number;
-    var seg: number;
-    var meanWeight: number;
-    var alpha: number;
-    var color: THREE.Color;
+    let links: networkcube.Link[];
+    let e: networkcube.Link;
+    let x, y, z: number;
+    let linkNum: number;
+    let seg: number;
+    let meanWeight: number;
+    let alpha: number;
+    let color: THREE.Color;
 
     links = pair.links().toArray();
     linkNum = links.length;
     seg = this.cellSize / linkNum;
     z = 1;
 
-    for (var j = 0; j < links.length; j++) {
+    for (let j = 0; j < links.length; j++) {
       e = links[j];
       
-      var webColor: string = networkcube.getPriorityColor(e);
+      let webColor: string = networkcube.getPriorityColor(e);
       if (!webColor)
           webColor = '#000000';
       meanWeight = e.weights()? e.weights(this.matrix.startTime, this.matrix.endTime).mean(): 1;
@@ -477,10 +464,10 @@ class MatrixVisualization{
 
   paintCell(id: number, x: number, y: number, w: number, 
             color: number[], positive: Boolean){
-    var h: number = this.cellSize;
-    var highlightFrames: THREE.Mesh = new THREE.Mesh();
-    var selectionFrames: THREE.Mesh = new THREE.Mesh();
-    var frame: THREE.Line;
+    let h: number = this.cellSize;
+    let highlightFrames: THREE.Mesh = new THREE.Mesh();
+    let selectionFrames: THREE.Mesh = new THREE.Mesh();
+    let frame: THREE.Line;
     
     if (positive) {
       glutils.addBufferedRect(this.vertexPositions, x, -y, 0, w - 1, h - 1, 
@@ -508,30 +495,30 @@ class MatrixVisualization{
 
   }
   updateGuideLines(){
-    for(var i=0 ; i<this.guideLines.length ; i++){
+    for(let i=0 ; i<this.guideLines.length ; i++){
         this.scene.remove(this.guideLines[i]);
     }    
     if(!this.data) return;
     console.log("update guidelines")
     
-    var w = this.ncols*this.cellSize;
-    var h = this.nrows*this.cellSize;
+    let w = this.ncols*this.cellSize;
+    let h = this.nrows*this.cellSize;
     
-    var geometry1 = new THREE.Geometry();
+    let geometry1 = new THREE.Geometry();
     geometry1.vertices.push(
         new THREE.Vector3( this.offset[0], 0, 0 ),
         new THREE.Vector3( w+this.offset[0], 0, 0)
     )
-    var geometry2 = new THREE.Geometry();
+    let geometry2 = new THREE.Geometry();
     geometry2.vertices.push(
         new THREE.Vector3( 0, -this.offset[1], 0 ),
         new THREE.Vector3( 0, -h-this.offset[1] , 0 )
     )
-    var m, pos;
-    var mat = new THREE.LineBasicMaterial( {color: 0xeeeeee, linewidth:1} );
-    var x,y;
-    var j = 0;
-    for(var i=0; i <=h; i+=this.cellSize){
+    let m, pos;
+    let mat = new THREE.LineBasicMaterial( {color: 0xeeeeee, linewidth:1} );
+    let x,y;
+    let j = 0;
+    for(let i=0; i <=h; i+=this.cellSize){
         pos =  j * this.cellSize + this.offset[1];
         m = new THREE.Line(geometry1, mat)
         m.position.set(0, -pos, 0);
@@ -540,7 +527,7 @@ class MatrixVisualization{
         j++;
     }
     j = 0;
-    for(var i=0 ; i <=w; i+=this.cellSize){
+    for(let i=0 ; i <=w; i+=this.cellSize){
         pos =  j * this.cellSize + this.offset[0];
         m = new THREE.Line(geometry2, mat);
         m.position.set(pos, 0, 0);
@@ -552,13 +539,13 @@ class MatrixVisualization{
   } 
 
   highlightLink(cell){
-    var row = cell.row;
-    var col = cell.col;
-    var id: number;
+    let row = cell.row;
+    let col = cell.col;
+    let id: number;
     if(this.linksPos[row]){
       if(this.linksPos[row][col]){
-        for(var id of this.linksPos[row][col]){
-          for(var frame of this.cellHighlightFrames[id])
+        for(let id of this.linksPos[row][col]){
+          for(let frame of this.cellHighlightFrames[id])
             this.scene.add(frame);
           this.hoveredLinks.push(id);
         }
@@ -568,35 +555,35 @@ class MatrixVisualization{
   }
 
   posToCell(pos: Pos){
-   var row = Math.round((pos.y-this.offset[1]-this.cellSize/2)/this.cellSize);
-   var col = Math.round((pos.x-this.offset[0]-this.cellSize/2)/this.cellSize);
+   let row = Math.round((pos.y-this.offset[1]-this.cellSize/2)/this.cellSize);
+   let col = Math.round((pos.x-this.offset[0]-this.cellSize/2)/this.cellSize);
    return {row: row, col: col};
   }
 
   private mouseMoveHandler = (e: Event)=>{
-    var mpos: Pos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
+    let mpos: Pos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
 
-    for(var id of this.hoveredLinks){
+    for(let id of this.hoveredLinks){
       if(this.cellHighlightFrames[id])
-        for(var frame of this.cellHighlightFrames[id])
+        for(let frame of this.cellHighlightFrames[id])
           this.scene.remove(frame);
     }
     this.hoveredLinks = [];
 
-    var cell = this.posToCell(mpos);
+    let cell = this.posToCell(mpos);
 
     if (!this.mouseDown) {
       this.highlightLink(cell);
     }else{
-      var box: Box = {x0: 0, y0: 0, x1: 0, y1: 0};
+      let box: Box = {x0: 0, y0: 0, x1: 0, y1: 0};
       box.x0 = Math.min(cell.col, this.mouseDownCell.col);
       box.x1 = Math.max(cell.col, this.mouseDownCell.col);
       box.y0 = Math.min(cell.row, this.mouseDownCell.row);
       box.y1 = Math.max(cell.row, this.mouseDownCell.row);
 
-      for(var c=box.x0; c<=box.x1; c++){
-        for(var r=box.y0; r<=box.y1; r++){
-          var ch = {row: r, col: c};
+      for(let c=box.x0; c<=box.x1; c++){
+        for(let r=box.y0; r<=box.y1; r++){
+          let ch = {row: r, col: c};
           this.highlightLink(ch);
         }
       }
@@ -613,8 +600,8 @@ class MatrixVisualization{
   private mouseUpHandler = (e: Event)=>{
     this.mouseDown = false;
     this.view.call(this.zoom);
-      for(var id of this.hoveredLinks){
-          for(var frame of this.cellHighlightFrames[id])
+      for(let id of this.hoveredLinks){
+          for(let frame of this.cellHighlightFrames[id])
             this.scene.remove(frame);
       }
       this.hoveredLinks = [];
@@ -623,7 +610,7 @@ class MatrixVisualization{
     console.log("click");
   }
   private zoomed = () =>{
-    var z: number, tr: number[];
+    let z: number, tr: number[];
     z = this.zoom.scale();
     tr = this.zoom.translate();
     this.updateTransform(z, tr);
@@ -682,8 +669,8 @@ class Matrix{
   }
 
   updateCellSize(value: number){
-    var scale = value/this.initialCellSize;
-    var tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
+    let scale = value/this.initialCellSize;
+    let tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
     this.matrixVis.updateTransform(scale, tr);
   }
 
@@ -708,37 +695,37 @@ class Matrix{
 
   reorderWorker(orderType: string){
     if (orderType == 'alphanumerical') {
-        var nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
+        let nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
         this.nodeOrder = [];
-        for (var i = 0; i < nodes2.length; i++) {
+        for (let i = 0; i < nodes2.length; i++) {
             this.nodeOrder[nodes2[i].id()] = i;
         }
     } else if (orderType == 'reverse-alpha') {
-        var nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
+        let nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
         this.nodeOrder = [];
-        for (var i = 0; i < nodes2.length; i++) {
+        for (let i = 0; i < nodes2.length; i++) {
             this.nodeOrder[nodes2[i].id()] = i;
         }
     } else if (orderType == 'degree') {
-        var nodes2 = this._dgraph.nodes().visible()
+        let nodes2 = this._dgraph.nodes().visible()
             .createAttribute('degree', (n) => {
                 return n.neighbors().length;
             })
             .sort('degree').toArray();
-        for (var i = 0; i < nodes2.length; i++) {
+        for (let i = 0; i < nodes2.length; i++) {
             this.nodeOrder[nodes2[i].id()] = i;
         }
     } else if (orderType == 'similarity') {
-        var config: networkcube.OrderingConfiguration = new networkcube.OrderingConfiguration();
+        let config: networkcube.OrderingConfiguration = new networkcube.OrderingConfiguration();
         config.start = this.startTime;
         config.end = this.endTime;
         config.nodes = this._dgraph.nodes().visible().toArray();
         config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
         this.nodeOrder = networkcube.orderNodes(this._dgraph, config);
     } else {
-        var visibleNodes = this._dgraph.nodes().visible().toArray();
+        let visibleNodes = this._dgraph.nodes().visible().toArray();
         this.nodeOrder = [];
-        for (var i = 0; i < visibleNodes.length; i++) {
+        for (let i = 0; i < visibleNodes.length; i++) {
             this.nodeOrder[visibleNodes[i].id()] = i;
         }
     }
@@ -757,7 +744,7 @@ class Matrix{
 
   longestLabelLength(){
     if(this.dgraph){
-      var longestLabelNode = this.dgraph.nodes().toArray().reduce(
+      let longestLabelNode = this.dgraph.nodes().toArray().reduce(
         function(p, v, i, arr) {
           if (p == null || p.label() == null || 
               (v.label() && v.label().length > p.label().length))
@@ -784,28 +771,28 @@ class Matrix{
 
   updateVisibleData(){
     this.updateVisibleBox();
-    var leftNodes = this.dgraph.nodes().visible().toArray();
+    let leftNodes = this.dgraph.nodes().visible().toArray();
     leftNodes = leftNodes.filter( d => 
                                     this.nodeOrder[d.id()] >= this.bbox.y0 && 
                                     this.nodeOrder[d.id()] <= this.bbox.y1);
-    var topNodes = this.dgraph.nodes().visible().toArray();
+    let topNodes = this.dgraph.nodes().visible().toArray();
     topNodes = topNodes.filter( d => 
                                   this.nodeOrder[d.id()] >= this.bbox.x0 && 
                                   this.nodeOrder[d.id()] <= this.bbox.x1);
     
-    var visibleData: {[id: number]: {[id: number]: networkcube.NodePair}} = {};
-    var tmpHash: {[id: number]: Boolean} = {};
-    var row, col: number;
-    var node: networkcube.Node;
+    let visibleData: {[id: number]: {[id: number]: networkcube.NodePair}} = {};
+    let tmpHash: {[id: number]: Boolean} = {};
+    let row, col: number;
+    let node: networkcube.Node;
 
-    for(var i = 0; i<leftNodes.length; i++){
+    for(let i = 0; i<leftNodes.length; i++){
       node = leftNodes[i];
       if(node.isVisible()){
         row = this.nodeOrder[node.id()] - this.bbox.y0;
-        for(var link of node.links().toArray()){
+        for(let link of node.links().toArray()){
           //if(true){//!tmpHash[link.nodePair().id()]){
             tmpHash[link.nodePair().id()] = true;
-            var neighbor = link.source.id() == node.id()?link.target: link.source;
+            let neighbor = link.source.id() == node.id()?link.target: link.source;
             if(neighbor.isVisible() &&
                this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
                  this.nodeOrder[neighbor.id()] <= this.bbox.x1){
@@ -827,6 +814,18 @@ class Matrix{
                               this.offset[0], this.offset[1], this.bbox);
     }
   }
+  nodeClicked(d: networkcube.Node){
+    let selections = d.getSelections();
+    let currentSelection = this.dgraph.getCurrentSelection();
+    for (let j = 0; j < selections.length; j++) {
+      if (selections[j] == currentSelection) {
+        networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d] });
+        return;
+      }
+    }
+    networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
+    this.labelsVis.updateSelectedNodes();
+  }
 
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
     this.startTime = this._dgraph.time(m.startId);
@@ -837,32 +836,32 @@ class Matrix{
   
 }
 
-var matrix = new Matrix();
+let matrix = new Matrix();
 
-var vizWidth: number = window.innerWidth - 10;
-var vizHeight: number = window.innerHeight - 115;
-var appendToBody = domId => {return  $('<div id='+ domId +'></div>').appendTo('body')};
-var menuJQ = appendToBody("networkcube-matrix-menu");
-var tsJQ = appendToBody("networkcube-matrix-timelineDiv'")
-var labJQ = appendToBody("networkcube-matrix-visDiv");
+let vizWidth: number = window.innerWidth - 10;
+let vizHeight: number = window.innerHeight - 115;
+let appendToBody = domId => {return  $('<div id='+ domId +'></div>').appendTo('body')};
+let menuJQ = appendToBody("networkcube-matrix-menu");
+let tsJQ = appendToBody("networkcube-matrix-timelineDiv'")
+let labJQ = appendToBody("networkcube-matrix-visDiv");
 
-var svg = d3.select(labJQ.get(0))
+let svg = d3.select(labJQ.get(0))
   .append('svg')
   .attr('id', 'networkcube-matrix-visSvg')
   .attr('width', vizWidth)
   .attr('height', vizHeight);
-var foreignObject = svg.append('foreignObject')
+let foreignObject = svg.append('foreignObject')
   .attr('id', 'networkcube-matrix-visCanvasFO')
   .attr('x', matrix.margin.left)
   .attr('y', matrix.margin.top)
   .attr('width', vizWidth - matrix.margin.left )
   .attr('height', vizHeight - matrix.margin.top);
-var bbox =  foreignObject.node().getBBox();
+let bbox =  foreignObject.node().getBBox();
 
-var matrixMenu = new MatrixMenu(menuJQ, matrix);
-var matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
-var matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
-var matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject,  matrix);
+let matrixMenu = new MatrixMenu(menuJQ, matrix);
+let matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
+let matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
+let matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject,  matrix);
 
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
