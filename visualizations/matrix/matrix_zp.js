@@ -61,6 +61,41 @@ var MatrixTimeSlider = (function () {
     };
     return MatrixTimeSlider;
 }());
+var CellLabel = (function () {
+    function CellLabel() {
+        this.cellLabelBackground = glutils.selectAll()
+            .data([{ id: 0 }])
+            .append('rect')
+            .attr('width', 70)
+            .attr('height', 22)
+            .attr('x', -100)
+            .attr('y', -100)
+            .style('fill', 0xffffff)
+            .style('stroke', 0xffffff)
+            .style('opacity', 0);
+        this.cellLabel = glutils.selectAll()
+            .data([{ id: 0 }])
+            .append('text')
+            .style('opacity', 0)
+            .attr('z', 2)
+            .style('font-size', 12);
+    }
+    CellLabel.prototype.updateCellLabel = function (mx, my, z, val, fw) {
+        this.cellLabel
+            .attr('x', mx + 40 / z)
+            .attr('y', -my)
+            .style('opacity', 1)
+            .text(val)
+            .style('font-size', fw);
+        this.cellLabelBackground
+            .attr('x', mx + 10 / z)
+            .attr('y', -my + 11 / z)
+            .attr("width", 70 / z)
+            .attr("height", 22 / z)
+            .style('opacity', .8);
+    };
+    return CellLabel;
+}());
 var MatrixLabels = (function () {
     function MatrixLabels(svg, margin, matrix) {
         this.svg = svg;
@@ -111,10 +146,10 @@ var MatrixLabels = (function () {
             .attr('y', this.margin.left - 10)
             .attr('transform', function (d, i) { return 'rotate(-90, ' + (_this.margin.top + cellSize * i + cellSize) + ', ' + (_this.margin.left - 10) + ')'; })
             .on('mouseover', function (d, i) {
-            networkcube.highlight('set', { nodes: [d] });
+            _this.matrix.highlightNodes([d.id()]);
         })
             .on('mouseout', function (d, i) {
-            networkcube.highlight('reset');
+            _this.matrix.highlightNodes([]);
         })
             .on('click', function (d, i) {
             _this.matrix.nodeClicked(d);
@@ -128,9 +163,10 @@ var MatrixLabels = (function () {
         })
             .attr('y', this.margin.top - 10)
             .attr('transform', function (d, i) { return 'rotate(-90, ' + (_this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()] - bbox.x0) + cellSize) + ', ' + (_this.margin.left - 10) + ')'; });
-        this.updateSelectedNodes();
+        this.updateHighlightedNodes();
     };
-    MatrixLabels.prototype.updateSelectedNodes = function () {
+    MatrixLabels.prototype.updateHighlightedNodes = function (highlightedLinks) {
+        if (highlightedLinks === void 0) { highlightedLinks = []; }
         this.svg.selectAll('.nodeLabel')
             .style('fill', function (d) {
             color = undefined;
@@ -148,6 +184,12 @@ var MatrixLabels = (function () {
             return 100;
         })
             .style('font-size', this.cellSize);
+        for (var i = 0; i < highlightedLinks.length; i++) {
+            d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
+                .style('font-weight', 900);
+            d3.selectAll('#nodeLabel_top_' + highlightedLinks[i])
+                .style('font-weight', 900);
+        }
     };
     return MatrixLabels;
 }());
@@ -156,15 +198,7 @@ var MatrixVisualization = (function () {
         var _this = this;
         this.mouseMoveHandler = function (e) {
             var mpos = glutils.getMousePos(_this.canvas, e.clientX, e.clientY);
-            for (var _i = 0, _a = _this.hoveredLinks; _i < _a.length; _i++) {
-                var id = _a[_i];
-                if (_this.cellHighlightFrames[id])
-                    for (var _b = 0, _c = _this.cellHighlightFrames[id]; _b < _c.length; _b++) {
-                        var frame = _c[_b];
-                        _this.scene.remove(frame);
-                    }
-            }
-            _this.hoveredLinks = [];
+            _this.toHoverLinks = [];
             var cell = _this.posToCell(mpos);
             if (!_this.mouseDown) {
                 _this.highlightLink(cell);
@@ -181,6 +215,10 @@ var MatrixVisualization = (function () {
                         _this.highlightLink(ch);
                     }
                 }
+            }
+            if (_this.toHoverLinks.length > 0) {
+                _this.matrix.highlightLinks(_this.toHoverLinks);
+                _this.matrix.updateCellLabel(_this.toHoverLinks[0], mpos.x, mpos.y);
             }
         };
         this.mouseDownHandler = function (e) {
@@ -220,6 +258,7 @@ var MatrixVisualization = (function () {
         this.offset = [0, 0];
         this.guideLines = [];
         this.hoveredLinks = [];
+        this.previousHoveredLinks = [];
         this.mouseDownCell = { row: 0, col: 0 };
         this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
         this.cellSelectionFrames = networkcube.array(undefined, matrix.numberOfLinks());
@@ -415,13 +454,8 @@ var MatrixVisualization = (function () {
             if (this.linksPos[row][col]) {
                 for (var _i = 0, _a = this.linksPos[row][col]; _i < _a.length; _i++) {
                     var id_1 = _a[_i];
-                    for (var _b = 0, _c = this.cellHighlightFrames[id_1]; _b < _c.length; _b++) {
-                        var frame = _c[_b];
-                        this.scene.add(frame);
-                    }
-                    this.hoveredLinks.push(id_1);
+                    this.toHoverLinks.push(id_1);
                 }
-                this.render();
             }
         }
     };
@@ -429,6 +463,28 @@ var MatrixVisualization = (function () {
         var row = Math.round((pos.y - this.offset[1] - this.cellSize / 2) / this.cellSize);
         var col = Math.round((pos.x - this.offset[0] - this.cellSize / 2) / this.cellSize);
         return { row: row, col: col };
+    };
+    MatrixVisualization.prototype.updateHighlightedLinks = function (hoveredLinks) {
+        if (hoveredLinks === void 0) { hoveredLinks = undefined; }
+        this.previousHoveredLinks = this.hoveredLinks;
+        this.hoveredLinks = hoveredLinks;
+        for (var _i = 0, _a = this.previousHoveredLinks; _i < _a.length; _i++) {
+            var id = _a[_i];
+            if (this.cellHighlightFrames[id])
+                for (var _b = 0, _c = this.cellHighlightFrames[id]; _b < _c.length; _b++) {
+                    var frame = _c[_b];
+                    this.scene.remove(frame);
+                }
+        }
+        for (var _d = 0, _e = this.hoveredLinks; _d < _e.length; _d++) {
+            var id = _e[_d];
+            if (this.cellHighlightFrames[id])
+                for (var _f = 0, _g = this.cellHighlightFrames[id]; _f < _g.length; _f++) {
+                    var frame = _g[_f];
+                    this.scene.add(frame);
+                }
+        }
+        this.render();
     };
     MatrixVisualization.prototype.clickHandler = function (e) {
         console.log("click");
@@ -445,6 +501,37 @@ var MatrixVisualization = (function () {
 var Matrix = (function () {
     function Matrix() {
         var _this = this;
+        this.updateEvent = function () {
+            console.log("update");
+            var highlightedNodesIds = [];
+            var highlightedLinksIds = [];
+            var highlightedLinks = _this._dgraph.links().highlighted().toArray();
+            if (highlightedLinks.length > 0) {
+                for (var i = 0; i < highlightedLinks.length; i++) {
+                    if (!highlightedLinks[i].isVisible())
+                        continue;
+                    highlightedNodesIds.push(highlightedLinks[i].source.id());
+                    highlightedNodesIds.push(highlightedLinks[i].target.id());
+                    highlightedLinksIds.push(highlightedLinks[i].id());
+                }
+            }
+            else {
+                var highlightedNodes = _this._dgraph.nodes().highlighted().toArray();
+                for (var i = 0; i < highlightedNodes.length; i++) {
+                    var node = highlightedNodes[i];
+                    if (node.isVisible()) {
+                        for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
+                            var link = _a[_i];
+                            var neighbor = link.source.id() == node.id() ? link.target : link.source;
+                            if (neighbor.isVisible())
+                                highlightedLinksIds.push(link.id());
+                        }
+                    }
+                }
+            }
+            _this.labelsVis.updateHighlightedNodes(highlightedNodesIds);
+            _this.matrixVis.updateHighlightedLinks(highlightedLinksIds);
+        };
         this.timeRangeHandler = function (m) {
             _this.startTime = _this._dgraph.time(m.startId);
             _this.endTime = _this._dgraph.time(m.endId);
@@ -464,6 +551,7 @@ var Matrix = (function () {
         this.longestLabelLength();
         this.margin = new NMargin(0);
         this.calculatePlotMargin();
+        networkcube.setDefaultEventListener(this.updateEvent);
     }
     Object.defineProperty(Matrix.prototype, "dgraph", {
         get: function () {
@@ -548,6 +636,9 @@ var Matrix = (function () {
     Matrix.prototype.setLabels = function (matrixLabels) {
         this.labelsVis = matrixLabels;
     };
+    Matrix.prototype.setCellLabel = function (cellLabel) {
+        this.cellLabel = cellLabel;
+    };
     Matrix.prototype.longestLabelLength = function () {
         if (this.dgraph) {
             var longestLabelNode = this.dgraph.nodes().toArray().reduce(function (p, v, i, arr) {
@@ -585,7 +676,6 @@ var Matrix = (function () {
                 _this.nodeOrder[d.id()] <= _this.bbox.x1;
         });
         var visibleData = {};
-        var tmpHash = {};
         var row, col;
         var node;
         for (var i = 0; i < leftNodes.length; i++) {
@@ -594,7 +684,6 @@ var Matrix = (function () {
                 row = this.nodeOrder[node.id()] - this.bbox.y0;
                 for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
                     var link = _a[_i];
-                    tmpHash[link.nodePair().id()] = true;
                     var neighbor = link.source.id() == node.id() ? link.target : link.source;
                     if (neighbor.isVisible() &&
                         this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
@@ -609,12 +698,21 @@ var Matrix = (function () {
         }
         this.matrixVis.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset);
         if (this.labelsVis) {
-            this.labelsVis.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder, this.offset[0], this.offset[1], this.bbox);
+            this.labelsVis.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder, this.offset[1], this.offset[0], this.bbox);
         }
+    };
+    Matrix.prototype.highlightLinks = function (highlightedIds) {
+        var _this = this;
+        if (highlightedIds.length > 0) {
+            var highlightedLinks = highlightedIds.map(function (d) { return _this._dgraph.link(d); });
+            networkcube.highlight('set', { links: highlightedLinks });
+        }
+        else
+            networkcube.highlight('reset');
     };
     Matrix.prototype.nodeClicked = function (d) {
         var selections = d.getSelections();
-        var currentSelection = this.dgraph.getCurrentSelection();
+        var currentSelection = this._dgraph.getCurrentSelection();
         for (var j = 0; j < selections.length; j++) {
             if (selections[j] == currentSelection) {
                 networkcube.selection('remove', { nodes: [d] });
@@ -622,7 +720,24 @@ var Matrix = (function () {
             }
         }
         networkcube.selection('add', { nodes: [d] });
-        this.labelsVis.updateSelectedNodes();
+        this.labelsVis.updateHighlightedNodes();
+    };
+    Matrix.prototype.highlightNodes = function (highlightedIds) {
+        var _this = this;
+        if (highlightedIds.length > 0) {
+            var highlightedNodes = highlightedIds.map(function (d) { return _this._dgraph.node(d); });
+            networkcube.highlight('set', { nodes: highlightedNodes });
+        }
+        else
+            networkcube.highlight('reset');
+    };
+    Matrix.prototype.updateCellLabel = function (linkId, mx, my) {
+        var link = this._dgraph.link(linkId);
+        var val = link.weights(this.startTime, this.endTime).get(0);
+        val = Math.round(val * 1000) / 1000;
+        var z = this._scale;
+        var fw = this.initialCellSize / z;
+        this.cellLabel.updateCellLabel(mx, my, z, val, fw);
     };
     return Matrix;
 }());
@@ -649,7 +764,9 @@ var matrixMenu = new MatrixMenu(menuJQ, matrix);
 var matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
 var matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
 var matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject, matrix);
+var cellLabel = new CellLabel();
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
+matrix.setCellLabel(cellLabel);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 //# sourceMappingURL=matrix_zp.js.map
