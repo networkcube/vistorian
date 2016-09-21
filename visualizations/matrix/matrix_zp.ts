@@ -7,24 +7,22 @@
 
 
 
-let COLOR_HIGHLIGHT = 0x000000;
-let COLOR_SELECTION = 0xff0000;
-let COLOR_CELL_DEFAULT = 0x000000;
-let COLOR_CELL_FILTER = 0xdddddd;
+const COLOR_HIGHLIGHT = 0x000000;
+const COLOR_SELECTION = 0xff0000;
+// let COLOR_CELL_DEFAULT = 0x000000;
+// let COLOR_CELL_FILTER = 0xdddddd;
 
-
-// FIXED VISUAL PARAMETERS
 
 class NMargin {
-    left: number;
-    top: number;
-    constructor(v: number) {
-      this.setMargin(v);
-    }
-    setMargin(v: number){
-      this.left = v;
-      this.top = v;
-    }
+  left: number;
+  top: number;
+  constructor(v: number) {
+    this.setMargin(v);
+  }
+  setMargin(v: number){
+    this.left = v;
+    this.top = v;
+  }
 }
 
 interface Box{
@@ -37,6 +35,11 @@ interface Box{
 interface Pos{
   x: number;
   y: number;
+}
+
+interface Cell{
+  row: number;
+  col: number;
 }
 
 class MatrixMenu{
@@ -77,6 +80,9 @@ class MatrixMenu{
     let orderType: string = $('#labelOrdering').val();
     matrix.reorderWorker(orderType);
   }
+  setScale(val: number){
+    $('#cellSizeBox').val(val);
+  }
 }
 
 class MatrixTimeSlider{
@@ -94,9 +100,9 @@ class MatrixTimeSlider{
   }
   init(){
     this.svg = d3.select(this.elem.get(0))
-        .append('svg')
-        .attr('width', this.width)
-        .attr('height', this.height)
+      .append('svg')
+      .attr('width', this.width)
+      .attr('height', this.height)
 
     let timeSlider: any = new TimeSlider(matrix.dgraph, vizWidth);
     timeSlider.appendTo(this.svg);
@@ -109,35 +115,35 @@ class CellLabel{
   private cellLabel;
   constructor(){
     this.cellLabelBackground = glutils.selectAll()
-    .data([{id:0}])
-    .append('rect')
-    .attr('width',70)
-    .attr('height',22)    
-    .attr('x', -100)
-    .attr('y', -100)    
-    .style('fill', 0xffffff)
-    .style('stroke', 0xffffff)
-    .style('opacity', 0)
+      .data([{id:0}])
+      .append('rect')
+      .attr('width',70)
+      .attr('height',22)
+      .attr('x', -100)
+      .attr('y', -100)
+      .style('fill', 0xffffff)
+      .style('stroke', 0xffffff)
+      .style('opacity', 0)
 
     this.cellLabel = glutils.selectAll()
-    .data([{id:0}])
-    .append('text')
-    .style('opacity', 0)
-    .attr('z', 2)
-    .style('font-size', 12)
+      .data([{id:0}])
+      .append('text')
+      .style('opacity', 0)
+      .attr('z', 2)
+      .style('font-size', 12)
   }
-  updateCellLabel(mx: number, my: number, z: number, val: number, fw: number){
+  updateCellLabel(mx: number, my: number, val: number, fw: number){
     this.cellLabel
-      .attr('x', mx + 40/z)
+      .attr('x', mx + 40)
       .attr('y', -my)
       .style('opacity', 1)
-      .text(val)
+      .text(val? val: 0)
       .style('font-size', fw);
     this.cellLabelBackground
-      .attr('x', mx + 10/z)
-      .attr('y', -my + 11/z)
-      .attr("width",70/z)
-      .attr("height",22/z)
+      .attr('x', mx + 10)
+      .attr('y', -my + 11)
+      .attr("width",70)
+      .attr("height", 22)
       .style('opacity', .8);
   }
 }
@@ -156,10 +162,6 @@ class MatrixLabels{
     this.matrix = matrix;
     this.margin = margin;
     this.cellSize = 0;
-    this.init();
-  }
-
-  init(){
   }
 
   updateData(leftNodes: networkcube.Node[], topNodes: networkcube.Node[],
@@ -170,95 +172,96 @@ class MatrixLabels{
     this.cellSize = cellSize;
 
     let labelsLeft = this.svg.selectAll('.labelsLeft')
-        .data(leftNodes);
+      .data(leftNodes);
 
-    let leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize; 
+    let leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize;
 
     labelsLeft.enter().append('text')
-        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
-        .attr('class', 'labelsLeft nodeLabel')
-        .attr('text-anchor', 'end')
-        .attr('x', this.margin.left - 10)
-        .attr('y', (d, i) => { return leftLabelPosition(d.id())})
-        .on('mouseover', (d, i) => {
-            networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: [d] });
-        })
-        .on('mouseout', (d, i) => {
-            networkcube.highlight('reset');
-        })
-        .on('click', (d, i) => {
-          this.matrix.nodeClicked(d);
-        });
+      .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
+      .attr('class', 'labelsLeft nodeLabel')
+      .attr('text-anchor', 'end')
+      .attr('x', this.margin.left - 10)
+      .attr('y', (d, i) => { return leftLabelPosition(d.id())})
+      .on('mouseover', (d, i) => {
+        networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: [d] });
+      })
+      .on('mouseout', (d, i) => {
+        networkcube.highlight('reset');
+      })
+      .on('click', (d, i) => {
+        this.matrix.nodeClicked(d);
+      });
 
     labelsLeft.exit().remove();
 
     labelsLeft
-        .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
-        .text((d, i) => { return d.label(); })
-        .attr('x', this.margin.left - 10)
-        .attr('y', (d, i) => {
-            return leftLabelPosition(d.id()); 
-        });
+      .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
+      .text((d, i) => { return d.label(); })
+      .attr('x', this.margin.left - 10)
+      .attr('y', (d, i) => {
+        return leftLabelPosition(d.id());
+      });
 
     let labelsTop = this.svg.selectAll('.labelsTop')
-        .data(topNodes);
+      .data(topNodes);
 
-    let topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize; 
+    let topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize;
 
     labelsTop.enter().append('text')
-        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
-        .attr('class', 'labelsTop nodeLabel')
-        .text((d, i) => { return d.label(); })
-        .attr('x', (d, i) => { return topLabelPosition(d.id())  })
-        .attr('y', this.margin.left - 10)
-        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + cellSize * i + cellSize) + ', ' + (this.margin.left - 10) + ')' })
-        .on('mouseover', (d, i) => {
-          this.matrix.highlightNodes([d.id()]);
-        })
-        .on('mouseout', (d, i) => {
-          this.matrix.highlightNodes([]);
-        })
-        .on('click', (d, i) => {
-          this.matrix.nodeClicked(d);
-        });
+      .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
+      .attr('class', 'labelsTop nodeLabel')
+      .text((d, i) => { return d.label(); })
+      .attr('x', (d, i) => { return topLabelPosition(d.id())  })
+      .attr('y', this.margin.left - 10)
+      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + cellSize * i + cellSize) + ', ' + (this.margin.left - 10) + ')' })
+      .on('mouseover', (d, i) => {
+        this.matrix.highlightNodes([d.id()]);
+      })
+      .on('mouseout', (d, i) => {
+        this.matrix.highlightNodes([]);
+      })
+      .on('click', (d, i) => {
+        this.matrix.nodeClicked(d);
+      });
 
     labelsTop.exit().remove();
     labelsTop
-        .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
-        .text((d, i) => { return d.label(); })
-        .attr('x', (d, i) => {
-            return topLabelPosition(d.id()); 
-        })
-        .attr('y', this.margin.top - 10)
-        .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' });
+      .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
+      .text((d, i) => { return d.label(); })
+      .attr('x', (d, i) => {
+        return topLabelPosition(d.id());
+      })
+      .attr('y', this.margin.top - 10)
+      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' });
 
-        this.updateHighlightedNodes();
- }
+    this.updateHighlightedNodes();
+  }
 
   updateHighlightedNodes(highlightedLinks: number[] = []){
+    let color: string;
     this.svg.selectAll('.nodeLabel')
-        .style('fill', function(d) {
-            color = undefined;
-            if (d.isSelected()) {
-                color = networkcube.getPriorityColor(d);
-            }
-            if (!color)
-                color = '#000000';
-            return color;
-        })
-        .style('font-weight', function(d) {
-            if (d.isHighlighted() ) {
-                return 900;
-            }
-            return 100;
-        })
-        .style('font-size', this.cellSize);
+      .style('fill', function(d) {
+        color = undefined;
+        if (d.isSelected()) {
+          color = networkcube.getPriorityColor(d);
+        }
+        if (!color)
+          color = '#000000';
+        return color;
+      })
+      .style('font-weight', function(d) {
+        if (d.isHighlighted() ) {
+          return 900;
+        }
+        return 100;
+      })
+      .style('font-size', this.cellSize);
 
     for (let i = 0; i < highlightedLinks.length; i++) {
-        d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
-            .style('font-weight', 900);
-        d3.selectAll('#nodeLabel_top_' + highlightedLinks[i])
-            .style('font-weight', 900);
+      d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
+        .style('font-weight', 900);
+      d3.selectAll('#nodeLabel_top_' + highlightedLinks[i])
+        .style('font-weight', 900);
     }
   }
 
@@ -278,7 +281,7 @@ class MatrixVisualization{
   private linksPos: {[row: number]: {[col: number]: number[]}};
   private mouseDown: Boolean;
   private mouseDownPos: Pos;
-  private mouseDownCell: any;
+  private mouseDownCell: Cell;
   private toHoverLinks: number[];
   private hoveredLinks: number[];
   private previousHoveredLinks: number[];
@@ -294,13 +297,14 @@ class MatrixVisualization{
   private vertexPositions: number[][];
   private vertexColors: number[][];
   private shaderMaterial: THREE.ShaderMaterial;
-  private cellHighlightFrames: THREE.Mesh[]; 
+  private cellHighlightFrames: {[id: number]: THREE.Mesh[]};
   private cellSelectionFrames: THREE.Mesh[];
   private linkWeightScale: D3.Scale.LinearScale;
-  
+
+
   private data:  {[id: number]: {[id: number]: networkcube.NodePair}};
-  constructor(width: number, height: number, 
-              elem: HTMLElement, matrix: Matrix){
+  constructor(width: number, height: number,
+              elem: D3.Selection, matrix: Matrix){
     this.width = width;
     this.height = height;
     this.elem = elem;
@@ -317,7 +321,7 @@ class MatrixVisualization{
     this.cellHighlightFrames = networkcube.array(undefined, matrix.numberOfLinks());
     this.cellSelectionFrames = networkcube.array(undefined,  matrix.numberOfLinks());
     this.linkWeightScale = d3.scale.linear().range([0.1, 1])
-                            .domain([0, matrix.maxWeight()]);
+      .domain([0, matrix.maxWeight()]);
     this.init();
   }
   init(){
@@ -325,8 +329,8 @@ class MatrixVisualization{
     this.elem.node().appendChild(this.canvas);
     this.view = d3.select(this.canvas);
     this.zoom = d3.behavior.zoom()
-        .scaleExtent([0.2, 4])
-        .on('zoom', this.zoomed);
+      .scaleExtent([0.2, 4])
+      .on('zoom', this.zoomed);
     this.view.call(this.zoom);
     this.initGeometry();
     this.cellSize = this.matrix.cellSize;
@@ -336,11 +340,11 @@ class MatrixVisualization{
     this.scene = new THREE.Scene();
     // camera
     this.camera = new THREE.OrthographicCamera(
-        this.width / -2,
-        this.width / 2,
-        this.height/ 2,
-        this.height / -2,
-        0, 1000)
+      this.width / -2,
+      this.width / 2,
+      this.height/ 2,
+      this.height / -2,
+      0, 1000)
 
     this.scene.add(this.camera);
     this.camera.position.x = this.width / 2;
@@ -357,7 +361,7 @@ class MatrixVisualization{
 
     // position canvas element containing cells
     this.canvas = this.renderer.domElement;
-    
+
     // set canvas listeners
     this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
     this.canvas.addEventListener('mousedown', this.mouseDownHandler);
@@ -381,16 +385,16 @@ class MatrixVisualization{
       void main() {
         gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);
       }`;
-    
+
     let attributes = {
-        customColor: { type: 'c', value: [] }
+      customColor: { type: 'c', value: [] }
     }
 
     // SHADERS
     this.shaderMaterial = new THREE.ShaderMaterial({
-        attributes: attributes,
-        vertexShader: vertexShaderProgram,
-        fragmentShader: fragmentShaderProgram,
+      attributes: attributes,
+      vertexShader: vertexShaderProgram,
+      fragmentShader: fragmentShaderProgram,
     });
     this.shaderMaterial.blending = THREE.NormalBlending;
     this.shaderMaterial.depthTest = true;
@@ -408,10 +412,10 @@ class MatrixVisualization{
   }
 
   updateData(data:  {[id: number]: {[id: number]: networkcube.NodePair}},
-              nrows: number, ncols: number,
-              cellSize: number,
-              offset: number[]
-            ){
+             nrows: number, ncols: number,
+             cellSize: number,
+             offset: number[]
+  ){
     this.data = data;
     this.nrows = nrows;
     this.ncols = ncols;
@@ -419,35 +423,34 @@ class MatrixVisualization{
     this.cellSize = cellSize;
 
 
-    if (this.geometry) {
-        this.scene.remove(this.mesh);
+    if (this.geometry){
+      this.scene.remove(this.mesh);
     }
     for(let id of this.hoveredLinks){
       if(this.cellHighlightFrames[id])
         for(let frame of this.cellHighlightFrames[id])
           this.scene.remove(frame);
-    }    
-    
+    }
+
     this.updateGuideLines();
-    
+
     this.vertexPositions = [];
     this.vertexColors = [];
-    this.highlightFrames = [];
     this.cellHighlightFrames = [];
     this.linksPos = {};
-    
+
     for(let row in this.data){
-        for( let col in data[row]){
-           this.addCell(row, col, data[row][col]);
-        }
+      for( let col in data[row]){
+        this.addCell(row, col, data[row][col]);
+      }
     }
 
     // CREATE + ADD MESH
     this.geometry.addAttribute('position', new THREE.BufferAttribute(glutils.makeBuffer3f(this.vertexPositions), 3));
     this.geometry.addAttribute('customColor', new THREE.BufferAttribute(glutils.makeBuffer4f(this.vertexColors), 4));
-    
+
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
-    
+
     this.geometry.attributes['customColor'].needsUpdate = true;
 
     this.scene.add(this.mesh);
@@ -472,10 +475,10 @@ class MatrixVisualization{
 
     for (let j = 0; j < links.length; j++) {
       e = links[j];
-      
+
       let webColor: string = networkcube.getPriorityColor(e);
       if (!webColor)
-          webColor = '#000000';
+        webColor = '#000000';
       meanWeight = e.weights()? e.weights(this.matrix.startTime, this.matrix.endTime).mean(): 1;
       color = new THREE.Color(webColor);
       alpha = this.linkWeightScale(Math.abs(meanWeight));
@@ -487,7 +490,7 @@ class MatrixVisualization{
       if(!this.linksPos[row]) this.linksPos[row] = {};
       if(!this.linksPos[row][col]) this.linksPos[row][col] = [];
       this.linksPos[row][col].push(e.id());
-      
+
       //x = this.cellSize/2 + row * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
       //y = this.cellSize/2 + col * this.cellSize;
       //this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
@@ -495,19 +498,19 @@ class MatrixVisualization{
 
   }
 
-  paintCell(id: number, x: number, y: number, w: number, 
+  paintCell(id: number, x: number, y: number, w: number,
             color: number[], positive: Boolean){
     let h: number = this.cellSize;
     let highlightFrames: THREE.Mesh = new THREE.Mesh();
     let selectionFrames: THREE.Mesh = new THREE.Mesh();
     let frame: THREE.Line;
-    
+
     if (positive) {
-      glutils.addBufferedRect(this.vertexPositions, x, -y, 0, w - 1, h - 1, 
-                              this.vertexColors, color);
+      glutils.addBufferedRect(this.vertexPositions, x, -y, 0, w - 1, h - 1,
+        this.vertexColors, color);
     } else{
       glutils.addBufferedDiamond(this.vertexPositions, x, -y, 0, w - 1, h - 1,
-                                 this.vertexColors, color); 
+        this.vertexColors, color);
     }
     // highlight frame
     frame = glutils.createRectFrame(w - 1, h - 1, COLOR_HIGHLIGHT, 1)
@@ -529,49 +532,49 @@ class MatrixVisualization{
   }
   updateGuideLines(){
     for(let i=0 ; i<this.guideLines.length ; i++){
-        this.scene.remove(this.guideLines[i]);
-    }    
+      this.scene.remove(this.guideLines[i]);
+    }
     if(!this.data) return;
     console.log("update guidelines")
-    
+
     let w = this.ncols*this.cellSize;
     let h = this.nrows*this.cellSize;
-    
+
     let geometry1 = new THREE.Geometry();
     geometry1.vertices.push(
-        new THREE.Vector3( this.offset[0], 0, 0 ),
-        new THREE.Vector3( w+this.offset[0], 0, 0)
+      new THREE.Vector3( this.offset[0], 0, 0 ),
+      new THREE.Vector3( w+this.offset[0], 0, 0)
     )
     let geometry2 = new THREE.Geometry();
     geometry2.vertices.push(
-        new THREE.Vector3( 0, -this.offset[1], 0 ),
-        new THREE.Vector3( 0, -h-this.offset[1] , 0 )
+      new THREE.Vector3( 0, -this.offset[1], 0 ),
+      new THREE.Vector3( 0, -h-this.offset[1] , 0 )
     )
     let m, pos;
     let mat = new THREE.LineBasicMaterial( {color: 0xeeeeee, linewidth:1} );
     let x,y;
     let j = 0;
     for(let i=0; i <=h; i+=this.cellSize){
-        pos =  j * this.cellSize + this.offset[1];
-        m = new THREE.Line(geometry1, mat)
-        m.position.set(0, -pos, 0);
-        this.scene.add(m);
-        this.guideLines.push(m);
-        j++;
+      pos =  j * this.cellSize + this.offset[1];
+      m = new THREE.Line(geometry1, mat)
+      m.position.set(0, -pos, 0);
+      this.scene.add(m);
+      this.guideLines.push(m);
+      j++;
     }
     j = 0;
     for(let i=0 ; i <=w; i+=this.cellSize){
-        pos =  j * this.cellSize + this.offset[0];
-        m = new THREE.Line(geometry2, mat);
-        m.position.set(pos, 0, 0);
-        this.scene.add(m);
-        this.guideLines.push(m);
-        j++;
+      pos =  j * this.cellSize + this.offset[0];
+      m = new THREE.Line(geometry2, mat);
+      m.position.set(pos, 0, 0);
+      this.scene.add(m);
+      this.guideLines.push(m);
+      j++;
     }
-    
-  } 
 
-  highlightLink(cell){
+  }
+
+  highlightLink(cell: Cell){
     let row = cell.row;
     let col = cell.col;
     let id: number;
@@ -586,12 +589,12 @@ class MatrixVisualization{
   }
 
   posToCell(pos: Pos){
-   let row = Math.round((pos.y-this.offset[1]-this.cellSize/2)/this.cellSize);
-   let col = Math.round((pos.x-this.offset[0]-this.cellSize/2)/this.cellSize);
-   return {row: row, col: col};
+    let row = Math.round((pos.y-this.offset[1]-this.cellSize/2)/this.cellSize);
+    let col = Math.round((pos.x-this.offset[0]-this.cellSize/2)/this.cellSize);
+    return {row: row, col: col};
   }
 
-  private mouseMoveHandler = (e: Event)=>{
+  private mouseMoveHandler = (e: MouseEvent)=>{
     let mpos: Pos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
 
     this.toHoverLinks = [];
@@ -621,8 +624,8 @@ class MatrixVisualization{
   }
 
   updateHighlightedLinks(hoveredLinks: number[] = undefined){
-      this.previousHoveredLinks = this.hoveredLinks;
-      this.hoveredLinks = hoveredLinks;
+    this.previousHoveredLinks = this.hoveredLinks;
+    this.hoveredLinks = hoveredLinks;
     for(let id of this.previousHoveredLinks){
       if(this.cellHighlightFrames[id])
         for(let frame of this.cellHighlightFrames[id])
@@ -630,27 +633,27 @@ class MatrixVisualization{
     }
     for(let id of this.hoveredLinks){
       if(this.cellHighlightFrames[id])
-          for(let frame of this.cellHighlightFrames[id])
-            this.scene.add(frame);
+        for(let frame of this.cellHighlightFrames[id])
+          this.scene.add(frame);
     }
     this.render();
   }
-  private mouseDownHandler = (e: Event)=>{
+  private mouseDownHandler = (e: MouseEvent)=>{
     if (e.shiftKey) {
       this.view.on('mousedown.zoom',null);
       this.mouseDown = true;
       this.mouseDownPos = glutils.getMousePos(this.canvas, e.clientX, e.clientY);
-      this.mouseDownCell = this.posToCell(this.mouseDownPos); 
+      this.mouseDownCell = this.posToCell(this.mouseDownPos);
     }
   }
   private mouseUpHandler = (e: Event)=>{
     this.mouseDown = false;
     this.view.call(this.zoom);
-      for(let id of this.hoveredLinks){
-          for(let frame of this.cellHighlightFrames[id])
-            this.scene.remove(frame);
-      }
-      this.hoveredLinks = [];
+    for(let id of this.hoveredLinks){
+      for(let frame of this.cellHighlightFrames[id])
+        this.scene.remove(frame);
+    }
+    this.hoveredLinks = [];
   }
   clickHandler(e: Event){
     console.log("click");
@@ -667,15 +670,16 @@ class MatrixVisualization{
     tr[1] = Math.min(0, tr[1]);
     this.zoom.scale(z);
     this.zoom.translate(tr);
-    this.matrix.updateTransform(z, tr); 
+    this.matrix.updateTransform(z, tr);
   }
 }
 
 class Matrix{
 
-  private matrixVis: MatrixVisualization;
-  private labelsVis: MatrixLabels;
+  private visualization: MatrixVisualization;
+  private labels: MatrixLabels;
   private cellLabel: CellLabel;
+  private menu: MatrixMenu;
   private _dgraph: networkcube.DynamicGraph;
   public startTime: networkcube.Time;
   public endTime: networkcube.Time;
@@ -711,7 +715,7 @@ class Matrix{
   get dgraph(){
     return this._dgraph;
   }
-    
+
   get cellSize(){
     return this._cellSize;
   }
@@ -719,16 +723,18 @@ class Matrix{
   updateCellSize(value: number){
     let scale = value/this.initialCellSize;
     let tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
-    this.matrixVis.updateTransform(scale, tr);
+    this.visualization.updateTransform(scale, tr);
   }
 
   updateTransform(scale, tr){
     this._scale = scale;
     this._tr = tr;
     this._cellSize = this._scale*this.initialCellSize;
+    if(this.menu)
+      this.menu.setScale(this._cellSize);
     this.updateVisibleData();
   }
-  
+
   dgraphName(){
     return this._dgraph.name;
   }
@@ -743,67 +749,72 @@ class Matrix{
 
   reorderWorker(orderType: string){
     if (orderType == 'alphanumerical') {
-        let nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
-        this.nodeOrder = [];
-        for (let i = 0; i < nodes2.length; i++) {
-            this.nodeOrder[nodes2[i].id()] = i;
-        }
+      let nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
+      this.nodeOrder = [];
+      for (let i = 0; i < nodes2.length; i++) {
+        this.nodeOrder[nodes2[i].id()] = i;
+      }
     } else if (orderType == 'reverse-alpha') {
-        let nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
-        this.nodeOrder = [];
-        for (let i = 0; i < nodes2.length; i++) {
-            this.nodeOrder[nodes2[i].id()] = i;
-        }
+      let nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
+      this.nodeOrder = [];
+      for (let i = 0; i < nodes2.length; i++) {
+        this.nodeOrder[nodes2[i].id()] = i;
+      }
     } else if (orderType == 'degree') {
-        let nodes2 = this._dgraph.nodes().visible()
-            .createAttribute('degree', (n) => {
-                return n.neighbors().length;
-            })
-            .sort('degree').toArray();
-        for (let i = 0; i < nodes2.length; i++) {
-            this.nodeOrder[nodes2[i].id()] = i;
-        }
+      let nodes2 = this._dgraph.nodes().visible()
+        .createAttribute('degree', (n) => {
+          return n.neighbors().length;
+        })
+        .sort('degree').toArray();
+      for (let i = 0; i < nodes2.length; i++) {
+        this.nodeOrder[nodes2[i].id()] = i;
+      }
     } else if (orderType == 'similarity') {
-        let config: networkcube.OrderingConfiguration = new networkcube.OrderingConfiguration();
-        config.start = this.startTime;
-        config.end = this.endTime;
-        config.nodes = this._dgraph.nodes().visible().toArray();
-        config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
-        this.nodeOrder = networkcube.orderNodes(this._dgraph, config);
+      let config: networkcube.OrderingConfiguration = new networkcube.OrderingConfiguration();
+      config.start = this.startTime;
+      config.end = this.endTime;
+      config.nodes = this._dgraph.nodes().visible().toArray();
+      config.links = this._dgraph.links().presentIn(this.startTime, this.endTime).visible().toArray();
+      this.nodeOrder = networkcube.orderNodes(this._dgraph, config);
     } else {
-        let visibleNodes = this._dgraph.nodes().visible().toArray();
-        this.nodeOrder = [];
-        for (let i = 0; i < visibleNodes.length; i++) {
-            this.nodeOrder[visibleNodes[i].id()] = i;
-        }
+      let visibleNodes = this._dgraph.nodes().visible().toArray();
+      this.nodeOrder = [];
+      for (let i = 0; i < visibleNodes.length; i++) {
+        this.nodeOrder[visibleNodes[i].id()] = i;
+      }
     }
     this.updateVisibleData();
 
   }
 
   setVis(matrixVis: MatrixVisualization){
-    this.matrixVis = matrixVis;
+    this.visualization = matrixVis;
     this.updateTransform(1, [0, 0]);
   }
   setLabels(matrixLabels: MatrixLabels){
-    this.labelsVis = matrixLabels;
+    this.labels = matrixLabels;
   }
   setCellLabel(cellLabel: CellLabel){
     this.cellLabel = cellLabel;
   }
+  setMenu(menu: MatrixMenu){
+    this.menu = menu;
+  }
 
   longestLabelLength(){
+    let longestLabelNode;
     if(this.dgraph){
-      let longestLabelNode = this.dgraph.nodes().toArray().reduce(
+      longestLabelNode = this.dgraph.nodes().toArray().reduce(
         function(p, v, i, arr) {
-          if (p == null || p.label() == null || 
-              (v.label() && v.label().length > p.label().length))
+          if (p == null || p.label() == null ||
+            (v.label() && v.label().length > p.label().length))
             return v;
           else
             return p;
         });
     }
-    this.labelLength = longestLabelNode ? longestLabelNode.label().length : 8;
+    this.labelLength = longestLabelNode ? longestLabelNode.label().length+8 : 8;
+    console.log(this.labelLength);
   }
   calculatePlotMargin(){
     this.margin.setMargin((this.labelLength * 0.5) * this.cellSize);
@@ -813,24 +824,25 @@ class Matrix{
   updateVisibleBox(){
     this.bbox.x0 = -Math.floor(this._tr[0]/this._cellSize);
     this.bbox.y0 = -Math.floor(this._tr[1]/this._cellSize);
-    this.bbox.x1 = this.bbox.x0 + Math.floor(this.matrixVis.width/this._cellSize);
-    this.bbox.y1 = this.bbox.y0 + Math.floor(this.matrixVis.height/this._cellSize);
+    this.bbox.x1 = this.bbox.x0 + Math.floor(this.visualization.width/this._cellSize);
+    this.bbox.y1 = this.bbox.y0 + Math.floor(this.visualization.height/this._cellSize);
 
     this.offset[0] =  (this._tr[0]/this._cellSize + this.bbox.x0)*this._cellSize;
     this.offset[1] = (this._tr[1]/this._cellSize + this.bbox.y0)*this._cellSize;
   }
 
   updateVisibleData(){
+    console.log("updateVis");
     this.updateVisibleBox();
     let leftNodes = this.dgraph.nodes().visible().toArray();
-    leftNodes = leftNodes.filter( d => 
-                                    this.nodeOrder[d.id()] >= this.bbox.y0 && 
-                                    this.nodeOrder[d.id()] <= this.bbox.y1);
+    leftNodes = leftNodes.filter( d =>
+    this.nodeOrder[d.id()] >= this.bbox.y0 &&
+    this.nodeOrder[d.id()] <= this.bbox.y1);
     let topNodes = this.dgraph.nodes().visible().toArray();
-    topNodes = topNodes.filter( d => 
-                                  this.nodeOrder[d.id()] >= this.bbox.x0 && 
-                                  this.nodeOrder[d.id()] <= this.bbox.x1);
-    
+    topNodes = topNodes.filter( d =>
+    this.nodeOrder[d.id()] >= this.bbox.x0 &&
+    this.nodeOrder[d.id()] <= this.bbox.x1);
+
     let visibleData: {[id: number]: {[id: number]: networkcube.NodePair}} = {};
     let row, col: number;
     let node: networkcube.Node;
@@ -840,30 +852,30 @@ class Matrix{
       if(node.isVisible()){
         row = this.nodeOrder[node.id()] - this.bbox.y0;
         for(let link of node.links().toArray()){
-            let neighbor = link.source.id() == node.id()?link.target: link.source;
-            if(neighbor.isVisible() &&
-               this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
-                 this.nodeOrder[neighbor.id()] <= this.bbox.x1){
-              if(!visibleData[row])  visibleData[row] = {};
+          let neighbor = link.source.id() == node.id()?link.target: link.source;
+          if(neighbor.isVisible() &&
+            this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
+            this.nodeOrder[neighbor.id()] <= this.bbox.x1){
+            if(!visibleData[row])  visibleData[row] = {};
             col = this.nodeOrder[neighbor.id()] - this.bbox.x0;
             visibleData[row][col] = link.nodePair();
-            }
+          }
         }
       }
     }
-    this.matrixVis.updateData(visibleData, 
-                              leftNodes.length, topNodes.length,
-                              this.cellSize,
-                              this.offset);
+    this.visualization.updateData(visibleData,
+      leftNodes.length, topNodes.length,
+      this.cellSize,
+      this.offset);
 
-    if(this.labelsVis){
-    this.labelsVis.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder,
-                              this.offset[1], this.offset[0], this.bbox);
+    if(this.labels){
+      this.labels.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder,
+        this.offset[1], this.offset[0], this.bbox);
     }
   }
   highlightLinks(highlightedIds: number[]){
     if(highlightedIds.length>0){
-      let highlightedLinks: number[] = highlightedIds.map(
+      let highlightedLinks: networkcube.Link[] = highlightedIds.map(
         (d) => this._dgraph.link(d));
       networkcube.highlight('set', <networkcube.ElementCompound>{ links: highlightedLinks });
     }else
@@ -879,11 +891,11 @@ class Matrix{
       }
     }
     networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d] });
-    this.labelsVis.updateHighlightedNodes();
+    this.labels.updateHighlightedNodes();
   }
   highlightNodes(highlightedIds: number[]){
     if(highlightedIds.length>0){
-      let highlightedNodes: number[] = highlightedIds.map(
+      let highlightedNodes: networkcube.Node[] = highlightedIds.map(
         (d) => this._dgraph.node(d));
       networkcube.highlight('set', <networkcube.ElementCompound>{ nodes: highlightedNodes });
     }else
@@ -894,12 +906,11 @@ class Matrix{
     let val = link.weights(this.startTime, this.endTime).get(0);
     val = Math.round(val * 1000)/1000;
     let z = this._scale;
-    let fw = this.initialCellSize/z;
-    this.cellLabel.updateCellLabel(mx, my, z, val, fw);
-    
+    let fw = this.initialCellSize;
+    this.cellLabel.updateCellLabel(mx, my, val, fw);
+
   }
   updateEvent = () => {
-    console.log("update");
 
     let highlightedNodesIds = [];
     let highlightedLinksIds = [];
@@ -917,14 +928,14 @@ class Matrix{
     }else{
       let highlightedNodes = this._dgraph.nodes().highlighted().toArray();
       for (let i = 0; i < highlightedNodes.length; i++) {
-        let node = highlightedNodes[i]; 
+        let node = highlightedNodes[i];
         if(node.isVisible()){
           for(let link of node.links().toArray()){
             let neighbor = link.source.id() == node.id()?link.target: link.source;
             if(neighbor.isVisible())
-               // &&
-               //this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
-               //  this.nodeOrder[neighbor.id()] <= this.bbox.x1){
+            // &&
+            //this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
+            //  this.nodeOrder[neighbor.id()] <= this.bbox.x1){
               highlightedLinksIds.push(link.id());
             //}
           }
@@ -932,8 +943,8 @@ class Matrix{
       }
     }
 
-    this.labelsVis.updateHighlightedNodes(highlightedNodesIds);
-    this.matrixVis.updateHighlightedLinks(highlightedLinksIds);
+    this.labels.updateHighlightedNodes(highlightedNodesIds);
+    this.visualization.updateHighlightedLinks(highlightedLinksIds);
   }
 
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
@@ -942,7 +953,7 @@ class Matrix{
     //timeSlider.set(this.startTime, this.endTime);
     this.updateVisibleData();
   }
-  
+
 }
 
 let matrix = new Matrix();
@@ -959,7 +970,7 @@ let svg = d3.select(labJQ.get(0))
   .attr('id', 'networkcube-matrix-visSvg')
   .attr('width', vizWidth)
   .attr('height', vizHeight);
-let foreignObject = svg.append('foreignObject')
+let foreignObject: D3.Selection = svg.append('foreignObject')
   .attr('id', 'networkcube-matrix-visCanvasFO')
   .attr('x', matrix.margin.left)
   .attr('y', matrix.margin.top)
@@ -977,6 +988,7 @@ let cellLabel = new CellLabel();
 
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
+matrix.setMenu(matrixMenu);
 matrix.setCellLabel(cellLabel);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 
