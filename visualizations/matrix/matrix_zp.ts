@@ -68,7 +68,8 @@ class MatrixMenu{
     $('#labelOrdering').append('<option value="degree">Node degree</option>');
     $('#labelOrdering').append('<option value="similarity">Similarity</option>');
 
-    this.elem.append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
+    this.elem.append('<input value="Re-run" id="reorderBtn" type="button"/>');
+    $('#reorderBtn').click(this.reorderHandler);
 
     //$('#dataName').text(this.matrix.dgraphName());
   }
@@ -91,6 +92,7 @@ class MatrixTimeSlider{
   private width: number;
   private height: number;
   private svg: any;
+  private timeSlider: TimeSlider;
   constructor(elem: JQuery, matrix: Matrix, width: number){
     this.elem = elem;
     this.matrix= matrix;
@@ -104,9 +106,12 @@ class MatrixTimeSlider{
       .attr('width', this.width)
       .attr('height', this.height)
 
-    let timeSlider: any = new TimeSlider(matrix.dgraph, vizWidth);
-    timeSlider.appendTo(this.svg);
+    this.timeSlider = new TimeSlider(matrix.dgraph, vizWidth);
+    this.timeSlider.appendTo(this.svg);
 
+  }
+  set(sT: networkcube.Time, eT: networkcube.Time){
+    this.timeSlider.set(sT, eT);
   }
 }
 
@@ -680,6 +685,7 @@ class Matrix{
   private labels: MatrixLabels;
   private cellLabel: CellLabel;
   private menu: MatrixMenu;
+  private timeSlider: MatrixTimeSlider;
   private _dgraph: networkcube.DynamicGraph;
   public startTime: networkcube.Time;
   public endTime: networkcube.Time;
@@ -709,7 +715,8 @@ class Matrix{
     this.longestLabelLength();
     this.margin = new NMargin(0);
     this.calculatePlotMargin();
-    networkcube.setDefaultEventListener(this.updateEvent)
+    networkcube.setDefaultEventListener(this.updateEvent;
+    networkcube.addEventListener('timeRange', this.timeRangeHandler)
   }
 
   get dgraph(){
@@ -799,6 +806,9 @@ class Matrix{
   }
   setMenu(menu: MatrixMenu){
     this.menu = menu;
+  }
+  setTimeSlider(timeSlider: MatrixTimeSlider){
+    this.timeSlider = timeSlider;
   }
 
   longestLabelLength(){
@@ -950,7 +960,7 @@ class Matrix{
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
     this.startTime = this._dgraph.time(m.startId);
     this.endTime = this._dgraph.time(m.endId);
-    //timeSlider.set(this.startTime, this.endTime);
+    this.timeSlider.set(this.startTime, this.endTime);
     this.updateVisibleData();
   }
 
@@ -989,6 +999,7 @@ let cellLabel = new CellLabel();
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 matrix.setMenu(matrixMenu);
+matrix.setTimeSlider(matrixTimeSlider);
 matrix.setCellLabel(cellLabel);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 

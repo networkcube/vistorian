@@ -29,7 +29,8 @@ var MatrixMenu = (function () {
         $('#labelOrdering').append('<option value="reverse-alpha">Reverse Alphanumerical</option>');
         $('#labelOrdering').append('<option value="degree">Node degree</option>');
         $('#labelOrdering').append('<option value="similarity">Similarity</option>');
-        this.elem.append('<input value="Re-run" type="button" onclick="reorderHandler()"/>');
+        this.elem.append('<input value="Re-run" id="reorderBtn" type="button"/>');
+        $('#reorderBtn').click(this.reorderHandler);
     };
     MatrixMenu.prototype.updateCellSize = function () {
         var value = $('#cellSizeBox').val();
@@ -57,8 +58,11 @@ var MatrixTimeSlider = (function () {
             .append('svg')
             .attr('width', this.width)
             .attr('height', this.height);
-        var timeSlider = new TimeSlider(matrix.dgraph, vizWidth);
-        timeSlider.appendTo(this.svg);
+        this.timeSlider = new TimeSlider(matrix.dgraph, vizWidth);
+        this.timeSlider.appendTo(this.svg);
+    };
+    MatrixTimeSlider.prototype.set = function (sT, eT) {
+        this.timeSlider.set(sT, eT);
     };
     return MatrixTimeSlider;
 }());
@@ -532,6 +536,7 @@ var Matrix = (function () {
         this.timeRangeHandler = function (m) {
             _this.startTime = _this._dgraph.time(m.startId);
             _this.endTime = _this._dgraph.time(m.endId);
+            _this.timeSlider.set(_this.startTime, _this.endTime);
             _this.updateVisibleData();
         };
         this._dgraph = networkcube.getDynamicGraph();
@@ -549,6 +554,7 @@ var Matrix = (function () {
         this.margin = new NMargin(0);
         this.calculatePlotMargin();
         networkcube.setDefaultEventListener(this.updateEvent);
+        networkcube.addEventListener('timeRange', this.timeRangeHandler);
     }
     Object.defineProperty(Matrix.prototype, "dgraph", {
         get: function () {
@@ -640,6 +646,9 @@ var Matrix = (function () {
     };
     Matrix.prototype.setMenu = function (menu) {
         this.menu = menu;
+    };
+    Matrix.prototype.setTimeSlider = function (timeSlider) {
+        this.timeSlider = timeSlider;
     };
     Matrix.prototype.longestLabelLength = function () {
         var longestLabelNode;
@@ -773,6 +782,7 @@ var cellLabel = new CellLabel();
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 matrix.setMenu(matrixMenu);
+matrix.setTimeSlider(matrixTimeSlider);
 matrix.setCellLabel(cellLabel);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 //# sourceMappingURL=matrix_zp.js.map
