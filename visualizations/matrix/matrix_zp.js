@@ -101,6 +101,62 @@ var CellLabel = (function () {
     };
     return CellLabel;
 }());
+var MatrixOverview = (function () {
+    function MatrixOverview(svg, width, height, matrix) {
+        var _this = this;
+        this.zoomed = function () {
+            var z, tr;
+            z = _this.zoom.scale();
+            tr = _this.zoom.translate();
+            _this.updateTransform(z, tr);
+        };
+        this.svg = svg;
+        this.matrix = matrix;
+        this.width = width;
+        this.height = height;
+        this.init();
+    }
+    MatrixOverview.prototype.init = function () {
+        this.focusColor = "#333";
+        this.svg.append('g')
+            .append("rect")
+            .attr("class", "context")
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .attr("stroke", "black")
+            .attr("fill", "white");
+        var g = this.svg.append('g');
+        this.focus = g.append("rect")
+            .attr("class", "focus")
+            .attr("fill", this.focusColor)
+            .attr("fill-opacity", .2);
+        this.zoom = d3.behavior.zoom()
+            .scaleExtent([0.2, 4])
+            .on('zoom', this.zoomed);
+        this.focus.call(this.zoom);
+    };
+    MatrixOverview.prototype.updateTransform = function (z, tr) {
+        tr[0] = -tr[0] * this.ratio;
+        tr[1] = -tr[1] * this.ratio;
+        this.matrix.updateTransform(z, tr);
+    };
+    MatrixOverview.prototype.updateFocus = function (f, l, w, h, r) {
+        console.log(w, h);
+        console.log(f, l);
+        this.ratio = r / this.height;
+        var focusX = f * this.width;
+        var focusY = l * this.height;
+        var focusWidth = Math.min(w * this.width, this.width);
+        var focusHeight = Math.min(h * this.height, this.height);
+        focusWidth = (focusX + focusWidth) > this.width ? this.width - focusX : focusWidth;
+        focusHeight = (focusY + focusHeight) > this.height ? this.height - focusY : focusHeight;
+        this.focus.attr("width", focusWidth)
+            .attr("height", focusHeight)
+            .attr("x", focusX)
+            .attr("y", focusY);
+    };
+    return MatrixOverview;
+}());
 var MatrixLabels = (function () {
     function MatrixLabels(svg, margin, matrix) {
         this.svg = svg;
@@ -197,7 +253,7 @@ var MatrixLabels = (function () {
     return MatrixLabels;
 }());
 var MatrixVisualization = (function () {
-    function MatrixVisualization(width, height, elem, matrix) {
+    function MatrixVisualization(elem, width, height, matrix) {
         var _this = this;
         this.mouseMoveHandler = function (e) {
             var mpos = glutils.getMousePos(_this.canvas, e.clientX, e.clientY);
@@ -570,6 +626,25 @@ var Matrix = (function () {
         enumerable: true,
         configurable: true
     });
+    Matrix.prototype.setVis = function (matrixVis) {
+        this.visualization = matrixVis;
+        this.updateTransform(1, [0, 0]);
+    };
+    Matrix.prototype.setLabels = function (matrixLabels) {
+        this.labels = matrixLabels;
+    };
+    Matrix.prototype.setCellLabel = function (cellLabel) {
+        this.cellLabel = cellLabel;
+    };
+    Matrix.prototype.setOverview = function (overview) {
+        this.overview = overview;
+    };
+    Matrix.prototype.setMenu = function (menu) {
+        this.menu = menu;
+    };
+    Matrix.prototype.setTimeSlider = function (timeSlider) {
+        this.timeSlider = timeSlider;
+    };
     Matrix.prototype.updateCellSize = function (value) {
         var scale = value / this.initialCellSize;
         var tr = [this._tr[0] * scale / this._scale, this._tr[1] * scale / this._scale];
@@ -578,6 +653,8 @@ var Matrix = (function () {
     Matrix.prototype.updateTransform = function (scale, tr) {
         this._scale = scale;
         this._tr = tr;
+        this._tr[0] = Math.min(this._tr[0], 0);
+        this._tr[1] = Math.min(this._tr[1], 0);
         this._cellSize = this._scale * this.initialCellSize;
         if (this.menu)
             this.menu.setScale(this._cellSize);
@@ -633,22 +710,6 @@ var Matrix = (function () {
             }
         }
         this.updateVisibleData();
-    };
-    Matrix.prototype.setVis = function (matrixVis) {
-        this.visualization = matrixVis;
-        this.updateTransform(1, [0, 0]);
-    };
-    Matrix.prototype.setLabels = function (matrixLabels) {
-        this.labels = matrixLabels;
-    };
-    Matrix.prototype.setCellLabel = function (cellLabel) {
-        this.cellLabel = cellLabel;
-    };
-    Matrix.prototype.setMenu = function (menu) {
-        this.menu = menu;
-    };
-    Matrix.prototype.setTimeSlider = function (timeSlider) {
-        this.timeSlider = timeSlider;
     };
     Matrix.prototype.longestLabelLength = function () {
         var longestLabelNode;
@@ -711,6 +772,14 @@ var Matrix = (function () {
             }
         }
         this.visualization.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset);
+        if (this.overview) {
+            var totalNodes = this.dgraph.nodes().visible().length;
+            var widthRatio = (this.bbox.x1 - this.bbox.x0) / totalNodes;
+            var heightRatio = (this.bbox.y1 - this.bbox.y0) / totalNodes;
+            console.log("overview");
+            var ratio = totalNodes * this.cellSize;
+            this.overview.updateFocus(this.bbox.x0 / totalNodes, this.bbox.y0 / totalNodes, widthRatio, heightRatio, ratio);
+        }
         if (this.labels) {
             this.labels.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder, this.offset[1], this.offset[0], this.bbox);
         }
@@ -777,8 +846,10 @@ var bbox = foreignObject.node().getBBox();
 var matrixMenu = new MatrixMenu(menuJQ, matrix);
 var matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
 var matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
-var matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject, matrix);
+var matrixVis = new MatrixVisualization(foreignObject, bbox.width, bbox.height, matrix);
+var matrixOverview = new MatrixOverview(svg, matrix.margin.left - 2, matrix.margin.top - 2, matrix);
 var cellLabel = new CellLabel();
+matrix.setOverview(matrixOverview);
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 matrix.setMenu(matrixMenu);

@@ -152,6 +152,84 @@ class CellLabel{
       .style('opacity', .8);
   }
 }
+class MatrixOverview{
+  private width: number;
+  private height: number;
+  private matrix: Matrix;
+  private svg: D3.Selection;
+  private tr: number[];
+  private scale: number;
+  private ratio: number;
+  private focusColor: string;
+  private focus: D3.Selection;
+  private zoom: D3.Behavior.Zoom;
+
+  constructor(svg: D3.Selection,
+              width: number,
+              height: number,
+              matrix: Matrix){
+    this.svg = svg;
+    this.matrix = matrix;
+    this.width = width;
+    this.height = height;
+    this.init();
+  }
+  init(){
+
+    this.focusColor = "#333";
+
+    this.svg.append('g')
+      .append("rect")
+      .attr("class", "context")
+      .attr("width", this.width)
+      .attr("height", this.height)
+      .attr("stroke", "black")
+      .attr("fill", "white");
+    var g = this.svg.append('g');
+    this.focus = g.append("rect")
+      .attr("class", "focus")
+      .attr("fill", this.focusColor)
+      .attr("fill-opacity", .2);
+
+    this.zoom = d3.behavior.zoom()
+      .scaleExtent([0.2, 4])
+      .on('zoom', this.zoomed);
+
+    this.focus.call(this.zoom);
+
+  }
+
+  private zoomed = () =>{
+    let z: number, tr: number[];
+    z = this.zoom.scale();
+    tr = this.zoom.translate();
+    this.updateTransform(z, tr);
+  }
+
+  updateTransform(z, tr){
+    tr[0] = -tr[0]*this.ratio;
+    tr[1] = -tr[1]*this.ratio;
+    this.matrix.updateTransform(z, tr);
+  }
+  updateFocus(f: number, l: number, w: number, h: number, r: number){
+    console.log(w, h);
+    console.log(f, l);
+
+    this.ratio = r/this.height;
+
+    let focusX = f*this.width;
+    let focusY = l*this.height;
+    let focusWidth = Math.min(w*this.width, this.width);
+    let focusHeight = Math.min(h*this.height, this.height);
+    focusWidth = (focusX + focusWidth) > this.width? this.width-focusX: focusWidth;
+    focusHeight = (focusY + focusHeight) > this.height? this.height-focusY: focusHeight;
+    this.focus.attr("width", focusWidth)
+      .attr("height", focusHeight)
+      .attr("x", focusX)
+      .attr("y", focusY);
+  }
+
+}
 
 class MatrixLabels{
   private width: number;
@@ -308,8 +386,9 @@ class MatrixVisualization{
 
 
   private data:  {[id: number]: {[id: number]: networkcube.NodePair}};
-  constructor(width: number, height: number,
-              elem: D3.Selection, matrix: Matrix){
+  constructor(elem: D3.Selection,
+              width: number, height: number,
+              matrix: Matrix){
     this.width = width;
     this.height = height;
     this.elem = elem;
@@ -679,6 +758,8 @@ class MatrixVisualization{
   }
 }
 
+
+
 class Matrix{
 
   private visualization: MatrixVisualization;
@@ -686,6 +767,7 @@ class Matrix{
   private cellLabel: CellLabel;
   private menu: MatrixMenu;
   private timeSlider: MatrixTimeSlider;
+  private overview: MatrixOverview;
   private _dgraph: networkcube.DynamicGraph;
   public startTime: networkcube.Time;
   public endTime: networkcube.Time;
@@ -715,7 +797,7 @@ class Matrix{
     this.longestLabelLength();
     this.margin = new NMargin(0);
     this.calculatePlotMargin();
-    networkcube.setDefaultEventListener(this.updateEvent;
+    networkcube.setDefaultEventListener(this.updateEvent);
     networkcube.addEventListener('timeRange', this.timeRangeHandler)
   }
 
@@ -727,6 +809,26 @@ class Matrix{
     return this._cellSize;
   }
 
+  setVis(matrixVis: MatrixVisualization){
+    this.visualization = matrixVis;
+    this.updateTransform(1, [0, 0]);
+  }
+  setLabels(matrixLabels: MatrixLabels){
+    this.labels = matrixLabels;
+  }
+  setCellLabel(cellLabel: CellLabel){
+    this.cellLabel = cellLabel;
+  }
+  setOverview(overview: MatrixOverview){
+    this.overview = overview;
+  }
+  setMenu(menu: MatrixMenu){
+    this.menu = menu;
+  }
+  setTimeSlider(timeSlider: MatrixTimeSlider){
+    this.timeSlider = timeSlider;
+  }
+
   updateCellSize(value: number){
     let scale = value/this.initialCellSize;
     let tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
@@ -736,6 +838,8 @@ class Matrix{
   updateTransform(scale, tr){
     this._scale = scale;
     this._tr = tr;
+    this._tr[0] = Math.min(this._tr[0], 0);
+    this._tr[1] = Math.min(this._tr[1], 0);
     this._cellSize = this._scale*this.initialCellSize;
     if(this.menu)
       this.menu.setScale(this._cellSize);
@@ -794,22 +898,6 @@ class Matrix{
 
   }
 
-  setVis(matrixVis: MatrixVisualization){
-    this.visualization = matrixVis;
-    this.updateTransform(1, [0, 0]);
-  }
-  setLabels(matrixLabels: MatrixLabels){
-    this.labels = matrixLabels;
-  }
-  setCellLabel(cellLabel: CellLabel){
-    this.cellLabel = cellLabel;
-  }
-  setMenu(menu: MatrixMenu){
-    this.menu = menu;
-  }
-  setTimeSlider(timeSlider: MatrixTimeSlider){
-    this.timeSlider = timeSlider;
-  }
 
   longestLabelLength(){
     let longestLabelNode;
@@ -837,8 +925,9 @@ class Matrix{
     this.bbox.x1 = this.bbox.x0 + Math.floor(this.visualization.width/this._cellSize);
     this.bbox.y1 = this.bbox.y0 + Math.floor(this.visualization.height/this._cellSize);
 
-    this.offset[0] =  (this._tr[0]/this._cellSize + this.bbox.x0)*this._cellSize;
+    this.offset[0] = (this._tr[0]/this._cellSize + this.bbox.x0)*this._cellSize;
     this.offset[1] = (this._tr[1]/this._cellSize + this.bbox.y0)*this._cellSize;
+
   }
 
   updateVisibleData(){
@@ -877,6 +966,17 @@ class Matrix{
       leftNodes.length, topNodes.length,
       this.cellSize,
       this.offset);
+
+    if(this.overview){
+      let totalNodes = this.dgraph.nodes().visible().length;
+      let widthRatio = (this.bbox.x1 - this.bbox.x0)/totalNodes;
+      let heightRatio = (this.bbox.y1 - this.bbox.y0)/totalNodes;
+      console.log("overview");
+      let ratio = totalNodes*this.cellSize;
+      this.overview.updateFocus(this.bbox.x0/totalNodes, this.bbox.y0/totalNodes,
+                                widthRatio, heightRatio,
+                                ratio);
+    }
 
     if(this.labels){
       this.labels.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder,
@@ -966,6 +1066,7 @@ class Matrix{
 
 }
 
+
 let matrix = new Matrix();
 
 let vizWidth: number = window.innerWidth - 10;
@@ -991,11 +1092,12 @@ let bbox =  foreignObject.node().getBBox();
 let matrixMenu = new MatrixMenu(menuJQ, matrix);
 let matrixTimeSlider = new MatrixTimeSlider(tsJQ, matrix, vizWidth);
 let matrixLabels = new MatrixLabels(svg, matrix.margin, matrix);
-let matrixVis = new MatrixVisualization(bbox.width, bbox.height, foreignObject,  matrix);
+let matrixVis = new MatrixVisualization(foreignObject, bbox.width, bbox.height,  matrix);
+let matrixOverview = new MatrixOverview(svg, matrix.margin.left-2, matrix.margin.top-2, matrix);
 let cellLabel = new CellLabel();
 
 
-
+matrix.setOverview(matrixOverview);
 matrix.setLabels(matrixLabels);
 matrix.setVis(matrixVis);
 matrix.setMenu(matrixMenu);
