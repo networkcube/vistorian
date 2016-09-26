@@ -114,10 +114,11 @@ var MatrixOverview = (function () {
         this.matrix = matrix;
         this.width = width;
         this.height = height;
+        this.ratio = 1;
         this.init();
     }
     MatrixOverview.prototype.init = function () {
-        this.focusColor = "#333";
+        this.focusColor = "#ccc";
         this.svg.append('g')
             .append("rect")
             .attr("class", "context")
@@ -140,14 +141,16 @@ var MatrixOverview = (function () {
         tr[1] = -tr[1] * this.ratio;
         this.matrix.updateTransform(z, tr);
     };
-    MatrixOverview.prototype.updateFocus = function (f, l, w, h, r) {
-        console.log(w, h);
-        console.log(f, l);
+    MatrixOverview.prototype.updateFocus = function (matrixX0, matrixY0, visibleW, visibleH, r, z, tr) {
+        tr[0] = -tr[0] / this.ratio;
+        tr[1] = -tr[1] / this.ratio;
         this.ratio = r / this.height;
-        var focusX = f * this.width;
-        var focusY = l * this.height;
-        var focusWidth = Math.min(w * this.width, this.width);
-        var focusHeight = Math.min(h * this.height, this.height);
+        this.zoom.scale(z);
+        this.zoom.translate(tr);
+        var focusX = matrixX0 * this.width;
+        var focusY = matrixY0 * this.height;
+        var focusWidth = Math.min(visibleW * this.width, this.width);
+        var focusHeight = Math.min(visibleH * this.height, this.height);
         focusWidth = (focusX + focusWidth) > this.width ? this.width - focusX : focusWidth;
         focusHeight = (focusY + focusHeight) > this.height ? this.height - focusY : focusHeight;
         this.focus.attr("width", focusWidth)
@@ -293,10 +296,11 @@ var MatrixVisualization = (function () {
             _this.view.call(_this.zoom);
             for (var _i = 0, _a = _this.hoveredLinks; _i < _a.length; _i++) {
                 var id = _a[_i];
-                for (var _b = 0, _c = _this.cellHighlightFrames[id]; _b < _c.length; _b++) {
-                    var frame = _c[_b];
-                    _this.scene.remove(frame);
-                }
+                if (_this.cellHighlightFrames[id])
+                    for (var _b = 0, _c = _this.cellHighlightFrames[id]; _b < _c.length; _b++) {
+                        var frame = _c[_b];
+                        _this.scene.remove(frame);
+                    }
             }
             _this.hoveredLinks = [];
         };
@@ -378,12 +382,14 @@ var MatrixVisualization = (function () {
         d = new Date();
         console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
     };
-    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset) {
+    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset, scale, tr) {
         this.data = data;
         this.nrows = nrows;
         this.ncols = ncols;
         this.offset = offset;
         this.cellSize = cellSize;
+        this.zoom.scale(scale);
+        this.zoom.translate(tr);
         if (this.geometry) {
             this.scene.remove(this.mesh);
         }
@@ -709,7 +715,7 @@ var Matrix = (function () {
                 this.nodeOrder[visibleNodes[i].id()] = i;
             }
         }
-        this.updateVisibleData();
+        this.updateTransform(this._scale, [0, 0]);
     };
     Matrix.prototype.longestLabelLength = function () {
         var longestLabelNode;
@@ -771,14 +777,13 @@ var Matrix = (function () {
                 }
             }
         }
-        this.visualization.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset);
+        this.visualization.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset, this._scale, this._tr);
         if (this.overview) {
             var totalNodes = this.dgraph.nodes().visible().length;
             var widthRatio = (this.bbox.x1 - this.bbox.x0) / totalNodes;
             var heightRatio = (this.bbox.y1 - this.bbox.y0) / totalNodes;
-            console.log("overview");
             var ratio = totalNodes * this.cellSize;
-            this.overview.updateFocus(this.bbox.x0 / totalNodes, this.bbox.y0 / totalNodes, widthRatio, heightRatio, ratio);
+            this.overview.updateFocus(this.bbox.x0 / totalNodes, this.bbox.y0 / totalNodes, widthRatio, heightRatio, ratio, this._scale, this._tr);
         }
         if (this.labels) {
             this.labels.updateData(leftNodes, topNodes, this.cellSize, this.nodeOrder, this.offset[1], this.offset[0], this.bbox);

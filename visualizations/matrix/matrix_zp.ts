@@ -172,11 +172,12 @@ class MatrixOverview{
     this.matrix = matrix;
     this.width = width;
     this.height = height;
+    this.ratio = 1;
     this.init();
   }
   init(){
 
-    this.focusColor = "#333";
+    this.focusColor = "#ccc";
 
     this.svg.append('g')
       .append("rect")
@@ -211,16 +212,20 @@ class MatrixOverview{
     tr[1] = -tr[1]*this.ratio;
     this.matrix.updateTransform(z, tr);
   }
-  updateFocus(f: number, l: number, w: number, h: number, r: number){
-    console.log(w, h);
-    console.log(f, l);
-
+  updateFocus(matrixX0: number, matrixY0: number,
+              visibleW: number, visibleH: number,
+              r: number,
+              z: number, tr: number[]){
+    tr[0] = -tr[0]/this.ratio;
+    tr[1] = -tr[1]/this.ratio;
     this.ratio = r/this.height;
+    this.zoom.scale(z);
+    this.zoom.translate(tr);
 
-    let focusX = f*this.width;
-    let focusY = l*this.height;
-    let focusWidth = Math.min(w*this.width, this.width);
-    let focusHeight = Math.min(h*this.height, this.height);
+    let focusX = matrixX0*this.width;
+    let focusY = matrixY0*this.height;
+    let focusWidth = Math.min(visibleW*this.width, this.width);
+    let focusHeight = Math.min(visibleH*this.height, this.height);
     focusWidth = (focusX + focusWidth) > this.width? this.width-focusX: focusWidth;
     focusHeight = (focusY + focusHeight) > this.height? this.height-focusY: focusHeight;
     this.focus.attr("width", focusWidth)
@@ -498,13 +503,17 @@ class MatrixVisualization{
   updateData(data:  {[id: number]: {[id: number]: networkcube.NodePair}},
              nrows: number, ncols: number,
              cellSize: number,
-             offset: number[]
+             offset: number[],
+             scale: number,
+             tr: number[]
   ){
     this.data = data;
     this.nrows = nrows;
     this.ncols = ncols;
     this.offset = offset;
     this.cellSize = cellSize;
+    this.zoom.scale(scale);
+    this.zoom.translate(tr);
 
 
     if (this.geometry){
@@ -734,8 +743,9 @@ class MatrixVisualization{
     this.mouseDown = false;
     this.view.call(this.zoom);
     for(let id of this.hoveredLinks){
-      for(let frame of this.cellHighlightFrames[id])
-        this.scene.remove(frame);
+      if(this.cellHighlightFrames[id])
+        for(let frame of this.cellHighlightFrames[id])
+          this.scene.remove(frame);
     }
     this.hoveredLinks = [];
   }
@@ -894,7 +904,8 @@ class Matrix{
         this.nodeOrder[visibleNodes[i].id()] = i;
       }
     }
-    this.updateVisibleData();
+
+    this.updateTransform(this._scale, [0,0]);
 
   }
 
@@ -927,7 +938,6 @@ class Matrix{
 
     this.offset[0] = (this._tr[0]/this._cellSize + this.bbox.x0)*this._cellSize;
     this.offset[1] = (this._tr[1]/this._cellSize + this.bbox.y0)*this._cellSize;
-
   }
 
   updateVisibleData(){
@@ -965,17 +975,16 @@ class Matrix{
     this.visualization.updateData(visibleData,
       leftNodes.length, topNodes.length,
       this.cellSize,
-      this.offset);
+      this.offset, this._scale, this._tr);
 
     if(this.overview){
       let totalNodes = this.dgraph.nodes().visible().length;
       let widthRatio = (this.bbox.x1 - this.bbox.x0)/totalNodes;
       let heightRatio = (this.bbox.y1 - this.bbox.y0)/totalNodes;
-      console.log("overview");
       let ratio = totalNodes*this.cellSize;
       this.overview.updateFocus(this.bbox.x0/totalNodes, this.bbox.y0/totalNodes,
                                 widthRatio, heightRatio,
-                                ratio);
+                                ratio, this._scale, this._tr);
     }
 
     if(this.labels){
