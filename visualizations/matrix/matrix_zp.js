@@ -119,20 +119,30 @@ var MatrixOverview = (function () {
     }
     MatrixOverview.prototype.init = function () {
         this.focusColor = "#ccc";
-        this.svg.append('g')
-            .append("rect")
+        var g = this.svg.append('g');
+        this.contextPattern = g.append("defs")
+            .append("pattern")
+            .attr("id", "bg")
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr("width", this.width)
+            .attr("height", this.height);
+        this.contextImg = this.contextPattern.append("image")
+            .attr("x", 0)
+            .attr("y", (-this.width / 1.90))
+            .attr("width", this.width * 2.05)
+            .attr("height", this.height * 2.05);
+        this.context = g.append("rect")
             .attr("class", "context")
             .attr("width", this.width)
             .attr("height", this.height)
             .attr("stroke", "black")
             .attr("fill", "white");
-        var g = this.svg.append('g');
+        g = this.svg.append('g');
         this.focus = g.append("rect")
             .attr("class", "focus")
             .attr("fill", this.focusColor)
             .attr("fill-opacity", .2);
         this.zoom = d3.behavior.zoom()
-            .scaleExtent([0.2, 4])
             .on('zoom', this.zoomed);
         this.focus.call(this.zoom);
     };
@@ -157,6 +167,10 @@ var MatrixOverview = (function () {
             .attr("height", focusHeight)
             .attr("x", focusX)
             .attr("y", focusY);
+    };
+    MatrixOverview.prototype.updateOverviewImage = function (dataImg) {
+        this.contextImg.attr("xlink:href", dataImg);
+        this.context.attr("fill", "url(#bg)");
     };
     return MatrixOverview;
 }());
@@ -334,7 +348,6 @@ var MatrixVisualization = (function () {
         this.elem.node().appendChild(this.canvas);
         this.view = d3.select(this.canvas);
         this.zoom = d3.behavior.zoom()
-            .scaleExtent([0.2, 4])
             .on('zoom', this.zoomed);
         this.view.call(this.zoom);
         this.initGeometry();
@@ -350,7 +363,6 @@ var MatrixVisualization = (function () {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(0xffffff, 1);
-        var raycaster = new THREE.Raycaster();
         this.canvas = this.renderer.domElement;
         this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
         this.canvas.addEventListener('mousedown', this.mouseDownHandler);
@@ -382,7 +394,7 @@ var MatrixVisualization = (function () {
         d = new Date();
         console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
     };
-    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset, scale, tr) {
+    MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset, scale, tr, getImageData) {
         this.data = data;
         this.nrows = nrows;
         this.ncols = ncols;
@@ -417,6 +429,10 @@ var MatrixVisualization = (function () {
         this.geometry.attributes['customColor'].needsUpdate = true;
         this.scene.add(this.mesh);
         this.render();
+        if (getImageData) {
+            var imgData = this.canvas.toDataURL();
+            this.matrix.updateOverviewImage(imgData);
+        }
     };
     MatrixVisualization.prototype.addCell = function (row, col, pair) {
         var links;
@@ -609,6 +625,7 @@ var Matrix = (function () {
         this._tr = [0, 0];
         this.offset = [0, 0];
         this._scale = 1;
+        this.createOverviewImage = false;
         this.initialCellSize = 12;
         this._cellSize = this.initialCellSize;
         this.hoveredLinks = [];
@@ -632,9 +649,15 @@ var Matrix = (function () {
         enumerable: true,
         configurable: true
     });
+    Matrix.prototype.getOverviewScale = function () {
+        var totalNodes = this.dgraph.nodes().visible().length;
+        var cs = Math.min(this.visualization.height, this.visualization.width) / totalNodes;
+        var scale = cs / this.initialCellSize;
+        return scale;
+    };
     Matrix.prototype.setVis = function (matrixVis) {
         this.visualization = matrixVis;
-        this.updateTransform(1, [0, 0]);
+        this.resetTransform();
     };
     Matrix.prototype.setLabels = function (matrixLabels) {
         this.labels = matrixLabels;
@@ -651,10 +674,19 @@ var Matrix = (function () {
     Matrix.prototype.setTimeSlider = function (timeSlider) {
         this.timeSlider = timeSlider;
     };
+    Matrix.prototype.updateOverviewImage = function (dataImg) {
+        this.overview.updateOverviewImage(dataImg);
+    };
     Matrix.prototype.updateCellSize = function (value) {
         var scale = value / this.initialCellSize;
         var tr = [this._tr[0] * scale / this._scale, this._tr[1] * scale / this._scale];
         this.visualization.updateTransform(scale, tr);
+    };
+    Matrix.prototype.resetTransform = function () {
+        var scale = this.getOverviewScale();
+        this.createOverviewImage = true;
+        this.updateTransform(scale, [0, 0]);
+        this.createOverviewImage = false;
     };
     Matrix.prototype.updateTransform = function (scale, tr) {
         this._scale = scale;
@@ -715,21 +747,10 @@ var Matrix = (function () {
                 this.nodeOrder[visibleNodes[i].id()] = i;
             }
         }
-        this.updateTransform(this._scale, [0, 0]);
+        this.resetTransform();
     };
     Matrix.prototype.longestLabelLength = function () {
-        var longestLabelNode;
-        if (this.dgraph) {
-            longestLabelNode = this.dgraph.nodes().toArray().reduce(function (p, v, i, arr) {
-                if (p == null || p.label() == null ||
-                    (v.label() && v.label().length > p.label().length))
-                    return v;
-                else
-                    return p;
-            });
-        }
-        this.labelLength = longestLabelNode ? longestLabelNode.label().length + 8 : 8;
-        console.log(this.labelLength);
+        this.labelLength = 30;
     };
     Matrix.prototype.calculatePlotMargin = function () {
         this.margin.setMargin((this.labelLength * 0.5) * this.cellSize);
@@ -777,7 +798,7 @@ var Matrix = (function () {
                 }
             }
         }
-        this.visualization.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset, this._scale, this._tr);
+        this.visualization.updateData(visibleData, leftNodes.length, topNodes.length, this.cellSize, this.offset, this._scale, this._tr, this.createOverviewImage);
         if (this.overview) {
             var totalNodes = this.dgraph.nodes().visible().length;
             var widthRatio = (this.bbox.x1 - this.bbox.x0) / totalNodes;

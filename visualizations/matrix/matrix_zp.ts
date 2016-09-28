@@ -128,7 +128,7 @@ class CellLabel{
       .attr('y', -100)
       .style('fill', 0xffffff)
       .style('stroke', 0xffffff)
-      .style('opacity', 0)
+      .style('opacity', 0);
 
     this.cellLabel = glutils.selectAll()
       .data([{id:0}])
@@ -162,6 +162,9 @@ class MatrixOverview{
   private ratio: number;
   private focusColor: string;
   private focus: D3.Selection;
+  private context: D3.Selection;
+  private contextImg: D3.Selection;
+  private contextPattern: D3.Selection;
   private zoom: D3.Behavior.Zoom;
 
   constructor(svg: D3.Selection,
@@ -179,21 +182,33 @@ class MatrixOverview{
 
     this.focusColor = "#ccc";
 
-    this.svg.append('g')
-      .append("rect")
+    let g = this.svg.append('g');
+    this.contextPattern = g.append("defs")
+      .append("pattern")
+      .attr("id", "bg")
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr("width", this.width)
+      .attr("height", this.height);
+
+    this.contextImg = this.contextPattern.append("image")
+      .attr("x", 0)
+      .attr("y", (-this.width/1.90)) // TODO: those numbers are weird, I had to guess them
+      .attr("width", this.width*2.05)
+      .attr("height", this.height*2.05);
+    this.context = g.append("rect")
       .attr("class", "context")
       .attr("width", this.width)
       .attr("height", this.height)
       .attr("stroke", "black")
       .attr("fill", "white");
-    var g = this.svg.append('g');
+    g = this.svg.append('g');
     this.focus = g.append("rect")
       .attr("class", "focus")
       .attr("fill", this.focusColor)
       .attr("fill-opacity", .2);
 
     this.zoom = d3.behavior.zoom()
-      .scaleExtent([0.2, 4])
+      // .scaleExtent([0.2, 4])
       .on('zoom', this.zoomed);
 
     this.focus.call(this.zoom);
@@ -232,6 +247,10 @@ class MatrixOverview{
       .attr("height", focusHeight)
       .attr("x", focusX)
       .attr("y", focusY);
+  }
+  updateOverviewImage(dataImg){
+    this.contextImg.attr("xlink:href", dataImg);
+    this.context.attr("fill", "url(#bg)");
   }
 
 }
@@ -418,7 +437,7 @@ class MatrixVisualization{
     this.elem.node().appendChild(this.canvas);
     this.view = d3.select(this.canvas);
     this.zoom = d3.behavior.zoom()
-      .scaleExtent([0.2, 4])
+      //.scaleExtent([0.2, 4])
       .on('zoom', this.zoomed);
     this.view.call(this.zoom);
     this.initGeometry();
@@ -444,9 +463,6 @@ class MatrixVisualization{
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
     this.renderer.setSize(this.width, this.height)
     this.renderer.setClearColor(0xffffff, 1);
-
-    // raycaster
-    let raycaster: THREE.Raycaster = new THREE.Raycaster()
 
     // position canvas element containing cells
     this.canvas = this.renderer.domElement;
@@ -505,7 +521,8 @@ class MatrixVisualization{
              cellSize: number,
              offset: number[],
              scale: number,
-             tr: number[]
+             tr: number[],
+             getImageData: boolean
   ){
     this.data = data;
     this.nrows = nrows;
@@ -548,6 +565,10 @@ class MatrixVisualization{
 
     this.scene.add(this.mesh);
     this.render();
+    if(getImageData){
+      let imgData = this.canvas.toDataURL();
+      this.matrix.updateOverviewImage(imgData);
+    }
 
   }
 
@@ -783,6 +804,7 @@ class Matrix{
   public endTime: networkcube.Time;
   private nodeOrder: number[];
   private bbox: Box;
+  private createOverviewImage: boolean;
   private offset: number[];
   private _tr: number[];
   private _scale: number;
@@ -801,6 +823,7 @@ class Matrix{
     this._tr = [0, 0];
     this.offset = [0, 0];
     this._scale = 1;
+    this.createOverviewImage = false;
     this.initialCellSize = 12;
     this._cellSize = this.initialCellSize;
     this.hoveredLinks = [];
@@ -819,9 +842,15 @@ class Matrix{
     return this._cellSize;
   }
 
+  getOverviewScale(){
+    let totalNodes = this.dgraph.nodes().visible().length;
+    let cs = Math.min(this.visualization.height, this.visualization.width)/totalNodes;
+    let scale = cs/this.initialCellSize;
+    return scale;
+  }
   setVis(matrixVis: MatrixVisualization){
     this.visualization = matrixVis;
-    this.updateTransform(1, [0, 0]);
+    this.resetTransform();
   }
   setLabels(matrixLabels: MatrixLabels){
     this.labels = matrixLabels;
@@ -838,13 +867,21 @@ class Matrix{
   setTimeSlider(timeSlider: MatrixTimeSlider){
     this.timeSlider = timeSlider;
   }
+  updateOverviewImage(dataImg){
+    this.overview.updateOverviewImage(dataImg);
+  }
 
   updateCellSize(value: number){
     let scale = value/this.initialCellSize;
     let tr = [this._tr[0]*scale/this._scale, this._tr[1]*scale/this._scale];
     this.visualization.updateTransform(scale, tr);
   }
-
+  resetTransform(){
+    let scale = this.getOverviewScale();
+    this.createOverviewImage = true;
+    this.updateTransform(scale, [0, 0]);
+    this.createOverviewImage = false;
+  }
   updateTransform(scale, tr){
     this._scale = scale;
     this._tr = tr;
@@ -905,25 +942,26 @@ class Matrix{
       }
     }
 
-    this.updateTransform(this._scale, [0,0]);
+    this.resetTransform();
 
   }
 
 
   longestLabelLength(){
-    let longestLabelNode;
-    if(this.dgraph){
-      longestLabelNode = this.dgraph.nodes().toArray().reduce(
-        function(p, v, i, arr) {
-          if (p == null || p.label() == null ||
-            (v.label() && v.label().length > p.label().length))
-            return v;
-          else
-            return p;
-        });
-    }
-    this.labelLength = longestLabelNode ? longestLabelNode.label().length+8 : 8;
-    console.log(this.labelLength);
+    // let longestLabelNode;
+    // if(this.dgraph){
+    //   longestLabelNode = this.dgraph.nodes().toArray().reduce(
+    //     function(p, v, i, arr) {
+    //       if (p == null || p.label() == null ||
+    //         (v.label() && v.label().length > p.label().length))
+    //         return v;
+    //       else
+    //         return p;
+    //     });
+    // }
+    // this.labelLength = longestLabelNode ? longestLabelNode.label().length+8 : 8;
+    // this.labelLength = Math.min(this.labelLength, 30);
+    this.labelLength = 30;
   }
   calculatePlotMargin(){
     this.margin.setMargin((this.labelLength * 0.5) * this.cellSize);
@@ -973,9 +1011,10 @@ class Matrix{
       }
     }
     this.visualization.updateData(visibleData,
-      leftNodes.length, topNodes.length,
-      this.cellSize,
-      this.offset, this._scale, this._tr);
+                leftNodes.length, topNodes.length,
+                this.cellSize,
+                this.offset, this._scale, this._tr,
+                this.createOverviewImage);
 
     if(this.overview){
       let totalNodes = this.dgraph.nodes().visible().length;
