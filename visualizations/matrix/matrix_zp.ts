@@ -157,9 +157,8 @@ class MatrixOverview{
   private height: number;
   private matrix: Matrix;
   private svg: D3.Selection;
-  private tr: number[];
-  private scale: number;
   private ratio: number;
+  private canvasRatio: number;
   private focusColor: string;
   private focus: D3.Selection;
   private context: D3.Selection;
@@ -176,30 +175,31 @@ class MatrixOverview{
     this.width = width;
     this.height = height;
     this.ratio = 1;
+    this.canvasRatio = 1;
     this.init();
   }
   init(){
 
     this.focusColor = "#ccc";
 
+
     let g = this.svg.append('g');
     this.contextPattern = g.append("defs")
       .append("pattern")
       .attr("id", "bg")
-      .attr('patternUnits', 'userSpaceOnUse')
-      .attr("width", this.width)
-      .attr("height", this.height);
+      .attr('patternUnits', 'userSpaceOnUse');
+
 
     this.contextImg = this.contextPattern.append("image")
       .attr("x", 0)
-      .attr("y", (-this.width/1.90)) // TODO: those numbers are weird, I had to guess them
-      .attr("width", this.width*2.05)
-      .attr("height", this.height*2.05);
+      .attr("y", 0);
+
+
     this.context = g.append("rect")
       .attr("class", "context")
       .attr("width", this.width)
       .attr("height", this.height)
-      .attr("stroke", "black")
+      .attr("stroke", "#aaa")
       .attr("fill", "white");
     g = this.svg.append('g');
     this.focus = g.append("rect")
@@ -220,6 +220,16 @@ class MatrixOverview{
     z = this.zoom.scale();
     tr = this.zoom.translate();
     this.updateTransform(z, tr);
+  }
+
+  setCanvasRatio(canvasRatio: number){
+    this.canvasRatio = canvasRatio;
+    let w = this.canvasRatio>1? this.width*this.canvasRatio: this.width;
+    let h = this.canvasRatio<1? this.height*this.canvasRatio: this.height;
+    this.contextPattern.attr("width", w)
+      .attr("height", h);
+    this.contextImg.attr("width", w)
+      .attr("height", h);
   }
 
   updateTransform(z, tr){
@@ -281,12 +291,13 @@ class MatrixLabels{
     let labelsLeft = this.svg.selectAll('.labelsLeft')
       .data(leftNodes);
 
-    let leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize;
+    let leftLabelPosition = nodeId => this.margin.top + leftLabelOffset +  cellSize * (nodeOrder[nodeId] - bbox.y0) + cellSize/2;
 
     labelsLeft.enter().append('text')
       .attr('id', (d, i) => { return 'nodeLabel_left_' + d.id(); })
       .attr('class', 'labelsLeft nodeLabel')
       .attr('text-anchor', 'end')
+      .attr('alignment-baseline', 'middle')
       .attr('x', this.margin.left - 10)
       .attr('y', (d, i) => { return leftLabelPosition(d.id())})
       .on('mouseover', (d, i) => {
@@ -312,7 +323,7 @@ class MatrixLabels{
     let labelsTop = this.svg.selectAll('.labelsTop')
       .data(topNodes);
 
-    let topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize;
+    let topLabelPosition = nodeId => this.margin.left + topLabelOffset + cellSize * (nodeOrder[nodeId] - bbox.x0) + cellSize/2;
 
     labelsTop.enter().append('text')
       .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
@@ -320,7 +331,7 @@ class MatrixLabels{
       .text((d, i) => { return d.label(); })
       .attr('x', (d, i) => { return topLabelPosition(d.id())  })
       .attr('y', this.margin.left - 10)
-      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + cellSize * i + cellSize) + ', ' + (this.margin.left - 10) + ')' })
+      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + cellSize * i + cellSize/2) + ', ' + (this.margin.left - 10) + ')' })
       .on('mouseover', (d, i) => {
         this.matrix.highlightNodes([d.id()]);
       })
@@ -335,11 +346,12 @@ class MatrixLabels{
     labelsTop
       .attr('id', (d, i) => { return 'nodeLabel_top_' + d.id(); })
       .text((d, i) => { return d.label(); })
+      .attr('alignment-baseline', 'middle')
       .attr('x', (d, i) => {
         return topLabelPosition(d.id());
       })
       .attr('y', this.margin.top - 10)
-      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize) + ', ' + (this.margin.left - 10) + ')' });
+      .attr('transform', (d, i) => { return 'rotate(-90, ' + (this.margin.top + topLabelOffset + cellSize * (nodeOrder[d.id()]- bbox.x0) + cellSize/2) + ', ' + (this.margin.left - 10) + ')' });
 
     this.updateHighlightedNodes();
   }
@@ -362,7 +374,7 @@ class MatrixLabels{
         }
         return 100;
       })
-      .style('font-size', this.cellSize);
+      .style('font-size', Math.min(this.cellSize, 20));
 
     for (let i = 0; i < highlightedLinks.length; i++) {
       d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
@@ -461,7 +473,7 @@ class MatrixVisualization{
 
     // renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
-    this.renderer.setSize(this.width, this.height)
+    this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0xffffff, 1);
 
     // position canvas element containing cells
@@ -532,7 +544,6 @@ class MatrixVisualization{
     this.zoom.scale(scale);
     this.zoom.translate(tr);
 
-
     if (this.geometry){
       this.scene.remove(this.mesh);
     }
@@ -541,8 +552,11 @@ class MatrixVisualization{
         for(let frame of this.cellHighlightFrames[id])
           this.scene.remove(frame);
     }
+    for(let i=0 ; i<this.guideLines.length ; i++){
+      this.scene.remove(this.guideLines[i]);
+    }
 
-    this.updateGuideLines();
+
 
     this.vertexPositions = [];
     this.vertexColors = [];
@@ -569,7 +583,8 @@ class MatrixVisualization{
       let imgData = this.canvas.toDataURL();
       this.matrix.updateOverviewImage(imgData);
     }
-
+    this.updateGuideLines();
+    this.render();
   }
 
   addCell(row: number, col: number, pair: networkcube.NodePair){
@@ -645,9 +660,8 @@ class MatrixVisualization{
 
   }
   updateGuideLines(){
-    for(let i=0 ; i<this.guideLines.length ; i++){
-      this.scene.remove(this.guideLines[i]);
-    }
+    this.guideLines = [];
+
     if(!this.data) return;
     console.log("update guidelines")
 
@@ -850,6 +864,7 @@ class Matrix{
   }
   setVis(matrixVis: MatrixVisualization){
     this.visualization = matrixVis;
+    this.overview.setCanvasRatio(this.visualization.width/this.visualization.height);
     this.resetTransform();
   }
   setLabels(matrixLabels: MatrixLabels){
@@ -1145,12 +1160,12 @@ let matrixOverview = new MatrixOverview(svg, matrix.margin.left-2, matrix.margin
 let cellLabel = new CellLabel();
 
 
-matrix.setOverview(matrixOverview);
 matrix.setLabels(matrixLabels);
-matrix.setVis(matrixVis);
 matrix.setMenu(matrixMenu);
 matrix.setTimeSlider(matrixTimeSlider);
 matrix.setCellLabel(cellLabel);
+matrix.setOverview(matrixOverview);
+matrix.setVis(matrixVis);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 
 
