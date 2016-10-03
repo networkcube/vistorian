@@ -230,7 +230,7 @@ module glutils {
 
         elementQueries:WebGLElementQuery[] = []
 
-        constructor(){
+        constructor(params?:Object){
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
         }
@@ -249,6 +249,11 @@ module glutils {
             this.renderer.render(this.scene, this.camera)
             // d = new Date();
             // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
+        }
+
+
+        selectAll(){
+            return glutils.selectAll()
         }
 
         
@@ -284,7 +289,8 @@ module glutils {
     var webgl;
     export function initWebGL(parentId:string, width:number, height:number, params?:Object):WebGL{
         
-        webgl = new WebGL();
+        webgl = new WebGL(params);
+        
         
         webgl.camera = new THREE.OrthographicCamera(
             width/-2,
@@ -516,7 +522,10 @@ module glutils {
         text(v:any):WebGLElementQuery{
             var l = this.visualElements.length;
             for(var i=0 ; i<l ; i++){ 
-                setText(this.visualElements[i], v instanceof Function?v(this.dataElements[i], i):v);
+                this.visualElements[i]['text'] = v instanceof Function ? v(this.dataElements[i], i) : v
+                if(this.visualElements[i]['text'] == undefined)
+                    continue;
+                setText(this.visualElements[i], this.visualElements[i]['text']);
             }
             return this;
         }
@@ -535,7 +544,7 @@ module glutils {
             return this;
         }        
         
-        call(method:string, dataElement:T, event):WebGLElementQuery{
+        call(method:string, dataElement:any, event):WebGLElementQuery{
             var i = this.dataElements.indexOf(dataElement);
             switch(method){
                 case 'mouseover': this.mouseOverHandler(dataElement, i, event); break;
@@ -626,7 +635,7 @@ module glutils {
             element.wireframe.material.needsUpdate=true; 
     }
 
-    var textCtx
+    // var textCtx
     function setText(mesh:any, text:string, parConfig?:Object){
         var config = parConfig;            
         if(config == undefined){
@@ -638,7 +647,6 @@ module glutils {
         mesh['text'] = text;
         var backgroundMargin = 10;
         var txtCanvas = document.createElement("canvas");
-        // var textcanvas = document.getElementById("textCanvas");
         
         var context = txtCanvas.getContext("2d");
 
@@ -655,8 +663,7 @@ module glutils {
         // context.clearColor(1.0, 1.0, 0.0, 1.0)
         // context.clear(gl.COLOR_BUFFER_BIT)
         context.fillText(text, 0, txtCanvas.height / 2);
-        
-
+    
         var tex = new THREE.Texture(txtCanvas);
         tex.minFilter = THREE.LinearFilter
         tex.flipY = true;
@@ -673,6 +680,66 @@ module glutils {
         mesh.needsUpdate = true;
 
     }
+
+    // function setText(mesh:any, text:string, parConfig?:Object){
+    //     var SIZE = 10
+    //     var MARGIN = 2
+        
+        
+    //     var config = parConfig;            
+    //     if(config == undefined){
+    //         config = {};
+    //     }
+    //     if(config.color == undefined)        
+    //        config.color = '#000000'
+
+    //     var canvas = document.createElement("canvas");
+    //     var context = canvas.getContext("2d");
+    //     context.font = SIZE + "pt Arial";
+    //     var textWidth = context.measureText(text).width;
+    //     canvas.width = textWidth + MARGIN;
+    //     canvas.height = SIZE + MARGIN;
+    //     context = canvas.getContext("2d");
+    //     context.font = SIZE + "pt Arial";
+    //     // if(backGroundColor) {
+    //     //     context.fillStyle = backGroundColor;
+    //     //     context.fillRect(canvas.width / 2 - textWidth / 2 - backgroundMargin / 2, canvas.height / 2 - size / 2 - +backgroundMargin / 2, textWidth + backgroundMargin, size + backgroundMargin);
+    //     // }
+    //     context.textAlign = "left";
+    //     context.textBaseline = "middle";
+    //     context.fillStyle = config.color;;
+    //     context.fillText(text, canvas.width / 2, canvas.height / 2);
+    //     // context.strokeStyle = "black";
+    //     // context.strokeRect(0, 0, canvas.width, canvas.height);
+    //     var texture = new THREE.Texture(canvas);
+    //     texture.needsUpdate = true;
+    //     var material = new THREE.MeshBasicMaterial({
+    //         map : texture
+    //     });
+    //     // tex.minFilter = THREE.LinearFilter
+    //     // tex.flipY = true;
+    //     // tex.needsUpdate = true;
+
+    //     mesh.material.map = texture;
+    //     mesh.material.transparent = true;
+    //     mesh.material.needsUpdate = true;
+        
+    //     // adjust mesh geometry
+    //     mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
+    //     mesh.geometry.needsUpdate = true;
+    //     mesh.geometry.verticesNeedUpdate = true;
+    //     mesh.needsUpdate = true;
+    //     return mesh;
+        
+        
+    //     // var mesh = new THREE.Mesh(new THREE.PlaneGeometry(canvas.width, canvas.height), material);
+    //     // // mesh.overdraw = true;
+    //     // mesh.doubleSided = true;
+    //     // mesh.position.x = x - canvas.width;
+    //     // mesh.position.y = y - canvas.height;
+    //     // mesh.position.z = z;
+    //     // return mesh;
+    // }
 
     
     function setX1(mesh:THREE.Line, v){
@@ -1252,6 +1319,7 @@ module glutils {
             return intersectedElements;
         }
         intersectPaths(selection:WebGLElementQuery):any[]{
+            // console.log('intersect paths')
             var intersectedElements = []
             var e;
             var v1, v2
@@ -1261,7 +1329,13 @@ module glutils {
                 e = selection.visualElements[i];
                 for(var j = 1 ; j < e.geometry.vertices.length ; j++){
                     v1 = e.geometry.vertices[j-1] 
+                    v1 = {x: v1.x + selection.x[i],
+                          y: v1.y + selection.y[i]
+                    }
                     v2 = e.geometry.vertices[j]
+                    v2 = {x: v2.x + selection.x[i],
+                          y: v2.y + selection.y[i]
+                    }
                     if(distToSegmentSquared({x: this.mouse[0], y:this.mouse[1]}, v1, v2) < 3){
                         intersectedElements.push(selection.dataElements[i]);  
                         found = true;               

@@ -4,10 +4,12 @@ class SmartSlider {
 
     /* VISUALIZATION PARAMETERS */
     BAR_WIDTH: number = 5;
-    RADIUS_HANDLE: number = 4;
+    RADIUS_HANDLE: number = 5;
 
-    LEFT: number = this.RADIUS_HANDLE;
-    RIGHT: number = this.RADIUS_HANDLE;
+    // LEFT: number = this.RADIUS_HANDLE;
+    // RIGHT: number = this.RADIUS_HANDLE;
+    LEFT: number = 0;
+    RIGHT: number = 0;
     HEIGHT: number = 10;
     TOP: number = 0;
 

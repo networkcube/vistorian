@@ -9066,10 +9066,22 @@ var networkcube;
             _super.call(this, id, 'time', dynamicGraph);
         }
         Time.prototype.time = function () { return this.attr('momentTime'); };
+        Time.prototype.moment = function () { return this.attr('momentTime'); };
         Time.prototype.label = function () { return this.attr('label'); };
         Time.prototype.unixTime = function () { return this.attr('unixTime'); };
         Time.prototype.links = function () {
             return new LinkQuery(this.attr('links'), this.g);
+        };
+        Time.prototype.year = function () { return this.time().year(); };
+        Time.prototype.month = function () { return this.time().month(); };
+        Time.prototype.week = function () { return this.time().week(); };
+        Time.prototype.day = function () { return this.time().day(); };
+        Time.prototype.hour = function () { return this.time().hour(); };
+        Time.prototype.minute = function () { return this.time().minute(); };
+        Time.prototype.second = function () { return this.time().second(); };
+        Time.prototype.millisecond = function () { return this.time().millisecond(); };
+        Time.prototype.format = function (format) {
+            return this.time().format(format);
         };
         return Time;
     })(BasicElement);
@@ -10115,7 +10127,7 @@ var networkcube;
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
-    networkcube.GRANULARITY = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'millenium'];
+    networkcube.GRANULARITY = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'century', 'millenium'];
     networkcube.DGRAPH_SUB = "[*dgraph*]";
     networkcube.DGRAPH_SER_VERBOSE_LOGGING = false;
     function dgraphReviver(dgraph, key, value) {
@@ -10147,6 +10159,7 @@ var networkcube;
             this._nodePairs = [];
             this._locations = [];
             this._times = [];
+            this.timeObjects = [];
             this.matrix = [];
             this.nodeArrays = new NodeArray();
             this.linkArrays = new LinkArray();
@@ -10523,6 +10536,9 @@ var networkcube;
                 console.log('#TIMES:', this._times.length);
                 console.log('   minTime', this.timeArrays.label[0]);
                 console.log('   maxTime', this.timeArrays.label[this.timeArrays.length - 1]);
+                for (var g = 0; g <= networkcube.GRANULARITY.length; g++) {
+                    this.timeObjects.push([]);
+                }
             }
             if (this.timeArrays.length == 0) {
                 this.timeArrays.id.push(0);
@@ -11093,7 +11109,6 @@ var networkcube;
             s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
             this.selections.push(s);
-            console.log('Create new selection:', s.id);
             return s;
         };
         DynamicGraph.prototype.deleteSelection = function (selectionId) {
@@ -12851,8 +12866,8 @@ var networkcube;
         return SelectionMessage;
     })(Message);
     networkcube.SelectionMessage = SelectionMessage;
-    function timeRange(start, end, single, propagate) {
-        var m = new TimeRangeMessage(start, end, single);
+    function timeRange(startUnix, endUnix, single, propagate) {
+        var m = new TimeRangeMessage(startUnix, endUnix);
         if (propagate == undefined)
             propagate = false;
         if (propagate)
@@ -12863,11 +12878,10 @@ var networkcube;
     networkcube.timeRange = timeRange;
     var TimeRangeMessage = (function (_super) {
         __extends(TimeRangeMessage, _super);
-        function TimeRangeMessage(start, end, single) {
+        function TimeRangeMessage(start, end) {
             _super.call(this, networkcube.MESSAGE_TIME_RANGE);
-            this.startId = start.id();
-            this.endId = end.id();
-            this.singleId = single.id();
+            this.startUnix = start;
+            this.endUnix = end;
         }
         return TimeRangeMessage;
     })(Message);
@@ -13430,7 +13444,7 @@ var glutils;
     glutils.getMousePos = getMousePos;
     var txtCanvas = document.createElement("canvas");
     var WebGL = (function () {
-        function WebGL() {
+        function WebGL(params) {
             this.elementQueries = [];
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
@@ -13442,6 +13456,9 @@ var glutils;
                 }
             }
             this.renderer.render(this.scene, this.camera);
+        };
+        WebGL.prototype.selectAll = function () {
+            return glutils.selectAll();
         };
         WebGL.prototype.enableZoom = function (b) {
             if (b) {
@@ -13469,7 +13486,7 @@ var glutils;
     glutils.WebGL = WebGL;
     var webgl;
     function initWebGL(parentId, width, height, params) {
-        webgl = new WebGL();
+        webgl = new WebGL(params);
         webgl.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 1000);
         webgl.scene = new THREE.Scene();
         webgl.scene.add(webgl.camera);
@@ -13649,7 +13666,10 @@ var glutils;
         WebGLElementQuery.prototype.text = function (v) {
             var l = this.visualElements.length;
             for (var i = 0; i < l; i++) {
-                setText(this.visualElements[i], v instanceof Function ? v(this.dataElements[i], i) : v);
+                this.visualElements[i]['text'] = v instanceof Function ? v(this.dataElements[i], i) : v;
+                if (this.visualElements[i]['text'] == undefined)
+                    continue;
+                setText(this.visualElements[i], this.visualElements[i]['text']);
             }
             return this;
         };
@@ -13808,7 +13828,6 @@ var glutils;
         if (element.hasOwnProperty('wireframe'))
             element.wireframe.material.needsUpdate = true;
     }
-    var textCtx;
     function setText(mesh, text, parConfig) {
         var config = parConfig;
         if (config == undefined) {
@@ -14237,7 +14256,13 @@ var glutils;
                 e = selection.visualElements[i];
                 for (var j = 1; j < e.geometry.vertices.length; j++) {
                     v1 = e.geometry.vertices[j - 1];
+                    v1 = { x: v1.x + selection.x[i],
+                        y: v1.y + selection.y[i]
+                    };
                     v2 = e.geometry.vertices[j];
+                    v2 = { x: v2.x + selection.x[i],
+                        y: v2.y + selection.y[i]
+                    };
                     if (distToSegmentSquared({ x: this.mouse[0], y: this.mouse[1] }, v1, v2) < 3) {
                         intersectedElements.push(selection.dataElements[i]);
                         found = true;

@@ -64,7 +64,6 @@ function updateList(type, name) {
         .attr('transform', 'translate(' + INTENT + ',0)');
     d3.selectAll('.selectionDiv_' + type)
         .style('background-color', function (d) {
-        console.log('set background color', dgraph.currentSelection_id, d.id);
         if (dgraph.currentSelection_id == d.id)
             return '#cccccc';
         return '#ffffff';

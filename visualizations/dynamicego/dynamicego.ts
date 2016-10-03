@@ -14,15 +14,15 @@ var linkTypes = dgraph.links().linkTypes();
 
 // VIS PARAMETERS
 var WIDTH = window.innerWidth;
-var TABLE_LEFT = 200
+var TABLE_MARGIN_LEFT = 200
+var TABLE_PADDING_LEFT = 5
 var TABLE_RIGHT = 100
 var ROW_HEIGHT = 13;
 var COL_WIDTH = 10;
 var LINK_OPACITY= .2
 var NODE_OPACITY= .6
-var LINK_ANCHOR_RADIUS = 3;
-var ANCHOR_END_DIAMETER = 3;
-var ANCHOR_START_DIAMETER = 2;
+var ANCHOR_END_DIAMETER = 2;
+var ANCHOR_START_DIAMETER = 4;
 var NODE_LABEL_COLOR = '#000'
 var NODE_LABEL_WEIGHT = 300
 var LABEL_ORDER
@@ -33,8 +33,6 @@ var TIMELABEL_OPACITY = .3;
 var MARGIN_TOP = 70;
 var TABLE_TOP = 50;
 
-
-
 // VIS ELEMENTS
 var svg;
 var nodeYPosFunction = d3.scale.linear();
@@ -42,10 +40,10 @@ var timeXFunction = d3.scale.linear();
 // var linkTypeOffset = d3.scale.linear().range([0,ROW_HEIGHT]);
 // var linkTypeOffset = d3.scale.linear().range([ROW_HEIGHT/2,ROW_HEIGHT/2]);
 var bar;
-var row
-var startAnchors:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
-var endAnchors:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
-var arcs:glutils.WebGLElementQuery<networkcube.Link,THREE.Mesh>;
+var nodeLabel
+var startAnchors:glutils.WebGLElementQuery;
+var endAnchors:glutils.WebGLElementQuery;
+var arcs:glutils.WebGLElementQuery;
 var tickTimes = []
 // var timeLabels:glutils.WebGLElementQuery<networkcube.Time,THREE.Mesh>;
 var timeLabelHoverFields;
@@ -54,10 +52,10 @@ var egoNode:networkcube.Node;
 // STATES
 var isShownNoneEgoLinks = true;
 var yearOffset = 0
-var timeStartId = times[0].id();
-var timeEndId = times[times.length-1].id();
+var startUnix = times[0].unixTime();
+var endUnix = times[times.length-1].unixTime();
 var nodesScrollStart = 0;
-var cell_width = 13
+// var cell_width = 13
 var granualarity = dgraph.getMinGranularity();
 var globalNodeOrder = nodes.slice(0);
 var currentNodeOrder=[]
@@ -73,18 +71,17 @@ var lineFunction = d3.svg.line()
 
 
 // UI SETUP
-
-
 var HEIGHT = window.innerHeight;
 $('#visDiv').append('<svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg>');
 // $('#visCanvasFO').append(canvas);
 d3.select('#visCanvasFO')
-    .attr('x', TABLE_LEFT)
+    .attr('x', TABLE_MARGIN_LEFT)
     .attr('y', MARGIN_TOP)
     .attr('width', WIDTH)
     .attr('height', HEIGHT)
-    
-    
+
+
+
 /////////////
 /// WEBGL ///
 /////////////
@@ -98,6 +95,8 @@ webgl.camera.position.x = WIDTH/2;
 webgl.camera.position.y = -HEIGHT/2;
 webgl.camera.position.z = 1000;
 
+// TIMELINE
+var timeline = new Timeline(webgl, dgraph, TABLE_PADDING_LEFT-1, 0, WIDTH-TABLE_MARGIN_LEFT-TABLE_RIGHT, TABLE_TOP)
 
 // VERTICAL SCROLL EVENT
 window.addEventListener("mousewheel", mouseWheelHandler, false);
@@ -110,7 +109,7 @@ $('#menu').append('\
             </select>\
             '); 
 
-var timeSlider:TimeSlider = new TimeSlider(dgraph, WIDTH-100-TABLE_LEFT);
+var timeSlider:TimeSlider = new TimeSlider(dgraph, WIDTH-100-TABLE_MARGIN_LEFT);
 
 // init webgl raycaster
 this.visualize();
@@ -118,15 +117,16 @@ this.visualize();
 function visualize(){
     
     // SET UP GLOBAL PARAMETERS
-    cell_width = (WIDTH-TABLE_LEFT-TABLE_RIGHT) / times.length;
     nodeYPosFunction.domain([0,nodes.length-1])
         .range([TABLE_TOP+ROW_HEIGHT, TABLE_TOP+ROW_HEIGHT*nodes.length])
 
-    timeXFunction.domain([0,times.length-1])
-        .range([cell_width, times.length*cell_width])
-    
-    // linkTypeOffset.domain([0,linkTypes.length-1]);
-    // linkTypeOffset.domain([0,linkTypes.length-1]);
+    startUnix = times[0].unixTime();
+    endUnix = times[times.length-1].unixTime();    
+    console.log('timeXFunction(startUnix)', timeXFunction(startUnix))
+
+    timeXFunction
+        .domain([startUnix,endUnix])
+        .range([5, WIDTH - TABLE_MARGIN_LEFT - TABLE_RIGHT])
     
     
     // create svg
@@ -134,8 +134,7 @@ function visualize(){
     svg = d3.select('#visSvg')
         .attr('width', WIDTH)
         .attr('height', ROW_HEIGHT*nodes.length + 200)
-    timeSlider.appendTo(svg, TABLE_LEFT);
-
+    timeSlider.appendTo(svg, TABLE_MARGIN_LEFT);
 
     createNodes()
     createTimes()
@@ -148,12 +147,13 @@ var rowBars;
 function createNodes(){   
 
     // DRAW NODES
-    row = svg.selectAll('.nodeLabel')
+    nodeLabel = svg.selectAll('.nodeLabel')
         .data(nodes)
         .enter()
         .append('text')
-            .attr('x', TABLE_LEFT)
-            .attr('y', (d)=>MARGIN_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT-5)
+            .attr('x', TABLE_MARGIN_LEFT-5)
+            .attr('y', (d)=>
+                MARGIN_TOP + nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT-5)
             .text((d)=>{ return d.label() + ' ('+d.neighbors().size()+')';})
             .attr('class', 'nodeLabel')
             .style('font-weight', NODE_LABEL_WEIGHT)
@@ -174,9 +174,9 @@ function createNodes(){
         .data(nodes.slice(0))
         .filter((d,i)=> i%2==0 )
         .append('rect')
-        .attr('x', 5)
+        .attr('x', TABLE_PADDING_LEFT)
         .attr('y', (d,i)=>-nodeYPosFunction(i*2))
-        .attr('width', WIDTH-TABLE_LEFT-TABLE_RIGHT)
+        .attr('width', WIDTH-TABLE_MARGIN_LEFT-TABLE_RIGHT)
         .attr('height', ROW_HEIGHT)
         .style('fill', (d,i)=>i%3==2?0xdddddd:0xeeeeee)
         .style('stroke', (d,i)=>i%3==2?0xdddddd:0xeeeeee)
@@ -202,7 +202,7 @@ function createTimes(){
     timeLabelHoverFields = glutils.selectAll()
         .data(times)
         .append('rect')
-            .attr('x', (d,i)=> this.timeXFunction(i)-6)
+            .attr('x', (d,i)=> this.timeXFunction(d.unixTime())-6)
             .attr('y', (d)=> -TABLE_TOP + getTimeFormatted(d).length*8)
             .attr('z', 2)
             // .style('fill', '#ff0000')
@@ -210,7 +210,6 @@ function createTimes(){
             .attr('width', 12)
             .attr('height', (d)=> getTimeFormatted(d).length*8)
             .on('mouseover', (d, i) => {
-                console.log('mouse over time !!!')
                 networkcube.highlight('set', <networkcube.ElementCompound>{ times: [d] });
             })
             .on('mouseout', (d, i) => {
@@ -228,7 +227,7 @@ function createTimes(){
             //     networkcube.selection('add', <networkcube.ElementCompound>{ times: [d] });
             // });  
      
-     updateTimeGranularity();
+    //  updateTimeGranularity();
     
 }
 
@@ -251,59 +250,49 @@ function createLinks(){
         // CREATE ANCHORS
         startAnchors = glutils.selectAll().data(links);
         startAnchors.append('circle')
-            .attr('x', (l,i)=>this.timeXFunction(l.times().toArray()[0].id()))
+            .attr('x', (l,i)=>
+                timeXFunction(l.times().toArray()[0].unixTime()))
             .attr('y', (l,i)=>{
                 y1 = this.nodeYPosFunction(currentNodeOrder[l.source.id()]);
-                // yOffset = linkTypeOffset(this.linkTypes.indexOf(l.linkType()));
                 yOffset = ROW_HEIGHT/2;
-                return  -(y1 + yOffset)-ANCHOR_START_DIAMETER/2;
+                return  -(y1 + yOffset);
             })
+            .attr('z', 2)            
             .attr('r', ANCHOR_START_DIAMETER)
             .style('fill', (l)=>l.getSelections()[0].color)
-            .on('mouseover', (d, i) => {
-                networkcube.highlight('set', <networkcube.ElementCompound>{ links: [d] });
-            })
-            .on('mouseout', (d, i) => {
-                networkcube.highlight('reset');
-            })
+  
         // CREATE ANCHORS
         endAnchors = glutils.selectAll().data(links);
         endAnchors.append('circle')
-            .attr('x', (l,i)=>this.timeXFunction(l.times().toArray()[0].id()))
+            .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime()))
             .attr('y', (l,i)=>{
                 y2 = this.nodeYPosFunction(currentNodeOrder[l.target.id()]);
-                // yOffset = linkTypeOffset(this.linkTypes.indexOf(l.linkType()));
                 yOffset = ROW_HEIGHT/2;
-                return  -(y2 + yOffset)+ANCHOR_END_DIAMETER/2;
+                return  -(y2 + yOffset);
             })
+            .attr('z', 2)            
             .attr('r', ANCHOR_END_DIAMETER)
             .style('fill', (l)=>l.getSelections()[0].color)
-            .on('mouseover', (d, i) => {
-                networkcube.highlight('set', <networkcube.ElementCompound>{ links: [d] });
-            })
-            .on('mouseout', (d, i) => {
-                networkcube.highlight('reset');
-            })
- 
+    
          // CREATE ARCS
          arcs = glutils.selectAll()
             .data(links)
             .append('path')
             .attr('d', (l)=>makeArcPath(l))
-            .attr('x', (l,i)=>this.timeXFunction(l.times().toArray()[0].id()))
-            // .attr('y', (l,i)=>-linkTypeOffset(this.linkTypes.indexOf(l.linkType())))
+            .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime()))
             .attr('y', (l,i)=>-ROW_HEIGHT/2)
             .attr('z', 10)
             .style('stroke', (l)=> l.getSelections()[0].color)
             .style('stroke-width', 1)
             .style('opacity', .3)
             .on('mouseover', (d, i) => {
-                console.log('mouseover arc!!!')
+                console.log('mouse over year', d.times().get(0).format('DD/MM, YYYY'))
                 networkcube.highlight('set', <networkcube.ElementCompound>{ links: [d] });
+                timeline.highlight(d.times().get(0).unixTime())
             })
             .on('mouseout', (d, i) => {
-                console.log('mouseout arc :()')
                 networkcube.highlight('reset');
+                // timeline.highlight()
             })
     }
 
@@ -312,113 +301,95 @@ function createLinks(){
 
 function timeRangeHandler(m:networkcube.TimeRangeMessage){    
     
-    var start = dgraph.time(m.startId)
-    var end = dgraph.time(m.endId)
+    startUnix = m.startUnix;
+    endUnix = m.endUnix;
 
-    timeSlider.set(start, end);
+    timeSlider.set(startUnix, endUnix);
 
-    // update timeXFunction
-    cell_width = (WIDTH - TABLE_LEFT - TABLE_RIGHT)/(end.id() - start.id())
     timeXFunction
-        .domain([start.id(), end.id()])
-        .range([cell_width, (end.id()-start.id()) * cell_width])
+        .domain([startUnix, endUnix])
         
-    timeStartId = start.id();
-    timeEndId = end.id();
-    
     // update link positions
     arcs   
-        .attr('x', (l,i) => timeXFunction(l.times().toArray()[0].id()))
-        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].id())<5?0:1)
+        .attr('x', (l,i) => timeXFunction(l.times().toArray()[0].unixTime()))
+        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime())<5?0:1)
 
     startAnchors   
-        .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].id()))
-        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].id())<5?0:1)
+        .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime()))
+        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime())<5?0:1)
 
     endAnchors   
-        .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].id()))
-        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].id())<5?0:1)
+        .attr('x', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime()))
+        .style('opacity', (l,i)=>timeXFunction(l.times().toArray()[0].unixTime())<5?0:1)
     
     updateLinks();
-    
-    // update time positions and visibility
-    
-    // timeLabels
-    //     .attr('x', (d,i) => timeXFunction(d.id()))
-    //     .style('opacity', (d)=> d.id()<timeStartId || d.id()>timeEndId ? 0:TIMELABEL_OPACITY)
-    // timeLabelHoverFields
-    //     .attr('x', (d,i) => timeXFunction(d.id())-6)
-    
-    // need to change granularity? 
-    // var num_ticks = Math.floor((WIDTH-TABLE_LEFT-TABLE_RIGHT) / cell_width);
 
+    timeline.update(startUnix, endUnix)
     
-    updateTimeGranularity()
-
     webgl.render();
 }
 
-function updateTimeGranularity(){
+// function updateTimeGranularity(){
     
-    tickTimes = dgraph.times().toArray();
-    granualarity = dgraph.getMinGranularity();
-    var tick_width = cell_width
-    var allWidth = tickTimes.length * tick_width; 
-    while (
-        tickTimes.length > 0 
-        && granualarity <= dgraph.getMaxGranularity()
-        && tick_width < TIME_TICK_GAP_MAX) {
-        granualarity++;
-        tickTimes = [];
-        var curr_t = times[0].time();
-        var id = 1;
-        var count = 0
-        var d
-        while (id < times.length) {
-            if (granualarity == 1) {
-                if (times[id].time().second() != curr_t.second()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 2) {
-                if (times[id].time().minute() != curr_t.minute()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 3) {
-                if (times[id].time().hour() != curr_t.hour()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 4) {
-                if (times[id].time().day() != curr_t.day()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 5) {
-                if (times[id].time().week() != curr_t.week()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 6) {
-                if (times[id].time().month() != curr_t.month()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            } else if (granualarity == 7) {
-                if (times[id].time().year() != curr_t.year()) {
-                    curr_t = times[id].time();
-                    tickTimes.push(times[id])
-                }
-            }
-            id++;
-        }
-        tick_width = allWidth / tickTimes.length;
+//     tickTimes = dgraph.times().toArray();
+//     granualarity = dgraph.getMinGranularity();
+//     // var tick_width = cell_width
+//     var allWidth = tickTimes.length * tick_width; 
+//     while (
+//         tickTimes.length > 0 
+//         && granualarity <= dgraph.getMaxGranularity()
+//         && tick_width < TIME_TICK_GAP_MAX) {
+//         granualarity++;
+//         tickTimes = [];
+//         var curr_t = times[0].time();
+//         var id = 1;
+//         var count = 0
+//         var d
+//         while (id < times.length) {
+//             if (granualarity == 1) {
+//                 if (times[id].time().second() != curr_t.second()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 2) {
+//                 if (times[id].time().minute() != curr_t.minute()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 3) {
+//                 if (times[id].time().hour() != curr_t.hour()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 4) {
+//                 if (times[id].time().day() != curr_t.day()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 5) {
+//                 if (times[id].time().week() != curr_t.week()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 6) {
+//                 if (times[id].time().month() != curr_t.month()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             } else if (granualarity == 7) {
+//                 if (times[id].time().year() != curr_t.year()) {
+//                     curr_t = times[id].time();
+//                     tickTimes.push(times[id])
+//                 }
+//             }
+//             id++;
+//         }
+//         tick_width = allWidth / tickTimes.length;
         
-    }    
+//     }    
    
-    updateTimes(); 
-}
+//     updateTimes(); 
+// }
 
 function updateEventHandler(m:networkcube.Message){
     if(m.type == networkcube.MESSAGE_SELECTION_FILTER){
@@ -461,7 +432,6 @@ function updateCurrentOrder(){
 }
 
 function updateLinks(){
-    // console.log('nodesScrollStart', nodesScrollStart)
     arcs
         .style('stroke-width', (d)=>
             d.isHighlighted() 
@@ -473,9 +443,9 @@ function updateLinks(){
             !d.isVisible()
             || currentNodeOrder[d.source.id()] < nodesScrollStart
             || currentNodeOrder[d.target.id()] < nodesScrollStart
-            || d.times().get(0).id() < timeStartId 
-            || d.times().get(0).id() > timeEndId 
-            ?0:
+            || d.times().get(0).unixTime() < startUnix 
+            || d.times().get(0).unixTime() > endUnix 
+            ? 0:
             d.isHighlighted() 
             || d.source.isHighlighted() 
             || d.target.isHighlighted()
@@ -484,39 +454,33 @@ function updateLinks(){
         .style('stroke', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 
     endAnchors
-        .attr('r', (d)=>
-            d.isHighlighted() 
-            || d.source.isHighlighted()  
-            || d.target.isHighlighted()
-            || d.times().highlighted().size() > 0
-            ?LINK_ANCHOR_RADIUS+1:LINK_ANCHOR_RADIUS)
         .style('opacity', (d:networkcube.Link)=>
             !d.isVisible()
-            // || currentNodeOrder[d.source.id()] < nodesScrollStart
             || currentNodeOrder[d.target.id()] < nodesScrollStart
-            || d.times().get(0).id() < timeStartId 
-            || d.times().get(0).id() > timeEndId 
-            ?0:
-            d.isHighlighted() 
-            || d.source.isHighlighted() 
-            || d.target.isHighlighted()
-            || d.times().highlighted().size() > 0
-            ?1:.5)
+            || d.times().get(0).unixTime() < startUnix 
+            || d.times().get(0).unixTime() > endUnix 
+            ? 0
+            : d.isHighlighted() 
+                || d.source.isHighlighted() 
+                || d.target.isHighlighted()
+                || d.times().highlighted().size() > 0
+            ? 1
+            :.5)
         .style('fill', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 
     startAnchors
         .style('opacity', (d:networkcube.Link)=>
             !d.isVisible()
             || currentNodeOrder[d.source.id()] < nodesScrollStart
-            // || currentNodeOrder[d.target.id()] < nodesScrollStart
-            || d.times().get(0).id() < timeStartId 
-            || d.times().get(0).id() > timeEndId 
-            ?0:
-            d.isHighlighted() 
-            || d.source.isHighlighted() 
-            || d.target.isHighlighted()
-            || d.times().highlighted().size() > 0
-            ?1:.5)
+            || d.times().get(0).unixTime() < startUnix 
+            || d.times().get(0).unixTime() > endUnix 
+            ? 0
+            : d.isHighlighted() 
+                || d.source.isHighlighted() 
+                || d.target.isHighlighted()
+                || d.times().highlighted().size() > 0
+            ? 1
+            : .5)
         .style('fill', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 }
 
@@ -551,14 +515,12 @@ function updateLinkPositions(){
     startAnchors
         .attr('y', (l,i)=>{
             y1 = this.nodeYPosFunction(currentNodeOrder[l.source.id()]);
-            // yOffset = linkTypeOffset(this.linkTypes.indexOf(l.linkType()));
             yOffset = ROW_HEIGHT/2;
-            return  -(y1 + yOffset)-ANCHOR_START_DIAMETER/2;
-        })
+            return  -(y1 + yOffset)+ANCHOR_START_DIAMETER/2;
+       })
     endAnchors
         .attr('y', (l,i)=>{
             y2 = this.nodeYPosFunction(currentNodeOrder[l.target.id()]);
-            // yOffset = linkTypeOffset(this.linkTypes.indexOf(l.linkType()));
             yOffset = ROW_HEIGHT/2;
             return  -(y2 + yOffset)+ANCHOR_END_DIAMETER/2;
         })

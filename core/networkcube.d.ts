@@ -108,9 +108,19 @@ declare module networkcube {
     class Time extends BasicElement {
         constructor(id: number, dynamicGraph: DynamicGraph);
         time(): Moment;
+        moment(): Moment;
         label(): String;
         unixTime(): number;
         links(): LinkQuery;
+        year(): number;
+        month(): number;
+        week(): number;
+        day(): number;
+        hour(): number;
+        minute(): number;
+        second(): number;
+        millisecond(): number;
+        format(format: any): string;
     }
     class Node extends BasicElement {
         constructor(id: number, graph: DynamicGraph);
@@ -357,6 +367,7 @@ declare module networkcube {
         _nodePairs: NodePair[];
         _locations: Location[];
         _times: Time[];
+        timeObjects: any[];
         nodeOrders: Ordering[];
         matrix: number[][];
         nodeArrays: NodeArray;
@@ -689,12 +700,11 @@ declare module networkcube {
         idCompound: IDCompound;
         constructor(action: string, idCompound: IDCompound, selectionId?: number);
     }
-    function timeRange(start: Time, end: Time, single: Time, propagate?: boolean): void;
+    function timeRange(startUnix: number, endUnix: number, single: Time, propagate?: boolean): void;
     class TimeRangeMessage extends Message {
-        startId: number;
-        endId: number;
-        singleId: number;
-        constructor(start: Time, end: Time, single: Time);
+        startUnix: number;
+        endUnix: number;
+        constructor(start: number, end: number);
     }
     function createSelection(type: string, name: string): Selection;
     class CreateSelectionMessage extends Message {
@@ -797,18 +807,19 @@ declare module glutils {
         geometry: THREE.BufferGeometry;
         interactor: WebGLInteractor;
         elementQueries: WebGLElementQuery[];
-        constructor();
+        constructor(params?: Object);
         render(): void;
+        selectAll(): WebGLElementQuery;
         enableZoom(b?: boolean): void;
         enablePanning(b: boolean): void;
         enableHorizontalPanning(b: boolean): void;
     }
     function initWebGL(parentId: string, width: number, height: number, params?: Object): WebGL;
     function setWebGL(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.Renderer, canvas: any): void;
-    function selectAll(): WebGLElementQuery<any, any>;
-    class WebGLElementQuery<T, S> {
-        dataElements: T[];
-        visualElements: S[];
+    function selectAll(): WebGLElementQuery;
+    class WebGLElementQuery {
+        dataElements: Object[];
+        visualElements: Object[];
         mesh: THREE.Mesh;
         children: Object[];
         scene: THREE.Scene;
@@ -831,19 +842,19 @@ declare module glutils {
         updateStyle: boolean;
         IS_SHADER: boolean;
         constructor();
-        data(arr: T[]): WebGLElementQuery<T, S>;
-        append(shape: string): WebGLElementQuery<T, S>;
-        push(e: any): WebGLElementQuery<T, S>;
-        getData(i: S): T;
-        getVisual(i: T): S;
+        data(arr: Object[]): WebGLElementQuery;
+        append(shape: string): WebGLElementQuery;
+        push(e: any): WebGLElementQuery;
+        getData(i: any): any;
+        getVisual(i: any): any;
         length: number;
-        filter(f: Function): WebGLElementQuery<T, S>;
-        attr(name: string, v: any): WebGLElementQuery<T, S>;
-        style(name: string, v: any): WebGLElementQuery<T, S>;
-        set(): WebGLElementQuery<T, S>;
-        text(v: any): WebGLElementQuery<T, S>;
-        on(event: string, f: Function): WebGLElementQuery<T, S>;
-        call(method: string, dataElement: T, event: any): WebGLElementQuery<T, S>;
+        filter(f: Function): WebGLElementQuery;
+        attr(name: string, v: any): WebGLElementQuery;
+        style(name: string, v: any): WebGLElementQuery;
+        set(): WebGLElementQuery;
+        text(v: any): WebGLElementQuery;
+        on(event: string, f: Function): WebGLElementQuery;
+        call(method: string, dataElement: any, event: any): WebGLElementQuery;
         setAttr(element: THREE.Mesh, attr: string, v: any, index: number): void;
         removeAll(): void;
     }
@@ -866,23 +877,23 @@ declare module glutils {
         lassoStartHandler: Function;
         lassoMoveHandler: Function;
         lassoEndHandler: Function;
-        mouseOverSelections: WebGLElementQuery<any, any>[];
-        mouseMoveSelections: WebGLElementQuery<any, any>[];
-        mouseOutSelections: WebGLElementQuery<any, any>[];
-        mouseDownSelections: WebGLElementQuery<any, any>[];
-        mouseUpSelections: WebGLElementQuery<any, any>[];
-        clickSelections: WebGLElementQuery<any, any>[];
+        mouseOverSelections: WebGLElementQuery[];
+        mouseMoveSelections: WebGLElementQuery[];
+        mouseOutSelections: WebGLElementQuery[];
+        mouseDownSelections: WebGLElementQuery[];
+        mouseUpSelections: WebGLElementQuery[];
+        clickSelections: WebGLElementQuery[];
         constructor(scene: THREE.Scene, canvas: HTMLCanvasElement, camera: THREE.Camera);
-        register(selection: WebGLElementQuery<any, any>, method: string): void;
+        register(selection: WebGLElementQuery, method: string): void;
         addEventListener(eventName: String, f: Function): void;
         mouseMoveHandler(e: any): void;
         clickHandler(e: any): void;
         mouseDownHandler(e: any): void;
         mouseUpHandler(e: any): void;
-        intersect(selection: WebGLElementQuery<any, any>, mousex: any, mousey: any): any[];
-        intersectCircle(selection: WebGLElementQuery<any, any>): any[];
-        intersectRect(selection: WebGLElementQuery<any, any>): any[];
-        intersectPath(selection: WebGLElementQuery<any, any>): any[];
+        intersect(selection: WebGLElementQuery, mousex: any, mousey: any): any[];
+        intersectCircles(selection: WebGLElementQuery): any[];
+        intersectRects(selection: WebGLElementQuery): any[];
+        intersectPaths(selection: WebGLElementQuery): any[];
     }
     function mouseToWorldCoordinates(mouseX: any, mouseY: any): any[];
     function curve(points: any[]): any[];

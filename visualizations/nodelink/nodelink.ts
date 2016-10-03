@@ -410,9 +410,27 @@
     /////////////////
     
     function timeChangedHandler(m:networkcube.TimeRangeMessage){
-        time_start = dgraph.time(m.startId);
-        time_end = dgraph.time(m.endId);
-        timeSlider.set(time_start, time_end);
+
+        for(var i= 0 ; i < times.length ; i++){
+            if(times[i].unixTime() > m.startUnix){
+                time_start = times[i-1];
+                break;
+            }
+        }
+        for(i ; i < times.length ; i++){
+            if(times[i].unixTime() > m.endUnix){
+                time_end = times[i-1];
+                break;
+            }
+        }
+        if(time_end==undefined){
+            time_end = times[times.length-1]
+        }
+
+        console.log('start-end', time_start, time_end)
+      
+      
+        timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();
         updateNodes();
         webgl.render()

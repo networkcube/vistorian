@@ -7,7 +7,7 @@
 
 module networkcube {
 
-    export var GRANULARITY: string[] = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'millenium'];
+    export var GRANULARITY: string[] = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'century', 'millenium'];
 
     export var DGRAPH_SUB: string = "[*dgraph*]";
     export var DGRAPH_SER_VERBOSE_LOGGING = false;
@@ -54,6 +54,7 @@ module networkcube {
         // Contains all time objects for this dynamic graph
         _times: Time[] = [];
         // linkTypes: LinkType[] = [];
+        timeObjects = []
 
         nodeOrders: Ordering[];
 
@@ -560,6 +561,16 @@ module networkcube {
                 console.log('   minTime',  this.timeArrays.label[0])
                 console.log('   maxTime',  this.timeArrays.label[this.timeArrays.length -1])
 
+                // Now, all existing times with events and potentially
+                // attributes associated, have been created. 
+                // Below, we create a simple array of moment.moments
+                // for any possible time unit for every aggregation level. 
+                // In fact, those structures are created on-demand, i.e. 
+                // the first time they are needed. 
+                // Here, we only create the meta-structure
+                for(var g=0 ; g <= networkcube.GRANULARITY.length; g++){
+                    this.timeObjects.push([])
+                }
             } 
             
             // if no valid have been found:
@@ -1565,7 +1576,7 @@ module networkcube {
             s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
             this.selections.push(s);
-            console.log('Create new selection:', s.id)
+            // console.log('Create new selection:', s.id)
             return s;
         }
 
@@ -1694,6 +1705,7 @@ module networkcube {
         nodePairs(): NodePairQuery {
             return new NodePairQuery(this.nodePairArrays.id, this);
         }
+
         
         linksBetween(n1:Node, n2:Node): LinkQuery{
             var nodePairId = this.matrix[n1.id()][n2.id()];

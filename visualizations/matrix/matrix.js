@@ -9,7 +9,7 @@ var NMargin = (function () {
         this.top = v;
     }
     return NMargin;
-}());
+})();
 var vizWidth;
 var vizHeight;
 var urlVars = networkcube.getUrlVars();

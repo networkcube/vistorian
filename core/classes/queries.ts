@@ -146,6 +146,7 @@ module networkcube {
 
         /** @returns the moment object associated to this time object. */
         time(): Moment { return this.attr('momentTime'); }
+        moment(): Moment { return this.attr('momentTime'); }
 
         label():String {return this.attr('label')}
 
@@ -164,7 +165,19 @@ module networkcube {
             return new LinkQuery(this.attr('links'), this.g); 
         }
 
+        // wrapper to moment.js
+        year(){ return this.time().year(); }
+        month(){ return this.time().month(); }
+        week(){ return this.time().week(); }
+        day(){ return this.time().day(); }
+        hour(){ return this.time().hour(); }
+        minute(){ return this.time().minute(); }
+        second(){ return this.time().second(); }
+        millisecond(){ return this.time().millisecond(); }
 
+        format(format):string{
+            return this.time().format(format)
+        }
     }
 
     /**
@@ -260,6 +273,7 @@ module networkcube {
 
         }
 
+    
         // TODO
         // presentIn(start: Time, end?: Time): boolean {
         //     // TODO, consider present times for nodes.
