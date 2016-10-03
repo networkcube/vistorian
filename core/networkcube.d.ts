@@ -108,9 +108,19 @@ declare module networkcube {
     class Time extends BasicElement {
         constructor(id: number, dynamicGraph: DynamicGraph);
         time(): Moment;
+        moment(): Moment;
+        label(): String;
         unixTime(): number;
-        granularity(): string;
         links(): LinkQuery;
+        year(): number;
+        month(): number;
+        week(): number;
+        day(): number;
+        hour(): number;
+        minute(): number;
+        second(): number;
+        millisecond(): number;
+        format(format: any): string;
     }
     class Node extends BasicElement {
         constructor(id: number, graph: DynamicGraph);
@@ -194,6 +204,7 @@ declare module networkcube {
         sum(): number;
         toArray(): number[];
         get(index: number): number;
+        forEach(f: Function): NumberQuery;
     }
     class StringQuery {
         _elements: string[];
@@ -206,6 +217,7 @@ declare module networkcube {
         length: number;
         size(): number;
         toArray(): string[];
+        forEach(f: Function): StringQuery;
     }
     class GraphElementQuery extends Query {
         g: DynamicGraph;
@@ -240,6 +252,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): NodeQuery;
         intersection(q: NodeQuery): NodeQuery;
         removeDuplicates(): NodeQuery;
+        forEach(f: Function): NodeQuery;
     }
     class LinkQuery extends GraphElementQuery {
         elementType: string;
@@ -261,6 +274,7 @@ declare module networkcube {
         targets(): NodeQuery;
         intersection(q: LinkQuery): LinkQuery;
         removeDuplicates(): LinkQuery;
+        forEach(f: Function): LinkQuery;
     }
     class NodePairQuery extends GraphElementQuery {
         elementType: string;
@@ -278,6 +292,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): NodePairQuery;
         intersection(q: NodePairQuery): NodePairQuery;
         removeDuplicates(): NodePairQuery;
+        forEach(f: Function): NodePairQuery;
     }
     class TimeQuery extends GraphElementQuery {
         elementType: string;
@@ -296,6 +311,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): TimeQuery;
         unixTimes(): number[];
         intersection(q: TimeQuery): TimeQuery;
+        forEach(f: Function): TimeQuery;
     }
     class LocationQuery extends GraphElementQuery {
         elementType: string;
@@ -313,6 +329,7 @@ declare module networkcube {
         createAttribute(attrName: string, f: Function): LocationQuery;
         intersection(q: LocationQuery): LocationQuery;
         removeDuplicates(): LocationQuery;
+        forEach(f: Function): LocationQuery;
     }
     class Motif {
         nodes: Node[];
@@ -350,6 +367,7 @@ declare module networkcube {
         _nodePairs: NodePair[];
         _locations: Location[];
         _times: Time[];
+        timeObjects: any[];
         nodeOrders: Ordering[];
         matrix: number[][];
         nodeArrays: NodeArray;
@@ -494,7 +512,8 @@ declare module networkcube {
     }
     class TimeArray extends AttributeArray {
         id: number[];
-        time: Moment[];
+        momentTime: Moment[];
+        label: string[];
         unixTime: number[];
         selections: Selection[][];
         filter: boolean[];
@@ -631,7 +650,7 @@ declare module networkcube {
     function loadDyson(url: string, callback: Function): void;
     function loadLinkTable(url: string, callBack: Function, linkSchema: networkcube.LinkSchema, delimiter: string, timeFormat?: string): void;
     function loadXML(url: string, callBack: Function): void;
-    function loadJson(url: string, callBack: Function): void;
+    function loadJson(url: string, callBack: Function, dataName?: string): void;
     function loadJsonList(url: string, callBack: Function): void;
     function loadNCube(url: string, callBack: Function): void;
     function loadPajek(url: string, callBack: Function): void;
@@ -681,12 +700,11 @@ declare module networkcube {
         idCompound: IDCompound;
         constructor(action: string, idCompound: IDCompound, selectionId?: number);
     }
-    function timeRange(start: Time, end: Time, single: Time, propagate?: boolean): void;
+    function timeRange(startUnix: number, endUnix: number, single: Time, propagate?: boolean): void;
     class TimeRangeMessage extends Message {
-        startId: number;
-        endId: number;
-        singleId: number;
-        constructor(start: Time, end: Time, single: Time);
+        startUnix: number;
+        endUnix: number;
+        constructor(start: number, end: number);
     }
     function createSelection(type: string, name: string): Selection;
     class CreateSelectionMessage extends Message {
@@ -769,6 +787,7 @@ declare module glutils {
     function makeAlphaBuffer(array: number[], stretch: number): Float32Array;
     function addBufferedHatchedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
     function addBufferedRect(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
+    function addBufferedCirlce(vertexArray: number[][], x: number, y: number, z: number, radius: number, colorArray: number[][], c: number[]): void;
     function addBufferedDiamond(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]): void;
     function createRectFrame(w: number, h: number, color: number, lineThickness: number): THREE.Line;
     function createDiagonalCross(w: number, h: number, color: number, lineThickness: number): THREE.Line;
@@ -787,18 +806,21 @@ declare module glutils {
         canvas: any;
         geometry: THREE.BufferGeometry;
         interactor: WebGLInteractor;
-        constructor();
+        elementQueries: WebGLElementQuery[];
+        constructor(params?: Object);
         render(): void;
+        selectAll(): WebGLElementQuery;
         enableZoom(b?: boolean): void;
         enablePanning(b: boolean): void;
         enableHorizontalPanning(b: boolean): void;
     }
     function initWebGL(parentId: string, width: number, height: number, params?: Object): WebGL;
     function setWebGL(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.Renderer, canvas: any): void;
-    function selectAll(): WebGLElementQuery<any, any>;
-    class WebGLElementQuery<T, S> {
-        dataElements: T[];
-        visualElements: S[];
+    function selectAll(): WebGLElementQuery;
+    class WebGLElementQuery {
+        dataElements: Object[];
+        visualElements: Object[];
+        mesh: THREE.Mesh;
         children: Object[];
         scene: THREE.Scene;
         mouseOverHandler: Function;
@@ -810,21 +832,29 @@ declare module glutils {
         x: number[];
         y: number[];
         z: number[];
+        r: number[];
+        fill: number[];
+        stroke: number[];
+        strokewidth: number[];
+        opacity: number[];
         shape: string;
+        updateAttributes: boolean;
+        updateStyle: boolean;
         IS_SHADER: boolean;
         constructor();
-        data(arr: T[]): WebGLElementQuery<T, S>;
-        append(shape: string): WebGLElementQuery<T, S>;
-        push(e: any): WebGLElementQuery<T, S>;
-        getData(i: S): T;
-        getVisual(i: T): S;
+        data(arr: Object[]): WebGLElementQuery;
+        append(shape: string): WebGLElementQuery;
+        push(e: any): WebGLElementQuery;
+        getData(i: any): any;
+        getVisual(i: any): any;
         length: number;
-        filter(f: Function): WebGLElementQuery<T, S>;
-        attr(name: string, v: any): WebGLElementQuery<T, S>;
-        style(name: string, v: any): WebGLElementQuery<T, S>;
-        text(v: any): WebGLElementQuery<T, S>;
-        on(event: string, f: Function): WebGLElementQuery<T, S>;
-        call(method: string, dataElement: T, event: any): WebGLElementQuery<T, S>;
+        filter(f: Function): WebGLElementQuery;
+        attr(name: string, v: any): WebGLElementQuery;
+        style(name: string, v: any): WebGLElementQuery;
+        set(): WebGLElementQuery;
+        text(v: any): WebGLElementQuery;
+        on(event: string, f: Function): WebGLElementQuery;
+        call(method: string, dataElement: any, event: any): WebGLElementQuery;
         setAttr(element: THREE.Mesh, attr: string, v: any, index: number): void;
         removeAll(): void;
     }
@@ -847,23 +877,23 @@ declare module glutils {
         lassoStartHandler: Function;
         lassoMoveHandler: Function;
         lassoEndHandler: Function;
-        mouseOverSelections: WebGLElementQuery<any, any>[];
-        mouseMoveSelections: WebGLElementQuery<any, any>[];
-        mouseOutSelections: WebGLElementQuery<any, any>[];
-        mouseDownSelections: WebGLElementQuery<any, any>[];
-        mouseUpSelections: WebGLElementQuery<any, any>[];
-        clickSelections: WebGLElementQuery<any, any>[];
+        mouseOverSelections: WebGLElementQuery[];
+        mouseMoveSelections: WebGLElementQuery[];
+        mouseOutSelections: WebGLElementQuery[];
+        mouseDownSelections: WebGLElementQuery[];
+        mouseUpSelections: WebGLElementQuery[];
+        clickSelections: WebGLElementQuery[];
         constructor(scene: THREE.Scene, canvas: HTMLCanvasElement, camera: THREE.Camera);
-        register(selection: WebGLElementQuery<any, any>, method: string): void;
+        register(selection: WebGLElementQuery, method: string): void;
         addEventListener(eventName: String, f: Function): void;
         mouseMoveHandler(e: any): void;
         clickHandler(e: any): void;
         mouseDownHandler(e: any): void;
         mouseUpHandler(e: any): void;
-        intersect(selection: WebGLElementQuery<any, any>, mousex: any, mousey: any): any[];
-        intersectCircle(selection: WebGLElementQuery<any, any>): any[];
-        intersectRect(selection: WebGLElementQuery<any, any>): any[];
-        intersectPath(selection: WebGLElementQuery<any, any>): any[];
+        intersect(selection: WebGLElementQuery, mousex: any, mousey: any): any[];
+        intersectCircles(selection: WebGLElementQuery): any[];
+        intersectRects(selection: WebGLElementQuery): any[];
+        intersectPaths(selection: WebGLElementQuery): any[];
     }
     function mouseToWorldCoordinates(mouseX: any, mouseY: any): any[];
     function curve(points: any[]): any[];
