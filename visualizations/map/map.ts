@@ -28,8 +28,8 @@ var MENU_HEIGHT:number = 50;
 var positions = new Object();
 
 
-// get dynamic graph
 var dgraph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
+// get dynamic graph
 var links:networkcube.Link[] = dgraph.links().toArray();
 var time_start: networkcube.Time = dgraph.time(0);
 var time_end: networkcube.Time = dgraph.times().last();
@@ -56,113 +56,8 @@ class NodePositionObject{
     displacementVector: number[]
 }
 
-// STYLING MAP
-
-var mapOptions = {
-    center: new google.maps.LatLng(48.8588589, 2.3470599),
-    zoom: 5,
-    mapTypeControl:false,
-    rotateControl: false,
-    streetViewControl: false,
-    zoomControl: true,
-    draggableCursor: 'default',
-    styles: [
-        {
-            "featureType": "landscape", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "poi", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "road.highway", "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "road.arterial", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "road.local", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "transit", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "administrative.province", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "administrative.locality", "stylers": [
-                { "visibility": "off" }
-            ]
-        },
-        {
-            "featureType": "administrative.country", 
-            "elementType": "geometry.stroke",
-            "stylers": [
-                { "lightness": 60 }
-            ]
-        },
-        {
-            "featureType": "water", "elementType": "labels", "stylers": [
-                { "visibility": "off" },
-            ]
-        },
-        {
-            "featureType": "water", "elementType": "geometry", "stylers": [
-                { "lightness": 100 },
-            ]
-        },
-        {
-            featureType: "administrative.country", elementType: "labels", stylers: [
-                { visibility: "off" }
-            ]
-        },
-    ]
-};
-
-
-var map = new google.maps.Map(mapCanvas, mapOptions);
-map.addListener('zoom_changed', function() {
-    $('#weirdDiv').css('width', window.innerWidth * Math.random());
-    $('#weirdDiv').parent().parent().css('width', window.innerWidth * Math.random());
-});
-
-var lastPanUpdate: number = window.performance.now();
-map.addListener('center_changed', function(e) {
-
-    var current = window.performance.now();
-    var delta = current - lastPanUpdate;
-    if (delta < 1000) {
-        var pps = (1000 / delta).toFixed(0);
-        // console.log('pan-update took', delta.toFixed(2), 'ms. PPS=', pps);
-    }
-    lastPanUpdate = current;
-    $('#weirdDiv').css('width', window.innerWidth * Math.random());
-    $('#weirdDiv').parent().parent().css('width', window.innerWidth * Math.random());
-    
-    var northWest = {x:map.getBounds().getSouthWest().lng(), y: map.getBounds().getNorthEast().lat()}
-    // console.log('map.getBounds', overlay)
-});
-
-
-
-// create overlay over googlemaps
-var overlay = new google.maps.OverlayView();
-
+var overlay
+var map;
 
 
 var linkWeightScale = d3.scale.linear().range([0, 2]);
@@ -198,228 +93,451 @@ var layer;
 var locations = dgraph.locations().toArray();
 var locationsPanelDiv: HTMLDivElement;
 
-overlay.onAdd = function() {
-
-    layer = document.createElement('div');
-    $(layer).attr('id', 'weirdDiv');
-    $(layer).css('width', '100%');
-    locationsPanelDiv = document.createElement('div');
-    $(locationsPanelDiv).attr('id', 'locationsPanel').addClass('hidden');
-
-    this.getPanes().overlayLayer.appendChild(layer);
-    this.getPanes().overlayLayer.appendChild(locationsPanelDiv);
-
-    // setup locationsWindow        
     
-    function hideLocationsWindow() {
-        $(locationsPanelDiv).addClass('hidden').removeClass('shown');
-    }
+var locationDisplayTimeoutHandle = -1;
+var prevIntersectedLink;
+var prevIntersectedNode;
+var intersectedLink;
+var intersectedNode;
+var prevDist;
+var f;
+var F = 1000;
 
-    map.addListener('mouseout', function(ev: any) {
-        //console.log('mouseout');
-        hideLocationsWindow();
+
+// STYLING MAP
+function init(){
+    var mapOptions = {
+        center: new google.maps.LatLng(48.8588589, 2.3470599),
+        zoom: 5,
+        mapTypeControl:false,
+        rotateControl: false,
+        streetViewControl: false,
+        zoomControl: true,
+        draggableCursor: 'default',
+        styles: [
+            {
+                "featureType": "landscape", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "poi", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "road.highway", "stylers": [
+                    {
+                        "visibility": "off"
+                    }
+                ]
+            },
+            {
+                "featureType": "road.arterial", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "road.local", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "transit", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "administrative.province", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "administrative.locality", "stylers": [
+                    { "visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "administrative.country", 
+                "elementType": "geometry.stroke",
+                "stylers": [
+                    { "lightness": 60 }
+                ]
+            },
+            {
+                "featureType": "water", "elementType": "labels", "stylers": [
+                    { "visibility": "off" },
+                ]
+            },
+            {
+                "featureType": "water", "elementType": "geometry", "stylers": [
+                    { "lightness": 100 },
+                ]
+            },
+            {
+                featureType: "administrative.country", elementType: "labels", stylers: [
+                    { visibility: "off" }
+                ]
+            },
+        ]
+    };
+
+
+    map = new google.maps.Map(mapCanvas, mapOptions);
+    map.addListener('zoom_changed', function() {
+        $('#weirdDiv').css('width', window.innerWidth * Math.random());
+        $('#weirdDiv').parent().parent().css('width', window.innerWidth * Math.random());
     });
 
-    geoProjection = this.getProjection();
+    var lastPanUpdate: number = window.performance.now();
+    map.addListener('center_changed', function(e) {
 
-    svg = d3.select(layer).append("svg:svg")
-        .attr('id', 'svgOverlay')
-        .style('overflow', 'visible');
-
-
-
-    // CREATE LOCATION MARKERS
-
-    var locationMarker = svg.selectAll('.locationMarker')
-        .data(locations)
-        .enter()
-        .append('g')
-        .attr('class', 'locationMarker');
-
-    locationMarker.append('circle')
-        .attr('r', LOCATION_MARKER_WIDTH);
-
-    // define arrow markers for directed links
-
-    var defs = svg.append('svg:defs');
-    defs.append('svg:marker')
-        .attr('id', 'end-arrow')
-        .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 6)
-        .attr('markerWidth', 10)
-        .attr('markerHeight', 10)
-        .attr('orient', 'auto')
-        .append('svg:path')
-        .attr('d', 'M0,-3L10,0L0,3L2,0')
-        .attr('stroke-width', '0px')
-        .attr('fill', '#555')
-        .attr('opacity', .5)
-        .attr('transform', 'translate(-5, 0)')
-
-    var grad = defs.append('svg:linearGradient')
-        .attr('id', 'line-gradient')
-    grad.append('svg:stop')
-        .attr('offset', 0)
-        .attr('stop-color', '#000')
-    grad.append('svg:stop')
-        .attr('offset', .5)
-        .attr('stop-color', '#000')
-    grad.append('svg:stop')
-        .attr('offset', 1)
-        .attr('stop-color', '#eee')
+        var current = window.performance.now();
+        var delta = current - lastPanUpdate;
+        if (delta < 1000) {
+            var pps = (1000 / delta).toFixed(0);
+            // console.log('pan-update took', delta.toFixed(2), 'ms. PPS=', pps);
+        }
+        lastPanUpdate = current;
+        $('#weirdDiv').css('width', window.innerWidth * Math.random());
+        $('#weirdDiv').parent().parent().css('width', window.innerWidth * Math.random());
+        
+        var northWest = {x:map.getBounds().getSouthWest().lng(), y: map.getBounds().getNorthEast().lat()}
+        // console.log('map.getBounds', overlay)
+    });
 
 
-    svg = svg.append('g')
 
-    // DRAW EDGES  
+    // create overlay over googlemaps
+    overlay = new google.maps.OverlayView();
 
-    line = d3.svg.line()
-        .x(function(d) { return d.x; })
-        .y(function(d) { return d.y; })
-        .interpolate("basis");
+    overlay.onAdd = function(){
 
-    visualLinks = svg.selectAll(".link")
-            .data(dgraph.links().toArray())
+        layer = document.createElement('div');
+        $(layer).attr('id', 'weirdDiv');
+        $(layer).css('width', '100%');
+        locationsPanelDiv = document.createElement('div');
+        $(locationsPanelDiv).attr('id', 'locationsPanel').addClass('hidden');
+
+        this.getPanes().overlayLayer.appendChild(layer);
+        this.getPanes().overlayLayer.appendChild(locationsPanelDiv);
+
+        // setup locationsWindow        
+        
+        function hideLocationsWindow() {
+            $(locationsPanelDiv).addClass('hidden').removeClass('shown');
+        }
+
+        map.addListener('mouseout', function(ev: any) {
+            //console.log('mouseout');
+            hideLocationsWindow();
+        });
+
+        geoProjection = this.getProjection();
+
+        svg = d3.select(layer).append("svg:svg")
+            .attr('id', 'svgOverlay')
+            .style('overflow', 'visible');
+
+
+
+        // CREATE LOCATION MARKERS
+
+        var locationMarker = svg.selectAll('.locationMarker')
+            .data(locations)
             .enter()
-            .append("path")
-            .attr("class", "link")
-            .style('fill', 'none')
+            .append('g')
+            .attr('class', 'locationMarker');
+
+        locationMarker.append('circle')
+            .attr('r', LOCATION_MARKER_WIDTH);
+
+        // define arrow markers for directed links
+
+        var defs = svg.append('svg:defs');
+        defs.append('svg:marker')
+            .attr('id', 'end-arrow')
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 6)
+            .attr('markerWidth', 10)
+            .attr('markerHeight', 10)
+            .attr('orient', 'auto')
+            .append('svg:path')
+            .attr('d', 'M0,-3L10,0L0,3L2,0')
+            .attr('stroke-width', '0px')
+            .attr('fill', '#555')
+            .attr('opacity', .5)
+            .attr('transform', 'translate(-5, 0)')
+
+        var grad = defs.append('svg:linearGradient')
+            .attr('id', 'line-gradient')
+        grad.append('svg:stop')
+            .attr('offset', 0)
+            .attr('stop-color', '#000')
+        grad.append('svg:stop')
+            .attr('offset', .5)
+            .attr('stop-color', '#000')
+        grad.append('svg:stop')
+            .attr('offset', 1)
+            .attr('stop-color', '#eee')
+
+
+        svg = svg.append('g')
+
+        // DRAW EDGES  
+
+        line = d3.svg.line()
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; })
+            .interpolate("basis");
+
+        visualLinks = svg.selectAll(".link")
+                .data(dgraph.links().toArray())
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .style('fill', 'none')
+                // .on('click', d => {
+                //     var selections = d.getSelections();
+                //     var currentSelection = this.dgraph.getCurrentSelection();
+                //     for (var j = 0; j < selections.length; j++) {
+                //         if (selections[j] == currentSelection) {
+                //             networkcube.selection('remove', <networkcube.ElementCompound>{ links: [d] });
+                //             return;
+                //         }
+                //     }
+                //     networkcube.selection('add', <networkcube.ElementCompound>{ links: [d] });
+                // })
+        
+    
+
+        // DRAW NODES (one for every node x position it is at)
+
+        // obtain nodePositionObjects
+        // one npo per node x position 
+        var npo;
+        var nodes = dgraph.nodes().toArray();
+        var n, positions;
+        var googleLatLng;
+        var serie;
+        for( var i=0 ; i <nodes.length ; i++){
+            n = nodes[i];
+            positions = n.locationSerie().serie;
+            serie = new networkcube.ScalarTimeSeries<Object>();
+            nodePositionObjectsLookupTable.push(serie);
+            for(var t in positions){
+                googleLatLng = new google.maps.LatLng(
+                    positions[t].latitude(),
+                    positions[t].longitude());
+                // console.log('> NPO', positions[t].label())    
+                // console.log('> NPO from latlong', geoProjection.fromLatLngToDivPixel(googleLatLng).x, geoProjection.fromLatLngToDivPixel(googleLatLng).y)
+                npo = new NodePositionObject();    
+                npo.timeId = t, 
+                npo.location = positions[t],
+                npo.node = n,
+                npo.x = 0, 
+                npo.y = 0,
+                npo.xOrig = 0, 
+                npo.yOrig = 0,
+                npo.geoPos = googleLatLng, 
+                npo.displaced = false
+                npo.displacementVector = [0,0]
+                
+                nodePositionObjects.push(npo);
+                serie.set(dgraph.time(parseInt(t)), npo)    
+            }
+        }
+        
+        // assign NPOs to links
+        visualLinks
+            .each((link)=>{
+                // get source and target NPO
+                link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
+                if(!link.sourceNPO){
+                    link.sourceNPO = new NodePositionObject();
+                    link.sourceNPO.x = 0;
+                    link.sourceNPO.y = 0;
+                    link.sourceNPO.xOrig = 0;
+                    link.sourceNPO.yOrig = 0;
+                    link.sourceNPO.node = link.source;
+                    link.sourceNPO.googleLatLng = new google.maps.LatLng(0,0);
+                    link.sourceNPO.displaced = false
+                    link.sourceNPO.displacementVector = [0,0]
+                }
+                link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
+                if(!link.targetNPO){
+                    link.targetNPO = new NodePositionObject();
+                    link.targetNPO.x = 0;
+                    link.targetNPO.y = 0;
+                    link.targetNPO.xOrig = 0;
+                    link.targetNPO.yOrig = 0;
+                    link.targetNPO.node = link.target;
+                    link.targetNPO.googleLatLng = new google.maps.LatLng(0,0);
+                    link.targetNPO.displaced = false
+                    link.targetNPO.displacementVector = [0,0]
+                }
+                console.log(link.sourceNPO.x, link.targetNPO.x)
+            })
+
+        visualNodes = svg.selectAll(".node")
+            .data(nodePositionObjects)
+            .enter()
+            .append('g')
             // .on('click', d => {
             //     var selections = d.getSelections();
             //     var currentSelection = this.dgraph.getCurrentSelection();
             //     for (var j = 0; j < selections.length; j++) {
             //         if (selections[j] == currentSelection) {
-            //             networkcube.selection('remove', <networkcube.ElementCompound>{ links: [d] });
+            //             networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d.node] });
             //             return;
             //         }
             //     }
-            //     networkcube.selection('add', <networkcube.ElementCompound>{ links: [d] });
-            // })
-    
-  
+            //     networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d.node] });
+            // });
 
-    // DRAW NODES (one for every node x position it is at)
+        // NODE CIRLCE
+        visualNodes.append("circle")
+            .attr("class", "nodeCircle")
+            .attr("r", function(d) {
+                return nodeSizeFunction(d.node.neighbors().length);
+            })
 
-    // obtain nodePositionObjects
-    // one npo per node x position 
-    var npo;
-    var nodes = dgraph.nodes().toArray();
-    var n, positions;
-    var googleLatLng;
-    var serie;
-    for( var i=0 ; i <nodes.length ; i++){
-        n = nodes[i];
-        positions = n.locationSerie().serie;
-        serie = new networkcube.ScalarTimeSeries<Object>();
-        nodePositionObjectsLookupTable.push(serie);
-        for(var t in positions){
-            googleLatLng = new google.maps.LatLng(
-                positions[t].latitude(),
-                positions[t].longitude());
-            // console.log('> NPO', positions[t].label())    
-            // console.log('> NPO from latlong', geoProjection.fromLatLngToDivPixel(googleLatLng).x, geoProjection.fromLatLngToDivPixel(googleLatLng).y)
-            npo = new NodePositionObject();    
-            npo.timeId = t, 
-            npo.location = positions[t],
-            npo.node = n,
-            npo.x = 0, 
-            npo.y = 0,
-            npo.xOrig = 0, 
-            npo.yOrig = 0,
-            npo.geoPos = googleLatLng, 
-            npo.displaced = false
-            npo.displacementVector = [0,0]
+
+        // LOCATION CIRCLE for displaced nodes
+        visualNodes.append("circle")
+            .attr("class", "displacementCircle");
+
+        
+        // bb: not any longer needed for labeling is handled globally
+        // maybe include again later 
+        vNodeLabelBackgrounds = visualNodes.append("rect")
+            .attr("class", "nodeLabelBackground")
+            .attr('rx', 2)
+            .attr('ry', 2)
+            .attr('x', LABEL_OFFSET_X)
+            .attr('y', -7)
+            .attr("width", (d) => getTextWidth(createNodeLabel(d)))
+            .attr("height", 18)
+            .attr('visibility', 'hidden');
+
+
+        // NODE LABEL
+        vNodeLabels = visualNodes.append('text')
+            .text((d) => createNodeLabel(d))
+            .attr('x', LABEL_OFFSET_X+2)
+            .attr('y', 7)
+            .attr('class', 'nodeLabel')
+            .attr('visibility', 'hidden')
             
-            nodePositionObjects.push(npo);
-            serie.set(dgraph.time(parseInt(t)), npo)    
+        removeNodeOverlap();
+        updateLinks();
+        updateNodes();
+    }
+
+    map.addListener('mousemove', (ev: google.maps.MouseEvent) =>{
+   
+    if (locationDisplayTimeoutHandle >= 0){
+        window.clearTimeout(locationDisplayTimeoutHandle);
+    }
+
+    // test for hovering nodes
+    var minDist = .5*F;
+    var mouse = {x: ev.latLng.lng()*F,  y: ev.latLng.lat()*F}
+    var pos;
+    intersectedNode = undefined;
+    var projection = overlay.getProjection();
+    var d;
+    for(var i = 0 ; i <nodePositionObjects.length ; i++ ){
+    
+        pos = projection.fromDivPixelToLatLng({x: nodePositionObjects[i].x, y: nodePositionObjects[i].y})
+        pos = {x: pos.lng()*F, y:pos.lat() * F};
+
+        d = Math.hypot(mouse.x - pos.x, mouse.y - pos.y);
+        if(isNaN(d)) 
+            continue
+            
+        if(d < minDist){
+            intersectedNode = nodePositionObjects[i].node;                
+            minDist = d;
+        }               
+    }
+
+    // test for hovering links
+    var l;
+    intersectedLink = undefined;
+    var sourceNPO, targetNPO;
+    var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
+    for(var i = 0 ; i <this.links.length ; i++ ){
+        l = this.links[i]
+        
+        if(!l.isVisible())
+            continue;
+            
+        sourceNPO = l.sourceNPO
+        if(sourceNPO == undefined){
+            sourcePoint = {x:0, y:0};
+        }else{
+            sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
+            sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
+        }
+        
+        targetNPO = l.targetNPO
+        if(targetNPO == undefined){
+            targetPoint = {x:0, y:0};
+        }else{       
+            targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
+            targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
+        }
+
+        // collision detection   
+        d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
+        if(isNaN(d)) 
+            continue
+            
+        if(d < minDist){
+            intersectedLink = l;                
+            minDist = d;
+        }        
+    }
+
+    if(prevIntersectedLink != intersectedLink){
+        networkcube.highlight('reset');
+        if(intersectedLink != undefined){
+            intersectedNode == undefined;
+            networkcube.highlight('set', {links:[intersectedLink]});
         }
     }
-    
-    // assign NPOs to links
-    visualLinks
-        .each((link)=>{
-            // get source and target NPO
-            link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
-            if(!link.sourceNPO){
-                link.sourceNPO = new NodePositionObject();
-                link.sourceNPO.x = 0;
-                link.sourceNPO.y = 0;
-                link.sourceNPO.xOrig = 0;
-                link.sourceNPO.yOrig = 0;
-                link.sourceNPO.node = link.source;
-                link.sourceNPO.googleLatLng = new google.maps.LatLng(0,0);
-                link.sourceNPO.displaced = false
-                link.sourceNPO.displacementVector = [0,0]
-            }
-            link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
-            if(!link.targetNPO){
-                link.targetNPO = new NodePositionObject();
-                link.targetNPO.x = 0;
-                link.targetNPO.y = 0;
-                link.targetNPO.xOrig = 0;
-                link.targetNPO.yOrig = 0;
-                link.targetNPO.node = link.target;
-                link.targetNPO.googleLatLng = new google.maps.LatLng(0,0);
-                link.targetNPO.displaced = false
-                link.targetNPO.displacementVector = [0,0]
-            }
-            console.log(link.sourceNPO.x, link.targetNPO.x)
-        })
+    prevIntersectedLink = intersectedLink;
+    if(prevIntersectedNode != intersectedNode){
+        networkcube.highlight('reset');
+        if(intersectedNode != undefined){
+            networkcube.highlight('set', {nodes:[intersectedNode]});
+        }
+    }
+    prevIntersectedNode = intersectedNode;
 
-    visualNodes = svg.selectAll(".node")
-        .data(nodePositionObjects)
-        .enter()
-        .append('g')
-        // .on('click', d => {
-        //     var selections = d.getSelections();
-        //     var currentSelection = this.dgraph.getCurrentSelection();
-        //     for (var j = 0; j < selections.length; j++) {
-        //         if (selections[j] == currentSelection) {
-        //             networkcube.selection('remove', <networkcube.ElementCompound>{ nodes: [d.node] });
-        //             return;
-        //         }
-        //     }
-        //     networkcube.selection('add', <networkcube.ElementCompound>{ nodes: [d.node] });
-        // });
+    if(intersectedLink == undefined && intersectedNode == undefined){
+        this.displayLocationsWindow(overlay.getProjection(), ev.pixel, ev.latLng)    
+    }
 
-    // NODE CIRLCE
-    visualNodes.append("circle")
-        .attr("class", "nodeCircle")
-        .attr("r", function(d) {
-            return nodeSizeFunction(d.node.neighbors().length);
-        })
+});
 
 
-    // LOCATION CIRCLE for displaced nodes
-    visualNodes.append("circle")
-        .attr("class", "displacementCircle");
 
-    
-    // bb: not any longer needed for labeling is handled globally
-    // maybe include again later 
-    vNodeLabelBackgrounds = visualNodes.append("rect")
-        .attr("class", "nodeLabelBackground")
-        .attr('rx', 2)
-        .attr('ry', 2)
-        .attr('x', LABEL_OFFSET_X)
-        .attr('y', -7)
-        .attr("width", (d) => getTextWidth(createNodeLabel(d)))
-        .attr("height", 18)
-        .attr('visibility', 'hidden');
-
-
-    // NODE LABEL
-    vNodeLabels = visualNodes.append('text')
-        .text((d) => createNodeLabel(d))
-        .attr('x', LABEL_OFFSET_X+2)
-        .attr('y', 7)
-        .attr('class', 'nodeLabel')
-        .attr('visibility', 'hidden')
-        
-    removeNodeOverlap();
-    updateLinks();
-    updateNodes();
+overlay.draw = function() {
+    updateGeoNodePositions()
+    var currCenter = map.getCenter();
+    google.maps.event.trigger(map, 'resize');
+    map.setCenter(currCenter);    
+    updateNodePositions();
+    updateLocationMarkers();
 }
+overlay.setMap(map);
+
+    
+}
+
+
 
 function createNodeLabel(npo){
     return npo.node.label() + ' (' + npo.location.label()+', '+ moment(dgraph.time(npo.timeId).unixTime()).format('MM/DD/YYYY') +')';
@@ -529,120 +647,13 @@ function displayLocationsWindow(currentProjection: google.maps.MapCanvasProjecti
 
     return true;
 }
-    
-var locationDisplayTimeoutHandle = -1;
-var prevIntersectedLink;
-var prevIntersectedNode;
-var intersectedLink;
-var intersectedNode;
-var prevDist;
-var f;
-var F = 1000;
-map.addListener('mousemove', (ev: google.maps.MouseEvent) =>{
-   
-    if (locationDisplayTimeoutHandle >= 0){
-        window.clearTimeout(locationDisplayTimeoutHandle);
-    }
 
-    // test for hovering nodes
-    var minDist = .5*F;
-    var mouse = {x: ev.latLng.lng()*F,  y: ev.latLng.lat()*F}
-    var pos;
-    intersectedNode = undefined;
-    var projection = overlay.getProjection();
-    var d;
-    for(var i = 0 ; i <nodePositionObjects.length ; i++ ){
-    
-        pos = projection.fromDivPixelToLatLng({x: nodePositionObjects[i].x, y: nodePositionObjects[i].y})
-        pos = {x: pos.lng()*F, y:pos.lat() * F};
-
-        d = Math.hypot(mouse.x - pos.x, mouse.y - pos.y);
-        if(isNaN(d)) 
-            continue
-            
-        if(d < minDist){
-            intersectedNode = nodePositionObjects[i].node;                
-            minDist = d;
-        }               
-    }
-
-    // test for hovering links
-    var l;
-    intersectedLink = undefined;
-    var sourceNPO, targetNPO;
-    var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
-    for(var i = 0 ; i <this.links.length ; i++ ){
-        l = this.links[i]
-        
-        if(!l.isVisible())
-            continue;
-            
-        sourceNPO = l.sourceNPO
-        if(sourceNPO == undefined){
-            sourcePoint = {x:0, y:0};
-        }else{
-            sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
-            sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
-        }
-        
-        targetNPO = l.targetNPO
-        if(targetNPO == undefined){
-            targetPoint = {x:0, y:0};
-        }else{       
-            targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
-            targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
-        }
-
-        // collision detection   
-        d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
-        if(isNaN(d)) 
-            continue
-            
-        if(d < minDist){
-            intersectedLink = l;                
-            minDist = d;
-        }        
-    }
-
-    if(prevIntersectedLink != intersectedLink){
-        networkcube.highlight('reset');
-        if(intersectedLink != undefined){
-            intersectedNode == undefined;
-            networkcube.highlight('set', {links:[intersectedLink]});
-        }
-    }
-    prevIntersectedLink = intersectedLink;
-    if(prevIntersectedNode != intersectedNode){
-        networkcube.highlight('reset');
-        if(intersectedNode != undefined){
-            networkcube.highlight('set', {nodes:[intersectedNode]});
-        }
-    }
-    prevIntersectedNode = intersectedNode;
-
-    if(intersectedLink == undefined && intersectedNode == undefined){
-        this.displayLocationsWindow(overlay.getProjection(), ev.pixel, ev.latLng)    
-    }
-
-});
-
-
-
-overlay.draw = function() {
-    updateGeoNodePositions()
-    var currCenter = map.getCenter();
-    google.maps.event.trigger(map, 'resize');
-    map.setCenter(currCenter);    
-    updateNodePositions();
-    updateLocationMarkers();
-}
 
 function update() {
     updateLinks();
     updateNodes();
 }
 
-overlay.setMap(map);
 
 function hittestNodeGeoPositions(bounds: google.maps.LatLngBounds): Array<networkcube.Node> {
     var pos: google.maps.Point;
