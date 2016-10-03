@@ -65,7 +65,7 @@ function updateList(type, name) {
     d3.selectAll('.selectionDiv_' + type)
         .style('background-color', function (d) {
         if (dgraph.currentSelection_id == d.id)
-            return '#eeeeee';
+            return '#cccccc';
         return '#ffffff';
     });
     nodeGs.append('rect')
@@ -106,6 +106,7 @@ function updateList(type, name) {
         networkcube.filterSelection(d, !d.filter);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'up.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)
@@ -114,6 +115,7 @@ function updateList(type, name) {
             networkcube.swapPriority(d, d3.selectAll('.selectionDiv_' + d.acceptedType).data()[i - 1]);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'down.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)
@@ -122,6 +124,7 @@ function updateList(type, name) {
             networkcube.swapPriority(d, d3.selectAll('.selectionDiv_' + d.acceptedType).data()[i + 1]);
     });
     nodeGs.append('svg:image')
+        .filter(function (d) { return d.name.indexOf('Unselected') == -1; })
         .attr('class', 'icon')
         .attr('xlink:href', 'delete.png')
         .attr('x', 130 + (RECT_SIZE + GAP_ICONS) * i++)
@@ -144,11 +147,19 @@ function searchResultHandler(m) {
         row.append('<p class="searchResult">Links: <b>' + m.idCompound.linkIds.length + '</b> <u onclick="saveSearchResultAsSelection(\'link\')">(Save as selection)</u></p>');
 }
 function saveSearchResultAsSelection(type) {
-    console.log('>>saveSearchResultAsSelection');
     var s = networkcube.createSelection(type, searchMessage.searchTerm);
     var selectionIdCompound = new networkcube.IDCompound();
     selectionIdCompound[type + 'Ids'] = searchMessage.idCompound[type + 'Ids'];
     var temp = networkcube.makeElementCompound(selectionIdCompound, dgraph);
-    console.log('--');
-    window.setTimeout(function () { return networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id); }, 2000);
+    window.setTimeout(function () {
+        console.log('set selection', selectionIdCompound, s.id);
+        networkcube.highlight('reset');
+        window.setTimeout(function () {
+            networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id);
+        }, 1000);
+    }, 1000);
+}
+function clearSearchSelection() {
+    networkcube.highlight('reset');
+    $('#searchResults').empty();
 }

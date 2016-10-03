@@ -17,7 +17,6 @@ module networkcube {
     export var MESSAGE_SELECTION_PRIORITY = 'selectionPriority'
     export var MESSAGE_SEARCH_RESULT = 'searchResult';
 
-
     var MESSENGER_PROPAGATE: boolean = true;
 
 
@@ -178,8 +177,8 @@ module networkcube {
 
     // TIME CHANGE MESSAGES
     
-    export function timeRange(start:Time, end:Time, single:Time, propagate?:boolean){
-        var m:TimeRangeMessage = new TimeRangeMessage(start, end, single);
+    export function timeRange(startUnix:number, endUnix:number, single:Time, propagate?:boolean){
+        var m:TimeRangeMessage = new TimeRangeMessage(startUnix, endUnix);
         if(propagate == undefined)
             propagate = false;
 
@@ -190,15 +189,13 @@ module networkcube {
     }
 
     export class TimeRangeMessage extends Message {
-        startId: number;
-        endId: number;
-        singleId: number;
+        startUnix: number;
+        endUnix: number;
         
-        constructor(start: Time, end: Time, single:Time) {
+        constructor(start: number, end: number) {
             super(MESSAGE_TIME_RANGE);
-            this.startId = start.id();
-            this.endId = end.id();
-            this.singleId = single.id();
+            this.startUnix = start;
+            this.endUnix = end;
         }
     }
 

@@ -99,7 +99,7 @@ function updateList(type:string, name:string){
 	d3.selectAll('.selectionDiv_'+type)
 		.style('background-color', function(d){
 			if(dgraph.currentSelection_id == d.id)
-				return '#eeeeee';
+				return '#cccccc';
 			return '#ffffff';
 		})
 		
@@ -146,6 +146,7 @@ function updateList(type:string, name:string){
 		})
 
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'up.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		
@@ -155,6 +156,7 @@ function updateList(type:string, name:string){
 		})
 
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'down.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		
@@ -164,6 +166,7 @@ function updateList(type:string, name:string){
 		})
 	
 	nodeGs.append('svg:image')
+		.filter((d)=>{return d.name.indexOf('Unselected') == -1})
 		.attr('class', 'icon')
 		.attr('xlink:href', 'delete.png')
 		.attr('x', 130 + (RECT_SIZE+GAP_ICONS)*i++)		
@@ -190,11 +193,22 @@ function searchResultHandler(m:networkcube.SearchResultMessage){
 }
 
 function saveSearchResultAsSelection(type:string){
-	console.log('>>saveSearchResultAsSelection')
 	var s:networkcube.Selection = networkcube.createSelection(type, searchMessage.searchTerm);
     var selectionIdCompound:networkcube.IDCompound = new networkcube.IDCompound();
     selectionIdCompound[type+'Ids'] = searchMessage.idCompound[type+'Ids']
     var temp = networkcube.makeElementCompound(selectionIdCompound, dgraph);
-    console.log('--')
-    window.setTimeout(()=>networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id), 2000);
+    window.setTimeout(()=>{
+		console.log('set selection', selectionIdCompound, s.id)
+		networkcube.highlight('reset');
+		window.setTimeout(()=>{
+			networkcube.selection('set', networkcube.makeElementCompound(selectionIdCompound, dgraph), s.id);
+		}, 1000);
+
+	}, 1000);
+}
+
+// clear search field and highlighted nodes
+function clearSearchSelection(){
+	networkcube.highlight('reset');
+	$('#searchResults').empty();
 }

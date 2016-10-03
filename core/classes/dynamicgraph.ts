@@ -7,7 +7,7 @@
 
 module networkcube {
 
-    export var GRANULARITY: string[] = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'millenium'];
+    export var GRANULARITY: string[] = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'century', 'millenium'];
 
     export var DGRAPH_SUB: string = "[*dgraph*]";
     export var DGRAPH_SER_VERBOSE_LOGGING = false;
@@ -54,6 +54,7 @@ module networkcube {
         // Contains all time objects for this dynamic graph
         _times: Time[] = [];
         // linkTypes: LinkType[] = [];
+        timeObjects = []
 
         nodeOrders: Ordering[];
 
@@ -261,19 +262,19 @@ module networkcube {
                 console.log('No timeArrays');
                 this.timeArrays = new TimeArray();
             }
-            else if ('time' in this.timeArrays && 'unixTime' in this.timeArrays) {
-                var ta = this.timeArrays['time'];
+            else if ('momentTime' in this.timeArrays && 'unixTime' in this.timeArrays) {
+                var ta = this.timeArrays['momentTime'];
                 for (var i = 0; i < ta.length; i++) {
                     ta[i] = moment.utc(this.timeArrays['unixTime'][i]);
                 }
             }
             else if ('unixTime' in this.timeArrays) {
                 console.log('No time in timeArrays');
-                this.timeArrays['time'] = this.timeArrays['unixTime'].map(moment.utc);
+                this.timeArrays['momentTime'] = this.timeArrays['unixTime'].map(moment.utc);
             }
             else {
                 console.log('No time or unixTime in timeArrays');
-                this.timeArrays['time'] = []
+                this.timeArrays['momentTime'] = []
             }
 
             this.linkTypeArrays = dataMgr.getFromStorage<LinkTypeArray>(this.name, this.linkTypeArrays_NAME, DynamicGraph.linkTypeArrayReviver);
@@ -477,31 +478,34 @@ module networkcube {
 
             // fill node, link arrays and time
 
-            // CREATE TIMES
+            // CREATE TIME OBJECT for all events
             this.gran_min = 0;
             this.gran_max = 0;
-            console.log('data.linkSchema.time', data.linkSchema.time, isValidIndex(data.linkSchema.time))
+
             if (isValidIndex(data.linkSchema.time)) {
                 var timeLabels: number[] = [];
                 var timeLabel: string;
-                var timeArray: number[] = [];
+                var unixTimes: number[] = [];
                 var unixTime: number;
+
+                // get unix times for all times
                 for (var i = 0; i < data.linkTable.length; i++) {
                     timeLabel = data.linkTable[i][data.linkSchema.time];
-                    unixTime = parseInt(moment(timeLabel, 'YYYY-MM-DD hh:mm:ss').format('x'));
-                    if (timeArray.indexOf(unixTime) == -1) {
-                        timeArray.push(unixTime);
-                        // console.log('add timeStamp:', timeStamp);                        
-                    }
+                    unixTime = parseInt(moment(timeLabel, TIME_FORMAT).format('x'));
+                    if(unixTime == undefined)
+                        continue;
 
+                    if (unixTimes.indexOf(unixTime) == -1) {
+                        unixTimes.push(unixTime);
+                    }
                 }
                 // obtain granularity
-                timeArray.sort(sortNumber)
+                unixTimes.sort(sortNumber)
                 // console.log('>> timeArray:', timeArray)
 
                 var diff = 99999999999999;
-                for (var i = 0; i < timeArray.length - 2; i++) {
-                    diff = Math.min(diff, timeArray[i + 1] - timeArray[i]);
+                for (var i = 0; i < unixTimes.length - 2; i++) {
+                    diff = Math.min(diff, unixTimes[i + 1] - unixTimes[i]);
                 }
 
                 var diff_min = diff;
@@ -516,7 +520,7 @@ module networkcube {
                 if (diff >= 1000 * 60 * 60 * 24 * 30 * 12 * 100) this.gran_min = 9;
                 if (diff >= 1000 * 60 * 60 * 24 * 30 * 12 * 1000) this.gran_min = 10;
 
-                diff = timeArray[timeArray.length - 1] - timeArray[0];
+                diff = unixTimes[unixTimes.length - 1] - unixTimes[0];
                 this.gran_max = 0;
                 if (diff >= 1000) this.gran_max = 1;
                 if (diff >= 1000 * 60) this.gran_max = 2;
@@ -533,45 +537,55 @@ module networkcube {
                 console.log('[Dynamic Graph] Maximal granularity', GRANULARITY[this.gran_max]);
 
                 // create one time object for every time point of gran_min, between start and end time.
-                var start = moment(timeArray[0] + '', 'x').startOf(GRANULARITY[this.gran_min]);
-                var end = moment(timeArray[timeArray.length - 1] + '', 'x').startOf(GRANULARITY[this.gran_min]);
-                var numTimes = Math.ceil(Math.abs(start.diff(end, GRANULARITY[this.gran_min] + 's')));
+                // [bb] deprecated
+                // var start = moment(unixTimes[0] + '', 'x').startOf(GRANULARITY[this.gran_min]);
+                // var end = moment(unixTimes[unixTimes.length - 1] + '', 'x').startOf(GRANULARITY[this.gran_min]);
+                // var numTimes = Math.ceil(Math.abs(start.diff(end, GRANULARITY[this.gran_min] + 's')));
 
-
-                var curr_t = start;
-                this._times = [];
-                for (var i = 0; i <= numTimes + 2; i++) {
+                // var curr_t = start;
+                // this._times = [];
+                for (var i = 0; i < unixTimes.length; i++) {
                     this.timeArrays.id.push(i);
-                    this.timeArrays.time.push(moment(curr_t));
-                    this.timeArrays.unixTime.push(parseInt(curr_t.format('x')));
+                    this.timeArrays.momentTime.push(moment(unixTimes[i]));
+                    this.timeArrays.label.push(this.timeArrays.momentTime[i].format(TIME_FORMAT));
+                    this.timeArrays.unixTime.push(unixTimes[i]);
                     this.timeArrays.selections.push([]);
                     this.timeArrays.filter.push(false)
                     this.timeArrays.links.push([]);
 
-                    // console.log(curr_t.format());
-
                     // create time objects  
                     this._times.push(new Time(i, this));
-                    curr_t = start.add(1, GRANULARITY[this.gran_min] + 's');
+                    // curr_t = start.add(1, GRANULARITY[this.gran_min] + 's');
                 }
                 console.log('#TIMES:', this._times.length);
-                // console.log('   minTime', moment(this.minTime.unixTime +'').format());
-                // console.log('   maxTime', moment(this.maxTime.unixTime +'').format());
+                console.log('   minTime',  this.timeArrays.label[0])
+                console.log('   maxTime',  this.timeArrays.label[this.timeArrays.length -1])
 
-            } else {
+                // Now, all existing times with events and potentially
+                // attributes associated, have been created. 
+                // Below, we create a simple array of moment.moments
+                // for any possible time unit for every aggregation level. 
+                // In fact, those structures are created on-demand, i.e. 
+                // the first time they are needed. 
+                // Here, we only create the meta-structure
+                for(var g=0 ; g <= networkcube.GRANULARITY.length; g++){
+                    this.timeObjects.push([])
+                }
+            } 
+            
+            // if no valid have been found:
+            if(this.timeArrays.length == 0){
                 // null time object that represents one time step for the entire graph, i.e. a static graph
                 this.timeArrays.id.push(0);
-                this.timeArrays.time.push(moment(0));
+                this.timeArrays.momentTime.push(moment(0));
                 this.timeArrays.unixTime.push(0);
                 this.timeArrays.selections.push([]);
                 this.timeArrays.filter.push(false)
                 this.timeArrays.links.push([])
-                //this.timeArrays.time.push(0);
                 this._times.push(new Time(0, this));
             }
 
             // from here on, there is at least one time object present.
-
 
 
             // CREATE LOCATIONS
@@ -591,7 +605,6 @@ module networkcube {
                     this.locationArrays.y.push(data.locationTable[i][data.locationSchema.y]);
                     this.locationArrays.z.push(data.locationTable[i][data.locationSchema.z]);
                     this.locationArrays.radius.push(data.locationTable[i][data.locationSchema.radius]);
-                     
                 }
             }
             if ('id' in this.locationArrays)
@@ -603,9 +616,27 @@ module networkcube {
             var nodeId_data; // node id in data set
             var nodeId_table; // node id in table
             var attribute: any;
-            var time;
+            var time:Time;
             console.assert(data.nodeTable.length == 0 || isValidIndex(data.nodeSchema.id),
                 'either there is no nodeTable data, or we have a schema for the nodetable');
+
+            var nodeUserProperties = []
+            // Get user-properties on links, if exist
+            for(var prop in data.nodeSchema){
+                if(data.nodeSchema.hasOwnProperty(prop)
+                && prop != 'id'
+                && prop != 'label'
+                && prop != 'time'
+                && prop != 'name'
+                && prop != 'nodeType'
+                && prop != 'location'
+                && prop != 'constructor'){
+                    // console.log('user-prop found for nodes', prop)
+                    nodeUserProperties.push(prop);
+                    // create property
+                    this.nodeArrays[prop] = [] 
+                }
+            }
 
             for (var i = 0; i < data.nodeTable.length; i++) {
                 row = data.nodeTable[i];
@@ -635,6 +666,7 @@ module networkcube {
                 }
 
                 // get time        
+                // if (isValidIndex(data.nodeSchema.time)) {
                 if (isValidIndex(data.nodeSchema.time)) {
                     timeLabel = row[data.nodeSchema.time];
                     if (timeLabel == undefined) {//} || timeStamp.indexOf('null')) {
@@ -645,6 +677,8 @@ module networkcube {
                 } else {
                     time = this._times[0];
                 }
+                if(time == undefined)
+                    time = this._times[0];
 
                 // check locations
                 if (isValidIndex(data.nodeSchema.location)) {
@@ -666,6 +700,13 @@ module networkcube {
                     this.nodeArrays.nodeType[nodeId_table] = typeName;
                     data.nodeTable[i][data.nodeSchema.nodeType] = typeId;
                 }
+
+                // gather user-properties: 
+                for( var p=0 ; p < nodeUserProperties.length ; p++){
+                    prop = nodeUserProperties[p];
+                    this.nodeArrays[prop].push(row[data.nodeSchema[prop]]);
+                }
+
 
                 // see if temporal information is available
                 // if(data.nodeSchema.time && data.nodeSchema.time > -1){
@@ -737,6 +778,27 @@ module networkcube {
             var typeName: string;
             var typeId: number;
 
+            var linkUserProperties = []
+            // Get user-properties on links, if exist
+            for(var prop in data.linkSchema){
+                if(data.linkSchema.hasOwnProperty(prop)
+                && prop != 'id'
+                && prop != 'linkType'
+                && prop != 'time'
+                && prop != 'name'
+                && prop != 'source'
+                && prop != 'target'
+                && prop != 'weight'
+                && prop != 'directed'){
+                    // console.log('user-prop found for links', prop)
+                    linkUserProperties.push(prop);
+                    // create property
+                    this.linkArrays[prop] = [] 
+                }
+            }
+            console.log('linkUserProperties', linkUserProperties)
+
+
             console.assert(data.linkTable.length == 0 || (
                 isValidIndex(data.linkSchema.id)
                 && isValidIndex(data.linkSchema.source)
@@ -775,6 +837,9 @@ module networkcube {
                 } else {
                     timeId = 0;    
                 }
+                if(timeId == undefined)
+                    timeId = 0;
+
                 time = this._times[timeId];
                 this.linkArrays.presence[linkId].push(timeId);
 
@@ -863,19 +928,19 @@ module networkcube {
                     // this.linkArrays.linkType[i] = typeId;
                     // console.log('this.linkArrays.type[i]', i, this.linkArrays.type[i]);
                 }
-            }
-            console.log('links:', this.linkArrays.weights.length)
 
+                // gather user-properties: 
+                for( var p=0 ; p < linkUserProperties.length ; p++){
+                    prop = linkUserProperties[p];
+                    this.linkArrays[prop].push(row[data.linkSchema[prop]]);
+                }
+            }
 
             // For every time, store a pointer to all its links: 
             // var allLinks = links().toArray();
             // var allTimes = this.g.times().toArray();
             for (var i = 0; i < this.linkArrays.length; i++) {
                 for (var j = 0; j < this.timeArrays.length; j++) {
-// <<<<<<< HEAD
-//                     if (this.linkArrays.weights[i].serie.hasOwnProperty(this.timeArrays.id[j])) {
-//                         // console.log('set timeArrays.links')
-// =======
                     if (this.linkArrays.weights[i].serie.hasOwnProperty(this.timeArrays.id[j].toString())) {
                         this.timeArrays.links[j].push(this.linkArrays.id[i]);
                     }
@@ -1300,8 +1365,7 @@ module networkcube {
 
         // SELECT
         selection(action: string, idCompound: IDCompound, selectionId?: number) {
-            // console.log('current selection id', this.currentSelection_id);
-
+            
             if (selectionId == undefined)
                 selectionId = this.currentSelection_id;
 
@@ -1327,6 +1391,8 @@ module networkcube {
                 idCompound.nodePairIds.forEach((v, i, arr) => self.removeFromSelectionByTypeAndId(selection, 'nodePair', v));
             }
         }
+
+        
 
         // SELFIX : delegate to dgraph
         addToAttributeArraysSelection(selection: Selection, type: string, id: number) {
@@ -1487,8 +1553,9 @@ module networkcube {
 
 
         setCurrentSelection(id: number) {
-            if (id < 2) // i.e. either default node or link selection..
-                return;  // ignore
+            // [bbach] why should we ignore them?
+            // if (id < 2) // i.e. either default node or link selection..
+            //     return;  // ignore
             console.log('[DynamicGraph] setCurrentSelectionId ', id)
             this.currentSelection_id = id;
         }
@@ -1505,11 +1572,12 @@ module networkcube {
 
         // creates a selection for the passed type.
         createSelection(type: string): Selection {
-            var b = new Selection(this.selections.length, type);
-            b.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
+            var s = new Selection(this.selections.length, type);
+            s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
-            this.selections.push(b);
-            return b;
+            this.selections.push(s);
+            // console.log('Create new selection:', s.id)
+            return s;
         }
 
         deleteSelection(selectionId: number): void {
@@ -1521,8 +1589,11 @@ module networkcube {
             //             compound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
             //             this.selection('remove', compound, s.id)
             // =======
+
+            // remove 
             var idCompound: IDCompound = new IDCompound();
-            idCompound[s.acceptedType + 's'] = s.elementIds.slice(0);
+            idCompound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
+            console.log('Delete selection->remove elemeents', s.elementIds.slice(0))
             this.selection('remove', idCompound, s.id)
             // >>>>>>> api
 
@@ -1567,12 +1638,13 @@ module networkcube {
         getTimeIdForUnixTime(unixTime: number): number {
             var timeId: number;
             for (timeId = 0; timeId < this.timeArrays.length; timeId++) {
-                if (unixTime < this.timeArrays.unixTime[timeId]) {
-                    timeId--;
+                if (unixTime == this.timeArrays.unixTime[timeId]) {
+                    timeId;
                     return timeId;
                 }
             }
-            return this.timeArrays.length - 1;
+            console.error('Time object for unix time', unixTime, 'not found!')
+            return undefined;
         }
 
         // ORDERING
@@ -1633,6 +1705,7 @@ module networkcube {
         nodePairs(): NodePairQuery {
             return new NodePairQuery(this.nodePairArrays.id, this);
         }
+
         
         linksBetween(n1:Node, n2:Node): LinkQuery{
             var nodePairId = this.matrix[n1.id()][n2.id()];
@@ -1787,8 +1860,9 @@ module networkcube {
 
     export class TimeArray extends AttributeArray {
         id: number[] = [];
-        time: Moment[] = [];         // moment object
-        unixTime: number[] = [];         // js date object
+        momentTime: Moment[] = [];         // moment object
+        label:string[] = []
+        unixTime: number[] = [];         // unix time object
         selections: Selection[][] = [];
         filter: boolean[] = [];
         links: number[][] = []; // all links at that time

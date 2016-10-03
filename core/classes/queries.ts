@@ -145,16 +145,16 @@ module networkcube {
         // SPECIFIC ATTRIBUTE QUERIES
 
         /** @returns the moment object associated to this time object. */
-        time(): Moment { return this.attr('time'); }
+        time(): Moment { return this.attr('momentTime'); }
+        moment(): Moment { return this.attr('momentTime'); }
+
+        label():String {return this.attr('label')}
 
         /** @returns the unix time for this time object. */
         unixTime(): number { return this.attr('unixTime'); }
 
         /** @returns a string label for this object. */
         // label(): String { return this.attr('label') + ''; }
-
-        /** @returns the temporal granularity for this time object. */
-        granularity(): string { return this.attr('granularity'); }
         
         links():LinkQuery{
             // var links:number[] = [];
@@ -165,7 +165,19 @@ module networkcube {
             return new LinkQuery(this.attr('links'), this.g); 
         }
 
+        // wrapper to moment.js
+        year(){ return this.time().year(); }
+        month(){ return this.time().month(); }
+        week(){ return this.time().week(); }
+        day(){ return this.time().day(); }
+        hour(){ return this.time().hour(); }
+        minute(){ return this.time().minute(); }
+        second(){ return this.time().second(); }
+        millisecond(){ return this.time().millisecond(); }
 
+        format(format):string{
+            return this.time().format(format)
+        }
     }
 
     /**
@@ -261,6 +273,7 @@ module networkcube {
 
         }
 
+    
         // TODO
         // presentIn(start: Time, end?: Time): boolean {
         //     // TODO, consider present times for nodes.
@@ -554,7 +567,8 @@ module networkcube {
             }
             return new Query(intersection);
         }
-      
+
+       
     }
 
     /**
@@ -612,6 +626,14 @@ module networkcube {
         get(index:number):number{
             return this._elements[index];
         }
+
+        forEach(f:Function): NumberQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this._elements[i], i);
+           }
+           return this;
+        }
+      
     }
 
     export class StringQuery {
@@ -650,6 +672,13 @@ module networkcube {
         toArray(): string[] {
             return this._elements.slice(0);
         }
+        forEach(f:Function): StringQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this._elements[i], i);
+           }
+           return this;
+        }
+
     }
 
 
@@ -661,7 +690,6 @@ module networkcube {
             super(elements);
             this.g = g;
         }
-
 
         /** @returns a query that contains only the elements matching 
          * the filter critera;
@@ -876,6 +904,13 @@ module networkcube {
         removeDuplicates():NodeQuery{
             return new NodeQuery(this.generic_removeDuplicates()._elements , this.g);
         }
+        
+        forEach(f:Function): NodeQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this.g.node(this._elements[i]),i);
+           }
+           return this;
+        }
 
     }
 
@@ -995,6 +1030,12 @@ module networkcube {
         removeDuplicates():LinkQuery{
             return new LinkQuery(this.generic_removeDuplicates()._elements , this.g);
         }
+        forEach(f:Function): LinkQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this.g.link(this._elements[i]),i);
+           }
+           return this;
+        }
 
 
         
@@ -1079,6 +1120,12 @@ module networkcube {
         }
         removeDuplicates():NodePairQuery{
             return new NodePairQuery(this.generic_removeDuplicates()._elements , this.g);
+        }
+        forEach(f:Function): NodePairQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this.g.nodePair(this._elements[i]),i);
+           }
+           return this;
         }
 
     }
@@ -1182,6 +1229,12 @@ module networkcube {
         intersection(q:TimeQuery):TimeQuery{
             return new TimeQuery(this.generic_intersection(q)._elements , this.g);
         }
+        forEach(f:Function): TimeQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this.g.time(this._elements[i]),i);
+           }
+           return this;
+        }
        
 
     }
@@ -1261,6 +1314,12 @@ module networkcube {
         }
         removeDuplicates():LocationQuery{
             return new LocationQuery(this.generic_removeDuplicates()._elements , this.g);
+        }
+        forEach(f:Function): LocationQuery{
+           for (var i = 0; i < this._elements.length; i++) {
+               f(this.g.location(this._elements[i]),i);
+           }
+           return this;
         }
 
     }

@@ -13,7 +13,6 @@ class TimeSlider {
     TICK_GAP: number = 2;
     TICK_LABEL_GAP: number = 20;
     SLIDER_TOP: number = 25;
-    HEIGHT=200;
 
 
     /** GLOBAL VARIABLES */
@@ -24,8 +23,7 @@ class TimeSlider {
     sliderWidth: number;
     widgetWidth: number;
     callBack = undefined;
-
-
+  
     // function that is called when this time slider's time is changed
     propagateButton: networkcube.RadioButton;
 
@@ -41,7 +39,7 @@ class TimeSlider {
         this.widgetWidth = width;
 
         this.sliderWidth = width - this.MARGIN_SLIDER_RIGHT + 5 - this.MARGIN_SLIDER_LEFT - 5;
-        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), this.times[this.times.length - 1].unixTime(), 1);
+        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, 0, this.times.length - 1, 1);
 
         if(callBack)
             this.callBack = callBack
@@ -99,7 +97,9 @@ class TimeSlider {
             .style('user-select', 'none')
 
         this.slider.appendTo(g);
-        this.slider.setDragEndCallBack((min,max, single)=>this.updateTime(min, max, single));
+        this.slider.setDragEndCallBack((min, max, single) => {
+            this.updateTime(min, max, single);
+        });
 
         this.propagateButton = new networkcube.RadioButton('#000000', 'Syncronize Time')
         this.propagateButton.appendTo(this.sliderWidth + 15, this.SLIDER_TOP + 8, g)
@@ -176,40 +176,36 @@ class TimeSlider {
     }
 
 
-    updateTime(minUnix: number, maxUnix: number, single:number) {
+    updateTime(min: number, max: number, single:number) {
         //var format = this.tickScale.tickFormat();
-        // console.log('update time()', minUnix, maxUnix)
-        // times are still correct here? 
-
         var format = function(d) { return d.toDateString(); };
 
-        // min = Math.max(Math.round(min), 0);
-        // max = Math.min(Math.round(max), this.times.length-1);
+        min = Math.max(Math.round(min), 0);
+        max = Math.min(Math.round(max), this.times.length-1);
         single = Math.round(single);
 
         this.labelStart
-            .attr('x', this.slider.valueRange.invert(minUnix)+ 10)
+            .attr('x', this.slider.valueRange.invert(min)+ 10)
             .style('opacity', 1)
             //.text(this.formatForGranularities(this.times[min].time(), this.dgraph.gran_min, this.dgraph.gran_max));
-            .text(format(new Date(minUnix)));
+            .text(format(new Date(this.times[min].unixTime())));
 
         this.labelEnd
-            .attr('x', this.slider.valueRange.invert(maxUnix)+ 10)
+            .attr('x', this.slider.valueRange.invert(max)+ 10)
             .style('opacity', 1)
             //.text(this.formatForGranularities(this.times[max].time(), this.dgraph.gran_min, this.dgraph.gran_max));
-            .text(format(new Date(maxUnix)));
-        
-        // console.log('update time()', minUnix, maxUnix)
-        if(this.callBack != undefined)
-            this.callBack(minUnix, maxUnix, this.propagateButton.isChecked());
+            .text(format(new Date(this.times[max].unixTime())));
+
+
+        if(this.callBack)
+            this.callBack(this.times[min], this.times[max], this.times[single], this.propagateButton.isChecked());
         else
-            networkcube.timeRange(minUnix, maxUnix, this.times[single], this.propagateButton.isChecked());
+            networkcube.timeRange(this.times[min], this.times[max], this.times[single], this.propagateButton.isChecked());
     }
 
 
-    set(startUnix: number, endUnix: number) {
-        // console.log('startUnix, endUnix', startUnix, endUnix)
-        this.slider.set(startUnix, endUnix)
+    set(start: networkcube.Time, end: networkcube.Time) {
+        this.slider.set(start.id(), end.id())
     }
 
 

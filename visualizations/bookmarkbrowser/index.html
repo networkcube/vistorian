@@ -10,8 +10,10 @@
 <body>
 
 	<div id="searchDiv">
-		<input id="searchField" type="text" name="searchInput" value="Search ..."/>
+		<input id="searchField" type="text" name="searchInput" value="Search ..." onfocus="if (this.value == 'Search ...') {this.value = '';}" width="100%"/>
+		</br>
 		<input id="searchButton" type="button" name="searchButton" value="Find" onclick="startSearch()"/>
+		<input id="clearButton" type="button" name="clearButton" value="Clear Search" onclick="clearSearchSelection()"/>
 		<ul id="searchResults">
 		</ul>
 	</div>
@@ -20,7 +22,6 @@
 
 	<script>
 		function startSearch(){
-			console.log('startSearch');
 			var term = document.getElementById('searchField').value;
 			networkcube.search(term);			
 		}	

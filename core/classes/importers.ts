@@ -90,7 +90,7 @@ module networkcube{
                 
                 var linkRow;
                 for (var i = 0; i < linkData.length; i++) {
-                    if(linkData[i].length == 0){
+                    if(linkData[i].length == 0 || linkData[i][0].length == 0){
                         continue;
                     }
                     linkRow = new Array(colCount)
@@ -123,14 +123,18 @@ module networkcube{
                     linkRow[newLinkSchema.source] = id_source
                     linkRow[newLinkSchema.target] = id_target
 
+                    // format weight
+                    if(linkSchema.weight != undefined){
+                        linkRow[newLinkSchema.weight] = Number(linkData[i][linkSchema.weight]);
+                    }
                     // format time
                     if(linkSchema.time != undefined){
                         linkRow[newLinkSchema.time] = moment(linkData[i][linkSchema.time], timeFormat).format(networkcube.timeFormat())
                     }
                     // copy remaining attributes (linkType, weight, etc..)
                     for(var prop in linkSchema){
-                        if(prop != 'source' && prop != 'target' && prop != 'time'){
-                            linkRow[prop] = linkData[i][prop];
+                        if(prop != 'source' && prop != 'target' && prop != 'time' && prop != 'weight' ){
+                          linkRow[newLinkSchema[prop]] = linkData[i][linkSchema[prop]];
                         }
                     }
                     linkTable.push(linkRow)
@@ -203,14 +207,13 @@ module networkcube{
     /** Loads a .json file from the indicated url. 
      * The json must have a 'nodes/vertices' and a 'links/edge/connections/relations' array.
     */
-    export function loadJson(url:string, callBack:Function):void{
+    export function loadJson(url:string, callBack:Function, dataName?:string):void{
         var d:DataSet;
         var url = url;
         var dataset;
         var callBack = callBack;
          
         d3.json(url, (data)=>{
-            console.log('data:', data)
             if(!data)
                 return;
             
@@ -228,12 +231,46 @@ module networkcube{
             var link;
             var linkSchema = {id: 0, source: 1, target:2, weight: 3};
             var weight;
+            var linkUserProps = []
+            var prop;
+            
+            // check for user-properties to complete schema
+            for(var i=0 ; i<links.length ; i++){
+                link = links[i]
+                for(prop in link){
+                    // console.log('link prop: ', prop)
+                    if(link.hasOwnProperty(prop)
+                    && prop != 'id'
+                    && prop != 'linkType'
+                    && prop != 'time'
+                    && prop != 'name'
+                    && prop != 'source'
+                    && prop != 'target'
+                    && prop != 'weight'
+                    && prop != 'directed'){
+                        if(linkSchema[prop] == undefined){                           
+                            linkUserProps.push(prop);                     
+                            linkSchema[prop] = 3 + linkUserProps.length;
+                        }
+                    }
+                }      
+            }    
+            // collect data from links
             for(var i=0 ; i<links.length ; i++){
                 link = links[i]
                 weight = 1;
                 if(link.weight != undefined)
                     weight = link.weight;
+
                 line = [i ,link.source, link.target, weight];
+                for(var p=0 ; p < linkUserProps.length ; p++){
+                    prop = linkUserProps[p];
+                    if(link[prop] == undefined){
+                        line.push(undefined)
+                    }else{
+                        line.push(link[prop])
+                    }
+                }
                 linkTable.push(line)    
             }    
                 
@@ -247,7 +284,33 @@ module networkcube{
             var locationTable = []; // location table in case there are locations
             var locationSchema = {id:0, longitude:1, latitude:2}; // location table in case there are locations
             var locationEntry = [];           
-            var nodeSchema = {id:0, label:1, nodeType:2};
+            var nodeSchema = {id:0, label:1};
+            var nodeUserProperties = []
+            for(var i=0 ; i<nodes.length ; i++){
+                node = nodes[i];
+                // if(node.lng && node.lat){
+                //     locationTable.push([locationTable.length, node.lng, node.lat])
+                //     nodeSchema['location'] = 3
+                //     line.push(locationTable.length-1)
+                // }   
+                for(prop in node){
+                    // console.log('node prop: ', prop)
+                    if(node.hasOwnProperty(prop)
+                    && prop != 'id'
+                    && prop != 'label'
+                    && prop != 'time'
+                    && prop != 'name'
+                    && prop != 'nodeType'
+                    && prop != 'location'
+                    && prop != 'constructor'){
+                        if(nodeSchema[prop] == undefined){
+                            console.log('node user-prop found', prop)
+                            nodeUserProperties.push(prop)                    
+                            nodeSchema[prop] = 1 +nodeUserProperties.length; 
+                        }  
+                    }
+                }      
+            }    
             for(var i=0 ; i<nodes.length ; i++){
                 node = nodes[i]
                 line = [i];
@@ -259,23 +322,30 @@ module networkcube{
                 }else{
                     line.push(''+i)
                 }
-                if(node.group){
-                    line.push(node.group)
-                }else{
-                    line.push('0')
-                }
-                if(node.lng && node.lat){
-                    locationTable.push([locationTable.length, node.lng, node.lat])
-                    nodeSchema['location'] = 3
-                    line.push(locationTable.length-1)
-                }                       
+                // if(node.group){
+                //     line.push(node.group)
+                // }else{
+                //     line.push('0')
+                // }
+                       
+                // check for user-properties
+                for(var p=0 ; p < nodeUserProperties.length ; p++){
+                    prop = nodeUserProperties[p];
+                    if(node[prop] == undefined){
+                        line.push(undefined)
+                    }else{
+                        line.push(node[prop])
+                    }
+                }  
+                // console.log('node line', line);
                 nodeTable.push(line)    
             }       
-            console.log('>>locationTable', locationTable);
+            // console.log('>>locationTable', locationTable);
             
-            
+            if(dataName == undefined)
+                dataName = url.split('=')[0]; 
             callBack(new DataSet({
-                name: url.split('=')[0],
+                name: dataName,
                 nodeTable: nodeTable, 
                 locationTable:locationTable,
                 linkTable: linkTable, 

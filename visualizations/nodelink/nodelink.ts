@@ -6,7 +6,7 @@
     var LINK_OPACITY = .5;
     var LINK_WIDTH = 1.5;
     var OFFSET_LABEL = {x:0, y:10}
-    var LINK_GAP = 3;
+    var LINK_GAP = 2;
     var LAYOUT_TIMEOUT = 3000;
     var LABELBACKGROUND_OPACITY = 1;
     var LABELDISTANCE = 10;
@@ -39,9 +39,9 @@
     
     var nodePairs = dgraph.nodePairs();
     var links = dgraph.links().toArray();
-    console.log('links', links.length)
     var nodeLength = nodes.length;
     
+
     // states
     var mouseDownNode = undefined;
     var hiddenLabels = [];
@@ -203,6 +203,7 @@
                     }
                     networkcube.selection('add', <networkcube.ElementCompound>{nodes: [d]});
                 }) 
+                
 
                 
         // node labels 
@@ -213,7 +214,7 @@
                 .text((d)=> d.label())  
                 .style('font-size', 12)
                 .style('opacity', 0)    
-
+                
                         
         // node label backgrounds
         nodeLabelBackgrounds = glutils.selectAll()
@@ -226,6 +227,7 @@
                 .attr('height', (d,i)=> getLabelHeight(d))
                 .style('fill', '#eeeee6')
                 .style('opacity', 0)  
+                
                 
 
         // CREATE LINKS
@@ -251,7 +253,9 @@
                         }
                     }
                     networkcube.selection('add', <networkcube.ElementCompound>{links: [d]});                        
-                }) 
+                })
+                                 
+                 
 
         // updateLinks();
         // updateNodes();
@@ -263,22 +267,29 @@
         
         // update node positions
         visualNodes
-            .attr('x', (d,i)=> d.x)
+            .attr('x', (d,i)=>d.x)
             .attr('y', (d,i)=> -d.y)
-
+                             
         nodeLabels
             .attr('x', (d,i)=> d.x)
             .attr('y', (d,i)=> -d.y)
-            
+
         nodeLabelBackgrounds
             .attr('x', (d,i)=> d.x -getLabelWidth(d)/2)
             .attr('y', (d,i)=> -d.y +getLabelHeight(d)/2)
-        
+                             
+        // dgraph.links().forEach((d)=>{
+        //     console.log('d.source', d.source.x, d.source.y)
+        //     console.log('d.target', d.target.x, d.target.y)
+        // })
+
+
         // update link positions
         calculateCurvedLinks();        
         visualLinks
             .attr('d', (d)=> d.path)
-        
+                             
+
         // update nodelabel visibility after layout update.
         updateLabelVisibility();    
             
@@ -361,10 +372,10 @@
     /////////////////////
     
     function mouseOverNode(n){
-        networkcube.highlight('add', {nodes:[n]})
+        networkcube.highlight('set', {nodes:[n]})
     }
     function mouseOutNode(n){
-        networkcube.highlight('remove', {nodes:[n]})
+        networkcube.highlight('reset')
     }
     function mouseDownOnNode(n){
         mouseDownNode = n; 
@@ -399,9 +410,27 @@
     /////////////////
     
     function timeChangedHandler(m:networkcube.TimeRangeMessage){
-        time_start = dgraph.time(m.startId);
-        time_end = dgraph.time(m.endId);
-        timeSlider.set(time_start, time_end);
+
+        for(var i= 0 ; i < times.length ; i++){
+            if(times[i].unixTime() > m.startUnix){
+                time_start = times[i-1];
+                break;
+            }
+        }
+        for(i ; i < times.length ; i++){
+            if(times[i].unixTime() > m.endUnix){
+                time_end = times[i-1];
+                break;
+            }
+        }
+        if(time_end==undefined){
+            time_end = times[times.length-1]
+        }
+
+        console.log('start-end', time_start, time_end)
+      
+      
+        timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();
         updateNodes();
         webgl.render()
@@ -417,6 +446,8 @@
     function updateNodeSize(){
         visualNodes
             .attr('r', (n)=>getNodeRadius(n))
+                             
+
     }
     
     function updateNodes(){
@@ -439,13 +470,17 @@
                 else
                     return 1;
             }) 
+                             
+            
             
         nodeLabels
             .style('opacity', (e) => e.isHighlighted() 
                                 ||  e.links().highlighted().length > 0
                                 ||  hiddenLabels.indexOf(e)==-1 
                                 ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? 1 : 0)          
+                                ? 1 : 0)    
+                                                 
+      
             // .attr('z', (e) => e.isHighlighted() 
             //                     ||  e.links().highlighted().length > 0
             //                     ||  hiddenLabels.indexOf(e)==-1 
@@ -457,7 +492,7 @@
                                 ||  e.links().highlighted().length > 0
                                 ||  hiddenLabels.indexOf(e)==-1 
                                 ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? LABELBACKGROUND_OPACITY : 0)          
+                                ? LABELBACKGROUND_OPACITY : 0)  
             // .attr('z', (e) => e.isHighlighted() 
             //                     ||  e.links().highlighted().length > 0
             //                     ||  hiddenLabels.indexOf(e)==-1 
@@ -474,6 +509,7 @@
                     color = COLOR_DEFAULT_NODE;
                 return color;
             })
+                             
 
     }
     
@@ -487,7 +523,9 @@
             })
             .style('opacity', d=>{
                 var visible = d.isVisible();
-                if(!visible)
+                if(!visible 
+                || !d.source.isVisible() 
+                || !d.target.isVisible()) 
                     return 0;
                 if(d.presentIn(time_start, time_end)){    
                     return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ? 1 : LINK_OPACITY;
@@ -499,6 +537,8 @@
                 var w = linkWeightScale(d.weights(time_start, time_end).mean());    
                 return d.isHighlighted()?w*2 : w;        
             })
+                             
+
     }
     
     function calculateCurvedLinks(){
@@ -514,24 +554,42 @@
                     {x: multiLink.target.x, y: -multiLink.target.y},
                     {x: multiLink.target.x, y: -multiLink.target.y}]
             }else{
-                dir = {
-                    x: multiLink.target.x - multiLink.source.x,
-                    y: multiLink.target.y - multiLink.source.y}
-                // normalize
-                offset = stretchVector([-dir.y, dir.x], LINK_GAP)
-                offset2 = stretchVector([dir.x, dir.y], LINK_GAP)
-
-                // calculate paths
                 links = multiLink.links().toArray();
-                for(var j=0 ; j<links.length ; j++){
-                    links[j]['path'] = [
-                        {x: multiLink.source.x, y: -multiLink.source.y},
-                        {x: multiLink.source.x + offset2[0] + (j-links.length/2 + .5) * offset[0],
-                         y: -(multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
-                        {x: multiLink.target.x - offset2[0] + (j-links.length/2 + .5) * offset[0],
-                         y: -(multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
-                        {x: multiLink.target.x, y: -multiLink.target.y}]
+                // Draw self-links as back-link
+                if(multiLink.source == multiLink.target){
+                    var minGap = getNodeRadius(multiLink.source)/2 + 4;
+                    for(var j=0 ; j<links.length ; j++){
+                        links[j]['path'] = [
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: -multiLink.source.y + minGap + (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y + minGap + (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                        ]
+                    }
+                // non-self links
+                }else{
+                    
+                    dir = {
+                        x: multiLink.target.x - multiLink.source.x,
+                        y: multiLink.target.y - multiLink.source.y}
+                    // normalize
+                    offset = stretchVector([-dir.y, dir.x], LINK_GAP)
+                    offset2 = stretchVector([dir.x, dir.y], LINK_GAP)
+
+                    // calculate paths
+                    for(var j=0 ; j<links.length ; j++){
+                        links[j]['path'] = [
+                            {x: multiLink.source.x, y: -multiLink.source.y},
+                            {x: multiLink.source.x + offset2[0] + (j-links.length/2 + .5) * offset[0],
+                            y: -(multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            {x: multiLink.target.x - offset2[0] + (j-links.length/2 + .5) * offset[0],
+                            y: -(multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            {x: multiLink.target.x, y: -multiLink.target.y}]
+                    }
+
                 }
+
             }
         }
     }
@@ -562,6 +620,8 @@
                 .style('fill', '#ff9999')
                 .attr('x', (d)=>d[0])
                 .attr('y', (d)=>d[1])
+                                 
+
 
         webgl.render();
     }

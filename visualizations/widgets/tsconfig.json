@@ -16,6 +16,7 @@
     "files": [
         "./timeslider.ts",
         "./smartslider.ts",
+        "./timeline.ts",
         "./rangeslider.ts",
         "./slider.ts",
         "./ui.ts"

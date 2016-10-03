@@ -59,6 +59,7 @@ declare class TimeSlider {
     TICK_GAP: number;
     TICK_LABEL_GAP: number;
     SLIDER_TOP: number;
+    HEIGHT: number;
     dgraph: networkcube.DynamicGraph;
     slider: SmartSlider;
     times: networkcube.Time[];
@@ -76,8 +77,8 @@ declare class TimeSlider {
     formatAtGranularity(time: any, granualarity: number): any;
     formatForGranularities(time: any, gran_min: number, gran_max: number): any;
     getGranularityFormattingString(granualarity: any, separator: boolean): string;
-    updateTime(min: number, max: number, single: number): void;
-    set(start: networkcube.Time, end: networkcube.Time): void;
+    updateTime(minUnix: number, maxUnix: number, single: number): void;
+    set(startUnix: number, endUnix: number): void;
 }
 declare class SmartSlider {
     BAR_WIDTH: number;
@@ -120,6 +121,40 @@ declare class SmartSlider {
     getRelX(): number;
     set(min: number, max: number): void;
     setIsInverted(inv: boolean): void;
+}
+declare class Timeline {
+    TICK_MIN_DIST: number;
+    LABEL_MIN_DIST: number;
+    WIDTH: number;
+    HEIGHT: number;
+    webgl: glutils.WebGL;
+    network: networkcube.DynamicGraph;
+    x: number;
+    y: number;
+    position_x: any;
+    position_y: any;
+    label_opacity: any;
+    minTimeId: any;
+    maxTimeId: any;
+    timeObjects: Moment[];
+    highlightPointer: any;
+    highlightLabel: any;
+    minGran: number;
+    maxGran: number;
+    granules: any;
+    tickmarks: glutils.WebGLElementQuery;
+    timeLabels: glutils.WebGLElementQuery;
+    tick_minGran_visible: any;
+    tick_minGran_visible_prev: number;
+    label_minGran_visible: any;
+    constructor(webgl: glutils.WebGL, network: networkcube.DynamicGraph, x: number, y: number, width: number, height: number);
+    timeGranularities: any;
+    visualize(): void;
+    update(startUnix: any, endUnix: any): void;
+    updateWithIds(minTimeId: any, maxTimeId: any): void;
+    formatTime(index: any): string;
+    highlightId: number;
+    highlight(unixTime?: number): void;
 }
 declare class RangeSlider {
     BAR_WIDTH: number;
