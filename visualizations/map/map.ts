@@ -31,6 +31,7 @@ var positions = new Object();
 var dgraph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
 // get dynamic graph
 var links:networkcube.Link[] = dgraph.links().toArray();
+var times = dgraph.times().toArray();
 var time_start: networkcube.Time = dgraph.time(0);
 var time_end: networkcube.Time = dgraph.times().last();
 
@@ -1009,10 +1010,24 @@ function stretchVector(vec, finalLength) {
 
 
 function timeChangedHandler(m:networkcube.TimeRangeMessage) {
-    
-    time_start = dgraph.time(m.startId);
-    time_end = dgraph.time(m.endId);;
-    timeSlider.set(time_start, time_end);
+
+    for(var i= 0 ; i < times.length ; i++){
+        if(times[i].unixTime() > m.startUnix){
+            time_start = times[i-1];
+            break;
+        }
+    }
+    for(i ; i < times.length ; i++){
+        if(times[i].unixTime() > m.endUnix){
+            time_end = times[i-1];
+            break;
+        }
+    }
+    if(time_end==undefined){
+        time_end = times[times.length-1]
+    }
+
+    timeSlider.set(m.startUnix, m.endUnix);
 
     updateNodes();   
     updateLinks();
