@@ -11,12 +11,14 @@
 	font-family: 'Helvetiva Neue', sans-serif;	
 	font-size: 8pt;
     text-anchor: end;
+	cursor: pointer;	
 }
 
 .egolabel{
 	fill: #000;
 	text-decoration: underline;
 	font-weight: bold;
+	cursor: pointer;	
 }
 
 .rowBar{
