@@ -110,7 +110,7 @@ class MatrixTimeSlider{
     this.timeSlider.appendTo(this.svg);
 
   }
-  set(sT: networkcube.Time, eT: networkcube.Time){
+  set(sT:number, eT:number){
     this.timeSlider.set(sT, eT);
   }
 }
@@ -525,7 +525,7 @@ class MatrixVisualization{
     let begin = d.getTime()
     this.renderer.render(this.scene, this.camera)
     d = new Date();
-    console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
+    // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
   }
 
   updateData(data:  {[id: number]: {[id: number]: networkcube.NodePair}},
@@ -663,7 +663,7 @@ class MatrixVisualization{
     this.guideLines = [];
 
     if(!this.data) return;
-    console.log("update guidelines")
+    // console.log("update guidelines")
 
     let w = this.ncols*this.cellSize;
     let h = this.nrows*this.cellSize;
@@ -814,6 +814,7 @@ class Matrix{
   private timeSlider: MatrixTimeSlider;
   private overview: MatrixOverview;
   private _dgraph: networkcube.DynamicGraph;
+  private times: networkcube.Time[];
   public startTime: networkcube.Time;
   public endTime: networkcube.Time;
   private nodeOrder: number[];
@@ -832,6 +833,7 @@ class Matrix{
     this._dgraph = networkcube.getDynamicGraph();
     this.startTime = this.dgraph.startTime;
     this.endTime = this.dgraph.endTime;
+    this.times = this._dgraph.times().toArray()
     this.nodeOrder = this._dgraph.nodes().ids();
     this.bbox = {x0: 0, x1: 0, y0: 0, y1: 0};
     this._tr = [0, 0];
@@ -994,7 +996,7 @@ class Matrix{
   }
 
   updateVisibleData(){
-    console.log("updateVis");
+    // console.log("updateVis");
     this.updateVisibleBox();
     let leftNodes = this.dgraph.nodes().visible().toArray();
     leftNodes = leftNodes.filter( d =>
@@ -1121,10 +1123,28 @@ class Matrix{
   }
 
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
-    this.startTime = this._dgraph.time(m.startId);
-    this.endTime = this._dgraph.time(m.endId);
-    this.timeSlider.set(this.startTime, this.endTime);
-    this.updateVisibleData();
+
+      for(var i= 0 ; i < this.times.length ; i++){
+            if(this.times[i].unixTime() > m.startUnix){
+                this.startTime = this.times[i-1];
+                break;
+            }
+      }
+      for(i ; i < this.times.length ; i++){
+          if(this.times[i].unixTime() > m.endUnix){
+              this.endTime = this.times[i-1];
+              break;
+          }
+      }
+      if(this.endTime==undefined){
+          this.endTime = this.times[this.times.length-1]
+      }
+      // this.startTime = this._dgraph.time(m.startId);
+      // this.endTime = this._dgraph.time(m.endId);
+      // this.timeSlider.set(this.startTime, this.endTime);
+      this.timeSlider.set(m.startUnix, m.endUnix);
+
+      this.updateVisibleData();
   }
 
 }
