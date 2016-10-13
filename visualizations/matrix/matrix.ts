@@ -418,6 +418,9 @@ class MatrixVisualization{
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
+  private bufferScene: THREE.Scene;
+  private bufferCamera: THREE.OrthographicCamera;
+  private bufferRenderer: THREE.WebGLRenderer;
   private geometry: THREE.BufferGeometry;
   private mesh: THREE.Mesh;
   private guideLines: THREE.LineBasicMaterial[];
@@ -485,8 +488,6 @@ class MatrixVisualization{
     this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0xffffff, 1);
 
-    this.initTextureFramebuffer();
-
     // position canvas element containing cells
     this.canvas = this.renderer.domElement;
 
@@ -496,11 +497,36 @@ class MatrixVisualization{
     this.canvas.addEventListener('mouseup', this.mouseUpHandler);
     this.canvas.addEventListener('click', this.clickHandler);
 
+    this.initTextureFramebuffer();
+
     // init glutils renderer for D3 wrapper
     glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
   }
   initTextureFramebuffer() {
-    this.bufferTexture = new THREE.WebGLRenderTarget( 256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
+    // this.bufferScene = new THREE.Scene();
+    // // camera
+    // this.bufferCamera = new THREE.OrthographicCamera(
+    //   this.width / -2,
+    //   this.width / 2,
+    //   this.height/ 2,
+    //   this.height / -2,
+    //   0, 100)
+    //
+    // this.bufferScene.add(this.bufferCamera);
+    // this.bufferCamera.position.x = this.width / 2;
+    // this.bufferCamera.position.y = -this.height / 2;
+    // this.bufferCamera.position.z = 100;
+    //
+    // this.bufferRenderer = new THREE.WebGLRenderer({ antialias: true })
+    // this.bufferRenderer.setSize(this.width, this.height);
+    // this.bufferRenderer.setClearColor(0xffffff, 1);
+
+    this.bufferTexture = new THREE.WebGLRenderTarget( 128, 128,
+      { minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        // depthBuffer: false,
+        // stencilBuffer: false
+      });
   }
 
   initGeometry(){
@@ -514,7 +540,7 @@ class MatrixVisualization{
     let fragmentShaderProgram = `
       varying vec4 vColor;
       void main() {
-        gl_FragColor = vec4(vColor[0], vColor[1], vColor[2], vColor[3]);
+        gl_FragColor = vColor;
       }`;
 
     let attributes = {
@@ -525,6 +551,7 @@ class MatrixVisualization{
     this.shaderMaterial = new THREE.ShaderMaterial({
       attributes: attributes,
       vertexShader: vertexShaderProgram,
+      blending: THREE.AdditiveBlending,
       fragmentShader: fragmentShaderProgram,
     });
     this.shaderMaterial.blending = THREE.NormalBlending;
@@ -570,7 +597,59 @@ class MatrixVisualization{
       this.scene.remove(this.guideLines[i]);
     }
 
+    if(getImageData){
 
+      let smallDim =  this.bufferTexture.width;//Math.min(this.height, this.width);
+      let cellSize = smallDim/this.nrows;
+
+      this.vertexPositions = [];
+      this.vertexColors = [];
+      this.cellHighlightFrames = [];
+      this.linksPos = {};
+
+      for(let row in this.data){
+        for( let col in data[row]){
+          this.addCell(row, col, data[row][col], cellSize, false );
+        }
+      }
+
+      // CREATE + ADD MESH
+      this.geometry.addAttribute('position', new THREE.BufferAttribute(glutils.makeBuffer3f(this.vertexPositions), 3));
+      this.geometry.addAttribute('customColor', new THREE.BufferAttribute(glutils.makeBuffer4f(this.vertexColors), 4));
+
+      this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
+
+      this.geometry.attributes['customColor'].needsUpdate = true;
+      this.scene.add(this.mesh);
+      this.matrix.hideCellLabel();
+
+      this.resizeCanvas(smallDim, smallDim, true);
+
+      this.renderer.render(this.scene, this.camera, this.bufferTexture);
+      var dat = new Uint8Array(this.bufferTexture.width * this.bufferTexture.height * 4);
+      this.renderer.readRenderTargetPixels(this.bufferTexture, 0, 0, this.bufferTexture.width, this.bufferTexture.height, dat);
+
+      // Create a 2D canvas to store the result
+      var canvas = document.createElement('canvas');
+      canvas.width = this.bufferTexture.width;
+      canvas.height = this.bufferTexture.height;
+      var context = canvas.getContext('2d');
+
+      // Copy the pixels to a 2D canvas
+      var imageData = context.createImageData(this.bufferTexture.width, this.bufferTexture.height);
+      imageData.data.set(dat);
+      context.putImageData(imageData, 0, 0, 0, 0, canvas.width, canvas.height);
+
+      // let imgData = this.canvas.toDataURL();
+      let imgData = canvas.toDataURL();
+      this.matrix.updateOverviewImage(imgData);
+
+      this.resizeCanvas(this.width, this.height);
+    }
+
+    if (this.geometry){
+      this.scene.remove(this.mesh);
+    }
 
     this.vertexPositions = [];
     this.vertexColors = [];
@@ -579,7 +658,7 @@ class MatrixVisualization{
 
     for(let row in this.data){
       for( let col in data[row]){
-        this.addCell(row, col, data[row][col]);
+        this.addCell(row, col, data[row][col], this.cellSize );
       }
     }
 
@@ -590,67 +669,31 @@ class MatrixVisualization{
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
 
     this.geometry.attributes['customColor'].needsUpdate = true;
-
     this.scene.add(this.mesh);
-    this.render();
-    if(getImageData){
+    this.matrix.hideCellLabel();
 
-
-      let smallDim = Math.min(this.height, this.width);
-
-      this.resizeCanvas(smallDim, smallDim);
-      //
-      // this.renderer.render(this.scene, this.camera, this.bufferTexture);
-      // // Read the contents of the framebuffer
-      //
-      // console.log(this.bufferTexture);
-      // // this.bufferTexture.__webglTexture.flipY = false;
-      //
-      // var dat = new Uint8Array(this.bufferTexture.width * this.bufferTexture.height * 4);
-      //
-      //
-      // this.renderer.readRenderTargetPixels(this.bufferTexture, 0, 0, this.bufferTexture.width, this.bufferTexture.height, dat);
-      //
-      // // Create a 2D canvas to store the result
-      // var canvas = document.createElement('canvas');
-      // canvas.width = this.bufferTexture.width;
-      // canvas.height = this.bufferTexture.height;
-      // var context = canvas.getContext('2d');
-      //
-      // // Copy the pixels to a 2D canvas
-      // var imageData = context.createImageData(this.bufferTexture.width, this.bufferTexture.height);
-      // imageData.data.set(dat);
-      // context.putImageData(imageData, 0, 0, 0, 0, canvas.width, canvas.height);
-
-
-      this.matrix.hideCellLabel();
-      this.render();
-
-      // let imgData = this.canvas.toDataURL();
-      let imgData = this.canvas.toDataURL();
-      this.matrix.updateOverviewImage(imgData);
-
-      this.resizeCanvas(this.width, this.height);
-
-    }
     this.updateGuideLines();
     this.render();
   }
 
 
-  resizeCanvas(width: number, height: number){
-
-    this.camera.position.x = width / 2;
-    this.camera.position.y = -height / 2;
-    this.camera.left = width / -2;
-    this.camera.right = width / 2;
-    this.camera.top = height/ 2;
-    this.camera.bottom = height/ -2;
-    this.camera.updateProjectionMatrix ();
-    this.renderer.setSize(width, height);
+  resizeCanvas(width: number, height: number, flipY=false,
+               camera=this.camera, renderer=this.renderer){
+    camera.position.x = width / 2;
+    camera.position.y = -height / 2;
+    camera.left = width / -2;
+    camera.right = width / 2;
+    camera.top = height/ 2;
+    camera.bottom = height/ -2;
+    if(flipY) {
+      camera.top = -camera.top;
+      camera.bottom = -camera.bottom;
+    }
+    camera.updateProjectionMatrix ();
+    renderer.setSize(width, height);
   }
 
-  addCell(row: number, col: number, pair: networkcube.NodePair){
+  addCell(row: number, col: number, pair: networkcube.NodePair, cellSize: number, addToTable=true){
     let links: networkcube.Link[];
     let e: networkcube.Link;
     let x, y, z: number;
@@ -662,7 +705,7 @@ class MatrixVisualization{
 
     links = pair.links().toArray();
     linkNum = links.length;
-    seg = this.cellSize / linkNum;
+    seg = cellSize / linkNum;
     z = 1;
 
     for (let j = 0; j < links.length; j++) {
@@ -675,13 +718,15 @@ class MatrixVisualization{
       color = new THREE.Color(webColor);
       alpha = this.linkWeightScale(Math.abs(meanWeight));
 
-      x = col * this.cellSize + seg * j + seg / 2 + this.offset[0];
-      y = row * this.cellSize + this.cellSize/2 + this.offset[1];
-      this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
+      x = col * cellSize + seg * j + seg / 2 + this.offset[0];
+      y = row * cellSize + cellSize/2 + this.offset[1];
+      this.paintCell(e.id(), x, y, seg, cellSize, [color.r, color.g, color.b, alpha], meanWeight>0, addToTable);
 
-      if(!this.linksPos[row]) this.linksPos[row] = {};
-      if(!this.linksPos[row][col]) this.linksPos[row][col] = [];
-      this.linksPos[row][col].push(e.id());
+      if(addToTable) {
+        if (!this.linksPos[row]) this.linksPos[row] = {};
+        if (!this.linksPos[row][col]) this.linksPos[row][col] = [];
+        this.linksPos[row][col].push(e.id());
+      }
 
       //x = this.cellSize/2 + row * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
       //y = this.cellSize/2 + col * this.cellSize;
@@ -690,12 +735,11 @@ class MatrixVisualization{
 
   }
 
-  paintCell(id: number, x: number, y: number, w: number,
-            color: number[], positive: Boolean){
-    let h: number = this.cellSize;
-    let highlightFrames: THREE.Mesh = new THREE.Mesh();
-    let selectionFrames: THREE.Mesh = new THREE.Mesh();
-    let frame: THREE.Line;
+  paintCell(id: number, x: number, y: number,
+            w: number, h: number,
+            color: number[], positive: Boolean,
+            addFrame=true){
+
 
     if (positive) {
       glutils.addBufferedRect(this.vertexPositions, x, -y, 0, w - 1, h - 1,
@@ -704,22 +748,30 @@ class MatrixVisualization{
       glutils.addBufferedDiamond(this.vertexPositions, x, -y, 0, w - 1, h - 1,
         this.vertexColors, color);
     }
-    // highlight frame
-    frame = glutils.createRectFrame(w - 1, h - 1, COLOR_HIGHLIGHT, 1)
-    frame.position.x = x;
-    frame.position.y = -y;
-    frame.position.z = 10;
-    highlightFrames.add(frame);
-    if(!this.cellHighlightFrames[id]) this.cellHighlightFrames[id] = [];
-    this.cellHighlightFrames[id].push(highlightFrames);
 
-    // selection frame
-    frame = glutils.createRectFrame(w - 1, h - 1, COLOR_SELECTION, 2)
-    frame.position.x = x;
-    frame.position.y = -y;
-    frame.position.z = 9;
-    selectionFrames.add(frame);
-    this.cellSelectionFrames[id] = selectionFrames;
+    if(addFrame) {
+
+      let highlightFrames: THREE.Mesh = new THREE.Mesh();
+      let selectionFrames: THREE.Mesh = new THREE.Mesh();
+      let frame: THREE.Line;
+
+      // highlight frame
+      frame = glutils.createRectFrame(w - 1, h - 1, COLOR_HIGHLIGHT, 1)
+      frame.position.x = x;
+      frame.position.y = -y;
+      frame.position.z = 10;
+      highlightFrames.add(frame);
+      if (!this.cellHighlightFrames[id]) this.cellHighlightFrames[id] = [];
+      this.cellHighlightFrames[id].push(highlightFrames);
+
+      // selection frame
+      frame = glutils.createRectFrame(w - 1, h - 1, COLOR_SELECTION, 2)
+      frame.position.x = x;
+      frame.position.y = -y;
+      frame.position.z = 9;
+      selectionFrames.add(frame);
+      this.cellSelectionFrames[id] = selectionFrames;
+    }
 
   }
   updateGuideLines(){
@@ -1255,4 +1307,23 @@ matrix.setOverview(matrixOverview);
 matrix.setVis(matrixVis);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
 
-
+function addBufferedPoint(vertexArray: number[][], x: number, y: number, z: number, width: number, height: number, colorArray: number[][], c: number[]) {
+  width = width / 2;
+  height = height / 2;
+  vertexArray.push(
+    [x - width, y - height, z],
+    [x + width, y - height, z],
+    [x + width, y + height, z],
+    [x + width, y + height, z],
+    [x - width, y + height, z],
+    [x - width, y - height, z]
+  );
+  colorArray.push(
+    [c[0], c[1], c[2], c[3]],
+    [c[0], c[1], c[2], c[3]],
+    [c[0], c[1], c[2], c[3]],
+    [c[0], c[1], c[2], c[3]],
+    [c[0], c[1], c[2], c[3]],
+    [c[0], c[1], c[2], c[3]]
+  );
+}
