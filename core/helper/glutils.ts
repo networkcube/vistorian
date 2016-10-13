@@ -495,7 +495,7 @@ module glutils {
         set():WebGLElementQuery{
             if(!this.IS_SHADER)
                 return this;
-
+                
             var l = this.visualElements.length;
             var vertexPositionBuffer = []
             var vertexColorBuffer = []

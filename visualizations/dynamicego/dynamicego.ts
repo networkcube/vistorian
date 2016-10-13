@@ -248,8 +248,11 @@ function createLinks(){
         var yOffset;
         
         // CREATE ANCHORS
-        startAnchors = glutils.selectAll().data(links);
-        startAnchors.append('circle')
+        startAnchors = webgl.selectAll()
+            .data(links);
+
+        startAnchors
+            .append('circle')
             .attr('x', (l,i)=>
                 timeXFunction(l.times().toArray()[0].unixTime()))
             .attr('y', (l,i)=>{
