@@ -7,7 +7,8 @@ var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#999999';
 var COLOR_HIGHLIGHT = '#ff8800';
 var LINK_OPACITY = .8;
-var LOCATION_MARKER_WIDTH = 5;
+var NODE_UNPOSITIONED_OPACITY = .5
+var LOCATION_MARKER_WIDTH = 10;
 var OVERLAP_FRACTION = .8;
 var NODE_SIZE = 4;
 var OUT_OF_TIME_NODES_OPACITY = 0;
@@ -25,13 +26,11 @@ var margin: Bounds = { left: 20, top: 20 };
 var TIMELINE_HEIGHT: number = 50;
 var MENU_HEIGHT:number = 50;
 
-var positions = new Object();
-
-
 var dgraph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
 // get dynamic graph
 var links:networkcube.Link[] = dgraph.links().toArray();
 var times = dgraph.times().toArray();
+var locations = dgraph.locations().toArray();
 var time_start: networkcube.Time = dgraph.time(0);
 var time_end: networkcube.Time = dgraph.times().last();
 
@@ -40,12 +39,15 @@ var mapCanvas = d3.select('#visDiv').node();
 $(mapCanvas).css('width', '100%');
 $(mapCanvas).css('height', $(window).height()-60);
 
+// one empty default nodeposition object for every node
+// for the cases this node has no position at a given time.
+var emptyNodePositions = {}
 
 // VISUAL ELEMENTS
 var nodePositionObjects = [];
 var nodePositionObjectsLookupTable = [];
 class NodePositionObject{
-    timeId:number; 
+    timeIds:number[] = []; 
     location: networkcube.Location;
     node: networkcube.Node
     x:number 
@@ -54,7 +56,8 @@ class NodePositionObject{
     yOrig:number;
     geoPos: google.maps.LatLng; 
     displaced: boolean;
-    displacementVector: number[]
+    displacementVector: number[]; 
+    fixedPosition:boolean = true;
 }
 
 var overlay
@@ -91,7 +94,6 @@ var vNodeLabels;
 var vNodeLabelBackgrounds;
 var geoProjection: google.maps.MapCanvasProjection;
 var layer;
-var locations = dgraph.locations().toArray();
 var locationsPanelDiv: HTMLDivElement;
 
     
@@ -242,7 +244,7 @@ function init(){
 
 
 
-        // CREATE LOCATION MARKERS
+        // CREATE LOCATION MARKERS (Cirle for every location)
 
         var locationMarker = svg.selectAll('.locationMarker')
             .data(locations)
@@ -250,8 +252,12 @@ function init(){
             .append('g')
             .attr('class', 'locationMarker');
 
-        locationMarker.append('circle')
-            .attr('r', LOCATION_MARKER_WIDTH);
+        locationMarker.append('rect')
+            .attr('width', LOCATION_MARKER_WIDTH)
+            .attr('height', LOCATION_MARKER_WIDTH)
+            .attr('x', -LOCATION_MARKER_WIDTH/2)
+            .attr('y', -LOCATION_MARKER_WIDTH/2)
+            .style('opacity', .4)
 
         // define arrow markers for directed links
 
@@ -316,7 +322,7 @@ function init(){
 
         // obtain nodePositionObjects
         // one npo per node x position 
-        var npo;
+        var npo:NodePositionObject;
         var nodes = dgraph.nodes().toArray();
         var n, positions;
         var googleLatLng;
@@ -330,55 +336,100 @@ function init(){
                 googleLatLng = new google.maps.LatLng(
                     positions[t].latitude(),
                     positions[t].longitude());
-                // console.log('> NPO', positions[t].label())    
-                // console.log('> NPO from latlong', geoProjection.fromLatLngToDivPixel(googleLatLng).x, geoProjection.fromLatLngToDivPixel(googleLatLng).y)
-                npo = new NodePositionObject();    
-                npo.timeId = t, 
+                // check if npo for this node and position does 
+                // already exist, if not its created in side this function
+                npo = getNodePositionObjectsForLocation(n,positions[t].longitude(), positions[t].latitude());
                 npo.location = positions[t],
-                npo.node = n,
-                npo.x = 0, 
-                npo.y = 0,
-                npo.xOrig = 0, 
-                npo.yOrig = 0,
                 npo.geoPos = googleLatLng, 
-                npo.displaced = false
-                npo.displacementVector = [0,0]
-                
-                nodePositionObjects.push(npo);
+                npo.timeIds.push(parseInt(t))
                 serie.set(dgraph.time(parseInt(t)), npo)    
+
             }
         }
+
         
         // assign NPOs to links
+        var loc:networkcube.Location
         visualLinks
             .each((link)=>{
                 // get source and target NPO
                 link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
-                if(!link.sourceNPO){
-                    link.sourceNPO = new NodePositionObject();
-                    link.sourceNPO.x = 0;
-                    link.sourceNPO.y = 0;
-                    link.sourceNPO.xOrig = 0;
-                    link.sourceNPO.yOrig = 0;
-                    link.sourceNPO.node = link.source;
-                    link.sourceNPO.googleLatLng = new google.maps.LatLng(0,0);
-                    link.sourceNPO.displaced = false
-                    link.sourceNPO.displacementVector = [0,0]
-                }
+                // if(!link.sourceNPO){
+                //     link.sourceNPO = new NodePositionObject();
+                //     link.sourceNPO.x = 0;
+                //     link.sourceNPO.y = 0;
+                //     link.sourceNPO.timeId = link.times().get(0).id();
+                //     link.sourceNPO.xOrig = 0;
+                //     link.sourceNPO.yOrig = 0;
+                //     link.sourceNPO.node = link.source;
+                //     link.sourceNPO.geoPos = new google.maps.LatLng(0,0);
+                //     link.sourceNPO.displaced = false
+                //     link.sourceNPO.displacementVector = [0,0]
+                //     nodePositionObjects.push(link.sourceNPO)
+                // }
                 link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
-                if(!link.targetNPO){
-                    link.targetNPO = new NodePositionObject();
-                    link.targetNPO.x = 0;
-                    link.targetNPO.y = 0;
-                    link.targetNPO.xOrig = 0;
-                    link.targetNPO.yOrig = 0;
-                    link.targetNPO.node = link.target;
-                    link.targetNPO.googleLatLng = new google.maps.LatLng(0,0);
-                    link.targetNPO.displaced = false
-                    link.targetNPO.displacementVector = [0,0]
-                }
-                console.log(link.sourceNPO.x, link.targetNPO.x)
+                // if(!link.targetNPO){
+                    // link.targetNPO = new NodePositionObject();
+                    // link.targetNPO.x = 0;
+                    // link.targetNPO.y = 0;
+                    // link.targetNPO.timeId = link.times().get(0).id();
+                    // link.targetNPO.xOrig = 0;
+                    // link.targetNPO.yOrig = 0;
+                    // link.targetNPO.node = link.target;
+                    // link.targetNPO.geoPos = new google.maps.LatLng(0,0);
+                    // link.targetNPO.displaced = false
+                    // link.targetNPO.displacementVector = [0,0]
+                    // nodePositionObjects.push(link.targetNPO)
+                // }
+                // console.log(link['sourceNPO'], link['targetNPO'])
             })
+
+        // POSITION NODES WITHOUT OWN POSITIONS
+        // 1. create layout network 
+        var layoutNodes = []
+        for(var i=0 ; i < nodePositionObjects.length ; i++){
+            layoutNodes.push({id:i,
+                x: nodePositionObjects[i].geoPos.lng(),
+                y: nodePositionObjects[i].geoPos.lat() 
+            })
+            if(layoutNodes[i].x != undefined && layoutNodes[i].x != 0
+            && layoutNodes[i].y != undefined && layoutNodes[i].y != 0){
+                layoutNodes[i].fixed = true;
+            }else{
+                layoutNodes[i].fixed = false;
+            }
+        }
+
+        var layoutLinks = []
+        for(var i=0 ; i < links.length ; i++){
+            layoutLinks.push({
+                source: nodePositionObjects.indexOf(links[i].sourceNPO),
+                target: nodePositionObjects.indexOf(links[i].targetNPO),
+            })
+        }
+        
+        var force = d3.layout.force()
+            .nodes(layoutNodes)
+            .links(layoutLinks)
+            // .linkStrength(0.1)
+            // .friction(0.9)
+            .linkDistance(.1)
+            // .charge(-30)
+            // .gravity(1)
+            .theta(0.8)
+            .alpha(0.1)
+            .start()
+            .on('end', ()=>{
+                for(var i=0 ; i < layoutNodes.length ; i++){
+                    if(!layoutNodes[i].fixed){
+                        // normalize length if possible
+                        nodePositionObjects[i].geoPos = new google.maps.LatLng(layoutNodes[i].x,layoutNodes[i].y);
+                    }   
+                }
+                update()
+            })
+
+        
 
         visualNodes = svg.selectAll(".node")
             .data(nodePositionObjects)
@@ -402,7 +453,6 @@ function init(){
             .attr("r", function(d) {
                 return nodeSizeFunction(d.node.neighbors().length);
             })
-
 
         // LOCATION CIRCLE for displaced nodes
         visualNodes.append("circle")
@@ -541,7 +591,13 @@ overlay.setMap(map);
 
 
 function createNodeLabel(npo){
-    return npo.node.label() + ' (' + npo.location.label()+', '+ moment(dgraph.time(npo.timeId).unixTime()).format('MM/DD/YYYY') +')';
+    var locationLabel
+    if(npo.location == undefined || npo.location.label() == undefined)
+        locationLabel = ''
+    else
+        locationLabel =  npo.location.label()+', ';
+
+    return npo.node.label() + ' ('+ moment(dgraph.time(npo.timeIds[0]).unixTime()).format('MM/DD/YYYY') +')';
 }
 
 var hittestRect: google.maps.LatLngBounds = null;
@@ -760,12 +816,14 @@ function updateNodes() {
     visibleLabels = [];
 
     visualNodes
-        .attr('opacity', d => {
-            var visible = d.node.isVisible();
-            if (!visible)
+        .attr('opacity', (d) => {
+            if (!d.node.isVisible())
                 return 0;
-            return d.timeId >= time_start.id() && d.timeId <= time_end.id()
-            ?1:OUT_OF_TIME_NODES_OPACITY;
+            return d.timeIds[0] <= time_end.id() && d.timeIds[d.timeIds.length-1] >= time_start.id() ? 
+                d.fixedPosition ? 
+                    1 : 
+                    NODE_UNPOSITIONED_OPACITY
+                : OUT_OF_TIME_NODES_OPACITY;
         })
     
     svg.selectAll(".nodeCircle")
@@ -985,11 +1043,19 @@ networkcube.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTI
     OVERLAP_FRACTION = value;
     updateNodePositions();
 })
+
 // LINK OPACITY SLIDER    
 var menuDiv = d3.select('#menuDiv');
 networkcube.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 0, 1, function(value:number){
     LINK_OPACITY = value;
     updateLinks();
+})
+
+// NON-POSITIONED NODES OPACITY SLIDER    
+var menuDiv = d3.select('#menuDiv');
+networkcube.makeSlider(menuDiv, 'Unpositiond Nodes Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 0, 1, function(value:number){
+    NODE_UNPOSITIONED_OPACITY = value;
+    updateNodes();
 })
 
 
@@ -1158,10 +1224,57 @@ function removeNodeOverlap() {
         .attr('cy', function(d) { return d.yOrig - d.y; })
 }
 
+function getNodePositionObjectsForLocation(n:networkcube.Node, long, lat):NodePositionObject{
+    var s = this.nodePositionObjectsLookupTable[n.id()]
+    var npo;
+    if(s != undefined){
+        for(var t in s.serie){
+            npo = s.serie[t]
+            if(npo.geoPos.lng() == long && npo.geoPos.lat() == lat)
+                return npo;
+        }
+    }
+        // init node positions
+    npo = new NodePositionObject();    
+    npo.node = n,
+    npo.x = 0, 
+    npo.y = 0,
+    npo.xOrig = 0, 
+    npo.yOrig = 0,
+    npo.displaced = false
+    npo.displacementVector = [0,0]
+    nodePositionObjects.push(npo);
+    return npo
+}
+
 
 function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object{
     var s = this.nodePositionObjectsLookupTable[n.id()]
-    return s.serie[tId];
+    var npo;
+    if(s.serie[tId] == undefined){
+        // check if empty node object exist for n
+        if(emptyNodePositions[n.id()] != undefined){
+            npo = emptyNodePositions[n.id()];
+        }else{
+            // create node
+            npo = new NodePositionObject();
+            npo.x = 0;
+            npo.y = 0;
+            npo.timeIds.push(tId);
+            npo.xOrig = 0;
+            npo.yOrig = 0;
+            npo.node = n;
+            npo.geoPos = new google.maps.LatLng(0,0);
+            npo.displaced = false
+            npo.displacementVector = [0,0]
+            npo.fixedPosition = false;
+            nodePositionObjects.push(npo)
+            emptyNodePositions[n.id()] = npo;
+        }
+    }else{
+        npo = s.serie[tId];
+    }
+    return npo;
 }
 
 

@@ -2,7 +2,8 @@ var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#999999';
 var COLOR_HIGHLIGHT = '#ff8800';
 var LINK_OPACITY = .8;
-var LOCATION_MARKER_WIDTH = 5;
+var NODE_UNPOSITIONED_OPACITY = .5;
+var LOCATION_MARKER_WIDTH = 10;
 var OVERLAP_FRACTION = .8;
 var NODE_SIZE = 4;
 var OUT_OF_TIME_NODES_OPACITY = 0;
@@ -13,19 +14,22 @@ var height = window.innerHeight - 100;
 var margin = { left: 20, top: 20 };
 var TIMELINE_HEIGHT = 50;
 var MENU_HEIGHT = 50;
-var positions = new Object();
 var dgraph = networkcube.getDynamicGraph();
 var links = dgraph.links().toArray();
 var times = dgraph.times().toArray();
+var locations = dgraph.locations().toArray();
 var time_start = dgraph.time(0);
 var time_end = dgraph.times().last();
 var mapCanvas = d3.select('#visDiv').node();
 $(mapCanvas).css('width', '100%');
 $(mapCanvas).css('height', $(window).height() - 60);
+var emptyNodePositions = {};
 var nodePositionObjects = [];
 var nodePositionObjectsLookupTable = [];
 var NodePositionObject = (function () {
     function NodePositionObject() {
+        this.timeIds = [];
+        this.fixedPosition = true;
     }
     return NodePositionObject;
 })();
@@ -53,7 +57,6 @@ var vNodeLabels;
 var vNodeLabelBackgrounds;
 var geoProjection;
 var layer;
-var locations = dgraph.locations().toArray();
 var locationsPanelDiv;
 var locationDisplayTimeoutHandle = -1;
 var prevIntersectedLink;
@@ -181,8 +184,12 @@ function init() {
             .enter()
             .append('g')
             .attr('class', 'locationMarker');
-        locationMarker.append('circle')
-            .attr('r', LOCATION_MARKER_WIDTH);
+        locationMarker.append('rect')
+            .attr('width', LOCATION_MARKER_WIDTH)
+            .attr('height', LOCATION_MARKER_WIDTH)
+            .attr('x', -LOCATION_MARKER_WIDTH / 2)
+            .attr('y', -LOCATION_MARKER_WIDTH / 2)
+            .style('opacity', .4);
         var defs = svg.append('svg:defs');
         defs.append('svg:marker')
             .attr('id', 'end-arrow')
@@ -231,48 +238,54 @@ function init() {
             nodePositionObjectsLookupTable.push(serie);
             for (var t in positions) {
                 googleLatLng = new google.maps.LatLng(positions[t].latitude(), positions[t].longitude());
-                npo = new NodePositionObject();
-                npo.timeId = t,
-                    npo.location = positions[t],
-                    npo.node = n,
-                    npo.x = 0,
-                    npo.y = 0,
-                    npo.xOrig = 0,
-                    npo.yOrig = 0,
+                npo = getNodePositionObjectsForLocation(n, positions[t].longitude(), positions[t].latitude());
+                npo.location = positions[t],
                     npo.geoPos = googleLatLng,
-                    npo.displaced = false;
-                npo.displacementVector = [0, 0];
-                nodePositionObjects.push(npo);
+                    npo.timeIds.push(parseInt(t));
                 serie.set(dgraph.time(parseInt(t)), npo);
             }
         }
+        var loc;
         visualLinks
             .each(function (link) {
             link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id());
-            if (!link.sourceNPO) {
-                link.sourceNPO = new NodePositionObject();
-                link.sourceNPO.x = 0;
-                link.sourceNPO.y = 0;
-                link.sourceNPO.xOrig = 0;
-                link.sourceNPO.yOrig = 0;
-                link.sourceNPO.node = link.source;
-                link.sourceNPO.googleLatLng = new google.maps.LatLng(0, 0);
-                link.sourceNPO.displaced = false;
-                link.sourceNPO.displacementVector = [0, 0];
-            }
             link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id());
-            if (!link.targetNPO) {
-                link.targetNPO = new NodePositionObject();
-                link.targetNPO.x = 0;
-                link.targetNPO.y = 0;
-                link.targetNPO.xOrig = 0;
-                link.targetNPO.yOrig = 0;
-                link.targetNPO.node = link.target;
-                link.targetNPO.googleLatLng = new google.maps.LatLng(0, 0);
-                link.targetNPO.displaced = false;
-                link.targetNPO.displacementVector = [0, 0];
+        });
+        var layoutNodes = [];
+        for (var i = 0; i < nodePositionObjects.length; i++) {
+            layoutNodes.push({ id: i,
+                x: nodePositionObjects[i].geoPos.lng(),
+                y: nodePositionObjects[i].geoPos.lat()
+            });
+            if (layoutNodes[i].x != undefined && layoutNodes[i].x != 0
+                && layoutNodes[i].y != undefined && layoutNodes[i].y != 0) {
+                layoutNodes[i].fixed = true;
             }
-            console.log(link.sourceNPO.x, link.targetNPO.x);
+            else {
+                layoutNodes[i].fixed = false;
+            }
+        }
+        var layoutLinks = [];
+        for (var i = 0; i < links.length; i++) {
+            layoutLinks.push({
+                source: nodePositionObjects.indexOf(links[i].sourceNPO),
+                target: nodePositionObjects.indexOf(links[i].targetNPO),
+            });
+        }
+        var force = d3.layout.force()
+            .nodes(layoutNodes)
+            .links(layoutLinks)
+            .linkDistance(.1)
+            .theta(0.8)
+            .alpha(0.1)
+            .start()
+            .on('end', function () {
+            for (var i = 0; i < layoutNodes.length; i++) {
+                if (!layoutNodes[i].fixed) {
+                    nodePositionObjects[i].geoPos = new google.maps.LatLng(layoutNodes[i].x, layoutNodes[i].y);
+                }
+            }
+            update();
         });
         visualNodes = svg.selectAll(".node")
             .data(nodePositionObjects)
@@ -387,7 +400,12 @@ function init() {
     overlay.setMap(map);
 }
 function createNodeLabel(npo) {
-    return npo.node.label() + ' (' + npo.location.label() + ', ' + moment(dgraph.time(npo.timeId).unixTime()).format('MM/DD/YYYY') + ')';
+    var locationLabel;
+    if (npo.location == undefined || npo.location.label() == undefined)
+        locationLabel = '';
+    else
+        locationLabel = npo.location.label() + ', ';
+    return npo.node.label() + ' (' + moment(dgraph.time(npo.timeIds[0]).unixTime()).format('MM/DD/YYYY') + ')';
 }
 var hittestRect = null;
 var hittestRadius = 20;
@@ -550,11 +568,13 @@ function updateNodes() {
     visibleLabels = [];
     visualNodes
         .attr('opacity', function (d) {
-        var visible = d.node.isVisible();
-        if (!visible)
+        if (!d.node.isVisible())
             return 0;
-        return d.timeId >= time_start.id() && d.timeId <= time_end.id()
-            ? 1 : OUT_OF_TIME_NODES_OPACITY;
+        return d.timeIds[0] <= time_end.id() && d.timeIds[d.timeIds.length - 1] >= time_start.id() ?
+            d.fixedPosition ?
+                1 :
+                NODE_UNPOSITIONED_OPACITY
+            : OUT_OF_TIME_NODES_OPACITY;
     });
     svg.selectAll(".nodeCircle")
         .classed('highlighted', function (n) { return n.node.isHighlighted() || n.node.links().highlighted().length > 0; })
@@ -732,6 +752,11 @@ networkcube.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 
     LINK_OPACITY = value;
     updateLinks();
 });
+var menuDiv = d3.select('#menuDiv');
+networkcube.makeSlider(menuDiv, 'Unpositiond Nodes Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 0, 1, function (value) {
+    NODE_UNPOSITIONED_OPACITY = value;
+    updateNodes();
+});
 function stretchVector(vec, finalLength) {
     var len = 0;
     for (var i = 0; i < vec.length; i++) {
@@ -866,9 +891,54 @@ function removeNodeOverlap() {
         .attr('cx', function (d) { return d.xOrig - d.x; })
         .attr('cy', function (d) { return d.yOrig - d.y; });
 }
+function getNodePositionObjectsForLocation(n, long, lat) {
+    var s = this.nodePositionObjectsLookupTable[n.id()];
+    var npo;
+    if (s != undefined) {
+        for (var t in s.serie) {
+            npo = s.serie[t];
+            if (npo.geoPos.lng() == long && npo.geoPos.lat() == lat)
+                return npo;
+        }
+    }
+    npo = new NodePositionObject();
+    npo.node = n,
+        npo.x = 0,
+        npo.y = 0,
+        npo.xOrig = 0,
+        npo.yOrig = 0,
+        npo.displaced = false;
+    npo.displacementVector = [0, 0];
+    nodePositionObjects.push(npo);
+    return npo;
+}
 function getNodePositionObjectAtTime(n, tId) {
     var s = this.nodePositionObjectsLookupTable[n.id()];
-    return s.serie[tId];
+    var npo;
+    if (s.serie[tId] == undefined) {
+        if (emptyNodePositions[n.id()] != undefined) {
+            npo = emptyNodePositions[n.id()];
+        }
+        else {
+            npo = new NodePositionObject();
+            npo.x = 0;
+            npo.y = 0;
+            npo.timeIds.push(tId);
+            npo.xOrig = 0;
+            npo.yOrig = 0;
+            npo.node = n;
+            npo.geoPos = new google.maps.LatLng(0, 0);
+            npo.displaced = false;
+            npo.displacementVector = [0, 0];
+            npo.fixedPosition = false;
+            nodePositionObjects.push(npo);
+            emptyNodePositions[n.id()] = npo;
+        }
+    }
+    else {
+        npo = s.serie[tId];
+    }
+    return npo;
 }
 function sqr(x) {
     return x * x;
