@@ -23,3 +23,10 @@ div#main{
 	margin-top: 400px;
 	font-size: 7pt;
 }
+.manual-button{
+	float:right;
+	font-weight: 600;
+	color: #555;
+	margin-right:20px;
+	margin-top: 20px;
+}
