@@ -6,10 +6,10 @@
 var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#999999';
 var COLOR_HIGHLIGHT = '#ff8800';
-var LINK_OPACITY = .8;
-var NODE_UNPOSITIONED_OPACITY = .5
+var INNER_OPACITY = .8;
+var NODE_UNPOSITIONED_OPACITY = .4
 var LOCATION_MARKER_WIDTH = 10;
-var OVERLAP_FRACTION = .8;
+var OVERLAP_FRACTION = .3;
 var NODE_SIZE = 4;
 var OUT_OF_TIME_NODES_OPACITY = 0;
 var LABEL_OFFSET_X = 20;
@@ -31,6 +31,9 @@ var dgraph: networkcube.DynamicGraph = networkcube.getDynamicGraph();
 var links:networkcube.Link[] = dgraph.links().toArray();
 var times = dgraph.times().toArray();
 var locations = dgraph.locations().toArray();
+for(var i=0 ; i < locations.length ; i++){
+    locations[i]['npos'] = [];
+}
 var time_start: networkcube.Time = dgraph.time(0);
 var time_end: networkcube.Time = dgraph.times().last();
 
@@ -58,6 +61,10 @@ class NodePositionObject{
     displaced: boolean;
     displacementVector: number[]; 
     fixedPosition:boolean = true;
+    inLinks:networkcube.Link[] = [];
+    outLinks:networkcube.Link[] = [];
+    inNeighbors:networkcube.Node[] = [];
+    outNeighbors:networkcube.Node[] = [];
 }
 
 var overlay
@@ -332,17 +339,20 @@ function init(){
             positions = n.locationSerie().serie;
             serie = new networkcube.ScalarTimeSeries<Object>();
             nodePositionObjectsLookupTable.push(serie);
-            for(var t in positions){
+            for(var tId in positions){
                 googleLatLng = new google.maps.LatLng(
-                    positions[t].latitude(),
-                    positions[t].longitude());
+                    positions[tId].latitude(),
+                    positions[tId].longitude());
                 // check if npo for this node and position does 
                 // already exist, if not its created in side this function
-                npo = getNodePositionObjectsForLocation(n,positions[t].longitude(), positions[t].latitude());
-                npo.location = positions[t],
-                npo.geoPos = googleLatLng, 
-                npo.timeIds.push(parseInt(t))
-                serie.set(dgraph.time(parseInt(t)), npo)    
+                npo = getNodePositionObjectsForLocation(n, positions[tId].longitude(), positions[tId].latitude());
+                npo.location = positions[tId]
+                if(positions[tId].npos.indexOf(npo) == -1){
+                    positions[tId].npos.push(npo);
+                }
+                npo.geoPos = googleLatLng
+                npo.timeIds.push(parseInt(tId))
+                serie.set(dgraph.time(parseInt(tId)), npo)    
 
             }
         }
@@ -354,35 +364,14 @@ function init(){
             .each((link)=>{
                 // get source and target NPO
                 link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
-                // if(!link.sourceNPO){
-                //     link.sourceNPO = new NodePositionObject();
-                //     link.sourceNPO.x = 0;
-                //     link.sourceNPO.y = 0;
-                //     link.sourceNPO.timeId = link.times().get(0).id();
-                //     link.sourceNPO.xOrig = 0;
-                //     link.sourceNPO.yOrig = 0;
-                //     link.sourceNPO.node = link.source;
-                //     link.sourceNPO.geoPos = new google.maps.LatLng(0,0);
-                //     link.sourceNPO.displaced = false
-                //     link.sourceNPO.displacementVector = [0,0]
-                //     nodePositionObjects.push(link.sourceNPO)
-                // }
+                link['sourceNPO'].outLinks.push(link)
+ 
                 link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
-                // if(!link.targetNPO){
-                    // link.targetNPO = new NodePositionObject();
-                    // link.targetNPO.x = 0;
-                    // link.targetNPO.y = 0;
-                    // link.targetNPO.timeId = link.times().get(0).id();
-                    // link.targetNPO.xOrig = 0;
-                    // link.targetNPO.yOrig = 0;
-                    // link.targetNPO.node = link.target;
-                    // link.targetNPO.geoPos = new google.maps.LatLng(0,0);
-                    // link.targetNPO.displaced = false
-                    // link.targetNPO.displacementVector = [0,0]
-                    // nodePositionObjects.push(link.targetNPO)
-                // }
-                // console.log(link['sourceNPO'], link['targetNPO'])
-            })
+                link['targetNPO'].inLinks.push(link)
+                
+                link['sourceNPO'].outNeighbors.push(link['targetNPO'])
+                link['targetNPO'].inNeighbors.push(link['sourceNPO'])  
+        })
 
         // POSITION NODES WITHOUT OWN POSITIONS
         // 1. create layout network 
@@ -397,8 +386,12 @@ function init(){
                 layoutNodes[i].fixed = true;
             }else{
                 layoutNodes[i].fixed = false;
+                layoutNodes[i].x = Math.random() * 1
+                layoutNodes[i].y = Math.random() * 1
             }
+
         }
+
 
         var layoutLinks = []
         for(var i=0 ; i < links.length ; i++){
@@ -411,22 +404,17 @@ function init(){
         var force = d3.layout.force()
             .nodes(layoutNodes)
             .links(layoutLinks)
-            // .linkStrength(0.1)
-            // .friction(0.9)
-            .linkDistance(.1)
-            // .charge(-30)
-            // .gravity(1)
-            .theta(0.8)
-            .alpha(0.1)
+            .linkDistance(1)
             .start()
             .on('end', ()=>{
+                var npo
                 for(var i=0 ; i < layoutNodes.length ; i++){
                     if(!layoutNodes[i].fixed){
-                        // normalize length if possible
-                        nodePositionObjects[i].geoPos = new google.maps.LatLng(layoutNodes[i].x,layoutNodes[i].y);
-                    }   
+                        npo = nodePositionObjects[i]
+                        npo.geoPos = new google.maps.LatLng(layoutNodes[i].x,layoutNodes[i].y);
+                    }
                 }
-                update()
+                overlay.draw();
             })
 
         
@@ -455,8 +443,8 @@ function init(){
             })
 
         // LOCATION CIRCLE for displaced nodes
-        visualNodes.append("circle")
-            .attr("class", "displacementCircle");
+        // visualNodes.append("circle")
+        //     .attr("class", "displacementCircle");
 
         
         // bb: not any longer needed for labeling is handled globally
@@ -480,7 +468,8 @@ function init(){
             .attr('class', 'nodeLabel')
             .attr('visibility', 'hidden')
             
-        removeNodeOverlap();
+        updateNodeDisplacementVectors();
+        updateNodePositions()
         updateLinks();
         updateNodes();
     }
@@ -509,63 +498,71 @@ function init(){
             
         if(d < minDist){
             intersectedNode = nodePositionObjects[i].node;                
+            console.log('>>>>intersectedNode')
             minDist = d;
         }               
     }
 
-    // test for hovering links
-    var l;
     intersectedLink = undefined;
-    var sourceNPO, targetNPO;
-    var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
-    for(var i = 0 ; i <this.links.length ; i++ ){
-        l = this.links[i]
-        
-        if(!l.isVisible())
-            continue;
+    if(intersectedNode == undefined){
+        // test for hovering links
+        var l;
+        var sourceNPO, targetNPO;
+        var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
+        for(var i = 0 ; i <this.links.length ; i++ ){
+            l = this.links[i]
             
-        sourceNPO = l.sourceNPO
-        if(sourceNPO == undefined){
-            sourcePoint = {x:0, y:0};
-        }else{
-            sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
-            sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
-        }
-        
-        targetNPO = l.targetNPO
-        if(targetNPO == undefined){
-            targetPoint = {x:0, y:0};
-        }else{       
-            targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
-            targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
-        }
+            if(!l.isVisible())
+                continue;
+                
+            sourceNPO = l.sourceNPO
+            if(sourceNPO == undefined){
+                sourcePoint = {x:0, y:0};
+            }else{
+                sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
+                sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
+            }
+            
+            targetNPO = l.targetNPO
+            if(targetNPO == undefined){
+                targetPoint = {x:0, y:0};
+            }else{       
+                targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
+                targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
+            }
 
-        // collision detection   
-        d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
-        if(isNaN(d)) 
-            continue
-            
-        if(d < minDist){
-            intersectedLink = l;                
-            minDist = d;
-        }        
+            // collision detection   
+            d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
+            if(isNaN(d)) 
+                continue
+                
+            if(d < minDist){
+                intersectedLink = l;                
+                minDist = d;
+            }        
+        }
     }
 
-    if(prevIntersectedLink != intersectedLink){
-        networkcube.highlight('reset');
-        if(intersectedLink != undefined){
-            intersectedNode == undefined;
-            networkcube.highlight('set', {links:[intersectedLink]});
-        }
-    }
-    prevIntersectedLink = intersectedLink;
+    // var nodeHighlighted = false;  
     if(prevIntersectedNode != intersectedNode){
         networkcube.highlight('reset');
         if(intersectedNode != undefined){
             networkcube.highlight('set', {nodes:[intersectedNode]});
+            // nodeHighlighted = true;
         }
     }
     prevIntersectedNode = intersectedNode;
+
+    // if(!nodeHighlighted){
+        if(prevIntersectedLink != intersectedLink){
+            networkcube.highlight('reset');
+            if(intersectedLink != undefined){
+                intersectedNode == undefined;
+                networkcube.highlight('set', {links:[intersectedLink]});
+            }
+        }
+        prevIntersectedLink = intersectedLink;
+    // }
 
     if(intersectedLink == undefined && intersectedNode == undefined){
         this.displayLocationsWindow(overlay.getProjection(), ev.pixel, ev.latLng)    
@@ -575,11 +572,13 @@ function init(){
 
 
 
-overlay.draw = function() {
+overlay.draw = function() 
+{
     updateGeoNodePositions()
     var currCenter = map.getCenter();
     google.maps.event.trigger(map, 'resize');
     map.setCenter(currCenter);    
+    // updateNodeDisplacementVectors();
     updateNodePositions();
     updateLocationMarkers();
 }
@@ -706,11 +705,6 @@ function displayLocationsWindow(currentProjection: google.maps.MapCanvasProjecti
 }
 
 
-function update() {
-    updateLinks();
-    updateNodes();
-}
-
 
 function hittestNodeGeoPositions(bounds: google.maps.LatLngBounds): Array<networkcube.Node> {
     var pos: google.maps.Point;
@@ -791,9 +785,14 @@ function updateLinks() {
                 if(intersectedLink == d)
                     return 1;
                 else    
-                    return LINK_OPACITY *.3; 
+                    return INNER_OPACITY *.3; 
             }
-            return LINK_OPACITY;
+
+            return d.isHighlighted() 
+            || d.source.isHighlighted()
+            || d.target.isHighlighted() ? 
+                1 :
+                INNER_OPACITY;
         })
         .style('stroke-width', function(d) {
             var weight = linkWeightScale(d.weights(time_start, time_end).mean());
@@ -820,14 +819,16 @@ function updateNodes() {
             if (!d.node.isVisible())
                 return 0;
             return d.timeIds[0] <= time_end.id() && d.timeIds[d.timeIds.length-1] >= time_start.id() ? 
-                d.fixedPosition ? 
-                    1 : 
-                    NODE_UNPOSITIONED_OPACITY
+                1
                 : OUT_OF_TIME_NODES_OPACITY;
         })
     
     svg.selectAll(".nodeCircle")
-        .classed('highlighted', (n)=>n.node.isHighlighted() || n.node.links().highlighted().length > 0)
+        .classed('highlighted', (n) => 
+            n.node.isHighlighted() 
+            || n.node.links().highlighted().length > 0
+            || n.node.neighbors().highlighted().length > 0 
+            )
         .style('fill', d => {
             var color;
             if (d.node.isHighlighted()) {
@@ -838,6 +839,16 @@ function updateNodes() {
             if (!color)
                 color = COLOR_DEFAULT_NODE;
             return color;
+        })
+        .style('opacity', (d)=>{
+                        if (!d.node.isVisible())
+                return 0;
+            return d.timeIds[0] <= time_end.id() && d.timeIds[d.timeIds.length-1] >= time_start.id() ? 
+                d.fixedPosition ? 
+                    1 : 
+                    NODE_UNPOSITIONED_OPACITY
+                : OUT_OF_TIME_NODES_OPACITY;
+            
         })
 
 
@@ -1039,21 +1050,21 @@ timeSlider.appendTo(timeSvg);
 
 // OVERLAP SLIDER    
 var menuDiv = d3.select('#menuDiv');
-networkcube.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTION, -.2, 6, function(value:number){
+networkcube.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTION, -.05, 3, function(value:number){
     OVERLAP_FRACTION = value;
     updateNodePositions();
 })
 
 // LINK OPACITY SLIDER    
 var menuDiv = d3.select('#menuDiv');
-networkcube.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 0, 1, function(value:number){
-    LINK_OPACITY = value;
+networkcube.makeSlider(menuDiv, 'Link Opacity', 100, MENU_HEIGHT, INNER_OPACITY, 0, 1, function(value:number){
+    INNER_OPACITY = value;
     updateLinks();
 })
 
 // NON-POSITIONED NODES OPACITY SLIDER    
 var menuDiv = d3.select('#menuDiv');
-networkcube.makeSlider(menuDiv, 'Unpositiond Nodes Opacity', 100, MENU_HEIGHT, LINK_OPACITY, 0, 1, function(value:number){
+networkcube.makeSlider(menuDiv, 'Opacity of Positionless Nodes', 200, MENU_HEIGHT, INNER_OPACITY, 0, 1, function(value:number){
     NODE_UNPOSITIONED_OPACITY = value;
     updateNodes();
 })
@@ -1095,6 +1106,8 @@ function timeChangedHandler(m:networkcube.TimeRangeMessage) {
 
     timeSlider.set(m.startUnix, m.endUnix);
 
+    updateNodeDisplacementVectors();
+    updateNodePositions();
     updateNodes();   
     updateLinks();
 }
@@ -1126,115 +1139,185 @@ function updateNodePositions() {
         npo.y = npo.yOrig + npo.displacementVector[1] * OVERLAP_FRACTION;
     }
 
+
+    for(var i=0 ; i < nodePositionObjects.length ; i++){
+        if(!nodePositionObjects[i].fixedPosition){
+            npo = nodePositionObjects[i]
+
+            // calculat barycenter of related npos
+            var x_bar = 0
+            var y_bar = 0
+            for(var j = 0 ; j < npo.inNeighbors.length ; j++){
+                x_bar += npo.inNeighbors[j].x
+                y_bar += npo.inNeighbors[j].y
+            }
+            for(var j = 0 ; j < npo.outNeighbors.length ; j++){
+                x_bar += npo.outNeighbors[j].x
+                y_bar += npo.outNeighbors[j].y
+            }
+            x_bar /= (npo.inNeighbors.length + npo.outNeighbors.length)
+            y_bar /= (npo.inNeighbors.length + npo.outNeighbors.length)
+
+            var x_vec = npo.x - x_bar;
+            var y_vec = npo.y - y_bar;
+            var d = Math.sqrt(x_vec*x_vec + y_vec*y_vec);
+            if(d == 0){
+                d=1;
+            }
+            x_vec /= d;
+            y_vec /= d;
+
+            npo.x = x_bar + 200 * x_vec;
+            npo.y = y_bar + 200 * y_vec;
+        }   
+    }
+
+
     visualNodes
         .attr("transform", function(d) { 
             return 'translate(' + d.x + ',' + d.y + ')'; })
 
-    d3.selectAll('.displacementCircle')
-        .attr('cx', (d) => - d.displacementVector[0] * OVERLAP_FRACTION)
-        .attr('cy', (d) => - d.displacementVector[1] * OVERLAP_FRACTION)
-        .attr('r', function(d) {
-            if (d.displaced) {
-                return Math.hypot(d.displacementVector[0], d.displacementVector[1]) * OVERLAP_FRACTION;
-            } else {
-                return 0;
-            }
-        })
-
-
     updateLinkPaths();
 }
 
-function removeNodeOverlap() {
-    var overlaps: number = 1;
-    for (var i = 0; i < nodePositionObjects.length; i++) {
-        nodePositionObjects[i].displaced = false;
-        nodePositionObjects[i].x = nodePositionObjects[i].xOrig;
-        nodePositionObjects[i].y = nodePositionObjects[i].yOrig;
-    }
+// function removeNodeOverlap() {
+//     var overlaps: number = 1;
+//     for (var i = 0; i < nodePositionObjects.length; i++) {
+//         nodePositionObjects[i].displaced = false;
+//         nodePositionObjects[i].x = nodePositionObjects[i].xOrig;
+//         nodePositionObjects[i].y = nodePositionObjects[i].yOrig;
+//     }
 
-    var minDist;
-    var iteration: number = 0;
-    var l: number;
-    var xx, yy: number;
-    var dx: number, dy: number, dd: number;
+//     var minDist;
+//     var iteration: number = 0;
+//     var l: number;
+//     var xx, yy: number;
+//     var dx: number, dy: number, dd: number;
 
-    // detect nodes at identical positions and add noise.
-    for (var i = 0; i < nodePositionObjects.length - 1; i++) {
-        for (var j = 0; j < nodePositionObjects.length - 1; j++) {
-            dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
-            dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
-            dd = Math.sqrt(dx * dx + dy * dy);
+//     // detect nodes at identical positions and add noise.
+//     for (var i = 0; i < nodePositionObjects.length - 1; i++) {
+//         for (var j = 0; j < nodePositionObjects.length - 1; j++) {
+//             dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
+//             dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
+//             dd = Math.sqrt(dx * dx + dy * dy);
 
-            // if identical positions, add some noise to first node
-            if (dd == 0) {
-                nodePositionObjects[i].x += ((i * 1000) % nodePositionObjects.length) / nodePositionObjects.length - .5;
-                nodePositionObjects[i].y += ((i * 999) % nodePositionObjects.length) / nodePositionObjects.length - .5;
-            }
-        }
-    }
+//             // if identical positions, add some noise to first node
+//             if (dd == 0) {
+//                 nodePositionObjects[i].x += ((i * 1000) % nodePositionObjects.length) / nodePositionObjects.length - .5;
+//                 nodePositionObjects[i].y += ((i * 999) % nodePositionObjects.length) / nodePositionObjects.length - .5;
+//             }
+//         }
+//     }
 
-    // remove overlaps
-    while (overlaps > 0 && iteration < 10) {
-        overlaps = 0;
-        for (var i = 0; i < nodePositionObjects.length - 1; i++) {
-            for (var j = i + 1; j < nodePositionObjects.length; j++) {
-                dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
-                dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
-                dd = Math.sqrt(dx * dx + dy * dy);
-                minDist = nodeSizeFunction(nodePositionObjects[i].node.neighbors().length) + nodeSizeFunction(nodePositionObjects[j].node.neighbors().length)
-                minDist *= OVERLAP_FRACTION;
+//     // remove overlaps
+//     while (overlaps > 0 && iteration < 10) {
+//         overlaps = 0;
+//         for (var i = 0; i < nodePositionObjects.length - 1; i++) {
+//             for (var j = i + 1; j < nodePositionObjects.length; j++) {
+//                 dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
+//                 dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
+//                 dd = Math.sqrt(dx * dx + dy * dy);
+//                 minDist = nodeSizeFunction(nodePositionObjects[i].node.neighbors().length) + nodeSizeFunction(nodePositionObjects[j].node.neighbors().length)
+//                 minDist *= OVERLAP_FRACTION;
 
-                if (dd < minDist) {
-                    overlaps++;
-                    l = (minDist - dd) / 4;
-                    xx = l * (dx / dd);
-                    yy = l * (dy / dd);
-                    nodePositionObjects[i].x += xx;
-                    nodePositionObjects[i].y += yy;
-                    nodePositionObjects[i].displaced = true;
-                    nodePositionObjects[j].x -= xx;
-                    nodePositionObjects[j].y -= yy;
-                    nodePositionObjects[j].displaced = true;
-                }
-            }
-        }
-        iteration++;
-    }
+//                 if (dd < minDist) {
+//                     overlaps++;
+//                     l = (minDist - dd) / 4;
+//                     xx = l * (dx / dd);
+//                     yy = l * (dy / dd);
+//                     nodePositionObjects[i].x += xx;
+//                     nodePositionObjects[i].y += yy;
+//                     nodePositionObjects[i].displaced = true;
+//                     nodePositionObjects[j].x -= xx;
+//                     nodePositionObjects[j].y -= yy;
+//                     nodePositionObjects[j].displaced = true;
+//                 }
+//             }
+//         }
+//         iteration++;
+//     }
     
-    // after all node overlaps are removed, assign direction vector for allowing interpolation
-    var npo;
-    for (var i = 0; i < nodePositionObjects.length; i++) {
-        npo = nodePositionObjects[i]
-        npo.displacementVector[0] = npo.x - npo.xOrig;             
-        npo.displacementVector[1] = npo.y - npo.yOrig;             
-    }
+//     // after all node overlaps are removed, assign direction vector for allowing interpolation
+//     var npo;
+//     for (var i = 0; i < nodePositionObjects.length; i++) {
+//         npo = nodePositionObjects[i]
+//         npo.displacementVector[0] = npo.x - npo.xOrig;             
+//         npo.displacementVector[1] = npo.y - npo.yOrig;             
+//     }
 
-    // draw extra circle for displaced nodes
-    var r;
-    d3.selectAll('.displacementCircle')
-        .attr('r', function(d) {
-            if (d.displaced) {
-                return Math.hypot(d.x - d.xOrig, d.y - d.yOrig);
-            } else {
-                return 0;
+//     // draw extra circle for displaced nodes
+//     var r;
+//     // d3.selectAll('.displacementCircle')
+//     //     .attr('r', function(d) {
+//     //         if (d.displaced) {
+//     //             return Math.hypot(d.x - d.xOrig, d.y - d.yOrig);
+//     //         } else {
+//     //             return 0;
+//     //         }
+//     //     })
+//     //     .attr('cx', function(d) { return d.xOrig - d.x; })
+//     //     .attr('cy', function(d) { return d.yOrig - d.y; })
+// }
+
+function updateNodeDisplacementVectors(){
+
+    // calculate angles: 
+    var l:networkcube.Location;
+    var localNPOs;
+    for (var i = 0; i < locations.length; i++) {
+        l = locations[i];
+        localNPOs = []
+        // filter npos present in this time
+        for(var j=0 ; j < l.npos.length ; j++){
+            if(l.npos[j].timeIds[0] <= time_end.id() 
+            && l.npos[j].timeIds[l.npos[j].timeIds.length-1] >= time_start.id()){
+                localNPOs.push(l.npos[j]);
+            }         
+        }
+        if(localNPOs.length == 1){
+            localNPOs[0].displacementVector[0] = 0;
+            localNPOs[0].displacementVector[1] = 0;
+        }else{
+            // calculate andle
+            var alpha = Math.PI *2 / localNPOs.length;
+            var npo;
+            var radius = localNPOs.length * NODE_SIZE  / Math.PI;
+            for (var j = 0; j < localNPOs.length; j++) {
+                npo = localNPOs[j]
+                // npo.x = npo.xOrig + radius * Math.sin(alpha *j);
+                // npo.y = npo.yOrig + radius * Math.cos(alpha *j);
+                // if(npo.node.id() == 0){
+                //      console.log('npo.xOrig, npo.yOrig', npo.xOrig, npo.yOrig)
+                // }
+                // npo.displacementVector[0] = npo.x - npo.xOrig;             
+                // npo.displacementVector[1] = npo.y - npo.yOrig;             
+                npo.displacementVector[0] = Math.sin(alpha *j)* radius;    
+                npo.displacementVector[1] = Math.cos(alpha *j) * radius;        
             }
-        })
-        .attr('cx', function(d) { return d.xOrig - d.x; })
-        .attr('cy', function(d) { return d.yOrig - d.y; })
+        }
+    }
+   
+
+    // create displacement vector for each NPO
 }
 
 function getNodePositionObjectsForLocation(n:networkcube.Node, long, lat):NodePositionObject{
     var s = this.nodePositionObjectsLookupTable[n.id()]
     var npo;
+    long = Math.round(long * 100) / 100
+    lat = Math.round(lat * 100) / 100
+    var a,b
     if(s != undefined){
         for(var t in s.serie){
-            npo = s.serie[t]
-            if(npo.geoPos.lng() == long && npo.geoPos.lat() == lat)
-                return npo;
+            a = Math.round(s.serie[t].geoPos.lng() * 100) / 100
+            b = Math.round(s.serie[t].geoPos.lat() * 100) / 100
+            if(a == long && b == lat){
+                // console.log('\tLOC FOUND',long, lat, n.label())
+                return s.serie[t];
+            }
         }
-    }
-        // init node positions
+    }        
+    // init node positions
     npo = new NodePositionObject();    
     npo.node = n,
     npo.x = 0, 
@@ -1244,6 +1327,7 @@ function getNodePositionObjectsForLocation(n:networkcube.Node, long, lat):NodePo
     npo.displaced = false
     npo.displacementVector = [0,0]
     nodePositionObjects.push(npo);
+    
     return npo
 }
 
