@@ -976,3 +976,4 @@ function distToSegment(p, v, w) {
 function getTextWidth(s) {
     return s.length * 8.8;
 }
+$(document).ready(function () { init(); });
