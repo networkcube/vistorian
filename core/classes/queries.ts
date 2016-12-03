@@ -196,6 +196,7 @@ module networkcube {
          * If no string value was delivered by the user, returns the ID as string.
          */
         label(): string { return '' + this.attr('label'); }
+            
         nodeType(): string { return this.attr('nodeType') }
 
         /** Returns this nodes neighbors in a NodeQuery. No duplicates. 
