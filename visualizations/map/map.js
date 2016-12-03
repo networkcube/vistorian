@@ -258,50 +258,12 @@ function init() {
         var loc;
         visualLinks
             .each(function (link) {
-            link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id());
-            link['sourceNPO'].outLinks.push(link);
-            link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id());
-            link['targetNPO'].inLinks.push(link);
-            link['sourceNPO'].outNeighbors.push(link['targetNPO']);
-            link['targetNPO'].inNeighbors.push(link['sourceNPO']);
-        });
-        var layoutNodes = [];
-        for (var i = 0; i < nodePositionObjects.length; i++) {
-            layoutNodes.push({ id: i,
-                x: nodePositionObjects[i].geoPos.lng(),
-                y: nodePositionObjects[i].geoPos.lat()
-            });
-            if (layoutNodes[i].x != undefined && layoutNodes[i].x != 0
-                && layoutNodes[i].y != undefined && layoutNodes[i].y != 0) {
-                layoutNodes[i].fixed = true;
-            }
-            else {
-                layoutNodes[i].fixed = false;
-                layoutNodes[i].x = Math.random() * 1;
-                layoutNodes[i].y = Math.random() * 1;
-            }
-        }
-        var layoutLinks = [];
-        for (var i = 0; i < links.length; i++) {
-            layoutLinks.push({
-                source: nodePositionObjects.indexOf(links[i].sourceNPO),
-                target: nodePositionObjects.indexOf(links[i].targetNPO),
-            });
-        }
-        var force = d3.layout.force()
-            .nodes(layoutNodes)
-            .links(layoutLinks)
-            .linkDistance(1)
-            .start()
-            .on('end', function () {
-            var npo;
-            for (var i = 0; i < layoutNodes.length; i++) {
-                if (!layoutNodes[i].fixed) {
-                    npo = nodePositionObjects[i];
-                    npo.geoPos = new google.maps.LatLng(layoutNodes[i].x, layoutNodes[i].y);
-                }
-            }
-            overlay.draw();
+            link.sourceNPO = getNodePositionObjectAtTime(link.source, link.times().get(0).id());
+            link.sourceNPO.outLinks.push(link);
+            link.targetNPO = getNodePositionObjectAtTime(link.target, link.times().get(0).id());
+            link.targetNPO.inLinks.push(link);
+            link.sourceNPO.outNeighbors.push(link.targetNPO);
+            link.targetNPO.inNeighbors.push(link.sourceNPO);
         });
         visualNodes = svg.selectAll(".node")
             .data(nodePositionObjects)
@@ -364,10 +326,13 @@ function init() {
                 if (!l.isVisible())
                     continue;
                 sourceNPO = l.sourceNPO;
+                var fds = sourceNPO.y;
+                console.log("sourceNPO.y", fds);
                 if (sourceNPO == undefined) {
                     sourcePoint = { x: 0, y: 0 };
                 }
                 else {
+                    console.log('sourceNPO.x, sourceNPO.y', sourceNPO.x, sourceNPO.y);
                     sourcePoint = projection.fromDivPixelToLatLng({ x: sourceNPO.x, y: sourceNPO.y });
                     sourcePoint = { x: sourcePoint.lng() * F, y: sourcePoint.lat() * F };
                 }

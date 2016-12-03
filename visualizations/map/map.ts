@@ -353,7 +353,6 @@ function init(){
                 npo.geoPos = googleLatLng
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
-
             }
         }
 
@@ -363,59 +362,61 @@ function init(){
         visualLinks
             .each((link)=>{
                 // get source and target NPO
-                link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
-                link['sourceNPO'].outLinks.push(link)
+                link.sourceNPO = getNodePositionObjectAtTime(link.source, link.times().get(0).id())
+                link.sourceNPO.outLinks.push(link)
  
-                link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
-                link['targetNPO'].inLinks.push(link)
+                link.targetNPO = getNodePositionObjectAtTime(link.target, link.times().get(0).id())
+                link.targetNPO.inLinks.push(link)
                 
-                link['sourceNPO'].outNeighbors.push(link['targetNPO'])
-                link['targetNPO'].inNeighbors.push(link['sourceNPO'])  
+                link.sourceNPO.outNeighbors.push(link.targetNPO)
+                link.targetNPO.inNeighbors.push(link.sourceNPO)  
+                // console.log("sourceNPO.y", link.sourceNPO.y)
         })
 
-        // POSITION NODES WITHOUT OWN POSITIONS
-        // 1. create layout network 
-        var layoutNodes = []
-        for(var i=0 ; i < nodePositionObjects.length ; i++){
-            layoutNodes.push({id:i,
-                x: nodePositionObjects[i].geoPos.lng(),
-                y: nodePositionObjects[i].geoPos.lat() 
-            })
-            if(layoutNodes[i].x != undefined && layoutNodes[i].x != 0
-            && layoutNodes[i].y != undefined && layoutNodes[i].y != 0){
-                layoutNodes[i].fixed = true;
-            }else{
-                layoutNodes[i].fixed = false;
-                layoutNodes[i].x = Math.random() * 1
-                layoutNodes[i].y = Math.random() * 1
-            }
 
-        }
+        // // POSITION NODES WITHOUT OWN POSITIONS
+        // // 1. create layout network 
+        // var layoutNodes = []
+        // for(var i=0 ; i < nodePositionObjects.length ; i++){
+        //     layoutNodes.push({id:i,
+        //         x: nodePositionObjects[i].geoPos.lng(),
+        //         y: nodePositionObjects[i].geoPos.lat() 
+        //     })
+        //     if(layoutNodes[i].x != undefined && layoutNodes[i].x != 0
+        //     && layoutNodes[i].y != undefined && layoutNodes[i].y != 0){
+        //         layoutNodes[i].fixed = true;
+        //     }else{
+        //         layoutNodes[i].fixed = false;
+        //         layoutNodes[i].x = Math.random() * 1
+        //         layoutNodes[i].y = Math.random() * 1
+        //     }
+
+        // }
 
 
-        var layoutLinks = []
-        for(var i=0 ; i < links.length ; i++){
-            layoutLinks.push({
-                source: nodePositionObjects.indexOf(links[i].sourceNPO),
-                target: nodePositionObjects.indexOf(links[i].targetNPO),
-            })
-        }
+        // var layoutLinks = []
+        // for(var i=0 ; i < links.length ; i++){
+        //     layoutLinks.push({
+        //         source: nodePositionObjects.indexOf(links[i].sourceNPO),
+        //         target: nodePositionObjects.indexOf(links[i].targetNPO),
+        //     })
+        // }
         
-        var force = d3.layout.force()
-            .nodes(layoutNodes)
-            .links(layoutLinks)
-            .linkDistance(1)
-            .start()
-            .on('end', ()=>{
-                var npo
-                for(var i=0 ; i < layoutNodes.length ; i++){
-                    if(!layoutNodes[i].fixed){
-                        npo = nodePositionObjects[i]
-                        npo.geoPos = new google.maps.LatLng(layoutNodes[i].x,layoutNodes[i].y);
-                    }
-                }
-                overlay.draw();
-            })
+        // var force = d3.layout.force()
+        //     .nodes(layoutNodes)
+        //     .links(layoutLinks)
+        //     .linkDistance(1)
+        //     .start()
+        //     .on('end', ()=>{
+        //         var npo
+        //         for(var i=0 ; i < layoutNodes.length ; i++){
+        //             if(!layoutNodes[i].fixed){
+        //                 npo = nodePositionObjects[i]
+        //                 npo.geoPos = new google.maps.LatLng(layoutNodes[i].x,layoutNodes[i].y);
+        //             }
+        //         }
+        //         overlay.draw();
+        // })
 
         
 
@@ -474,115 +475,119 @@ function init(){
         updateNodes();
     }
 
-    map.addListener('mousemove', (ev: google.maps.MouseEvent) =>{
+
+
+    map.addListener('mousemove', (ev: google.maps.MouseEvent) => {
    
-    if (locationDisplayTimeoutHandle >= 0){
-        window.clearTimeout(locationDisplayTimeoutHandle);
-    }
+        if (locationDisplayTimeoutHandle >= 0){
+            window.clearTimeout(locationDisplayTimeoutHandle);
+        }
 
-    // test for hovering nodes
-    var minDist = .5*F;
-    var mouse = {x: ev.latLng.lng()*F,  y: ev.latLng.lat()*F}
-    var pos;
-    intersectedNode = undefined;
-    var projection = overlay.getProjection();
-    var d;
-    for(var i = 0 ; i <nodePositionObjects.length ; i++ ){
-    
-        pos = projection.fromDivPixelToLatLng({x: nodePositionObjects[i].x, y: nodePositionObjects[i].y})
-        pos = {x: pos.lng()*F, y:pos.lat() * F};
+        // test for hovering nodes
+        var minDist = .5*F;
+        var mouse = {x: ev.latLng.lng()*F,  y: ev.latLng.lat()*F}
+        var pos;
+        intersectedNode = undefined;
+        var projection = overlay.getProjection();
+        var d;
+        for(var i = 0 ; i <nodePositionObjects.length ; i++ ){
+        
+            pos = projection.fromDivPixelToLatLng({x: nodePositionObjects[i].x, y: nodePositionObjects[i].y})
+            pos = {x: pos.lng()*F, y:pos.lat() * F};
 
-        d = Math.hypot(mouse.x - pos.x, mouse.y - pos.y);
-        if(isNaN(d)) 
-            continue
-            
-        if(d < minDist){
-            intersectedNode = nodePositionObjects[i].node;                
-            console.log('>>>>intersectedNode')
-            minDist = d;
-        }               
-    }
-
-    intersectedLink = undefined;
-    if(intersectedNode == undefined){
-        // test for hovering links
-        var l;
-        var sourceNPO, targetNPO;
-        var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
-        for(var i = 0 ; i <this.links.length ; i++ ){
-            l = this.links[i]
-            
-            if(!l.isVisible())
-                continue;
-                
-            sourceNPO = l.sourceNPO
-            if(sourceNPO == undefined){
-                sourcePoint = {x:0, y:0};
-            }else{
-                sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
-                sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
-            }
-            
-            targetNPO = l.targetNPO
-            if(targetNPO == undefined){
-                targetPoint = {x:0, y:0};
-            }else{       
-                targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
-                targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
-            }
-
-            // collision detection   
-            d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
+            d = Math.hypot(mouse.x - pos.x, mouse.y - pos.y);
             if(isNaN(d)) 
                 continue
                 
             if(d < minDist){
-                intersectedLink = l;                
+                intersectedNode = nodePositionObjects[i].node;                
+                console.log('>>>>intersectedNode')
                 minDist = d;
-            }        
+            }               
         }
-    }
 
-    // var nodeHighlighted = false;  
-    if(prevIntersectedNode != intersectedNode){
-        networkcube.highlight('reset');
-        if(intersectedNode != undefined){
-            networkcube.highlight('set', {nodes:[intersectedNode]});
-            // nodeHighlighted = true;
-        }
-    }
-    prevIntersectedNode = intersectedNode;
+        intersectedLink = undefined;
+        if(intersectedNode == undefined){
+            // test for hovering links
+            var l;
+            var sourceNPO, targetNPO;
+            var sourcePoint:google.maps.Point, targetPoint:google.maps.Point;
+            for(var i = 0 ; i <this.links.length ; i++ ){
+                l = this.links[i]
+                
+                if(!l.isVisible())
+                    continue;
+                    
+                sourceNPO = l.sourceNPO
+                var fds  = sourceNPO.y;
+                if(sourceNPO == undefined){
+                    sourcePoint = {x:0, y:0};
+                }else{
+                    sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
+                    sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
+                }
+                
+                targetNPO = l.targetNPO
+                if(targetNPO == undefined){
+                    targetPoint = {x:0, y:0};
+                }else{       
+                    targetPoint = projection.fromDivPixelToLatLng({x:targetNPO.x, y:targetNPO.y});
+                    targetPoint = {x: targetPoint.lng()*F, y:targetPoint.lat() * F};
+                }
 
-    // if(!nodeHighlighted){
-        if(prevIntersectedLink != intersectedLink){
-            networkcube.highlight('reset');
-            if(intersectedLink != undefined){
-                intersectedNode == undefined;
-                networkcube.highlight('set', {links:[intersectedLink]});
+                // collision detection   
+                d = distToSegmentSquared(mouse, sourcePoint, targetPoint);
+                if(isNaN(d)) 
+                    continue
+                    
+                if(d < minDist){
+                    intersectedLink = l;                
+                    minDist = d;
+                }        
             }
         }
-        prevIntersectedLink = intersectedLink;
-    // }
 
-    if(intersectedLink == undefined && intersectedNode == undefined){
-        this.displayLocationsWindow(overlay.getProjection(), ev.pixel, ev.latLng)    
+        // var nodeHighlighted = false;  
+        if(prevIntersectedNode != intersectedNode){
+            networkcube.highlight('reset');
+            if(intersectedNode != undefined){
+                networkcube.highlight('set', {nodes:[intersectedNode]});
+                // nodeHighlighted = true;
+            }
+        }
+        prevIntersectedNode = intersectedNode;
+
+        // if(!nodeHighlighted){
+            if(prevIntersectedLink != intersectedLink){
+                networkcube.highlight('reset');
+                if(intersectedLink != undefined){
+                    intersectedNode == undefined;
+                    networkcube.highlight('set', {links:[intersectedLink]});
+                }
+            }
+            prevIntersectedLink = intersectedLink;
+        // }
+
+        if(intersectedLink == undefined && intersectedNode == undefined){
+            this.displayLocationsWindow(overlay.getProjection(), ev.pixel, ev.latLng)    
+        }
+
+    });
+
+
+
+    overlay.draw = function() 
+    {
+        updateGeoNodePositions()
+        var currCenter = map.getCenter();
+        google.maps.event.trigger(map, 'resize');
+        map.setCenter(currCenter);    
+        // updateNodeDisplacementVectors();
+        updateNodePositions();
+        updateLocationMarkers();
     }
 
-});
-
-
-
-overlay.draw = function() 
-{
-    updateGeoNodePositions()
-    var currCenter = map.getCenter();
-    google.maps.event.trigger(map, 'resize');
-    map.setCenter(currCenter);    
-    // updateNodeDisplacementVectors();
-    updateNodePositions();
-    updateLocationMarkers();
-}
-overlay.setMap(map);
+    overlay.setMap(map);
 
     
 }
