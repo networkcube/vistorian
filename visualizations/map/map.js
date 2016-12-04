@@ -251,6 +251,7 @@ function init() {
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng;
+                console.log('tId', tId, parseInt(tId));
                 npo.timeIds.push(parseInt(tId));
                 serie.set(dgraph.time(parseInt(tId)), npo);
             }
@@ -258,50 +259,12 @@ function init() {
         var loc;
         visualLinks
             .each(function (link) {
-            link['sourceNPO'] = getNodePositionObjectAtTime(link.source, link.times().get(0).id());
-            link['sourceNPO'].outLinks.push(link);
-            link['targetNPO'] = getNodePositionObjectAtTime(link.target, link.times().get(0).id());
-            link['targetNPO'].inLinks.push(link);
-            link['sourceNPO'].outNeighbors.push(link['targetNPO']);
-            link['targetNPO'].inNeighbors.push(link['sourceNPO']);
-        });
-        var layoutNodes = [];
-        for (var i = 0; i < nodePositionObjects.length; i++) {
-            layoutNodes.push({ id: i,
-                x: nodePositionObjects[i].geoPos.lng(),
-                y: nodePositionObjects[i].geoPos.lat()
-            });
-            if (layoutNodes[i].x != undefined && layoutNodes[i].x != 0
-                && layoutNodes[i].y != undefined && layoutNodes[i].y != 0) {
-                layoutNodes[i].fixed = true;
-            }
-            else {
-                layoutNodes[i].fixed = false;
-                layoutNodes[i].x = Math.random() * 1;
-                layoutNodes[i].y = Math.random() * 1;
-            }
-        }
-        var layoutLinks = [];
-        for (var i = 0; i < links.length; i++) {
-            layoutLinks.push({
-                source: nodePositionObjects.indexOf(links[i].sourceNPO),
-                target: nodePositionObjects.indexOf(links[i].targetNPO),
-            });
-        }
-        var force = d3.layout.force()
-            .nodes(layoutNodes)
-            .links(layoutLinks)
-            .linkDistance(1)
-            .start()
-            .on('end', function () {
-            var npo;
-            for (var i = 0; i < layoutNodes.length; i++) {
-                if (!layoutNodes[i].fixed) {
-                    npo = nodePositionObjects[i];
-                    npo.geoPos = new google.maps.LatLng(layoutNodes[i].x, layoutNodes[i].y);
-                }
-            }
-            overlay.draw();
+            link.sourceNPO = getNodePositionObjectAtTime(link.source, link.times().get(0).id());
+            link.sourceNPO.outLinks.push(link);
+            link.targetNPO = getNodePositionObjectAtTime(link.target, link.times().get(0).id());
+            link.targetNPO.inLinks.push(link);
+            link.sourceNPO.outNeighbors.push(link.targetNPO);
+            link.targetNPO.inNeighbors.push(link.sourceNPO);
         });
         visualNodes = svg.selectAll(".node")
             .data(nodePositionObjects)
@@ -350,9 +313,9 @@ function init() {
                 continue;
             if (d < minDist) {
                 intersectedNode = nodePositionObjects[i].node;
-                console.log('>>>>intersectedNode');
                 minDist = d;
             }
+            console.log('1) sourceNPO.y', nodePositionObjects[i].y, nodePositionObjects[i].timeIds[0]);
         }
         intersectedLink = undefined;
         if (intersectedNode == undefined) {
@@ -928,6 +891,7 @@ function getNodePositionObjectsForLocation(n, long, lat) {
 function getNodePositionObjectAtTime(n, tId) {
     var s = this.nodePositionObjectsLookupTable[n.id()];
     var npo;
+    console.log('s.serie[tId]', tId, s.serie[tId]);
     if (s.serie[tId] == undefined) {
         if (emptyNodePositions[n.id()] != undefined) {
             npo = emptyNodePositions[n.id()];
