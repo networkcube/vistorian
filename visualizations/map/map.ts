@@ -340,6 +340,7 @@ function init(){
             serie = new networkcube.ScalarTimeSeries<Object>();
             nodePositionObjectsLookupTable.push(serie);
             for(var tId in positions){
+                // console.log('tId', tId)
                 googleLatLng = new google.maps.LatLng(
                     positions[tId].latitude(),
                     positions[tId].longitude());
@@ -351,6 +352,7 @@ function init(){
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng
+                console.log('tId', tId, parseInt(tId) )
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
             }
@@ -501,9 +503,9 @@ function init(){
                 
             if(d < minDist){
                 intersectedNode = nodePositionObjects[i].node;                
-                console.log('>>>>intersectedNode')
                 minDist = d;
-            }               
+            }                  
+            console.log('1) sourceNPO.y', nodePositionObjects[i].y, nodePositionObjects[i].timeIds[0])
         }
 
         intersectedLink = undefined;
@@ -519,11 +521,11 @@ function init(){
                     continue;
                     
                 sourceNPO = l.sourceNPO
-                var fds  = sourceNPO.y;
                 if(sourceNPO == undefined){
                     sourcePoint = {x:0, y:0};
                 }else{
                     sourcePoint = projection.fromDivPixelToLatLng({x:sourceNPO.x, y:sourceNPO.y});
+                    // console.log('sourcePoint.lat()', sourcePoint.lat(), sourcePoint.lng())
                     sourcePoint = {x: sourcePoint.lng()*F, y:sourcePoint.lat() * F};
                 }
                 
@@ -760,7 +762,11 @@ function updateGeoNodePositions() {
     var npo:NodePositionObject;
     for (var i = 0; i < this.nodePositionObjects.length; i++) {
         npo = this.nodePositionObjects[i];        
+
+        // console.log("1) npo.geoPos", npo.geoPos.lat(), npo.geoPos.lng());
         pos = geoProjection.fromLatLngToDivPixel(npo.geoPos);
+        // console.log("2) npo.geoPos", npo.geoPos.lng(), pos.y);
+
         if (pos.x == undefined) {
             npo.xOrig = 0;
             npo.yOrig = 0;
@@ -1337,18 +1343,24 @@ function getNodePositionObjectsForLocation(n:networkcube.Node, long, lat):NodePo
 }
 
 
-function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object{
+function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object
+{
     var s = this.nodePositionObjectsLookupTable[n.id()]
     var npo;
-    if(s.serie[tId] == undefined){
+    console.log('s.serie[tId]', tId, s.serie[tId])
+    
+    if(s.serie[tId] == undefined)
+    {
         // check if empty node object exist for n
         if(emptyNodePositions[n.id()] != undefined){
             npo = emptyNodePositions[n.id()];
+
         }else{
             // create node
             npo = new NodePositionObject();
             npo.x = 0;
             npo.y = 0;
+            // console.log('tId', tId)
             npo.timeIds.push(tId);
             npo.xOrig = 0;
             npo.yOrig = 0;

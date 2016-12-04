@@ -251,6 +251,7 @@ function init() {
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng;
+                console.log('tId', tId, parseInt(tId));
                 npo.timeIds.push(parseInt(tId));
                 serie.set(dgraph.time(parseInt(tId)), npo);
             }
@@ -312,9 +313,9 @@ function init() {
                 continue;
             if (d < minDist) {
                 intersectedNode = nodePositionObjects[i].node;
-                console.log('>>>>intersectedNode');
                 minDist = d;
             }
+            console.log('1) sourceNPO.y', nodePositionObjects[i].y, nodePositionObjects[i].timeIds[0]);
         }
         intersectedLink = undefined;
         if (intersectedNode == undefined) {
@@ -326,13 +327,10 @@ function init() {
                 if (!l.isVisible())
                     continue;
                 sourceNPO = l.sourceNPO;
-                var fds = sourceNPO.y;
-                console.log("sourceNPO.y", fds);
                 if (sourceNPO == undefined) {
                     sourcePoint = { x: 0, y: 0 };
                 }
                 else {
-                    console.log('sourceNPO.x, sourceNPO.y', sourceNPO.x, sourceNPO.y);
                     sourcePoint = projection.fromDivPixelToLatLng({ x: sourceNPO.x, y: sourceNPO.y });
                     sourcePoint = { x: sourcePoint.lng() * F, y: sourcePoint.lat() * F };
                 }
@@ -893,6 +891,7 @@ function getNodePositionObjectsForLocation(n, long, lat) {
 function getNodePositionObjectAtTime(n, tId) {
     var s = this.nodePositionObjectsLookupTable[n.id()];
     var npo;
+    console.log('s.serie[tId]', tId, s.serie[tId]);
     if (s.serie[tId] == undefined) {
         if (emptyNodePositions[n.id()] != undefined) {
             npo = emptyNodePositions[n.id()];
