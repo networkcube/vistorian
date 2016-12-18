@@ -13274,6 +13274,9 @@ var networkcube;
             iframe.attr('width', width);
         if (height)
             iframe.attr('height', height);
+        if (visParams['scrolling'] != undefined) {
+            iframe.attr('scrolling', visParams.scrolling);
+        }
         return iframe;
     }
     networkcube.createVisualizationIFrame = createVisualizationIFrame;
