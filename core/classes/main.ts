@@ -201,7 +201,7 @@ module networkcube {
         if (height)
             iframe.attr('height', height)
 
-        if(visParams['scrolling'] != undefined){
+        if(visParams != undefined && visParams.hasOwnProperty('scrolling')){
             iframe.attr('scrolling', visParams.scrolling);
         }    
 
