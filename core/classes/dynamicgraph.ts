@@ -498,6 +498,7 @@ module networkcube {
                     if (unixTimes.indexOf(unixTime) == -1) {
                         unixTimes.push(unixTime);
                     }
+                    // console.log('PARSE LINK ROW: ', unixTime, data.linkTable[i] )
                 }
                 // obtain granularity
                 unixTimes.sort(sortNumber)
