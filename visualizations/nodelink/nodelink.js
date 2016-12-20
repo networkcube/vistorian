@@ -170,6 +170,12 @@ function init() {
         .append('path')
         .attr('d', function (d) { return d.path; })
         .style('opacity', LINK_OPACITY)
+        .on('mouseover', function (d, i) {
+        networkcube.highlight('set', { links: [d] });
+    })
+        .on('mouseout', function (d) {
+        networkcube.highlight('reset');
+    })
         .on('click', function (d) {
         var selections = d.getSelections();
         var currentSelection = _this.dgraph.getCurrentSelection();
@@ -382,7 +388,8 @@ function updateLinks() {
             || !d.target.isVisible())
             return 0;
         if (d.presentIn(time_start, time_end)) {
-            return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ? 1 : LINK_OPACITY;
+            return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ?
+                Math.min(1, LINK_OPACITY + .2) : LINK_OPACITY;
         }
         else {
             return 0;
