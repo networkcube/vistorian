@@ -311,6 +311,13 @@ function init(){
                 .append("path")
                 .attr("class", "link")
                 .style('fill', 'none')
+                .on('mouseover', (d,i)=>{
+                    networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
+                })
+                .on('mouseout', d=>{
+                    networkcube.highlight('reset')
+                })
+
                 // .on('click', d => {
                 //     var selections = d.getSelections();
                 //     var currentSelection = this.dgraph.getCurrentSelection();
@@ -505,7 +512,6 @@ function init(){
                 intersectedNode = nodePositionObjects[i].node;                
                 minDist = d;
             }                  
-            console.log('1) sourceNPO.y', nodePositionObjects[i].y, nodePositionObjects[i].timeIds[0])
         }
 
         intersectedLink = undefined;
@@ -802,8 +808,10 @@ function updateLinks() {
             return d.isHighlighted() 
             || d.source.isHighlighted()
             || d.target.isHighlighted() ? 
-                1 :
-                INNER_OPACITY;
+                // 1 :
+                // INNER_OPACITY;
+                Math.min(1, INNER_OPACITY + .2) : INNER_OPACITY;
+
         })
         .style('stroke-width', function(d) {
             var weight = linkWeightScale(d.weights(time_start, time_end).mean());
