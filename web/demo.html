@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff">
+    <title>The Vistorian</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="demo-styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+</head>    
+<body>
+
+
+        <!-- <script src="lib/jquery.js"></script> -->
+        <script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+        <script src="lib/jstorage.js"></script>
+        <script src="classes/storage.js"></script>
+        <script src="classes/utils.js"></script>
+        <script src="classes/vistorian.js"></script>
+
+
+        <div id="main">
+            <p id="sessId" style="display:none"/>
+            <div id="intro">
+                <a href="index.html"><img id="logo" src="logos/logo2.png"/></a>
+                <p class="subtitle">Interactive Visualizations for Dynamic and Multivariate Networks. <br> Online and Open Source.</p>
+
+  <!--           <div id="vistiles">                    
+                <div>
+                    <a href="#div_nodelink" target="_blank">
+                        <img class="visimage" src="figures/nodelink.png"/>
+                        <p class="visLabel">Node-Link</p>
+                    </a>
+                </div>
+                <div>
+                    <a href="#div_matrix" target="_blank">
+                        <img class="visimage" src="figures/ego.png" />
+                        <p class="visLabel">Matrix</p>
+                    </a>
+                </div>
+                <div>
+                    <a href="#div_dynamicego" target="_blank">
+                        <img class="visimage" src="figures/matrix.png" />
+                        <p class="visLabel">Dynamic Ego</p>
+                    </a>
+                </div>
+                <div>
+                    <a href="#div_map" target="_blank">
+                        <img class="visimage" src="figures/map.png" />
+                        <p class="visLabel">Map</p>
+                    </a>
+                </div>
+
+            </div>
+ -->
+        </div>
+
+        <div id="content">
+
+            <p>
+                Scroll down and interact with the visualizations.
+                Each view shows the same network, a fictive dynamic scientific social network.
+                Hovering elements in one visualization propagates to the 
+                other views, highlighting the same element(s).
+            </p>
+
+            <p>
+                Use the time slider in each visualization to navigate through time. Each visualization provides additional parameters for visual refinement.
+            </p>
+
+            <p>
+            <a href="index.html">Back to main page</a> 
+            </p>
+        
+
+            <div id="div_nodelink">
+                <h2>Node Link Visualization</h2>
+                <p>
+                Node-link diagrams show nodes in the network as points (dots) and (multiple) relations between nodes as straight lines. Moving the time slider on the top of the visualization filters links between nodes according to their presence in time. Colors show the type of relation.
+                </p>    
+
+            
+            </div>
+        
+
+            <div id="div_matrix">
+                <h2>Matrix Visualization</h2>
+
+                <p>
+                Adjacency matrices (or simply matrices) are table representations of network. Nodes are represented both as rows and columns, connections are shown as marks in the corresponding cells at the intersection of row and column. Contrary to node-link representations, matrices do not suffer from visual clutter if the network is dense (i.e. contains many links). Matrices help you exploring dense networks that would look too cluttered with node-link diagrams.
+                </p>
+
+                <p>
+                The below example shows a cluster of connections of the same type (red). The first row in the matrix, featuring cells of different types (colors), indicates a highly connected node.
+                </p>
+
+                <p>
+                Node labels are shown for rows and columns. A small overview on the left shows the entire matrix and the currently visible part when panning and zooming.
+                </p>
+                
+            </div>
+        
+
+            <div id="div_dynamicego">
+                <h2>Dynamic Ego Visualization</h2>
+
+                <p>An dynamic ego network shows a node in a network (ego) and its immediate neighbors (alters), as well as connections between the alters. A dynamic ego network shows these connections over time. The above pictures shows a timeline running from left to right. Rows represent the nodes in the network and arcs represent connections between them. Adapting the time slider on the top of the visualization adapts the time range visible in the visualization.
+                </p>
+
+                <p>
+                Clicking a node label sets this node the current ego node and removes all nodes from the visualization that are not connected to the ego node.
+                </p>
+                
+            </div>
+        
+
+            <div id="div_map">
+                <h2>Map Visualization</h2>
+
+                <p>The map visualization shows a dynamic network with nodes having geographic node positions. This requires that nodes have geographic coordinates associated with them in the data model. Every dot-node on the map represents a position of an actual node in the network. In other words, for every geographical position that one node occupies during its lifetime, there is one node rendered on the map. Hovering a node on the map, shows all the nodes belonging to the same node in the network. For example, if a person in a social network moves between three different positions over time, there will be three nodes rendered on the map and highlighted if one of them is hovered.
+                </p>
+
+                <p>
+                All locations that are occupied by some node over time, are rendered as black transparent squares. Hovering, reveals the location's name as well as the names of the present nodes.
+                </p>
+
+                <p>
+                Nodes without any geographic position (free nodes) will be placed as close as possible to all their connected neighbors. Free nodes are rendered transparent, which can be adjusted using the corresponding slider on the top of the map visualization.
+                </p>
+
+                <p>
+                One common problem with geographic positions is, that multiple nodes are present at the same location. The map visualization allows to specify an offset between these nodes (slider on the top of the visualization) that nodes at the same geographical position slightly apart.
+                </p>
+
+                <p>
+                The visual encoding of the network is otherwise the same as for the <a href="#div_nodelink">node-link visualization</a>.
+                </p>
+                
+            </div>
+
+
+        </div>
+
+
+
+
+        <div id="footer">
+            <p>Page and visualizations built with:
+                <a href="http://jQuery.com">jQuery</a> |
+                <a href="http://www.d3js.org">D3</a>
+                <div>Icons made by <a href="http://www.flaticon.com/authors/robin-kylander" title="Robin Kylander">Robin Kylander</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by 
+                <a href="http://creativecommons.org/licenses/by/3.0/"
+                    title="Creative Commons BY 3.0">CC BY 3.0</a></div>
+            </p>
+
+                <a class="footer" href="mailto:networkcube@microsoft.com" target="_top">Contact Us</a> |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a>   |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a>   |
+                <a class="footer" href="http://go.microsoft.com/fwlink/?LinkId=506942" title="trademarks">Trademarks</a>   
+                © 2016 Microsoft <img src="logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="logos/logo-inria.png" height="20px">
+        
+        </div>
+
+        <script>
+            
+            $( document ).ready(function() {
+
+                var WIDTH = 1000
+                var HEIGHT = 700
+
+                var visparams = {scrolling: "no"};
+
+
+                var params = networkcube.getUrlVars();
+                params['datasetName'] = params['datasetName'].replace(/___/g, ' ');
+
+                console.log('NETWORK', networkcube.getDynamicGraph(params['datasetName'], params['session']))
+
+                networkcube.createVisualizationIFrame(
+                    'div_nodelink', 
+                    'https://networkcube.github.io/networkcube/visualizations/nodelink/index.html',
+                    params['session'], params['datasetName'], 
+                    WIDTH, HEIGHT, visparams);
+
+                networkcube.createVisualizationIFrame(
+                    'div_matrix', 
+                    'https://networkcube.github.io/networkcube/visualizations/matrix/index.html',
+                    params['session'], params['datasetName'], 
+                    WIDTH, HEIGHT, visparams);
+                
+                networkcube.createVisualizationIFrame(
+                    'div_dynamicego', 
+                    'https://networkcube.github.io/networkcube/visualizations/dynamicego/index.html',
+                    params['session'], params['datasetName'], 
+                    WIDTH, HEIGHT, visparams);
+                
+                networkcube.createVisualizationIFrame(
+                    'div_map', 
+                    'https://networkcube.github.io/networkcube/visualizations/map/index.html',
+                    params['session'], params['datasetName'], 
+                    WIDTH, HEIGHT, visparams);
+
+        });
+
+        </script>
+ 
+
+    </div>
+    </body>
