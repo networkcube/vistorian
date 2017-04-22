@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../styles.css">
+<link rel="stylesheet" type="text/css" href="../visview.css">
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
+
+<script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+<!-- <script src="https://networkcube.github.io/networkcube/core/networkcube.js"/> -->
+<script src="../classes/vistorian.js"></script>
+
+</head>
+<title>The Vistorian</title>
+<body>
+
+    <table>
+        <tr>
+            <td width="220px">
+                <div id="logoFrame"></div>
+                <div width="220" id="bookmarkFrame"></div> 
+            </td>    
+            <td width="220px">
+                <div width="220" id="visFrame"> 
+            </td>    
+        </tr>
+    </table>
+      <div id="footer">
+                <a class="footer" href="mailto:networkcube@microsoft.com" target="_top">Contact Us</a> |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a>   |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a>   |
+                <a class="footer" href="http://go.microsoft.com/fwlink/?LinkId=506942" title="trademarks">Trademarks</a>   
+                © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="20px">
+    </div>
+	<script>
+        
+        $( document ).ready(function() {
+            var width = window.innerWidth -30;
+            width_col1 = 220;
+            width_col2 = (width - width_col1);
+
+            var height = window.innerHeight - 50
+
+            var params = networkcube.getUrlVars();
+            params['datasetName'] = params['datasetName'].replace(/___/g, ' ');
+            console.log(params)
+            networkcube.createVisualizationIFrame(
+                'bookmarkFrame', 
+                'https://networkcube.github.io/networkcube/visualizations/bookmarkbrowser/index.html',
+                params['session'], params['datasetName'], 
+                width_col1, height)
+            networkcube.createVisualizationIFrame(
+                'visFrame', 
+                'https://networkcube.github.io/networkcube/visualizations/map/index.html',
+                params['session'], params['datasetName'], 
+                width_col2, height)
+
+            vistorian.setHeader('logoFrame', params['datasetName']);
+        });
+    </script>
+</body>
+</html>

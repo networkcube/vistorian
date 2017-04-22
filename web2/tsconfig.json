@@ -1,0 +1,22 @@
+{
+    "version": "1.5.0-alpha",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "watch": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "files": [
+        "../networkcube/core/networkcube.d.ts",
+        "./classes/storage.ts",
+        "./classes/utils.ts",
+        "./classes/vistorian.ts",
+        "./dataview.ts",
+        "./scripts/jstorage.d.ts"
+    ]
+}
