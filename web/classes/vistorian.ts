@@ -472,7 +472,7 @@ module vistorian {
 
 
     export function setHeader(elementId:String, datasetname:String){
-        var header = $('<a href="../index.html"><img width="100%" src="../logos/logo2.png"/></a>')
+        var header = $('<a href="../index.html"><img width="100%" src="../logos/logo-networkcube.png"/></a>')
         $('#'+elementId).append(header);
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
