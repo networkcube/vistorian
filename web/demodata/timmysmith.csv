@@ -1,27 +1,27 @@
 Name 1,Location 1,Relation Type,Name 2,Location 2,Date
-Maurice Wilkins,Yaoundé,Academic Work,Ivan Pavlov,Kinshasa,03/08/1973
-Wilbur and Orville Wright,Yaoundé,Academic Work,Maurice Wilkins,Yaoundé,06/08/1975
+Maurice Wilkins,Yaoundé,Work,Ivan Pavlov,Kinshasa,03/08/1973
+Wilbur and Orville Wright,Yaoundé,Work,Maurice Wilkins,Yaoundé,06/08/1975
 Wilbur and Orville Wright,Yaoundé,Friendship,Maurice Wilkins,Yaoundé,06/08/1975
 Wilbur and Orville Wright,Yaoundé,Friendship,Hans Christian Oersted,Yaoundé,15/09/1971
-Wilbur and Orville Wright,Addis Ababa,Academic Work,Hans Christian Oersted,Yaoundé,15/09/1971
-Wilbur and Orville Wright,Addis Ababa,Academic Work,Maurice Wilkins,Addis Ababa,15/09/1971
+Wilbur and Orville Wright,Addis Ababa,Work,Hans Christian Oersted,Yaoundé,15/09/1971
+Wilbur and Orville Wright,Addis Ababa,Work,Maurice Wilkins,Addis Ababa,15/09/1971
 Erwin Schrodinger,Vatican City,Politics,Karl Landsteiner,Sarajevo,01/01/1976
-Erwin Schrodinger,Vatican City,Academic Work,Michio Kaku,Kinshasa,01/01/1976
+Erwin Schrodinger,Vatican City,Work,Michio Kaku,Kinshasa,01/01/1976
 Erwin Schrodinger,Vatican City,Friendship,Erwin Schrodinger,La Paz,01/01/1976
 Erwin Schrodinger,Vatican City,Friendship,George Washington Carver,Beirut,01/01/1976
-Erwin Schrodinger,Vatican City,Academic Work,Michael Faraday,Sarajevo,01/01/1976
-Erwin Schrodinger,Vatican City,Academic Work,Georg Ohm,Sarajevo,01/01/1976
-Erwin Schrodinger,Vatican City,Academic Work,Maurice Wilkins,Yaoundé,01/01/1976
+Erwin Schrodinger,Vatican City,Work,Michael Faraday,Sarajevo,01/01/1976
+Erwin Schrodinger,Vatican City,Work,Georg Ohm,Sarajevo,01/01/1976
+Erwin Schrodinger,Vatican City,Work,Maurice Wilkins,Yaoundé,01/01/1976
 Erwin Schrodinger,Vatican City,Colleges,Jean-Baptiste Lamarck,Sarajevo,01/01/1976
 Erwin Schrodinger,Vatican City,Colleges,Maurice Hilleman,Luanda,01/01/1976
 Maurice Hilleman,Yaoundé,Friendship,Dmitri Mendeleev,Yaoundé,01/01/1976
 Hermann Rorschach,Baghdad,Politics,Henrietta Swan Leavitt,Baghdad,12/06/1976
-Hermann Rorschach,Baghdad,Academic Work,Johannes Kepler,Baghdad,12/06/1976
+Hermann Rorschach,Baghdad,Work,Johannes Kepler,Baghdad,12/06/1976
 Hermann Rorschach,Baghdad,Friendship,Johannes Kepler,Baghdad,12/06/1976
 Henrietta Swan Leavitt,Baghdad,Friendship,Lawrence Bragg,Baghdad,12/06/1976
-Hermann Rorschach,Baghdad,Academic Work,Maurice Wilkins,Vatican City,12/06/1976
-Henrietta Swan Leavitt,Baghdad,Academic Work,Lawrence Bragg,Baghdad,12/06/1976
-Henrietta Swan Leavitt,Baghdad,Academic Work,Maurice Wilkins,Vatican City,12/06/1976
+Hermann Rorschach,Baghdad,Work,Maurice Wilkins,Vatican City,12/06/1976
+Henrietta Swan Leavitt,Baghdad,Work,Lawrence Bragg,Baghdad,12/06/1976
+Henrietta Swan Leavitt,Baghdad,Work,Maurice Wilkins,Vatican City,12/06/1976
 Johannes Kepler,Baghdad,Politics,Maurice Wilkins,Vatican City,12/06/1976
 Johannes Kepler,Baghdad,Friendship,Jean Piaget,Baghdad,12/06/1976
 Hermann Rorschach,Baghdad,Friendship,Jean Piaget,Baghdad,12/06/1976
@@ -32,24 +32,24 @@ Lawrence Bragg,Baghdad,Politics,Arthur Compton,Yaoundé,31/07/1976
 Lawrence Bragg,Baghdad,Friendship,Heinrich Hertz,Baghdad,31/07/1976
 Heinrich Hertz,Baghdad,Friendship,Henrietta Swan Leavitt,Baghdad,31/07/1976
 Henrietta Swan Leavitt,Baghdad,Friendship,Lawrence Bragg,Baghdad,31/07/1976
-Arthur Compton,Yaoundé,Academic Work,Maurice Wilkins,Yaoundé,31/07/1976
-Maurice Wilkins,Yaoundé,Academic Work,Ivan Pavlov,Kinshasa,31/07/1976
+Arthur Compton,Yaoundé,Work,Maurice Wilkins,Yaoundé,31/07/1976
+Maurice Wilkins,Yaoundé,Work,Ivan Pavlov,Kinshasa,31/07/1976
 Lawrence Bragg,Santiago,Politics,Ivan Pavlov,Kinshasa,31/07/1976
-Luther Burbank,Bangkok,Academic Work,John Dalton,Bangkok,18/09/1976
-John Dalton,Bangkok,Academic Work,Maurice Wilkins,Yaoundé,18/09/1976
-Werner Heisenberg,Bangkok,Academic Work,Maurice Wilkins,Yaoundé,18/09/1976
-Werner Heisenberg,Bangkok,Academic Work,James Watson,Bangkok,18/09/1976
-John Dalton,Bangkok,Academic Work,James Watson,Bangkok,18/09/1976
-Maurice Wilkins,Yaoundé,Academic Work,Arthur Compton,Yaoundé,03/12/1976
-Maurice Wilkins,Yaoundé,Academic Work,Arthur Compton,Yaoundé,07/02/1981
-Maurice Wilkins,Yaoundé,Academic Work,Wernher Von Braun,Maputo,24/03/1982
+Luther Burbank,Bangkok,Work,John Dalton,Bangkok,18/09/1976
+John Dalton,Bangkok,Work,Maurice Wilkins,Yaoundé,18/09/1976
+Werner Heisenberg,Bangkok,Work,Maurice Wilkins,Yaoundé,18/09/1976
+Werner Heisenberg,Bangkok,Work,James Watson,Bangkok,18/09/1976
+John Dalton,Bangkok,Work,James Watson,Bangkok,18/09/1976
+Maurice Wilkins,Yaoundé,Work,Arthur Compton,Yaoundé,03/12/1976
+Maurice Wilkins,Yaoundé,Work,Arthur Compton,Yaoundé,07/02/1981
+Maurice Wilkins,Yaoundé,Work,Wernher Von Braun,Maputo,24/03/1982
 Maurice Wilkins,Yaoundé,Friendship,J. Robert Oppenheimer,Yaoundé,28/11/1985
 Maurice Wilkins,Yaoundé,Friendship,J. Robert Oppenheimer,Yaoundé,02/09/1983
 J. Robert Oppenheimer,Yaoundé,Friendship,Maurice Wilkins,Yaoundé,25/10/1989
 J. Robert Oppenheimer,Yaoundé,Friendship,Maurice Wilkins,Yaoundé,25/10/1989
-Maurice Wilkins,Yaoundé,Academic Work,Justus von Liebig,Addis Ababa,25/10/1989
-Maurice Wilkins,Yaoundé,Academic Work,Leonardo da Vinci,Monrovia,25/10/1989
-J. Robert Oppenheimer,Yaoundé,Academic Work,Leonardo da Vinci,Monrovia,25/10/1989
+Maurice Wilkins,Yaoundé,Work,Justus von Liebig,Addis Ababa,25/10/1989
+Maurice Wilkins,Yaoundé,Work,Leonardo da Vinci,Monrovia,25/10/1989
+J. Robert Oppenheimer,Yaoundé,Work,Leonardo da Vinci,Monrovia,25/10/1989
 Maurice Wilkins,Yaoundé,Colleges,Hans Christian Oersted,Yaoundé,26/12/1989
 Maurice Wilkins,Yaoundé,Colleges,Virginia Apgar,Sarajevo,20/12/1983
 Maurice Wilkins,Yaoundé,Friendship,Emile Berliner,Yaoundé,31/12/1989
@@ -60,9 +60,9 @@ Maurice Wilkins,Yaoundé,Friendship,Wilbur and Orville Wright,Yaoundé,31/12/198
 Maurice Wilkins,Yaoundé,Colleges,Gregor Mendel,Vatican City,31/12/1989
 Maurice Wilkins,Yaoundé,Friendship,Gregor Mendel,Vatican City,31/12/1989
 J. Robert Oppenheimer,Yaoundé,Friendship,Gregor Mendel,Vatican City,31/12/1989
-Maurice Wilkins,Yaoundé,Academic Work,Euclid,Vatican City,31/12/1989
-Maurice Wilkins,Yaoundé,Academic Work,Harold Urey,Vatican City,31/12/1989
-Euclid,Vatican City,Academic Work,Harold Urey,Vatican City,31/12/1989
+Maurice Wilkins,Yaoundé,Work,Euclid,Vatican City,31/12/1989
+Maurice Wilkins,Yaoundé,Work,Harold Urey,Vatican City,31/12/1989
+Euclid,Vatican City,Work,Harold Urey,Vatican City,31/12/1989
 Maurice Wilkins,Yaoundé,Politics,Robert Boyle,Yaoundé,31/12/1989
 Maurice Wilkins,Yaoundé,Friendship,Aristarchus,Addis Ababa,07/01/1990
 Maurice Wilkins,Yaoundé,Friendship,Maria Goeppert-Mayer,Addis Ababa,07/01/1990
@@ -98,10 +98,10 @@ Maurice Wilkins,Yaoundé,Colleges,Wilhelm Conrad Roentgen,Paris,06/06/1990
 Maurice Wilkins,Yaoundé,Colleges,Gottfried Leibniz,Yaoundé,06/06/1990
 J. Robert Oppenheimer,Yaoundé,Friendship,Maurice Wilkins,Yaoundé,06/06/1990
 J. Robert Oppenheimer,Yaoundé,Politics,Edwin Hubble,Abu Dhabi,06/06/1990
-Charles Lyell,Yaoundé,Academic Work,J. Robert Oppenheimer,Yaoundé,19/01/1992
+Charles Lyell,Yaoundé,Work,J. Robert Oppenheimer,Yaoundé,19/01/1992
 Irene Joliot-Curie,Oslo,Friendship,J. Robert Oppenheimer,Yaoundé,03/06/1992
 Wilbur and Orville Wright,Yaoundé,Politics,Benjamin Thompson,Dhaka,13/12/1960
-Wilbur and Orville Wright,Yaoundé,Academic Work,Brahmagupta,Rabat,11/07/1962
+Wilbur and Orville Wright,Yaoundé,Work,Brahmagupta,Rabat,11/07/1962
 Brahmagupta,Rabat,Politics,Katharine Burr Blodgett,Ottawa,11/07/1962
 Brahmagupta,Rabat,Politics,Charles-Augustin de Coulomb,San Salvador,11/07/1962
 Brahmagupta,Rabat,Politics,Ernst Haeckel,San Salvador,11/07/1962
@@ -111,16 +111,16 @@ Wilbur and Orville Wright,Yaoundé,Politics,Ernst Haeckel,San Salvador,11/07/196
 Wilbur and Orville Wright,Yaoundé,Friendship,Alan Turing,Algiers,14/12/1963
 Konrad Lorenz,Monrovia,Friendship,Grace Murray Hopper,Algiers,14/12/1963
 Konrad Lorenz,Monrovia,Friendship,Grace Murray Hopper,Algiers,14/12/1963
-Wilbur and Orville Wright,Yaoundé,Academic Work,Konrad Lorenz,Monrovia,14/12/1963
-Alan Turing,Algiers,Academic Work,Grace Murray Hopper,Algiers,14/12/1963
+Wilbur and Orville Wright,Yaoundé,Work,Konrad Lorenz,Monrovia,14/12/1963
+Alan Turing,Algiers,Work,Grace Murray Hopper,Algiers,14/12/1963
 Marguerite Perey,Yaoundé,Friendship,Tycho Brahe,Yaoundé,01/02/1964
 Tycho Brahe,Yaoundé,Politics,C. V. Raman,Moscow,01/02/1964
-Joseph Priestley,Sarajevo,Academic Work,Carolus Linnaeus,Sarajevo,01/02/1964
+Joseph Priestley,Sarajevo,Work,Carolus Linnaeus,Sarajevo,01/02/1964
 Hedy Lamarr,Sarajevo,Colleges,William Harvey,Sarajevo,01/02/1964
 Hedy Lamarr,Sarajevo,Colleges,Richard Feynman,Sarajevo,01/02/1964
-Richard Feynman,Sarajevo,Academic Work,Christiaan Huygens,Bangkok,01/02/1964
+Richard Feynman,Sarajevo,Work,Christiaan Huygens,Bangkok,01/02/1964
 Hedy Lamarr,Sarajevo,Colleges,Wilbur and Orville Wright,Yaoundé,01/02/1964
-Wilbur and Orville Wright,Yaoundé,Academic Work,Georges-Louis Leclerc,Bangkok,01/02/1964
+Wilbur and Orville Wright,Yaoundé,Work,Georges-Louis Leclerc,Bangkok,01/02/1964
 William Harvey,Sarajevo,Colleges,Richard Feynman,Sarajevo,01/02/1964
 William Harvey,Sarajevo,Colleges,Wilbur and Orville Wright,Yaoundé,01/02/1964
 Richard Feynman,Sarajevo,Colleges,Wilbur and Orville Wright,Yaoundé,01/02/1964
@@ -132,7 +132,7 @@ Marguerite Perey,Yaoundé,Colleges,Hedy Lamarr,Sarajevo,01/02/1964
 Marguerite Perey,Yaoundé,Colleges,William Harvey,Sarajevo,01/02/1964
 Marguerite Perey,Yaoundé,Colleges,Richard Feynman,Sarajevo,01/02/1964
 Marguerite Perey,Yaoundé,Colleges,Wilbur and Orville Wright,Yaoundé,01/02/1964
-Wilbur and Orville Wright,Yaoundé,Academic Work,Brahmagupta,Bogotá,09/04/1964
+Wilbur and Orville Wright,Yaoundé,Work,Brahmagupta,Bogotá,09/04/1964
 Brahmagupta,Rabat,Politics,Alberto Santos-Dumont,Georgetown,09/04/1964
 Brahmagupta,Rabat,Politics,Wilhelm Röntgen,Rabat,09/04/1964
 Brahmagupta,Rabat,Politics,Antonio Meucci,Bridgetown,09/04/1964
@@ -144,15 +144,15 @@ Wilbur and Orville Wright,Yaoundé,Politics,Antonio Meucci,Bridgetown,09/04/1964
 Wilbur and Orville Wright,Yaoundé,Politics,Robert Bunsen,Tbilisi,09/04/1964
 Wilbur and Orville Wright,Yaoundé,Politics,B. F. Skinner,Warsaw,09/04/1964
 Wilbur and Orville Wright,Yaoundé,Friendship,Alan Turing,Yaoundé,12/08/1966
-Wilbur and Orville Wright,Yaoundé,Academic Work,Alan Turing,Yaoundé,12/08/1966
+Wilbur and Orville Wright,Yaoundé,Work,Alan Turing,Yaoundé,12/08/1966
 Wilbur and Orville Wright,Yaoundé,Politics,Charles Darwin,Tbilisi,12/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,René Descartes,Sarajevo,12/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Rachel Carson,Sarajevo,12/08/1966
 René Descartes,Sarajevo,Colleges,Rachel Carson,Sarajevo,12/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Noam Chomsky,Hanoi,25/08/1966
-Anders Celsius,Hanoi,Academic Work,Theodosius Dobzhansky,Hanoi,25/08/1966
+Anders Celsius,Hanoi,Work,Theodosius Dobzhansky,Hanoi,25/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Francis Crick,Hanoi,25/08/1966
-Claude Levi-Strauss,Hanoi,Academic Work,E. O. Wilson,Hanoi,25/08/1966
+Claude Levi-Strauss,Hanoi,Work,E. O. Wilson,Hanoi,25/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Luis Alvarez,Hanoi,25/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Thomas Newcomen,Sarajevo,25/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Inge Lehmann,Sarajevo,25/08/1966
@@ -168,16 +168,16 @@ Wilbur and Orville Wright,Yaoundé,Colleges,Wolfgang Ernst Pauli,Riyadh,31/08/19
 Wilbur and Orville Wright,Yaoundé,Colleges,Niels Bohr,Riyadh,31/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Henri Becquerel,Beirut,31/08/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Stephen Hawking,Riyadh,31/08/1966
-Wilbur and Orville Wright,Yaoundé,Academic Work,Pierre-Simon Laplace,Bangkok,17/11/1966
-Wilbur and Orville Wright,Yaoundé,Academic Work,Nikola Tesla,Bangkok,17/11/1966
+Wilbur and Orville Wright,Yaoundé,Work,Pierre-Simon Laplace,Bangkok,17/11/1966
+Wilbur and Orville Wright,Yaoundé,Work,Nikola Tesla,Bangkok,17/11/1966
 Pierre-Simon Laplace,Bangkok,Friendship,Nikola Tesla,Bangkok,17/11/1966
-Pierre-Simon Laplace,Bangkok,Academic Work,Nikola Tesla,Bangkok,17/11/1966
+Pierre-Simon Laplace,Bangkok,Work,Nikola Tesla,Bangkok,17/11/1966
 Wilbur and Orville Wright,Yaoundé,Politics,Arthur Eddington,Athens,17/11/1966
 Wilbur and Orville Wright,Yaoundé,Politics,Archimedes,Belmopan,28/09/1967
 Wilbur and Orville Wright,Yaoundé,Friendship,Alan Turing,N'Djamena,28/09/1967
 Alan Turing,N'Djamena,Colleges,Emmy Noether,Sarajevo,08/03/1967
 Alan Turing,Yaoundé,Friendship,Wilbur and Orville Wright,Yaoundé,27/11/1967
-Alan Turing,Yaoundé,Academic Work,Wilbur and Orville Wright,Yaoundé,27/11/1967
+Alan Turing,Yaoundé,Work,Wilbur and Orville Wright,Yaoundé,27/11/1967
 Alan Turing,Yaoundé,Politics,Karl Popper,Bangkok,27/11/1967
 Alan Turing,Yaoundé,Politics,Nikola Tesla,Bangkok,27/11/1967
 Alan Turing,Yaoundé,Politics,Niccolo Tartaglia,Bangkok,27/11/1967
@@ -185,14 +185,14 @@ Karl Popper,Bangkok,Colleges,Nikola Tesla,Bangkok,27/11/1967
 Karl Popper,Bangkok,Colleges,Niccolo Tartaglia,Bangkok,27/11/1967
 Nikola Tesla,Bangkok,Colleges,Niccolo Tartaglia,Bangkok,27/11/1967
 Alan Turing,Yaoundé,Politics,Tim Noakes,Belmopan,27/11/1967
-Alan Turing,Yaoundé,Academic Work,Ernst Mach,Kuwait City,27/11/1967
-Aage Bohr,Kuwait City,Academic Work,Alexander Von Humboldt,Kuwait City,27/11/1967
-Alan Turing,Yaoundé,Academic Work,Dian Fossey,Monrovia,27/11/1967
-Ernst Werner von Siemens,Belmopan,Academic Work,Robert Goddard,Belmopan,28/04/1968
+Alan Turing,Yaoundé,Work,Ernst Mach,Kuwait City,27/11/1967
+Aage Bohr,Kuwait City,Work,Alexander Von Humboldt,Kuwait City,27/11/1967
+Alan Turing,Yaoundé,Work,Dian Fossey,Monrovia,27/11/1967
+Ernst Werner von Siemens,Belmopan,Work,Robert Goddard,Belmopan,28/04/1968
 Robert Goddard,Belmopan,Colleges,Nicolaus Copernicus,Sarajevo,28/04/1968
 Ernst Werner von Siemens,Belmopan,Colleges,Nicolaus Copernicus,Sarajevo,28/04/1968
-Wilbur and Orville Wright,Yaoundé,Academic Work,Alfred Wegener,Sarajevo,01/05/1968
-Robert Goddard,Belmopan,Academic Work,Wilbur and Orville Wright,Yaoundé,01/05/1968
+Wilbur and Orville Wright,Yaoundé,Work,Alfred Wegener,Sarajevo,01/05/1968
+Robert Goddard,Belmopan,Work,Wilbur and Orville Wright,Yaoundé,01/05/1968
 Robert Goddard,Belmopan,Friendship,Alfred Binet,Belmopan,01/05/1968
 Wilbur and Orville Wright,Yaoundé,Colleges,Isaac Newton,Monrovia,22/07/1970
 Isaac Newton,Monrovia,Colleges,Francis Bacon,Bangkok,22/07/1970
@@ -203,12 +203,12 @@ Antoine Lavoisier,Monrovia,Colleges,Isaac Newton,Monrovia,22/07/1970
 Clyde Tombaugh,Monrovia,Colleges,Isaac Newton,Monrovia,22/07/1970
 Gene Shoemaker,Monrovia,Colleges,Isaac Newton,Monrovia,22/07/1970
 Wilbur and Orville Wright,Yaoundé,Friendship,Frank Drake,Yaoundé,09/09/1970
-Wilbur and Orville Wright,Yaoundé,Academic Work,Albert Einstein,Yaoundé,09/09/1970
-Frank Drake,Yaoundé,Academic Work,Albert Einstein,Yaoundé,09/09/1970
+Wilbur and Orville Wright,Yaoundé,Work,Albert Einstein,Yaoundé,09/09/1970
+Frank Drake,Yaoundé,Work,Albert Einstein,Yaoundé,09/09/1970
 Angel Alcala,Riyadh,Politics,Frank Drake,Yaoundé,09/09/1970
 Angel Alcala,Riyadh,Politics,Albert Einstein,Yaoundé,09/09/1970
 Angel Alcala,Riyadh,Politics,Wilbur and Orville Wright,Yaoundé,09/09/1970
-Wilbur and Orville Wright,Yaoundé,Academic Work,Frank Drake,Yaoundé,09/09/1970
+Wilbur and Orville Wright,Yaoundé,Work,Frank Drake,Yaoundé,09/09/1970
 Angel Alcala,Riyadh,Politics,Louis de Broglie,Riyadh,09/09/1970
 Maurice Wilkins,Yaoundé,Friendship,J. Robert Oppenheimer,Yaoundé,12/10/1970
 Maurice Wilkins,Yaoundé,Friendship,Aristarchus,Riga,12/10/1970
@@ -220,16 +220,16 @@ J. Robert Oppenheimer,Yaoundé,Friendship,John Logie Baird,Malé,12/10/1970
 Alan Turing,Malé,Friendship,John Logie Baird,Malé,12/10/1970
 J. Robert Oppenheimer,Yaoundé,Friendship,Wilbur and Orville Wright,Yaoundé,12/10/1970
 Wilbur and Orville Wright,Yaoundé,Friendship,Alan Turing,Malé,12/10/1970
-Wilbur and Orville Wright,Yaoundé,Academic Work,Alan Turing,Malé,12/10/1970
+Wilbur and Orville Wright,Yaoundé,Work,Alan Turing,Malé,12/10/1970
 Joseph Banks,Yaoundé,Colleges,J. Robert Oppenheimer,Yaoundé,12/10/1970
-Joseph Banks,Yaoundé,Academic Work,Maurice Wilkins,Yaoundé,12/10/1970
+Joseph Banks,Yaoundé,Work,Maurice Wilkins,Yaoundé,12/10/1970
 Henry Cavendish,Vatican City,Friendship,Maurice Wilkins,Yaoundé,12/06/1969
-Henry Cavendish,Vatican City,Academic Work,Maurice Wilkins,Yaoundé,12/06/1969
+Henry Cavendish,Vatican City,Work,Maurice Wilkins,Yaoundé,12/06/1969
 Claude Bernard,Tashkent,Politics,Maurice Wilkins,Yaoundé,11/02/1971
 Claude Bernard,Tashkent,Friendship,Harriet Quimby,Tashkent,11/02/1971
 Claude Bernard,Tashkent,Friendship,Oswald Avery,Tashkent,11/02/1971
 Harriet Quimby,Tashkent,Friendship,Oswald Avery,Tashkent,11/02/1971
-Maurice Wilkins,Yaoundé,Academic Work,Timothy John Berners-Lee,Vatican City,11/02/1971
+Maurice Wilkins,Yaoundé,Work,Timothy John Berners-Lee,Vatican City,11/02/1971
 Claude Bernard,Tashkent,Politics,Pierre de Fermat,Lomé,11/02/1971
 Claude Bernard,Tashkent,Politics,Timothy John Berners-Lee,Vatican City,11/02/1971
 John Locke,Windhoek,Food,Hermann von Helmholtz,Windhoek,23/02/1971
@@ -237,28 +237,28 @@ Maurice Wilkins,Yaoundé,Colleges,John Locke,Windhoek,23/02/1971
 Wilbur and Orville Wright,Yaoundé,Friendship,Maurice Wilkins,Yaoundé,11/03/1971
 Wilbur and Orville Wright,Yaoundé,Friendship,J. Robert Oppenheimer,Yaoundé,11/03/1971
 Maurice Wilkins,Yaoundé,Friendship,Galen,Yaoundé,11/03/1971
-Wilbur and Orville Wright,Yaoundé,Academic Work,Maurice Wilkins,Yaoundé,11/03/1971
-Wilbur and Orville Wright,Yaoundé,Academic Work,J. Robert Oppenheimer,Yaoundé,11/03/1971
-Maurice Wilkins,Yaoundé,Academic Work,Galen,Yaoundé,11/03/1971
+Wilbur and Orville Wright,Yaoundé,Work,Maurice Wilkins,Yaoundé,11/03/1971
+Wilbur and Orville Wright,Yaoundé,Work,J. Robert Oppenheimer,Yaoundé,11/03/1971
+Maurice Wilkins,Yaoundé,Work,Galen,Yaoundé,11/03/1971
 Wilbur and Orville Wright,Yaoundé,Friendship,Hans Christian Oersted,Yaoundé,28/01/1972
-Wilbur and Orville Wright,Yaoundé,Academic Work,Hans Christian Oersted,Yaoundé,28/01/1972
-Edward Teller,Luanda,Academic Work,Aldo Leopold,Luanda,08/01/1972
-Edward Teller,Luanda,Academic Work,Thomas Alva Edison,Luanda,08/01/1972
-Edward Teller,Luanda,Academic Work,J. J. Thomson,Luanda,08/01/1972
-Thomas Alva Edison,Luanda,Academic Work,J. J. Thomson,Luanda,08/01/1972
-Thomas Alva Edison,Luanda,Academic Work,Aldo Leopold,Luanda,08/01/1972
-J. J. Thomson,Luanda,Academic Work,Aldo Leopold,Luanda,08/01/1972
-Aldo Leopold,Luanda,Academic Work,Joseph Lister,Islamabad,08/01/1972
+Wilbur and Orville Wright,Yaoundé,Work,Hans Christian Oersted,Yaoundé,28/01/1972
+Edward Teller,Luanda,Work,Aldo Leopold,Luanda,08/01/1972
+Edward Teller,Luanda,Work,Thomas Alva Edison,Luanda,08/01/1972
+Edward Teller,Luanda,Work,J. J. Thomson,Luanda,08/01/1972
+Thomas Alva Edison,Luanda,Work,J. J. Thomson,Luanda,08/01/1972
+Thomas Alva Edison,Luanda,Work,Aldo Leopold,Luanda,08/01/1972
+J. J. Thomson,Luanda,Work,Aldo Leopold,Luanda,08/01/1972
+Aldo Leopold,Luanda,Work,Joseph Lister,Islamabad,08/01/1972
 Jane Goodall,Sarajevo,Colleges,Edward Jenner,Sarajevo,08/01/1972
 Edward Jenner,Sarajevo,Colleges,David Hilbert,Sarajevo,08/01/1972
 David Hilbert,Sarajevo,Colleges,Jane Goodall,Sarajevo,08/01/1972
 Francis Bacon,Bangkok,Colleges,Svante Arrhenius,Bangkok,08/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,Francis Bacon,Bangkok,08/01/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Svante Arrhenius,Bangkok,08/01/1972
-Francis Bacon,Bangkok,Academic Work,Svante Arrhenius,Bangkok,08/01/1972
-Thomas Alva Edison,Luanda,Academic Work,Joseph Lister,Islamabad,08/01/1972
-J. J. Thomson,Luanda,Academic Work,Joseph Lister,Islamabad,08/01/1972
-Edward Teller,Luanda,Academic Work,Joseph Lister,Islamabad,08/01/1972
+Zora Neale Hurston,Yaoundé,Work,Svante Arrhenius,Bangkok,08/01/1972
+Francis Bacon,Bangkok,Work,Svante Arrhenius,Bangkok,08/01/1972
+Thomas Alva Edison,Luanda,Work,Joseph Lister,Islamabad,08/01/1972
+J. J. Thomson,Luanda,Work,Joseph Lister,Islamabad,08/01/1972
+Edward Teller,Luanda,Work,Joseph Lister,Islamabad,08/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,Jane Goodall,Sarajevo,08/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,Edward Jenner,Sarajevo,08/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,David Hilbert,Sarajevo,08/01/1972
@@ -280,22 +280,22 @@ Carl Friedrich Gauss,Sarajevo,Colleges,Clarence Birdseye,Sarajevo,12/10/1972
 Carl Friedrich Gauss,Sarajevo,Colleges,Richard Feynman,Sarajevo,12/10/1972
 Carl Friedrich Gauss,Sarajevo,Colleges,Ernst Mayr,Sarajevo,12/10/1972
 Carl Friedrich Gauss,Sarajevo,Colleges,James Chadwick,Sarajevo,12/10/1972
-James Chadwick,Sarajevo,Academic Work,John Ray,Sarajevo,12/10/1972
+James Chadwick,Sarajevo,Work,John Ray,Sarajevo,12/10/1972
 James Chadwick,Sarajevo,Friendship,John Ray,Sarajevo,12/10/1972
 James Chadwick,Sarajevo,Colleges,Zora Neale Hurston,Yaoundé,12/10/1972
 James Chadwick,Sarajevo,Colleges,Clarence Birdseye,Sarajevo,12/10/1972
 James Chadwick,Sarajevo,Colleges,Richard Feynman,Sarajevo,12/10/1972
 James Chadwick,Sarajevo,Colleges,Ernst Mayr,Sarajevo,12/10/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Francis Bacon,Sarajevo,12/10/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Svante Arrhenius,Bangkok,12/10/1972
+Zora Neale Hurston,Yaoundé,Work,Francis Bacon,Sarajevo,12/10/1972
+Zora Neale Hurston,Yaoundé,Work,Svante Arrhenius,Bangkok,12/10/1972
 Francis Bacon,Bangkok,Colleges,Svante Arrhenius,Bangkok,12/10/1972
 Zora Neale Hurston,Yaoundé,Colleges,Clarence Birdseye,Sarajevo,12/10/1972
 Zora Neale Hurston,Yaoundé,Colleges,Richard Feynman,Sarajevo,12/10/1972
 Zora Neale Hurston,Yaoundé,Colleges,Ernst Mayr,Sarajevo,12/10/1972
-Clarence Birdseye,Sarajevo,Academic Work,Edmund Halley,Sarajevo,12/10/1972
+Clarence Birdseye,Sarajevo,Work,Edmund Halley,Sarajevo,12/10/1972
 Clarence Birdseye,Sarajevo,Colleges,Richard Feynman,Sarajevo,12/10/1972
 Clarence Birdseye,Sarajevo,Colleges,Ernst Mayr,Sarajevo,12/10/1972
-Richard Feynman,Sarajevo,Academic Work,Christiaan Huygens,Sarajevo,12/10/1972
+Richard Feynman,Sarajevo,Work,Christiaan Huygens,Sarajevo,12/10/1972
 Richard Feynman,Sarajevo,Colleges,Ernst Mayr,Sarajevo,12/10/1972
 Alexander Graham Bell,Sarajevo,Colleges,Rudolf Christian Karl Diesel,Tunis,12/10/1972
 Edward Jenner,Sarajevo,Colleges,Rudolf Christian Karl Diesel,Tunis,12/10/1972
@@ -314,7 +314,7 @@ James Prescott Joule,Baku,Friendship,S. N. Bose,Baku,19/03/1968
 Homi Jehangir Bhabha,Addis Ababa,Friendship,Subrahmanyan Chandrasekhar,Baku,19/03/1968
 James Prescott Joule,Baku,Friendship,Aristarchus,Kingston,19/03/1968
 Aristarchus,Kingston,Friendship,Homi Jehangir Bhabha,Addis Ababa,25/06/1973
-Wilbur and Orville Wright,Baku,Academic Work,Maurice Wilkins,Yaoundé,25/06/1973
+Wilbur and Orville Wright,Baku,Work,Maurice Wilkins,Yaoundé,25/06/1973
 Wilbur and Orville Wright,Baku,Friendship,Maurice Wilkins,Yaoundé,25/06/1973
 Homi Jehangir Bhabha,Addis Ababa,Friendship,Maurice Wilkins,Yaoundé,25/06/1973
 Homi Jehangir Bhabha,Addis Ababa,Friendship,S. N. Bose,Santiago,25/06/1973
@@ -331,7 +331,7 @@ Albert Abraham Michelson,Addis Ababa,Friendship,Elizabeth Blackwell,Sarajevo,25/
 Albert Abraham Michelson,Addis Ababa,Friendship,Humphry Davy,Sarajevo,25/06/1973
 Elizabeth Blackwell,Addis Ababa,Friendship,Humphry Davy,Sarajevo,25/06/1973
 Aristarchus,Kingston,Friendship,Homi Jehangir Bhabha,Addis Ababa,17/03/1974
-Wilbur and Orville Wright,Kigali,Academic Work,Maurice Wilkins,Yaoundé,17/03/1974
+Wilbur and Orville Wright,Kigali,Work,Maurice Wilkins,Yaoundé,17/03/1974
 Wilbur and Orville Wright,Kigali,Friendship,Maurice Wilkins,Yaoundé,17/03/1974
 Homi Jehangir Bhabha,Addis Ababa,Friendship,Maurice Wilkins,Yaoundé,17/03/1974
 Homi Jehangir Bhabha,Addis Ababa,Friendship,S. N. Bose,Amsterdam,17/03/1974
@@ -352,7 +352,7 @@ Aristotle,Riga,Colleges,S. N. Bose,Amsterdam,17/03/1974
 Aristotle,Riga,Colleges,Henry Cavendish,Baku,17/03/1974
 Albert Abraham Michelson,Addis Ababa,Colleges,Hipparchus,Addis Ababa,17/03/1974
 Homi Jehangir Bhabha,Addis Ababa,Colleges,Hipparchus,Addis Ababa,17/03/1974
-Maurice Wilkins,Kigali,Academic Work,Wilbur and Orville Wright,Sarajevo,19/08/1971
+Maurice Wilkins,Kigali,Work,Wilbur and Orville Wright,Sarajevo,19/08/1971
 Maurice Wilkins,Kigali,Friendship,Wilbur and Orville Wright,Sarajevo,19/08/1971
 Jane Marcet,London,Friendship,Albert Abraham Michelson,London,19/08/1971
 Maurice Wilkins,Kigali,Friendship,Jane Marcet,London,19/08/1971
@@ -447,24 +447,24 @@ Albert Abraham Michelson,Sarajevo,Friendship,Marie Curie,Sarajevo,28/08/1971
 Anaximander,Sarajevo,Friendship,Marie Curie,Sarajevo,28/08/1971
 Aristarchus,Bratislava,Friendship,Ronald Fisher,Sarajevo,28/08/1971
 Wilbur and Orville Wright,Yaoundé,Food,Claudius Ptolemy,Oslo,26/06/1966
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,26/06/1966
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,26/06/1966
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,27/10/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,27/10/1967
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,27/10/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,27/10/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,27/10/1967
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,27/10/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,31/10/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,31/10/1967
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,31/10/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,01/11/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,01/11/1967
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,01/11/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,27/10/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Christiaan Huygens,Bangkok,27/10/1967
+Wilbur and Orville Wright,Yaoundé,Work,Christiaan Huygens,Bangkok,27/10/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,27/10/1967
-Wilbur and Orville Wright,Yaoundé,Academic Work,Christiaan Huygens,Bangkok,27/10/1967
+Wilbur and Orville Wright,Yaoundé,Work,Christiaan Huygens,Bangkok,27/10/1967
 Wilbur and Orville Wright,Yaoundé,Colleges,Sigmund Freud,Yaoundé,13/01/1968
-Wilbur and Orville Wright,Yaoundé,Academic Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,13/01/1968
+Wilbur and Orville Wright,Yaoundé,Work,Muhammad ibn Musa al-Khwarizmi,Bangkok,13/01/1968
 Wilbur and Orville Wright,Yaoundé,Colleges,James Watt,Bern,11/07/1968
 Wilbur and Orville Wright,Yaoundé,Colleges,Benjamin Franklin,Bern,11/07/1968
-Wilbur and Orville Wright,Yaoundé,Academic Work,Bill Nye,Bangkok,11/07/1968
+Wilbur and Orville Wright,Yaoundé,Work,Bill Nye,Bangkok,11/07/1968
 Wilbur and Orville Wright,Yaoundé,Colleges,Jocelyn Bell Burnell,Sarajevo,19/02/1970
 Jocelyn Bell Burnell,Sarajevo,Friendship,Alfred Nobel,Sarajevo,19/02/1970
 Jocelyn Bell Burnell,Sarajevo,Friendship,Beatrix Potter,Sarajevo,19/02/1970
@@ -472,19 +472,19 @@ Wilbur and Orville Wright,Yaoundé,Colleges,Beatrix Potter,Sarajevo,19/02/1970
 Zora Neale Hurston,Yaoundé,Colleges,Franz Mesmer,Riyadh,12/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,Jonas Salk,Riyadh,12/01/1972
 Franz Mesmer,Riyadh,Colleges,Jonas Salk,Riyadh,12/01/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Francis Bacon,Bangkok,12/01/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Svante Arrhenius,Bangkok,12/01/1972
-Francis Bacon,Bangkok,Academic Work,Svante Arrhenius,Bangkok,12/01/1972
+Zora Neale Hurston,Yaoundé,Work,Francis Bacon,Bangkok,12/01/1972
+Zora Neale Hurston,Yaoundé,Work,Svante Arrhenius,Bangkok,12/01/1972
+Francis Bacon,Bangkok,Work,Svante Arrhenius,Bangkok,12/01/1972
 Zora Neale Hurston,Yaoundé,Colleges,Franz Mesmer,Riyadh,02/01/1973
 Zora Neale Hurston,Yaoundé,Colleges,Jonas Salk,Riyadh,02/01/1973
 Franz Mesmer,Riyadh,Colleges,Jonas Salk,Riyadh,02/01/1973
-Zora Neale Hurston,Yaoundé,Academic Work,Francis Bacon,Bangkok,02/01/1973
-Zora Neale Hurston,Yaoundé,Academic Work,Svante Arrhenius,Bangkok,02/01/1973
+Zora Neale Hurston,Yaoundé,Work,Francis Bacon,Bangkok,02/01/1973
+Zora Neale Hurston,Yaoundé,Work,Svante Arrhenius,Bangkok,02/01/1973
 Francis Bacon,Bangkok,Colleges,Svante Arrhenius,Bangkok,02/01/1973
 Zora Neale Hurston,Yaoundé,Colleges,Arnold Sommerfeld,Bangkok,25/08/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Bill Nye,Bangkok,25/08/1972
+Zora Neale Hurston,Yaoundé,Work,Bill Nye,Bangkok,25/08/1972
 Zora Neale Hurston,Yaoundé,Colleges,Arnold Sommerfeld,Bangkok,25/08/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Francis Bacon,Bangkok,25/08/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Svante Arrhenius,Bangkok,25/08/1972
+Zora Neale Hurston,Yaoundé,Work,Francis Bacon,Bangkok,25/08/1972
+Zora Neale Hurston,Yaoundé,Work,Svante Arrhenius,Bangkok,25/08/1972
 Zora Neale Hurston,Yaoundé,Colleges,Arnold Sommerfeld,Bangkok,23/09/1972
-Zora Neale Hurston,Yaoundé,Academic Work,Bill Nye,Bangkok,23/09/1972
+Zora Neale Hurston,Yaoundé,Work,Bill Nye,Bangkok,23/09/1972
