@@ -218,7 +218,7 @@ module glutils {
     
     // SETUP
     
-        var txtCanvas = document.createElement("canvas")
+    var txtCanvas = document.createElement("canvas")
 
     export class WebGL{
         scene:THREE.Scene;
@@ -284,6 +284,12 @@ module glutils {
         enableHorizontalPanning(b:boolean){
             this.interactor.isHorizontalPanEnabled = b;
         }
+
+
+        ////////////////////
+        /// IMAGE EXPORT ///
+        ////////////////////
+    
     }
     
     var webgl;
@@ -589,6 +595,8 @@ module glutils {
                 this.scene.remove(this.visualElements[i]);
             }
         }
+
+
     }
     
     
@@ -1633,4 +1641,6 @@ module geometry{
     
     
 }
+
+
 

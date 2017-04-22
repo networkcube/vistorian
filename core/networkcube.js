@@ -8982,6 +8982,29 @@ var networkcube;
         }
     }
     networkcube.formatTimeAtGranularity = formatTimeAtGranularity;
+    function exportPNG(canvas, name) {
+        var dataURL = canvas.toDataURL('image/jpg', 1);
+        var blob = dataURItoBlob(dataURL);
+        var fileNameToSaveAs = name + '_' + new Date().toUTCString() + '.png';
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.href = window.webkitURL.createObjectURL(blob);
+        downloadLink.click();
+    }
+    networkcube.exportPNG = exportPNG;
+    function dataURItoBlob(dataURI) {
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ia], { type: mimeString });
+    }
 })(networkcube || (networkcube = {}));
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

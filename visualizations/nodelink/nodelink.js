@@ -63,6 +63,12 @@ networkcube.makeSlider(menuDiv, 'Edge Gap', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_GA
     updateLayout();
     webgl.render();
 });
+networkcube.makeSlider(menuDiv, 'Link Width', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_WIDTH, 0, 10, function (value) {
+    LINK_WIDTH = value;
+    linkWeightScale.range([0, LINK_WIDTH]);
+    updateLinks();
+    webgl.render();
+});
 makeDropdown(menuDiv, 'Labeling', ['Automatic', 'Hide All', 'Show All', 'Neighbors'], function (selection) {
     LABELING_STRATEGY = parseInt(selection);
     updateLabelVisibility();
@@ -490,4 +496,7 @@ function lassoEndHandler(lassoPoints) {
     if (selectedNodes.length > 0) {
         networkcube.selection('set', { nodes: selectedNodes, links: selectedLinks });
     }
+}
+function exportPNG() {
+    networkcube.exportPNG(webgl.canvas, 'node-link');
 }

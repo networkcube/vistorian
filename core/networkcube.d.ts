@@ -86,6 +86,7 @@ declare module networkcube {
     function encapsulate(array: any[], attrName?: string): Object[];
     function isPointInPolyArray(poly: number[][], pt: number[]): boolean;
     function formatTimeAtGranularity(time: networkcube.Time, granualarity: number): number;
+    function exportPNG(canvas: any, name: string): void;
 }
 declare module networkcube {
     class BasicElement {

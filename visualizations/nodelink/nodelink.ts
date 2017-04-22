@@ -90,6 +90,13 @@
         updateLayout();   
         webgl.render();
     })
+    networkcube.makeSlider(menuDiv, 'Link Width', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_WIDTH, 0, 10, function(value:number){
+        LINK_WIDTH = value;
+        linkWeightScale.range([0,LINK_WIDTH]);
+        // updateLayout();
+        updateLinks();   
+        webgl.render();
+    })
     makeDropdown(menuDiv, 'Labeling', ['Automatic', 'Hide All', 'Show All', 'Neighbors'], (selection)=>{
         LABELING_STRATEGY = parseInt(selection);
         updateLabelVisibility();
@@ -654,6 +661,10 @@
         if(selectedNodes.length > 0){
             networkcube.selection('set', {nodes:selectedNodes, links:selectedLinks})
         }
+    }
+
+    function exportPNG(){
+        networkcube.exportPNG(webgl.canvas, 'node-link');
     }
 
 
