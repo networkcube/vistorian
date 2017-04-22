@@ -39,11 +39,11 @@ div#logos img{
 	margin-right: 20px;
 }
 
-#video_div{
-	/*background-color: #eeeeee;*/
-	/*padding: 10px;*/
-	width: 100%
+video{
+	border: 1px #dddddd solid; 
 }
+
+
 
 
 /*CONTENT*/
