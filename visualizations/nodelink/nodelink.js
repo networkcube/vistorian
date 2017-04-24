@@ -151,6 +151,7 @@ layout = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .on('end', function () {
+    unshowMessage();
     _this.updateNodes();
     _this.updateLinks();
     _this.updateLayout();
@@ -161,6 +162,7 @@ layout = d3.layout.force()
     networkcube.sendMessage('layout', { coords: coords });
 })
     .start();
+showMessage('Calculating<br/>layout');
 init();
 function init() {
     var _this = this;
@@ -518,4 +520,13 @@ function lassoEndHandler(lassoPoints) {
 }
 function exportPNG() {
     console.error('PNG EXPORT DISABLED!');
+}
+function showMessage(message) {
+    if ($('#messageBox'))
+        $('#messageBox').remove();
+    $('#visDiv').append('<div id="messageBox"><p>' + message + '</p></div>');
+}
+function unshowMessage() {
+    if ($('#messageBox'))
+        $('#messageBox').remove();
 }
