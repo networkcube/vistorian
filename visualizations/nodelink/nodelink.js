@@ -28,7 +28,6 @@ var nodesOrderedByDegree = dgraph.nodes().toArray().sort(function (n1, n2) { ret
 var nodePairs = dgraph.nodePairs();
 var links = dgraph.links().toArray();
 var nodeLength = nodes.length;
-var mouseDownNode = undefined;
 var hiddenLabels = [];
 var LABELING_STRATEGY = 1;
 var linkWeightScale = d3.scale.linear().range([0, LINK_WIDTH]);
@@ -37,16 +36,6 @@ linkWeightScale.domain([
     dgraph.links().weights().max()
 ]);
 networkcube.setDefaultEventListener(updateEvent);
-var shiftDown = false;
-$(document).on('keyup keydown', function (e) { shiftDown = e.shiftKey; });
-$(document).on('mousemove', function (e) {
-    if (mouseDownNode != undefined) {
-        var mousePos = svg.mouseToWorldCoordinates(e.clientX, e.clientY);
-        mouseDownNode.x = mousePos[0];
-        mouseDownNode.y = -mousePos[1];
-        _this.updateLayout();
-    }
-});
 var menuDiv = d3.select('#menuDiv');
 networkcube.makeSlider(menuDiv, 'Link Opacity', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_OPACITY, 0, 1, function (value) {
     LINK_OPACITY = value;
@@ -78,7 +67,6 @@ function makeDropdown(d3parent, name, values, callback) {
         s.append('option').attr('value', i).html(v);
     });
     s.on('change', function () {
-        console.log('name', name);
         var e = document.getElementById("selection-input_" + name);
         callback(e.options[e.selectedIndex].value);
     });
@@ -95,10 +83,10 @@ var mouseStart;
 var panOffsetLocal = [0, 0];
 var panOffsetGlobal = [0, 0];
 var isMouseDown = false;
+var globalZoom = 1;
 var svg = d3.select('#visSvg')
     .on('mousedown', function () {
     isMouseDown = true;
-    console.log('mousedown');
     mouseStart = [d3.event.x, d3.event.y];
 })
     .on('mousemove', function () {
@@ -176,8 +164,6 @@ function init() {
         .style('fill', COLOR_DEFAULT_NODE)
         .on('mouseover', mouseOverNode)
         .on('mouseout', mouseOutNode)
-        .on('mousedown', mouseDownOnNode)
-        .on('mouseup', mouseUpNode)
         .on('click', function (d) {
         var selections = d.getSelections();
         var currentSelection = _this.dgraph.getCurrentSelection();
@@ -319,15 +305,7 @@ function mouseOverNode(n) {
 function mouseOutNode(n) {
     networkcube.highlight('reset');
 }
-function mouseDownOnNode(n) {
-    mouseDownNode = n;
-}
-function mouseUpNode(n) {
-    mouseDownNode = undefined;
-}
-var globalZoom = 1;
 function timeChangedHandler(m) {
-    console.log('RECEIVE MESSAGE');
     for (var i = 0; i < times.length; i++) {
         if (times[i].unixTime() > m.startUnix) {
             time_start = times[i - 1];
@@ -483,43 +461,6 @@ function stretchVector(vec, finalLength) {
         vec[i] = vec[i] / len * finalLength;
     }
     return vec;
-}
-var visualLassoPoints;
-function lassoMoveHandler(lassoPoints) {
-    if (visualLassoPoints != undefined)
-        visualLassoPoints.removeAll();
-    visualLassoPoints = svg.selectAll('visualLassoPoints')
-        .data(lassoPoints)
-        .append('circle')
-        .attr('r', 1)
-        .style('fill', '#ff9999')
-        .attr('x', function (d) { return d[0]; })
-        .attr('y', function (d) { return d[1]; });
-}
-function lassoEndHandler(lassoPoints) {
-    if (visualLassoPoints != undefined)
-        visualLassoPoints.removeAll();
-    var selectedNodes = [];
-    for (var i = 0; i < nodes.length; i++) {
-        if (networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, nodes[i].y]))
-            selectedNodes.push(nodes[i]);
-    }
-    console.log('Selected nodes:', selectedNodes.length);
-    var selectedLinks = [];
-    var incidentLinks = [];
-    for (var i = 0; i < selectedNodes.length; i++) {
-        for (var j = i + 1; j < selectedNodes.length; j++) {
-            incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).toArray();
-            selectedLinks = selectedLinks.concat(incidentLinks);
-        }
-    }
-    console.log('Selected links:', selectedLinks.length);
-    if (selectedNodes.length > 0) {
-        networkcube.selection('set', { nodes: selectedNodes, links: selectedLinks });
-    }
-}
-function exportPNG() {
-    console.error('PNG EXPORT DISABLED!');
 }
 function showMessage(message) {
     if ($('#messageBox'))

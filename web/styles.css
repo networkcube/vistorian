@@ -39,13 +39,17 @@ div#logos img{
 	margin-right: 20px;
 }
 
+div#logos img#uoe{
+	height: 65px;
+	margin-bottom: -15px;
+}
+
 div#video_div{
 }
 
 video{
 	border: 1px #dddddd solid; 
 }
-
 
 
 

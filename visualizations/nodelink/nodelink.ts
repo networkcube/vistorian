@@ -3,16 +3,16 @@
     var COLOR_DEFAULT_LINK = '#999999';
     var COLOR_DEFAULT_NODE = '#333333';
     var COLOR_HIGHLIGHT = '#ff8800';
-    var LINK_OPACITY = .5;
-    var LINK_WIDTH = 1.5;
+    var LINK_OPACITY:number = .5;
+    var LINK_WIDTH:number = 1.5;
     var OFFSET_LABEL = {x:5, y:4}
-    var LINK_GAP = 2;
-    var LAYOUT_TIMEOUT = 3000;
-    var LABELBACKGROUND_OPACITY = 1;
-    var LABELDISTANCE = 10;
-    var SLIDER_WIDTH = 100
-    var SLIDER_HEIGHT = 35;
-    var NODE_SIZE = 1;
+    var LINK_GAP:number = 2;
+    var LAYOUT_TIMEOUT:number = 3000;
+    var LABELBACKGROUND_OPACITY:number = 1;
+    var LABELDISTANCE:number = 10;
+    var SLIDER_WIDTH:number = 100
+    var SLIDER_HEIGHT:number = 35;
+    var NODE_SIZE:number = 1;
     
     var width:number = window.innerWidth
     var height:number = window.innerHeight - 100;
@@ -43,7 +43,7 @@
     
 
     // states
-    var mouseDownNode = undefined;
+    // var mouseDownNode = undefined;
     var hiddenLabels = [];
     var LABELING_STRATEGY = 1;
    
@@ -56,51 +56,29 @@
     networkcube.setDefaultEventListener(updateEvent);
     
     
-    // GENERAL LISTENERS
-    var shiftDown=false;
-    $(document).on('keyup keydown', function(e){shiftDown = e.shiftKey} );
-    $(document).on('mousemove', (e)=>{
-        if(mouseDownNode != undefined){
-            var mousePos = svg.mouseToWorldCoordinates(e.clientX, e.clientY)
-            mouseDownNode.x = mousePos[0] 
-            mouseDownNode.y = -mousePos[1] 
-            this.updateLayout();
-        }
-    });
-    
-    
-    
-    
+  
     // MENU
     var menuDiv = d3.select('#menuDiv');
     networkcube.makeSlider(menuDiv, 'Link Opacity', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_OPACITY, 0, 1, function(value:number){
-        // linkWeightScale.range([0,value])
         LINK_OPACITY = value;
         updateLinks();   
-        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Node Size', SLIDER_WIDTH, SLIDER_HEIGHT, NODE_SIZE, .01, 3, function(value:number){
-        // linkWeightScale.range([0,value])
         NODE_SIZE = value;
         updateNodeSize();   
-        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Edge Gap', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_GAP, 0, 10, function(value:number){
         LINK_GAP = value;
         updateLayout();   
-        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Link Width', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_WIDTH, 0, 10, function(value:number){
         LINK_WIDTH = value;
         linkWeightScale.range([0,LINK_WIDTH]);
-        // updateLayout();
         updateLinks();   
-        // webgl.render();
     })
     makeDropdown(menuDiv, 'Labeling', ['Automatic', 'Hide All', 'Show All', 'Neighbors'], (selection)=>{
         LABELING_STRATEGY = parseInt(selection);
         updateLabelVisibility();
-        // webgl.render();        
     })
     
     function makeDropdown(d3parent, name:string, values:String[], callback:Function){
@@ -114,7 +92,6 @@
             s.append('option').attr('value', i).html(v)   
         })
         s.on('change', ()=>{
-            console.log('name', name)
             var e = document.getElementById("selection-input_"+name);
             callback(e.options[e.selectedIndex].value);
         }) 
@@ -142,12 +119,11 @@
     var panOffsetGlobal:number []= [0,0];
 
     var isMouseDown:boolean = false;
+    var globalZoom = 1;  
 
     var svg = d3.select('#visSvg')
         .on('mousedown', ()=> {
-            // d3.event.stopPropagation();
             isMouseDown = true;
-            console.log('mousedown')
             mouseStart = [d3.event.x,d3.event.y];})
         .on('mousemove', ()=> {
             if(isMouseDown){
@@ -190,7 +166,6 @@
     var visualNodes;
     var nodeLabels;
     var nodeLabelOutlines;
-    // var nodeLabelBackgrounds;
     var visualLinks;
     var layout;
 
@@ -200,8 +175,6 @@
         .y(function(d) { return d.y; })
         .interpolate("linear");    
 
-    // layout = d3.layout.force()
-    // set nod width
     for(var i=0 ; i <nodes.length ; i++){
         nodes[i]['width'] = getNodeRadius(nodes[i])*2;
         nodes[i]['height'] = getNodeRadius(nodes[i])*2;
@@ -246,8 +219,6 @@
                 .style('fill', COLOR_DEFAULT_NODE)
                 .on('mouseover', mouseOverNode)
                 .on('mouseout',mouseOutNode)
-                .on('mousedown', mouseDownOnNode)
-                .on('mouseup', mouseUpNode)
                 .on('click', d=>{
                     var selections = d.getSelections();
                     var currentSelection = this.dgraph.getCurrentSelection();
@@ -384,7 +355,6 @@
         }
 
         // render;
-        // nodeLabels.style('opacity', (n)=>hiddenLabels.indexOf(n)>-1?0:1)
         nodeLabels.attr('visibility', (n)=>hiddenLabels.indexOf(n)>-1?'hidden':'visible')
         nodeLabelOutlines.attr('visibility', (n)=>hiddenLabels.indexOf(n)>-1?'hidden':'visible')
     }
@@ -426,34 +396,8 @@
     function mouseOutNode(n){
         networkcube.highlight('reset')
     }
-    function mouseDownOnNode(n){
-        mouseDownNode = n; 
-        // webgl.enablePanning(false)
-    }
-    function mouseUpNode(n){
-        mouseDownNode = undefined; 
-        // webgl.enablePanning(true)
-    }
-    
-    // window.addEventListener("mousewheel", mouseWheel, false);
-    var globalZoom = 1;  
 
-    // function mouseWheel(event){
 
-    //     // event.preventDefault();
-    //     // var mouse = svg.mouseToWorldCoordinates(event.clientX, event.clientY)
-    //     // globalZoom = 1 + event.wheelDelta/1000;
-
-    //     // // updatelayout
-    //     // var d,n;
-    //     // for(var i=0 ; i <nodes.length ; i++){
-    //     //     n = nodes[i]
-    //     //     n.x = mouse[0] + (n.x - mouse[0]) * globalZoom;
-    //     //     n.y = -mouse[1] + (n.y + mouse[1]) * globalZoom;
-    //     // }
-
-    //     updateLayout()
-    // }
 
 
     /////////////////
@@ -462,7 +406,6 @@
     
     function timeChangedHandler(m:networkcube.TimeRangeMessage){
 
-        console.log('RECEIVE MESSAGE')
         for(var i= 0 ; i < times.length ; i++){
             if(times[i].unixTime() > m.startUnix){
                 time_start = times[i-1];
@@ -478,21 +421,16 @@
         if(time_end==undefined){
             time_end = times[times.length-1]
         }
-
-        // console.log('start-end', time_start, time_end)
-      
-      
+  
         timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();
         updateNodes();
-        // webgl.render()
     }
 
     
     function updateEvent(m:networkcube.Message){
         updateLinks();
         updateNodes();
-        // webgl.render();
     }
 
     function updateNodeSize(){
@@ -647,59 +585,50 @@
         return vec
     }
 
-    var visualLassoPoints:svg.WebGLElementQuery;
-    function lassoMoveHandler(lassoPoints:number[][]){
+    // var visualLassoPoints:svg.WebGLElementQuery;
+    // function lassoMoveHandler(lassoPoints:number[][]){
 
-        if(visualLassoPoints != undefined)
-            visualLassoPoints.removeAll();
+    //     if(visualLassoPoints != undefined)
+    //         visualLassoPoints.removeAll();
 
-        visualLassoPoints = svg.selectAll('visualLassoPoints')
-            // .data([lassoPoints[lassoPoints.length-1]])
-            .data(lassoPoints)
-            .append('circle')
-                .attr('r', 1)
-                .style('fill', '#ff9999')
-                .attr('x', (d)=>d[0])
-                .attr('y', (d)=>d[1])
+    //     visualLassoPoints = svg.selectAll('visualLassoPoints')
+    //         .data(lassoPoints)
+    //         .append('circle')
+    //             .attr('r', 1)
+    //             .style('fill', '#ff9999')
+    //             .attr('x', (d)=>d[0])
+    //             .attr('y', (d)=>d[1])
                                  
-
-        // webgl.render();
-    }
+    // }
 
 
-    function lassoEndHandler(lassoPoints:number[][]){
+    // function lassoEndHandler(lassoPoints:number[][]){
         
-        if(visualLassoPoints != undefined)
-            visualLassoPoints.removeAll();
+    //     if(visualLassoPoints != undefined)
+    //         visualLassoPoints.removeAll();
 
         
-        var selectedNodes = []
-        for(var i=0 ; i <nodes.length ; i++){
-            if(networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, nodes[i].y]))
-                selectedNodes.push(nodes[i])
-        }   
-        console.log('Selected nodes:', selectedNodes.length)
-        // get links in selection
-        var selectedLinks = []
-        var incidentLinks = [];
-        for(var i=0 ; i <selectedNodes.length ; i++){
-            for(var j=i+1 ; j <selectedNodes.length ; j++){
-                // incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).presentIn(time_start,time_end).toArray() 
-                incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).toArray() 
-                selectedLinks = selectedLinks.concat(incidentLinks);
-            }   
-        }   
-        console.log('Selected links:', selectedLinks.length)
-        if(selectedNodes.length > 0){
-            networkcube.selection('set', {nodes:selectedNodes, links:selectedLinks})
-        }
-    }
-
-    function exportPNG(){
-        console.error('PNG EXPORT DISABLED!');
-        // networkcube.exportPNG(webgl.canvas, 'node-link');
-    }
-
+    //     var selectedNodes = []
+    //     for(var i=0 ; i <nodes.length ; i++){
+    //         if(networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, nodes[i].y]))
+    //             selectedNodes.push(nodes[i])
+    //     }   
+    //     console.log('Selected nodes:', selectedNodes.length)
+    //     // get links in selection
+    //     var selectedLinks = []
+    //     var incidentLinks = [];
+    //     for(var i=0 ; i <selectedNodes.length ; i++){
+    //         for(var j=i+1 ; j <selectedNodes.length ; j++){
+    //             // incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).presentIn(time_start,time_end).toArray() 
+    //             incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).toArray() 
+    //             selectedLinks = selectedLinks.concat(incidentLinks);
+    //         }   
+    //     }   
+    //     console.log('Selected links:', selectedLinks.length)
+    //     if(selectedNodes.length > 0){
+    //         networkcube.selection('set', {nodes:selectedNodes, links:selectedLinks})
+    //     }
+    // }
 
     function showMessage(message: string) 
     {
