@@ -213,6 +213,8 @@
         .nodes(nodes)
         .links(links)
         .on('end', ()=>{
+            unshowMessage(); 
+
             this.updateNodes();
             this.updateLinks();
             this.updateLayout();
@@ -224,6 +226,9 @@
             networkcube.sendMessage('layout', {coords:coords})
         })
         .start()
+
+    // show layout-message    
+    showMessage('Calculating<br/>layout'); 
 
     init();
     function init(){
@@ -694,5 +699,22 @@
         console.error('PNG EXPORT DISABLED!');
         // networkcube.exportPNG(webgl.canvas, 'node-link');
     }
+
+
+    function showMessage(message: string) 
+    {
+        if ($('#messageBox'))
+            $('#messageBox').remove();
+        
+        $('#visDiv').append('<div id="messageBox"><p>' + message + '</p></div>');
+        
+    }
+
+    function unshowMessage()
+    {
+        if ($('#messageBox'))
+            $('#messageBox').remove();
+    }
+    
 
 
