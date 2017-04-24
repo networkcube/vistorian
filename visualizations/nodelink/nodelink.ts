@@ -5,7 +5,7 @@
     var COLOR_HIGHLIGHT = '#ff8800';
     var LINK_OPACITY = .5;
     var LINK_WIDTH = 1.5;
-    var OFFSET_LABEL = {x:0, y:10}
+    var OFFSET_LABEL = {x:5, y:4}
     var LINK_GAP = 2;
     var LAYOUT_TIMEOUT = 3000;
     var LABELBACKGROUND_OPACITY = 1;
@@ -61,7 +61,7 @@
     $(document).on('keyup keydown', function(e){shiftDown = e.shiftKey} );
     $(document).on('mousemove', (e)=>{
         if(mouseDownNode != undefined){
-            var mousePos = glutils.mouseToWorldCoordinates(e.clientX, e.clientY)
+            var mousePos = svg.mouseToWorldCoordinates(e.clientX, e.clientY)
             mouseDownNode.x = mousePos[0] 
             mouseDownNode.y = -mousePos[1] 
             this.updateLayout();
@@ -77,30 +77,30 @@
         // linkWeightScale.range([0,value])
         LINK_OPACITY = value;
         updateLinks();   
-        webgl.render();
+        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Node Size', SLIDER_WIDTH, SLIDER_HEIGHT, NODE_SIZE, .01, 3, function(value:number){
         // linkWeightScale.range([0,value])
         NODE_SIZE = value;
         updateNodeSize();   
-        webgl.render();
+        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Edge Gap', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_GAP, 0, 10, function(value:number){
         LINK_GAP = value;
         updateLayout();   
-        webgl.render();
+        // webgl.render();
     })
     networkcube.makeSlider(menuDiv, 'Link Width', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_WIDTH, 0, 10, function(value:number){
         LINK_WIDTH = value;
         linkWeightScale.range([0,LINK_WIDTH]);
         // updateLayout();
         updateLinks();   
-        webgl.render();
+        // webgl.render();
     })
     makeDropdown(menuDiv, 'Labeling', ['Automatic', 'Hide All', 'Show All', 'Neighbors'], (selection)=>{
         LABELING_STRATEGY = parseInt(selection);
         updateLabelVisibility();
-        webgl.render();        
+        // webgl.render();        
     })
     
     function makeDropdown(d3parent, name:string, values:String[], callback:Function){
@@ -134,31 +134,72 @@
     networkcube.addEventListener('timeRange', timeChangedHandler)
 
 
-
-
     
-    // WEBGL + VISUALIZATION
-    $('#visDiv').append('<svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg>');
-    d3.select('#visCanvasFO')
-        .attr('x', 0)
-        .attr('y', 0)
-        
-    var webgl = glutils.initWebGL('visCanvasFO', width, height);
-    // webgl.enableZoom();
-    webgl.camera.position.x = width/2;
-    webgl.camera.position.y = -height/2;
-    webgl.camera.position.z = 1000;
-            
-    webgl.interactor.addEventListener('lassoEnd', lassoEndHandler)
-    webgl.interactor.addEventListener('lassoMove', lassoMoveHandler)
+    $('#visDiv').append('<svg id="visSvg" width="'+(width-20)+'" height="'+(height-20)+'"></svg>');
+    
+    var mouseStart:number[];
+    var panOffsetLocal:number []= [0,0];
+    var panOffsetGlobal:number []= [0,0];
+
+    var isMouseDown:boolean = false;
+
+    var svg = d3.select('#visSvg')
+        .on('mousedown', ()=> {
+            // d3.event.stopPropagation();
+            isMouseDown = true;
+            console.log('mousedown')
+            mouseStart = [d3.event.x,d3.event.y];})
+        .on('mousemove', ()=> {
+            if(isMouseDown){
+                panOffsetLocal[0] = (d3.event.x - mouseStart[0]) * globalZoom;
+                panOffsetLocal[1] = (d3.event.y - mouseStart[1]) * globalZoom;
+                svg.attr("transform", "translate(" + (panOffsetGlobal[0]+panOffsetLocal[0]) +','+ (panOffsetGlobal[1]+panOffsetLocal[1])  + ")");
+            }
+        })
+        .on('mouseup', ()=>{
+            isMouseDown = false;
+            panOffsetGlobal[0] += panOffsetLocal[0] 
+            panOffsetGlobal[1] += panOffsetLocal[1] 
+        })
+       .on('wheel', ()=>{
+            // zoom 
+            d3.event.preventDefault();
+            d3.event.stopPropagation();
+            var globalZoom = 1 + d3.event.wheelDelta / 1000;
+            var mouse = [d3.event.x - panOffsetGlobal[0], d3.event.y - panOffsetGlobal[1]]; 
+            var d,n;
+            for(var i=0 ; i <nodes.length ; i++){
+                n = nodes[i]
+                n.x = mouse[0] + (n.x - mouse[0]) * globalZoom;
+                n.y = mouse[1] + (n.y - mouse[1]) * globalZoom;
+            }
+            updateLayout();
+        })
+    
+    svg = svg.append('g')
+            .attr('width', width)
+            .attr('height', height)
+   
+   
+    var linkLayer = svg.append('g')
+    var nodeLayer = svg.append('g')
+    var labelLayer = svg.append('g')
+
 
 
     var visualNodes;
     var nodeLabels;
-    var nodeLabelBackgrounds;
+    var nodeLabelOutlines;
+    // var nodeLabelBackgrounds;
     var visualLinks;
     var layout;
-    
+
+    // line function for curved links
+    var lineFunction = d3.svg.line()
+        .x(function(d) { return d.x; })
+        .y(function(d) { return d.y; })
+        .interpolate("linear");    
+
     // layout = d3.layout.force()
     // set nod width
     for(var i=0 ; i <nodes.length ; i++){
@@ -166,9 +207,7 @@
         nodes[i]['height'] = getNodeRadius(nodes[i])*2;
     }
 
-
     layout = d3.layout.force()
-    // layout = cola.d3adaptor()
         .linkDistance(30)
         .size([width, height])
         .nodes(nodes)
@@ -190,10 +229,15 @@
     function init(){
         // CREATE NODES:
         // node circles
-        visualNodes = glutils.selectAll()
+
+        console.log(nodes.length);
+
+        visualNodes = nodeLayer.selectAll('nodes')
             .data(nodes)
+            .enter()
             .append('circle')
-                .attr('r', (n)=>getNodeRadius(n))
+                .attr('r', (n) => getNodeRadius(n))
+                .attr('class', 'nodes')
                 .style('fill', COLOR_DEFAULT_NODE)
                 .on('mouseover', mouseOverNode)
                 .on('mouseout',mouseOutNode)
@@ -210,39 +254,38 @@
                     }
                     networkcube.selection('add', <networkcube.ElementCompound>{nodes: [d]});
                 }) 
-                
-
+            
                 
         // node labels 
-        nodeLabels = glutils.selectAll()
+
+        nodeLabelOutlines = labelLayer.selectAll('.nodeLabelOutlines')
             .data(nodes)  
+            .enter()
             .append('text')
                 .attr('z', 2)
                 .text((d)=> d.label())  
                 .style('font-size', 12)
-                .style('opacity', 0)    
-                
-                        
-        // node label backgrounds
-        nodeLabelBackgrounds = glutils.selectAll()
+                .attr('visibility', 'hidden')   
+                .attr('class', 'nodeLabelOutlines')
+     
+        nodeLabels = labelLayer.selectAll('nodeLabels')
             .data(nodes)  
-            .append('rect')
-                .attr('x', (d)=>d.x)
-                .attr('y', (d)=>d.y)
-                .attr('z', 1)
-                .attr('width', (d,i)=> getLabelWidth(d))
-                .attr('height', (d,i)=> getLabelHeight(d))
-                .style('fill', '#eeeee6')
-                .style('opacity', 0)  
-                
-                
+            .enter()
+            .append('text')
+                .attr('z', 2)
+                .text((d)=> d.label())  
+                .style('font-size', 12)
+                .attr('visibility', 'hidden')   
+    
+                        
 
         // CREATE LINKS
         calculateCurvedLinks();
-        visualLinks = glutils.selectAll()
+        visualLinks = linkLayer.selectAll('visualLinks')
             .data(links)
-                .append('path')
-                .attr('d', (d)=> d.path)
+            .enter()
+            .append('path')
+                .attr('d', (d)=> lineFunction(d.path))
                 .style('opacity', LINK_OPACITY)
                 .on('mouseover', (d,i)=>{
                     networkcube.highlight('set', <networkcube.ElementCompound>{links: [d]})
@@ -262,45 +305,38 @@
                     networkcube.selection('add', <networkcube.ElementCompound>{links: [d]});                        
                 })
                                  
-                 
-
-        // updateLinks();
-        // updateNodes();
                 
-        // updateLayout();
+        updateLinks();
+        updateNodes();
+                
+        updateLayout();
     }
     
     function updateLayout(){
         
         // update node positions
         visualNodes
-            .attr('x', (d,i)=>d.x)
-            .attr('y', (d,i)=> -d.y)
+            .attr('cx', (d,i)=> d.x)
+            .attr('cy', (d,i)=> d.y)
                              
         nodeLabels
-            .attr('x', (d,i)=> d.x)
-            .attr('y', (d,i)=> -d.y)
+            .attr('x', (d,i)=> d.x + OFFSET_LABEL.x)
+            .attr('y', (d,i)=> d.y + OFFSET_LABEL.y)
+        nodeLabelOutlines
+            .attr('x', (d,i)=> d.x + OFFSET_LABEL.x)
+            .attr('y', (d,i)=> d.y + OFFSET_LABEL.y)
 
-        nodeLabelBackgrounds
-            .attr('x', (d,i)=> d.x -getLabelWidth(d)/2)
-            .attr('y', (d,i)=> -d.y +getLabelHeight(d)/2)
-                             
-        // dgraph.links().forEach((d)=>{
-        //     console.log('d.source', d.source.x, d.source.y)
-        //     console.log('d.target', d.target.x, d.target.y)
-        // })
-
-
+ 
         // update link positions
         calculateCurvedLinks();        
         visualLinks
-            .attr('d', (d)=> d.path)
+            .attr('d', (d)=> lineFunction(d.path))
                              
 
         // update nodelabel visibility after layout update.
         updateLabelVisibility();    
             
-        webgl.render();
+        // webgl.render();
 
     }
     function getLabelWidth(n){
@@ -343,8 +379,9 @@
         }
 
         // render;
-        nodeLabels.style('opacity', (n)=>hiddenLabels.indexOf(n)>-1?0:1)
-        nodeLabelBackgrounds.style('opacity', (n)=>hiddenLabels.indexOf(n)>-1?0:LABELBACKGROUND_OPACITY)
+        // nodeLabels.style('opacity', (n)=>hiddenLabels.indexOf(n)>-1?0:1)
+        nodeLabels.attr('visibility', (n)=>hiddenLabels.indexOf(n)>-1?'hidden':'visible')
+        nodeLabelOutlines.attr('visibility', (n)=>hiddenLabels.indexOf(n)>-1?'hidden':'visible')
     }
     
 
@@ -354,23 +391,23 @@
         var n2e = n2.x + getLabelWidth(n2)/2 + LABELDISTANCE;
         var n1w = n1.x - getLabelWidth(n1)/2 - LABELDISTANCE;
         var n2w = n2.x - getLabelWidth(n2)/2 - LABELDISTANCE;
-        var n1n = n1.y - getLabelHeight(n1)/2 - LABELDISTANCE;
-        var n2n = n2.y - getLabelHeight(n2)/2 - LABELDISTANCE;
-        var n1s = n1.y + getLabelHeight(n1)/2 + LABELDISTANCE;
-        var n2s = n2.y + getLabelHeight(n2)/2 + LABELDISTANCE;
+        var n1n = n1.y + getLabelHeight(n1)/2 + LABELDISTANCE;
+        var n2n = n2.y + getLabelHeight(n2)/2 + LABELDISTANCE;
+        var n1s = n1.y - getLabelHeight(n1)/2 - LABELDISTANCE;
+        var n2s = n2.y - getLabelHeight(n2)/2 - LABELDISTANCE;
                         
-        return  (n1e > n2w && n1w < n2e && n1s > n2n && n1n < n2s)
-            ||  (n1e > n2w && n1w < n2e && n1n < n2s && n1s > n2n)
-            ||  (n1w < n2e && n1s > n2n && n1s > n2n && n1n < n2s)
-            ||  (n1w < n2e && n1n < n2s && n1n < n2s && n1s > n2n)
+        return  (n1e > n2w && n1w < n2e && n1s < n2n && n1n > n2s)
+            ||  (n1e > n2w && n1w < n2e && n1n > n2s && n1s < n2n)
+            ||  (n1w < n2e && n1s > n2n && n1s < n2n && n1n > n2s)
+            ||  (n1w < n2e && n1n < n2s && n1n > n2s && n1s < n2n)
     }
 
     function isHidingNode(n1,n2){
         var n1e = n1.x + getLabelWidth(n1)/2 + LABELDISTANCE;
         var n1w = n1.x - getLabelWidth(n1)/2 - LABELDISTANCE;
-        var n1n = n1.y - getLabelHeight(n1)/2 - LABELDISTANCE;
-        var n1s = n1.y + getLabelHeight(n1)/2 + LABELDISTANCE;
-        return n1w < n2.x && n1e > n2.x && n1n > n2.y && n1s < n2.y;
+        var n1n = n1.y + getLabelHeight(n1)/2 + LABELDISTANCE;
+        var n1s = n1.y - getLabelHeight(n1)/2 - LABELDISTANCE;
+        return n1w < n2.x && n1e > n2.x && n1n < n2.y && n1s > n2.y;
     }  
       
             
@@ -386,30 +423,32 @@
     }
     function mouseDownOnNode(n){
         mouseDownNode = n; 
-        webgl.enablePanning(false)
+        // webgl.enablePanning(false)
     }
     function mouseUpNode(n){
         mouseDownNode = undefined; 
-        webgl.enablePanning(true)
+        // webgl.enablePanning(true)
     }
     
-    window.addEventListener("mousewheel", mouseWheel, false);
+    // window.addEventListener("mousewheel", mouseWheel, false);
     var globalZoom = 1;  
-    function mouseWheel(event){
 
-        event.preventDefault();
-        var mouse = glutils.mouseToWorldCoordinates(event.clientX, event.clientY)
-        globalZoom = 1 + event.wheelDelta/1000;
+    // function mouseWheel(event){
 
-        // updatelayout
-        var d,n;
-        for(var i=0 ; i <nodes.length ; i++){
-            n = nodes[i]
-            n.x = mouse[0] + (n.x - mouse[0]) * globalZoom;
-            n.y = -mouse[1] + (n.y + mouse[1]) * globalZoom;
-        }                
-        updateLayout()
-    }
+    //     // event.preventDefault();
+    //     // var mouse = svg.mouseToWorldCoordinates(event.clientX, event.clientY)
+    //     // globalZoom = 1 + event.wheelDelta/1000;
+
+    //     // // updatelayout
+    //     // var d,n;
+    //     // for(var i=0 ; i <nodes.length ; i++){
+    //     //     n = nodes[i]
+    //     //     n.x = mouse[0] + (n.x - mouse[0]) * globalZoom;
+    //     //     n.y = -mouse[1] + (n.y + mouse[1]) * globalZoom;
+    //     // }
+
+    //     updateLayout()
+    // }
 
 
     /////////////////
@@ -418,6 +457,7 @@
     
     function timeChangedHandler(m:networkcube.TimeRangeMessage){
 
+        console.log('RECEIVE MESSAGE')
         for(var i= 0 ; i < times.length ; i++){
             if(times[i].unixTime() > m.startUnix){
                 time_start = times[i-1];
@@ -434,20 +474,20 @@
             time_end = times[times.length-1]
         }
 
-        console.log('start-end', time_start, time_end)
+        // console.log('start-end', time_start, time_end)
       
       
         timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();
         updateNodes();
-        webgl.render()
+        // webgl.render()
     }
 
     
     function updateEvent(m:networkcube.Message){
         updateLinks();
         updateNodes();
-        webgl.render();
+        // webgl.render();
     }
 
     function updateNodeSize(){
@@ -481,31 +521,13 @@
             
             
         nodeLabels
-            .style('opacity', (e) => e.isHighlighted() 
+            .attr('visibility', (e) => e.isHighlighted() 
                                 ||  e.links().highlighted().length > 0
                                 ||  hiddenLabels.indexOf(e)==-1 
                                 ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? 1 : 0)    
+                                ? 'visible' : 'hidden')    
                                                  
-      
-            // .attr('z', (e) => e.isHighlighted() 
-            //                     ||  e.links().highlighted().length > 0
-            //                     ||  hiddenLabels.indexOf(e)==-1 
-            //                     ||  (labelingStrategy == 3 && e.neighbors().highlighted().length > 0)                                  
-            //                     ? 11 : 1)          
-
-        nodeLabelBackgrounds 
-            .style('opacity', (e) => e.isHighlighted() 
-                                ||  e.links().highlighted().length > 0
-                                ||  hiddenLabels.indexOf(e)==-1 
-                                ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
-                                ? LABELBACKGROUND_OPACITY : 0)  
-            // .attr('z', (e) => e.isHighlighted() 
-            //                     ||  e.links().highlighted().length > 0
-            //                     ||  hiddenLabels.indexOf(e)==-1 
-            //                     ||  (labelingStrategy == 3 && e.neighbors().highlighted().length > 0)                                  
-            //                     ? 10 : 1)          
-            .style('stroke', d=>{
+            .style('color', d=>{
                 var color;
                 if(d.isHighlighted()){
                     color = COLOR_HIGHLIGHT;
@@ -516,7 +538,13 @@
                     color = COLOR_DEFAULT_NODE;
                 return color;
             })
-                             
+
+        nodeLabelOutlines
+            .attr('visibility', (e) => e.isHighlighted() 
+                                ||  e.links().highlighted().length > 0
+                                ||  hiddenLabels.indexOf(e)==-1 
+                                ||  (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)                                  
+                                ? 'visible' : 'hidden')    
 
     }
     
@@ -557,10 +585,10 @@
             multiLink = dgraph.nodePair(i);
             if(multiLink.links().length < 2){
                 multiLink.links().toArray()[0]['path'] = [
-                    {x: multiLink.source.x, y: -multiLink.source.y},
-                    {x: multiLink.source.x, y: -multiLink.source.y},
-                    {x: multiLink.target.x, y: -multiLink.target.y},
-                    {x: multiLink.target.x, y: -multiLink.target.y}]
+                    {x: multiLink.source.x, y: multiLink.source.y},
+                    {x: multiLink.source.x, y: multiLink.source.y},
+                    {x: multiLink.target.x, y: multiLink.target.y},
+                    {x: multiLink.target.x, y: multiLink.target.y}]
             }else{
                 links = multiLink.links().toArray();
                 // Draw self-links as back-link
@@ -568,10 +596,10 @@
                     var minGap = getNodeRadius(multiLink.source)/2 + 4;
                     for(var j=0 ; j<links.length ; j++){
                         links[j]['path'] = [
-                            {x: multiLink.source.x, y: -multiLink.source.y},
-                            {x: multiLink.source.x, y: -multiLink.source.y + minGap + (i * LINK_GAP)},
-                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y + minGap + (i * LINK_GAP)},
-                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: multiLink.source.y},
+                            {x: multiLink.source.x, y: multiLink.source.y - minGap - (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: multiLink.source.y - minGap - (i * LINK_GAP)},
+                            {x: multiLink.source.x + minGap + (i * LINK_GAP), y: multiLink.source.y},
                             {x: multiLink.source.x, y: -multiLink.source.y},
                         ]
                     }
@@ -588,12 +616,12 @@
                     // calculate paths
                     for(var j=0 ; j<links.length ; j++){
                         links[j]['path'] = [
-                            {x: multiLink.source.x, y: -multiLink.source.y},
+                            {x: multiLink.source.x, y: multiLink.source.y},
                             {x: multiLink.source.x + offset2[0] + (j-links.length/2 + .5) * offset[0],
-                            y: -(multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            y: (multiLink.source.y + offset2[1] + (j-links.length/2 + .5) * offset[1])},
                             {x: multiLink.target.x - offset2[0] + (j-links.length/2 + .5) * offset[0],
-                            y: -(multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
-                            {x: multiLink.target.x, y: -multiLink.target.y}]
+                            y: (multiLink.target.y - offset2[1] + (j-links.length/2 + .5) * offset[1])},
+                            {x: multiLink.target.x, y: multiLink.target.y}]
                     }
 
                 }
@@ -614,13 +642,13 @@
         return vec
     }
 
-    var visualLassoPoints:glutils.WebGLElementQuery;
+    var visualLassoPoints:svg.WebGLElementQuery;
     function lassoMoveHandler(lassoPoints:number[][]){
 
         if(visualLassoPoints != undefined)
             visualLassoPoints.removeAll();
 
-        visualLassoPoints = glutils.selectAll()
+        visualLassoPoints = svg.selectAll('visualLassoPoints')
             // .data([lassoPoints[lassoPoints.length-1]])
             .data(lassoPoints)
             .append('circle')
@@ -630,8 +658,7 @@
                 .attr('y', (d)=>d[1])
                                  
 
-
-        webgl.render();
+        // webgl.render();
     }
 
 
@@ -643,7 +670,7 @@
         
         var selectedNodes = []
         for(var i=0 ; i <nodes.length ; i++){
-            if(networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, -nodes[i].y]))
+            if(networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, nodes[i].y]))
                 selectedNodes.push(nodes[i])
         }   
         console.log('Selected nodes:', selectedNodes.length)
@@ -664,7 +691,8 @@
     }
 
     function exportPNG(){
-        networkcube.exportPNG(webgl.canvas, 'node-link');
+        console.error('PNG EXPORT DISABLED!');
+        // networkcube.exportPNG(webgl.canvas, 'node-link');
     }
 
 
