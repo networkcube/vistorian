@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff">
-    <title>The Vistorian</title>
+    <title>Networkcube</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="stylesheet" type="text/css" href="demo-styles.css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
@@ -12,8 +12,6 @@
 </head>    
 <body>
 
-
-        <!-- <script src="lib/jquery.js"></script> -->
         <script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
         <script src="lib/jstorage.js"></script>
         <script src="classes/storage.js"></script>
@@ -24,10 +22,10 @@
         <div id="main">
             <p id="sessId" style="display:none"/>
             <div id="intro">
-                <a href="index.html"><img id="logo" src="logos/networkcube-logo.png"/></a>
+                <a href="index.html"><img id="logo" src="logos/logo-networkcube.png""/></a>
                 <p class="subtitle">Interactive Visualizations for Dynamic and Multivariate Networks. <br> Online and Open Source.</p>
-
-  <!--           <div id="vistiles">                    
+<!-- 
+            <div id="vistiles">                    
                 <div>
                     <a href="#div_nodelink" target="_blank">
                         <img class="visimage" src="figures/nodelink.png"/>
@@ -53,8 +51,8 @@
                     </a>
                 </div>
 
-            </div>
- -->
+            </div> -->
+
         </div>
 
         <div id="content">
@@ -67,7 +65,7 @@
             </p>
 
             <p>
-                Use the time slider in each visualization to navigate through time. Each visualization provides additional parameters for visual refinement.
+                Use the time slider in each visualization to navigate through time. Each visualization provides additional parameters for visual refinement. (Possible delays in interaction are due to synchronization between visualizations. Visualizations will be faster if used in isolation).
             </p>
 
             <p>
@@ -78,7 +76,7 @@
             <div id="div_nodelink">
                 <h2>Node Link Visualization</h2>
                 <p>
-                Node-link diagrams show nodes in the network as points (dots) and (multiple) relations between nodes as straight lines. Moving the time slider on the top of the visualization filters links between nodes according to their presence in time. Colors show the type of relation.
+                Node-link diagrams show nodes in the network as points (dots) and (multiple) relations between nodes as straight parallel lines. Moving the time slider on the top of the visualization filters links between nodes according to their presence in time. Colors show the type of relation.
                 </p>    
 
             
@@ -89,7 +87,7 @@
                 <h2>Matrix Visualization</h2>
 
                 <p>
-                Adjacency matrices (or simply matrices) are table representations of network. Nodes are represented both as rows and columns, connections are shown as marks in the corresponding cells at the intersection of row and column. Contrary to node-link representations, matrices do not suffer from visual clutter if the network is dense (i.e. contains many links). Matrices help you exploring dense networks that would look too cluttered with node-link diagrams.
+                Adjacency matrices (or simply matrices) are table representations of networks. Nodes are represented both as rows and columns, connections between nodes are shown as black or colored cells in the matrix. Contrary to node-link representations, matrices do not suffer from visual clutter if the network is dense (i.e. contains many links). Matrices help you exploring dense networks that would look too cluttered with node-link diagrams.
                 </p>
 
                 <p>
@@ -106,7 +104,7 @@
             <div id="div_dynamicego">
                 <h2>Dynamic Ego Visualization</h2>
 
-                <p>An dynamic ego network shows a node in a network (ego) and its immediate neighbors (alters), as well as connections between the alters. A dynamic ego network shows these connections over time. The above pictures shows a timeline running from left to right. Rows represent the nodes in the network and arcs represent connections between them. Adapting the time slider on the top of the visualization adapts the time range visible in the visualization.
+                <p>An dynamic ego network shows a node in a network (<i>ego</i>) and its immediate neighbors (<i>alters</i>), as well as connections between the alters. A dynamic ego network shows these connections over time. The below visualization shows a timeline running from left to right. Rows represent nodes in the network and arcs represent connections between them. Adapting the time slider on the top of the visualization adapts the time range visible in the visualization.
                 </p>
 
                 <p>
