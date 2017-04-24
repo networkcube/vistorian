@@ -615,6 +615,8 @@ class MatrixVisualization{
       meanWeight = e.weights()? e.weights(this.matrix.startTime, this.matrix.endTime).mean(): 1;
       color = new THREE.Color(webColor);
       alpha = this.linkWeightScale(Math.abs(meanWeight));
+      if(!e.isVisible())  
+        alpha = 0;
 
       x = col * this.cellSize + seg * j + seg / 2 + this.offset[0];
       y = row * this.cellSize + this.cellSize/2 + this.offset[1];
@@ -1121,6 +1123,10 @@ class Matrix{
         }
       }
     }
+
+    // show/hide visible/filtered links
+
+    this.updateVisibleData();
 
     this.labels.updateHighlightedNodes(highlightedNodesIds);
     this.visualization.updateHighlightedLinks(highlightedLinksIds);

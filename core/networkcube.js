@@ -13143,7 +13143,6 @@ var networkcube;
         var l;
         var s;
         var t;
-        console.log('order with', links.length, 'links and ', nodes.length, 'nodes');
         for (var i = 0; i < links.length; i++) {
             weight = 0;
             s = nodes.indexOf(links[i].source);
@@ -13161,7 +13160,6 @@ var networkcube;
         }
         var leafOrder = reorder.leafOrder()
             .distance(distance)(similarityMatrix);
-        console.log(leafOrder);
         leafOrder.forEach(function (lo, i) {
             order[nodes[lo].id()] = i;
         });

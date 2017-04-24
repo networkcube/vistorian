@@ -467,6 +467,8 @@ var MatrixVisualization = (function () {
             meanWeight = e.weights() ? e.weights(this.matrix.startTime, this.matrix.endTime).mean() : 1;
             color = new THREE.Color(webColor);
             alpha = this.linkWeightScale(Math.abs(meanWeight));
+            if (!e.isVisible())
+                alpha = 0;
             x = col * this.cellSize + seg * j + seg / 2 + this.offset[0];
             y = row * this.cellSize + this.cellSize / 2 + this.offset[1];
             this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight > 0);
@@ -617,6 +619,7 @@ var Matrix = (function () {
                     }
                 }
             }
+            _this.updateVisibleData();
             _this.labels.updateHighlightedNodes(highlightedNodesIds);
             _this.visualization.updateHighlightedLinks(highlightedLinksIds);
         };
