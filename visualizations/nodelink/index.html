@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../styles.css">
+<link rel="stylesheet" type="text/css" href="styles.css">
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+</head>
+<title>Node link diagram</title>
+<body>
+    <div>
+        <div id="menuDiv">
+            <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#node-link-visualization-nodelink">Manual</a>
+            <input type="button" class="exportPNG-button" value="Export PNG" onclick="exportPNG()"/>
+        </div>
+        <div id="timelineDiv"></div>
+        <div id="visDiv">
+        </div>
+    </div>
+    <script src="../../../networkcube/core/lib/jquery.js"></script>
+    <script src="../../../networkcube/core/networkcube.js"></script>
+    <!--<script src="lib/three.js"></script>-->
+    <script src="lib/d3.js"></script>
+    <script src="lib/cola.js"></script>
+    <script src="../widgets/widgets.js"></script>
+    <script src="nodelink.js"></script>
+</body>
+</html>
