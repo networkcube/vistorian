@@ -35,7 +35,7 @@ module networkcube{
         var l:Link;
         var s:number;
         var t:number;
-        console.log('order with', links.length, 'links and ', nodes.length,  'nodes');
+        // console.log('order with', links.length, 'links and ', nodes.length,  'nodes');
         for (var i=0 ; i<links.length ;i++) {
             weight = 0;
             // check if nodes are in allowed nodes
@@ -59,7 +59,7 @@ module networkcube{
         var leafOrder = reorder.leafOrder()
 			.distance(distance)(similarityMatrix);
 			
-        console.log(leafOrder);
+        // console.log(leafOrder);
         leafOrder.forEach(function (lo, i) {
             order[nodes[lo].id()] = i;
         });

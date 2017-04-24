@@ -19,10 +19,11 @@ var TABLE_PADDING_LEFT = 5
 var TABLE_RIGHT = 100
 var ROW_HEIGHT = 13;
 var COL_WIDTH = 10;
-var LINK_OPACITY= .2
 var NODE_OPACITY= .6
 var ANCHOR_END_DIAMETER = 2;
 var ANCHOR_START_DIAMETER = 4;
+var LINK_OPACITY_DEFAULT = .2;
+var LINK_OPACITY_HIGHLIGHTED = 1;
 var NODE_LABEL_COLOR = '#000'
 var NODE_LABEL_WEIGHT = 300
 var LABEL_ORDER
@@ -37,15 +38,12 @@ var TABLE_TOP = 50;
 var svg;
 var nodeYPosFunction = d3.scale.linear();
 var timeXFunction = d3.scale.linear();
-// var linkTypeOffset = d3.scale.linear().range([0,ROW_HEIGHT]);
-// var linkTypeOffset = d3.scale.linear().range([ROW_HEIGHT/2,ROW_HEIGHT/2]);
 var bar;
 var nodeLabel
 var startAnchors:glutils.WebGLElementQuery;
 var endAnchors:glutils.WebGLElementQuery;
 var arcs:glutils.WebGLElementQuery;
 var tickTimes = []
-// var timeLabels:glutils.WebGLElementQuery<networkcube.Time,THREE.Mesh>;
 var timeLabelHoverFields;
 var egoNode:networkcube.Node;
 
@@ -55,7 +53,6 @@ var yearOffset = 0
 var startUnix = times[0].unixTime();
 var endUnix = times[times.length-1].unixTime();
 var nodesScrollStart = 0;
-// var cell_width = 13
 var granualarity = dgraph.getMinGranularity();
 var globalNodeOrder = nodes.slice(0);
 var currentNodeOrder=[]
@@ -73,7 +70,6 @@ var lineFunction = d3.svg.line()
 // UI SETUP
 var HEIGHT = window.innerHeight;
 $('#visDiv').append('<svg id="visSvg"><foreignObject id="visCanvasFO"></foreignObject></svg>');
-// $('#visCanvasFO').append(canvas);
 d3.select('#visCanvasFO')
     .attr('x', TABLE_MARGIN_LEFT)
     .attr('y', MARGIN_TOP)
@@ -185,20 +181,6 @@ function createNodes(){
 
 function createTimes(){
           
-    // timeLabels = glutils.selectAll()
-    //     .data(times)
-    //     .append('text')
-    //         .attr('x', (d,i)=> this.timeXFunction(i))
-    //         .attr('y', (d)=> -TABLE_TOP + getTimeFormatted(d).length*8/2)
-    //         .attr('z', 1)
-    //         .style('fill', (d)=>NODE_LABEL_COLOR)
-    //         .attr('rotation', 90)
-    //         .style('font-size',10)
-    //         .style('opacity',0)
-    //         .text((d:networkcube.Time)=>{
-    //             return getTimeFormatted(d);
-    //         })
-    
     timeLabelHoverFields = glutils.selectAll()
         .data(times)
         .append('rect')
@@ -215,19 +197,6 @@ function createTimes(){
             .on('mouseout', (d, i) => {
                 networkcube.highlight('reset');
             })
-            // .on('click', (d, i) => {
-            //     var selections = d.getSelections();
-            //     var currentSelection = this.dgraph.getCurrentSelection();
-            //     for (var j = 0; j < selections.length; j++) {
-            //         if (selections[j] == currentSelection) {
-            //             networkcube.selection('remove', <networkcube.ElementCompound>{ times: [d] });
-            //             return;
-            //         }
-            //     }
-            //     networkcube.selection('add', <networkcube.ElementCompound>{ times: [d] });
-            // });  
-     
-    //  updateTimeGranularity();
     
 }
 
@@ -332,68 +301,6 @@ function timeRangeHandler(m:networkcube.TimeRangeMessage){
     webgl.render();
 }
 
-// function updateTimeGranularity(){
-    
-//     tickTimes = dgraph.times().toArray();
-//     granualarity = dgraph.getMinGranularity();
-//     // var tick_width = cell_width
-//     var allWidth = tickTimes.length * tick_width; 
-//     while (
-//         tickTimes.length > 0 
-//         && granualarity <= dgraph.getMaxGranularity()
-//         && tick_width < TIME_TICK_GAP_MAX) {
-//         granualarity++;
-//         tickTimes = [];
-//         var curr_t = times[0].time();
-//         var id = 1;
-//         var count = 0
-//         var d
-//         while (id < times.length) {
-//             if (granualarity == 1) {
-//                 if (times[id].time().second() != curr_t.second()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 2) {
-//                 if (times[id].time().minute() != curr_t.minute()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 3) {
-//                 if (times[id].time().hour() != curr_t.hour()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 4) {
-//                 if (times[id].time().day() != curr_t.day()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 5) {
-//                 if (times[id].time().week() != curr_t.week()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 6) {
-//                 if (times[id].time().month() != curr_t.month()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             } else if (granualarity == 7) {
-//                 if (times[id].time().year() != curr_t.year()) {
-//                     curr_t = times[id].time();
-//                     tickTimes.push(times[id])
-//                 }
-//             }
-//             id++;
-//         }
-//         tick_width = allWidth / tickTimes.length;
-        
-//     }    
-   
-//     updateTimes(); 
-// }
-
 function updateEventHandler(m:networkcube.Message){
     if(m.type == networkcube.MESSAGE_SELECTION_FILTER){
         updateCurrentOrder();
@@ -401,7 +308,6 @@ function updateEventHandler(m:networkcube.Message){
     }else{        
         updateLinks();
         updateNodes();
-        updateTimes();
         webgl.render();
     }
 
@@ -415,9 +321,7 @@ function updateCurrentOrder(){
     var rank=0
     var n;
     for(var i=0 ; i <globalNodeOrder.length ; i++){
-        // console.log('rank', rank)
         if(globalNodeOrder[i].isVisible()){
-            // console.log('\trank', rank)
             currentNodeOrder[globalNodeOrder[i].id()] = rank
             rank++;
         }
@@ -453,7 +357,8 @@ function updateLinks(){
             || d.source.isHighlighted() 
             || d.target.isHighlighted()
             || d.times().highlighted().size() > 0
-            ?1:.5)
+            ? LINK_OPACITY_HIGHLIGHTED
+            : LINK_OPACITY_DEFAULT)
         .style('stroke', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 
     endAnchors
@@ -467,8 +372,8 @@ function updateLinks(){
                 || d.source.isHighlighted() 
                 || d.target.isHighlighted()
                 || d.times().highlighted().size() > 0
-            ? 1
-            :.5)
+            ? LINK_OPACITY_HIGHLIGHTED
+            : LINK_OPACITY_DEFAULT)
         .style('fill', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 
     startAnchors
@@ -482,8 +387,8 @@ function updateLinks(){
                 || d.source.isHighlighted() 
                 || d.target.isHighlighted()
                 || d.times().highlighted().size() > 0
-            ? 1
-            : .5)
+            ? LINK_OPACITY_HIGHLIGHTED
+            : LINK_OPACITY_DEFAULT)
         .style('fill', (d:networkcube.Link)=>d.getSelections()[0].showColor?d.getSelections()[0].color:'#999')
 }
 
@@ -509,7 +414,6 @@ function updateNodePositions(duration:number){
     d3.selectAll('.nodeLabel')
         .transition().duration(duration)
         .attr('y', (d)=>MARGIN_TOP+nodeYPosFunction(currentNodeOrder[d.id()]) + ROW_HEIGHT -5)
-        // .style('opacity', (n)=>currentNodeOrder[n.id()]>=nodesScrollStart?1:0)
         .style('opacity', (n)=>currentNodeOrder[n.id()]>=nodesScrollStart?n==egoNode?1:NODE_OPACITY:0)
 
 }
@@ -532,25 +436,6 @@ function updateLinkPositions(){
 }
 
 
-
-function updateTimes(){
-
-    // timeLabels
-    //     .style('fill', (d)=>d.isHighlighted()
-    //         || d.links().highlighted().size() > 0 
-    //         || d.links().sources().highlighted().size() > 0  
-    //         || d.links().targets().highlighted().size() > 0  
-    //         ?'#000':NODE_LABEL_COLOR)
-    //     .style('opacity', (d)=>
-    //         d.id()>=timeStartId
-    //         && d.id()<= timeEndId
-    //         && (d.links().highlighted().size() > 0 
-    //         || d.isHighlighted())
-    //         || tickTimes.indexOf(d) > -1
-    //         ?1:
-    //             d.links().highlighted().size() == 0?TIMELABEL_OPACITY:0
-    //     )
-}
 
 
 

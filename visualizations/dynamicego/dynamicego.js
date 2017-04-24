@@ -11,10 +11,11 @@ var TABLE_PADDING_LEFT = 5;
 var TABLE_RIGHT = 100;
 var ROW_HEIGHT = 13;
 var COL_WIDTH = 10;
-var LINK_OPACITY = .2;
 var NODE_OPACITY = .6;
 var ANCHOR_END_DIAMETER = 2;
 var ANCHOR_START_DIAMETER = 4;
+var LINK_OPACITY_DEFAULT = .2;
+var LINK_OPACITY_HIGHLIGHTED = 1;
 var NODE_LABEL_COLOR = '#000';
 var NODE_LABEL_WEIGHT = 300;
 var LABEL_ORDER;
@@ -157,8 +158,10 @@ function createLinks() {
     var p;
     var splineObject;
     var yOffset;
-    startAnchors = glutils.selectAll().data(links);
-    startAnchors.append('circle')
+    startAnchors = webgl.selectAll()
+        .data(links);
+    startAnchors
+        .append('circle')
         .attr('x', function (l, i) {
         return timeXFunction(l.times().toArray()[0].unixTime());
     })
@@ -227,7 +230,6 @@ function updateEventHandler(m) {
     else {
         updateLinks();
         updateNodes();
-        updateTimes();
         webgl.render();
     }
 }
@@ -272,7 +274,8 @@ function updateLinks() {
                 || d.source.isHighlighted()
                 || d.target.isHighlighted()
                 || d.times().highlighted().size() > 0
-                ? 1 : .5;
+                ? LINK_OPACITY_HIGHLIGHTED
+                : LINK_OPACITY_DEFAULT;
     })
         .style('stroke', function (d) { return d.getSelections()[0].showColor ? d.getSelections()[0].color : '#999'; });
     endAnchors
@@ -286,8 +289,8 @@ function updateLinks() {
                 || d.source.isHighlighted()
                 || d.target.isHighlighted()
                 || d.times().highlighted().size() > 0
-                ? 1
-                : .5;
+                ? LINK_OPACITY_HIGHLIGHTED
+                : LINK_OPACITY_DEFAULT;
     })
         .style('fill', function (d) { return d.getSelections()[0].showColor ? d.getSelections()[0].color : '#999'; });
     startAnchors
@@ -301,8 +304,8 @@ function updateLinks() {
                 || d.source.isHighlighted()
                 || d.target.isHighlighted()
                 || d.times().highlighted().size() > 0
-                ? 1
-                : .5;
+                ? LINK_OPACITY_HIGHLIGHTED
+                : LINK_OPACITY_DEFAULT;
     })
         .style('fill', function (d) { return d.getSelections()[0].showColor ? d.getSelections()[0].color : '#999'; });
 }
@@ -345,8 +348,6 @@ function updateLinkPositions() {
     });
     arcs
         .attr('d', function (l) { return makeArcPath(l); });
-}
-function updateTimes() {
 }
 function mouseWheelHandler(event) {
     event.preventDefault();
