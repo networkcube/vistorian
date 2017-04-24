@@ -16,6 +16,7 @@ Networkcube is currently has been build with two goals in mind:
 
 Networkcube is designed for research and is currently in a prorotype phase. However, the code is open and contributions are welcome. Please read the [Wiki](Home) for more information or contact us: benj.bach@gmail.com.
 
+Each visualization in networkcube is its individual model and runs in an iFrame. Visualizations are hosted here on github and can be integrated in any website. So, the only thing your website has to care is importing a user's data into the browser (https://github.com/networkcube/networkcube/wiki/Importing-Data).
 
 ## Demos and Example Projects
 
@@ -44,6 +45,7 @@ server and program the backend. Technically, this is possible. Eventually this m
 Visualizations are referenced via a URL and can hence sit anywhere in the internet. Once the visualization code is loaded
 all it needs to do is to query the data from the local storage.
 * A **messenger to send events between all the visualizations** in your browser: be they in windows, tabs, or iFrames. Messages pass simple interaction events such as node selection or changes to a time slider for temporal navigation.
+
 
 
 ## Technical Specifications
