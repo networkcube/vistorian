@@ -383,7 +383,7 @@ function init(){
         })
 
 
-        // // POSITION NODES WITHOUT OWN POSITIONS
+        // // POSITION NODES WITHOUT OWN POSITIONS (tentatively)
         // // 1. create layout network 
         // var layoutNodes = []
         // for(var i=0 ; i < nodePositionObjects.length ; i++){
@@ -958,7 +958,6 @@ function updateLocationMarkers() {
         .attr("transform", function(d) {
             var pos: google.maps.LatLng = new google.maps.LatLng(d.latitude(), d.longitude());
             var pixelpos: google.maps.Point = geoProjection.fromLatLngToDivPixel(pos);
-            // console.log(d.label(), d.latitude(), d.longitude())
             return 'translate(' + (pixelpos.x) + ',' + (pixelpos.y) + ')';
         })
 
@@ -1199,84 +1198,6 @@ function updateNodePositions() {
     updateLinkPaths();
 }
 
-// function removeNodeOverlap() {
-//     var overlaps: number = 1;
-//     for (var i = 0; i < nodePositionObjects.length; i++) {
-//         nodePositionObjects[i].displaced = false;
-//         nodePositionObjects[i].x = nodePositionObjects[i].xOrig;
-//         nodePositionObjects[i].y = nodePositionObjects[i].yOrig;
-//     }
-
-//     var minDist;
-//     var iteration: number = 0;
-//     var l: number;
-//     var xx, yy: number;
-//     var dx: number, dy: number, dd: number;
-
-//     // detect nodes at identical positions and add noise.
-//     for (var i = 0; i < nodePositionObjects.length - 1; i++) {
-//         for (var j = 0; j < nodePositionObjects.length - 1; j++) {
-//             dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
-//             dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
-//             dd = Math.sqrt(dx * dx + dy * dy);
-
-//             // if identical positions, add some noise to first node
-//             if (dd == 0) {
-//                 nodePositionObjects[i].x += ((i * 1000) % nodePositionObjects.length) / nodePositionObjects.length - .5;
-//                 nodePositionObjects[i].y += ((i * 999) % nodePositionObjects.length) / nodePositionObjects.length - .5;
-//             }
-//         }
-//     }
-
-//     // remove overlaps
-//     while (overlaps > 0 && iteration < 10) {
-//         overlaps = 0;
-//         for (var i = 0; i < nodePositionObjects.length - 1; i++) {
-//             for (var j = i + 1; j < nodePositionObjects.length; j++) {
-//                 dx = nodePositionObjects[i].x - nodePositionObjects[j].x;
-//                 dy = nodePositionObjects[i].y - nodePositionObjects[j].y;
-//                 dd = Math.sqrt(dx * dx + dy * dy);
-//                 minDist = nodeSizeFunction(nodePositionObjects[i].node.neighbors().length) + nodeSizeFunction(nodePositionObjects[j].node.neighbors().length)
-//                 minDist *= OVERLAP_FRACTION;
-
-//                 if (dd < minDist) {
-//                     overlaps++;
-//                     l = (minDist - dd) / 4;
-//                     xx = l * (dx / dd);
-//                     yy = l * (dy / dd);
-//                     nodePositionObjects[i].x += xx;
-//                     nodePositionObjects[i].y += yy;
-//                     nodePositionObjects[i].displaced = true;
-//                     nodePositionObjects[j].x -= xx;
-//                     nodePositionObjects[j].y -= yy;
-//                     nodePositionObjects[j].displaced = true;
-//                 }
-//             }
-//         }
-//         iteration++;
-//     }
-    
-//     // after all node overlaps are removed, assign direction vector for allowing interpolation
-//     var npo;
-//     for (var i = 0; i < nodePositionObjects.length; i++) {
-//         npo = nodePositionObjects[i]
-//         npo.displacementVector[0] = npo.x - npo.xOrig;             
-//         npo.displacementVector[1] = npo.y - npo.yOrig;             
-//     }
-
-//     // draw extra circle for displaced nodes
-//     var r;
-//     // d3.selectAll('.displacementCircle')
-//     //     .attr('r', function(d) {
-//     //         if (d.displaced) {
-//     //             return Math.hypot(d.x - d.xOrig, d.y - d.yOrig);
-//     //         } else {
-//     //             return 0;
-//     //         }
-//     //     })
-//     //     .attr('cx', function(d) { return d.xOrig - d.x; })
-//     //     .attr('cy', function(d) { return d.yOrig - d.y; })
-// }
 
 function updateNodeDisplacementVectors(){
 
@@ -1303,13 +1224,6 @@ function updateNodeDisplacementVectors(){
             var radius = localNPOs.length * NODE_SIZE  / Math.PI;
             for (var j = 0; j < localNPOs.length; j++) {
                 npo = localNPOs[j]
-                // npo.x = npo.xOrig + radius * Math.sin(alpha *j);
-                // npo.y = npo.yOrig + radius * Math.cos(alpha *j);
-                // if(npo.node.id() == 0){
-                //      console.log('npo.xOrig, npo.yOrig', npo.xOrig, npo.yOrig)
-                // }
-                // npo.displacementVector[0] = npo.x - npo.xOrig;             
-                // npo.displacementVector[1] = npo.y - npo.yOrig;             
                 npo.displacementVector[0] = Math.sin(alpha *j)* radius;    
                 npo.displacementVector[1] = Math.cos(alpha *j) * radius;        
             }
@@ -1368,7 +1282,6 @@ function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object
             npo = new NodePositionObject();
             npo.x = 0;
             npo.y = 0;
-            // console.log('tId', tId)
             npo.timeIds.push(tId);
             npo.xOrig = 0;
             npo.yOrig = 0;
