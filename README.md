@@ -28,10 +28,10 @@ A ready-to-use version can be found on http://networkcube.net.
 
 ## Using Networkcube in your projects
 
-1) Include the following link into your website. 
+1. Include the following link into your website. 
 <script src="https://networkcube.github.io/networkcube/core/networkcube.js"/>
 
-2) Learn how to import data (https://github.com/networkcube/networkcube/wiki/Importing-Data) and how to use the network API (https://github.com/networkcube/networkcube/wiki/Query-API)
+2. Learn how to import data (https://github.com/networkcube/networkcube/wiki/Importing-Data) and how to use the network API (https://github.com/networkcube/networkcube/wiki/Query-API)
 
 ## Components
 
