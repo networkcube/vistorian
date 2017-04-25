@@ -207,7 +207,7 @@ p#intro{
 }
 
 ul{
-	list-style: none;
+	/*list-style: none;*/
 }
 .nointent{
 	padding: 0;

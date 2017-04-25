@@ -99,7 +99,25 @@
     
                         Enter your data once, and explore it using various visualizations.
                     </p>
+                
+                    <h2>Use</h2>
 
+                    Networkcube is both
+
+                    <ul>
+                        <li>a <a href="https://github.com/networkcube/networkcube/tree/master/core">javascript library</a> for importing, storing, and querying dynamic networks in your browser cache, </li> 
+                        <li>a <a href="https://networkcube.github.io/networkcube/web/demo.html?session=0&datasetName=demo_scientists">set of online visualizations</a> build on top of that library, and</li> 
+                        <li>a ready-to-use web application (this website).</li>
+                    </ul>
+                    
+                    You can: 
+
+                    <ul>
+                        <li>start using this website by <a id="resumeSessionLink3" target="_blank">creating your session</a> (no registration required) and start importing your data. Data gets stored in your browser's cache,</li>
+                        <li>build your own website/webapp <a href="">using networkcube.js</a> and include our visualizations through a simple call to the API, </li> 
+                        <li>write your own visualizations on top of network and provide their URL for others to integrate,  and</li>                        
+                        <li>help us improving the visualizations and the core-functionality of networkcube</li>
+                    </ul>
 
                     <h2>Contribute</h2>
 
@@ -110,27 +128,23 @@
 
                     <h2>Current and past contributors</h2>
 
-                    <ul>
-                        <li><a href="http://benjbach.me">Benjamin Bach</a>, Edinburgh University, UK</li>
-                        <li><a href="http://www.aviz.fr/~fekete/pmwiki/pmwiki.php/Main/CV">Jean-Daniel Fekete</a>, Inria</li>
-                        <li><a href="https://www.microsoft.com/en-us/research/people/nath/">Nathalie Henry Riche</a>, Microsoft Research</li>
-                        <li>Nicole Dufournaud, EHSS, France</li>
-                    </ul>
-                    <ul>
-                        <li>Roland Fernandez, Microsoft Research</li>
-                        <li>Charles Parker, Microsoft Research</li>
-                        <li>Rick Guiterrez, Microsoft Research</li>
-                        <li>Paola Llerena Valdivia, Inria</li>
-                        <li>Emmanouil Giannisakis, Inria</li>
-                    </ul>
-
+                    <a href="http://benjbach.me">Benjamin Bach</a>, Edinburgh University, UK<br/>
+                    <a href="http://www.aviz.fr/~fekete/pmwiki/pmwiki.php/Main/CV">Jean-Daniel Fekete</a>, Inria<br/>
+                    <a href="https://www.microsoft.com/en-us/research/people/nath/">Nathalie Henry Riche</a>, Microsoft Research<br/>
+                    Nicole Dufournaud, EHSS, France<br/>
+                    <br>
+                    Roland Fernandez, Microsoft Research<br/>
+                    Charles Parker, Microsoft Research<br/>
+                    Rick Guiterrez, Microsoft Research<br/>
+                    Paola Llerena Valdivia, Inria<br/>
+                    Emmanouil Giannisakis, Inria<br/>  
+                    
                     <h2>Related Projects</h2>
-                    <ul class="relwork">
-                        <li><a href="https://nodexl.codeplex.com">NodeXL</a></li>
-                        <li><a href="http://republicofletters.stanford.edu/">Republic of letters</a></li>
-                        <li><a href="http://hdlab.stanford.edu/palladio/">Standford's Palladio</a></li>
-                    </ul>
-
+                    
+                    <a href="https://nodexl.codeplex.com">NodeXL</a><br/>
+                    <a href="http://republicofletters.stanford.edu/">Republic of letters</a><br/>
+                    <a href="http://hdlab.stanford.edu/palladio/">Standford's Palladio</a><br/>
+                    
 
                 </div>
 
@@ -237,6 +251,7 @@
 
             $('#resumeSessionLink').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
             $('#resumeSessionLink2').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
+            $('#resumeSessionLink3').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
 
             biblio = "<ol>";
             $.get("/pubdata/biblio.json", function (data) {
