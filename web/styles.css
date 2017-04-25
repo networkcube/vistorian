@@ -51,6 +51,11 @@ video{
 	border: 1px #dddddd solid; 
 }
 
+img.dataPicture{
+	margin-top:20px;
+	margin-bottom:20px;
+	width: 450px;
+}
 
 
 /*CONTENT*/
