@@ -1,0 +1,49 @@
+ssvg text {
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+svg text.nodeLabelOutlines{
+    stroke: white;
+    stroke-width: 2.5px;
+    opacity: .9;
+}
+
+
+#messageBox{
+    background-color: #fff;
+    opacity: .8;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top:0px;
+    left:0px;
+}
+
+#messageBox p{
+    font-weight: bold;
+    position:absolute;
+    top:50%;
+    left:50%;
+    text-align: center;
+}
+
+
+
+path{
+    fill: none;
+}
+
+/* HTML */
+
+
+#headDiv{
+
+}
+
+#legendDiv{
+}
+
