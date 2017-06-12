@@ -30,7 +30,8 @@ module networkcube {
         dataManager.setOptions(options);
     }
 
-    export function isSessionCached(session: string, dataSetName: string) {
+    export function isSessionCached(session: string, dataSetName: string) 
+    {
         return dataManager.isSessionCached(session, dataSetName);
     }
  
@@ -41,8 +42,8 @@ module networkcube {
      * @param  {DataSet} data    [description]
      * @return {[type]}          [description]
      */
-    export function importData(sessionName: string, data: DataSet) {
-        console.log('[n3] Import data', data.name);
+    export function importData(sessionName: string, data: DataSet) 
+    {
         session = sessionName;
         dataManager.importData(sessionName, data);
     }
