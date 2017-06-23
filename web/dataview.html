@@ -170,11 +170,6 @@
                     else
                         fileName = e.target.value.split( '\\' ).pop();
 
-                    console.log('fileName', fileName)
-                    if( fileName )
-                        label.querySelector( 'span' ).innerHTML = fileName;
-                    else
-                        label.innerHTML = labelVal;
                 });
 
                 // Firefox bug fix
