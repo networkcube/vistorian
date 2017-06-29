@@ -644,6 +644,27 @@
         if ($('#messageBox'))
             $('#messageBox').remove();
     }
-    
 
+
+    //////////////
+    /// STATES ///
+    //////////////
+
+
+
+    function captureState(){
+        /// capture state
+        var json;
+        
+        // node positions, nodes[i].x
+        // link visibility
+        // current time: time_start, time_end
+
+
+        return json;
+    }
+
+    function restoreState(json:String){
+        /// restore state
+    }
 
