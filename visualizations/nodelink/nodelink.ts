@@ -56,6 +56,7 @@
     networkcube.setDefaultEventListener(updateEvent);
     
     
+    
   
     // MENU
     var menuDiv = d3.select('#menuDiv');
@@ -95,7 +96,8 @@
             var e = document.getElementById("selection-input_"+name);
             callback(e.options[e.selectedIndex].value);
         }) 
-   }
+    }
+
 
         
     
@@ -648,22 +650,43 @@
 
     //////////////
     /// STATES ///
-    //////////////
+    //////////////  
 
 
+    d3.select('#captureButton')
+        .on('click', ()=>
+        {
+            captureState();    
+        })
 
-    function captureState(){
-        /// capture state
-        var json;
-        
+    
+    // Returns an object that captures the current visualization state
+    function captureState() : Object
+    {
+        /// capture states
+        var json = {};
         // node positions, nodes[i].x
-        // link visibility
-        // current time: time_start, time_end
+        var nodePosX = []
+        var nodePosY = []
+        for(var i=0 ; i<nodes.length ; i++){
+            nodePosX.push(nodes[i].x)
+            nodePosY.push(nodes[i].y)
+        }
+        json['nodePosX'] = nodePosX
+        json['nodePosY'] = nodePosY
 
+        // link visibility
+        
+
+        // current time: time_start, time_end
+        json['timeStart'] = time_start
+        json['timeEnd'] = time_end
 
         return json;
     }
 
+
+    // Restores the state passed by the string.
     function restoreState(json:String){
         /// restore state
     }

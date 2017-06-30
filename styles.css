@@ -29,7 +29,8 @@ div#main{
 	font-weight: 600;
 	color: #555;
 	margin-right:20px;
-	margin-top: 20px;
+	margin-top: 10px;
+	text-decoration: underline;
 }
 
 .exportPNG-button{
