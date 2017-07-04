@@ -661,7 +661,7 @@
 
     
     // Returns an object that captures the current visualization state
-    function captureState() : Object
+    function captureState()
     {
         /// capture states
         var json = {};
@@ -682,7 +682,9 @@
         json['timeStart'] = time_start
         json['timeEnd'] = time_end
 
-        return json;
+        networkcube.recordState(json);
+
+        return null;
     }
 
 
