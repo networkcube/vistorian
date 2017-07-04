@@ -682,8 +682,11 @@
         json['timeStart'] = time_start
         json['timeEnd'] = time_end
 
+        json['visualization'] = 'nodelink';
+
         networkcube.recordState(json);
 
+        console.log('json', json)
         return null;
     }
 
