@@ -284,6 +284,8 @@ var vistorian;
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> ' + datasetname + '</h2>');
         $('#' + elementId).append(dataname);
         var vars = networkcube.getUrlVars();
+		// VS: Clicks on Return to DataView
+		trace.event("system", "ts_ReturnDV", "CCC", "DDD");
         $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;">Return to Dataview</a>');
         $('#' + elementId).append('<br/><br/>');
     }
