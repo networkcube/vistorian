@@ -3,21 +3,32 @@
 <head>
 <link rel="stylesheet" type="text/css" href="../../styles.css">
 <link rel="stylesheet" type="text/css" href="styles.css">
+
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="../../web/traces/trace.js"></script>
+	
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 </head>
 <title>Node link diagram</title>
 <body>
+		<!-- VS: Call to trace_test_130529 -->
+		<script type="text/javascript" src="../../web/traces/trace_test_130529.js"></script>
     <div>
         <div id="menuDiv">
-            <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#node-link-visualization-nodelink">Manual</a>
+			<!-- VS: Clicks on Manual -->
+            <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#node-link-visualization-nodelink" onclick="trace.event('help', 'ts_nodelinkVisManual', 'CCC', 'DDD')"> Manual</a>
+			
+			<!-- Original code -->
+			<!-- <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#node-link-visualization-nodelink" onclick="trace.event('help', 'ts_NLVisManual', 'CCC', 'DDD')"> Manual</a> -->
+			
             <!--<input type="button" class="exportPNG-button" value="Export PNG" onclick="exportPNG()"/>-->
         </div>
         <div id="timelineDiv"></div>
         <div id="visDiv">
         </div>
     </div>
-    <script src="../../../networkcube/core/lib/jquery.js"></script>
-    <script src="../../../networkcube/core/networkcube.js"></script>
+    <script src="http://localhost/core/lib/jquery.js"></script>
+    <script src="http://localhost/core/networkcube.js"></script>
     <!--<script src="lib/three.js"></script>-->
     <script src="lib/d3.js"></script>
     <script src="lib/cola.js"></script>
