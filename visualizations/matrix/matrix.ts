@@ -62,8 +62,10 @@ class MatrixMenu{
       .append('<select id="labelOrdering"></select>')
   
 
-    $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
-
+    //$("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
+    // VS: Clicks on Manual
+    $("#networkcube-matrix-menu")
+      .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
 
     $('#labelOrdering').change(this.reorderHandler);
     $('#labelOrdering').append('<option value="none">---</option>');

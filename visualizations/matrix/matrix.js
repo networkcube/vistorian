@@ -16,6 +16,7 @@ var MatrixMenu = (function () {
         this.matrix = matrix;
         this.init();
     }
+	
     MatrixMenu.prototype.init = function () {
         this.elem.append("Zoom:  <input id=\"cellSizeBox\" type=\"range\" \n      name=\"cellSizeBox\" min=\"3\" max=\"20\" \n      value=\"" + this.matrix.cellSize + '"/>');
         $('#cellSizeBox').change(this.updateCellSize);
@@ -23,7 +24,9 @@ var MatrixMenu = (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-        $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
+		// VS: Clicks on Manual
+		$("#networkcube-matrix-menu")
+			.append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
         $('#labelOrdering').append('<option value="none">---</option>');
         $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
