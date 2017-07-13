@@ -8,13 +8,19 @@
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 
-<script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="../traces/trace.js"></script>
+	
+<script src="http://localhost/core/networkcube.js"></script>
 <script src="../classes/vistorian.js"></script>
 
 </head>
 <title>Dynamic Ego Network</title>
 <body>
 
+	<!-- VS: Call to trace_test_130529 -->
+	<script type="text/javascript" src="../traces/trace_test_130529.js"></script>
+	
     <table>
         <tr>
             <td width="220px">
@@ -47,12 +53,12 @@
             console.log(params);
            networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/bookmarkbrowser/index.html',
+                'http://localhost/visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height)
             networkcube.createVisualizationIFrame(
                 'visFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/dynamicego/index.html',
+                'http://localhost/visualizations/dynamicego/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height)     
 

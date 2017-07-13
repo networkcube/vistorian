@@ -8,13 +8,20 @@
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 
-<script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="../traces/trace.js"></script>
+	
+<script src="http://localhost/core/networkcube.js"></script>
 <script src="../classes/vistorian.js"></script>
 
 
 </head>
 <title>Tile view</title>
 <body>
+
+	<!-- VS: Call to trace_test_130529 -->
+	<script type="text/javascript" src="../traces/trace_test_130529.js"></script>
+	
     <div>
         <table id="layout" style="border:none" width="100%">
             <tr>
@@ -61,31 +68,31 @@
 
             networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/bookmarkbrowser/index.html',
+                'http://localhost/visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height);
             
             networkcube.createVisualizationIFrame(
                 'nodelinkVisFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/nodelink/index.html',
+                'http://localhost/visualizations/nodelink/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height/2)
             
             networkcube.createVisualizationIFrame(
                 'matrixVisFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/matrix/index.html',
+                'http://localhost/visualizations/matrix/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height/2);    
 
             networkcube.createVisualizationIFrame(
                 'dynamicegoVisFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/dynamicego/index.html',
+                'http://localhost/visualizations/dynamicego/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height/2);         
      
             networkcube.createVisualizationIFrame(
                 'mapVisFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/map/index.html',
+                'http://localhost/visualizations/map/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height/2);         
 
