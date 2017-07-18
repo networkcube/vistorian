@@ -40,8 +40,11 @@
                 © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="20px">
     </div>
 	<script>
-        VIS_SERVER='../../' // local
-        
+        SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = SERVER.split('web/')[0]
+
+        console.log('>> SERVER: ', SERVER)
+
         $( document ).ready(function() {
             var width = window.innerWidth -30;
             width_col1 = 220;
@@ -54,12 +57,12 @@
             console.log(params);
             networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                VIS_SERVER+'visualizations/bookmarkbrowser/index.html',
+                SERVER + 'visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height);
             networkcube.createVisualizationIFrame(
                 'visFrame', 
-                VIS_SERVER+'visualizations/matrix/index.html',
+                SERVER + 'visualizations/matrix/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height);
 

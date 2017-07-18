@@ -12,7 +12,7 @@
 </head>    
 <body>
 
-        <script src="http://localhost/core/networkcube.js"></script>
+        <script src="../core/networkcube.js"></script>
         <script src="lib/jstorage.js"></script>
         <script src="classes/storage.js"></script>
         <script src="classes/utils.js"></script>
@@ -163,6 +163,10 @@
 
         <script>
             
+            SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+            SERVER = SERVER.split('web/')[0]
+
+
             $( document ).ready(function() {
 
                 var WIDTH = 1000
@@ -178,25 +182,25 @@
 
                 networkcube.createVisualizationIFrame(
                     'div_nodelink', 
-                    'http://localhost/visualizations/nodelink/index.html',
+                    SERVER + 'visualizations/nodelink/index.html',
                     params['session'], params['datasetName'], 
                     WIDTH, HEIGHT, visparams);
 
                 networkcube.createVisualizationIFrame(
                     'div_matrix', 
-                    'http://localhost/visualizations/matrix/index.html',
+                    SERVER + 'visualizations/matrix/index.html',
                     params['session'], params['datasetName'], 
                     WIDTH, HEIGHT, visparams);
                 
                 networkcube.createVisualizationIFrame(
                     'div_dynamicego', 
-                    'http://localhost/visualizations/dynamicego/index.html',
+                    SERVER + 'visualizations/dynamicego/index.html',
                     params['session'], params['datasetName'], 
                     WIDTH, HEIGHT, visparams);
                 
                 networkcube.createVisualizationIFrame(
                     'div_map', 
-                    'http://localhost/visualizations/map/index.html',
+                    SERVER + 'visualizations/map/index.html',
                     params['session'], params['datasetName'], 
                     WIDTH, HEIGHT, visparams);
 

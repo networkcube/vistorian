@@ -11,7 +11,7 @@
 	<!-- VS: Call to trace.js -->
 	<script type="text/javascript" src="../traces/trace.js"></script>
 	
-<script src="http://localhost/core/networkcube.js"></script>
+<script src="../../core/networkcube.js"></script>
 <script src="../classes/vistorian.js"></script>
 
 </head>
@@ -41,6 +41,9 @@
     </div>
 	<script>
        
+        SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = SERVER.split('web/')[0]
+
         $( document ).ready(function() {
             var width = window.innerWidth -30;
             width_col1 = 220;
@@ -51,14 +54,14 @@
             var params = networkcube.getUrlVars();
             params['datasetName'] = params['datasetName'].replace(/___/g, ' ');
             console.log(params);
-           networkcube.createVisualizationIFrame(
+            networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                'http://localhost/visualizations/bookmarkbrowser/index.html',
+                SERVER + 'visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height)
             networkcube.createVisualizationIFrame(
                 'visFrame', 
-                'http://localhost/visualizations/dynamicego/index.html',
+                SERVER + 'visualizations/dynamicego/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height)     
 

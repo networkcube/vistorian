@@ -3,16 +3,17 @@
 <head>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="http://localhost/styles.css">
-<link rel="stylesheet" type="text/css" href="http://localhost/web/visview.css">
+<link rel="stylesheet" type="text/css" href="../styles.css">
+<link rel="stylesheet" type="text/css" href="../visview.css">
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 
-	<!-- VS: Call to trace.js -->
-	<script type="text/javascript" src="../traces/trace.js"></script>
-	
-<script src="http://localhost/core/networkcube.js"></script>
-<script src="http://localhost/web/classes/vistorian.js"></script>
+<!-- VS: Call to trace.js -->
+<script type="text/javascript" src="../traces/trace.js"></script>
+    
+<script src="../../core/networkcube.js"></script>
+<script src="../classes/vistorian.js"></script>
+
 
 
 </head>
@@ -36,9 +37,13 @@
                 <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a>   |
                 <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a>   |
                 <a class="footer" href="http://go.microsoft.com/fwlink/?LinkId=506942" title="trademarks">Trademarks</a>   
-                © 2016 Microsoft <img src="http://localhost/web/logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="http://localhost/web/logos/logo-inria.png" height="20px">
+                © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="20px">
     </div>
 	<script>
+
+        SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = SERVER.split('web/')[0]
+
       
         $( document ).ready(function() {
             var width = window.innerWidth -30;
@@ -52,14 +57,13 @@
             console.log(params)
             networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                'http://localhost/visualizations/bookmarkbrowser/index.html',
+                SERVER + 'visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height);
             
             networkcube.createVisualizationIFrame(
                 'visFrame', 
-                'http://localhost/visualizations/nodelink/index.html',
-                // '../../visualizations/nodelink/index.html',
+                SERVER + 'visualizations/nodelink/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height);
             

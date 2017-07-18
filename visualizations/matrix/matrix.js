@@ -16,7 +16,6 @@ var MatrixMenu = (function () {
         this.matrix = matrix;
         this.init();
     }
-	
     MatrixMenu.prototype.init = function () {
         this.elem.append("Zoom:  <input id=\"cellSizeBox\" type=\"range\" \n      name=\"cellSizeBox\" min=\"3\" max=\"20\" \n      value=\"" + this.matrix.cellSize + '"/>');
         $('#cellSizeBox').change(this.updateCellSize);
@@ -24,9 +23,8 @@ var MatrixMenu = (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-		// VS: Clicks on Manual
-		$("#networkcube-matrix-menu")
-			.append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
+        $("#networkcube-matrix-menu")
+            .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
         $('#labelOrdering').append('<option value="none">---</option>');
         $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
@@ -86,15 +84,21 @@ var CellLabel = (function () {
             .data([{ id: 0 }])
             .append('text')
             .style('opacity', 0)
-            .attr('z', 2)
+            .attr('z', -1)
             .style('font-size', 12);
     }
+    CellLabel.prototype.hideCellLabel = function () {
+        this.cellLabelBackground.style('opacity', 0);
+        this.cellLabel.attr('z', -1)
+            .style('opacity', 0);
+    };
     CellLabel.prototype.updateCellLabel = function (mx, my, val, fw) {
         this.cellLabel
             .attr('x', mx + 40)
             .attr('y', -my)
             .style('opacity', 1)
             .text(val ? val : 0)
+            .attr('z', 2)
             .style('font-size', fw);
         this.cellLabelBackground
             .attr('x', mx + 10)
@@ -128,10 +132,12 @@ var MatrixOverview = (function () {
         this.contextPattern = g.append("defs")
             .append("pattern")
             .attr("id", "bg")
-            .attr('patternUnits', 'userSpaceOnUse');
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr("width", this.width)
+            .attr("height", this.height);
         this.contextImg = this.contextPattern.append("image")
-            .attr("x", 0)
-            .attr("y", 0);
+            .attr("width", this.width)
+            .attr("height", this.height);
         this.context = g.append("rect")
             .attr("class", "context")
             .attr("width", this.width)
@@ -148,7 +154,7 @@ var MatrixOverview = (function () {
         this.focus.call(this.zoom);
     };
     MatrixOverview.prototype.setCanvasRatio = function (canvasRatio) {
-        this.canvasRatio = canvasRatio;
+        this.canvasRatio = 1;
         var w = this.canvasRatio > 1 ? this.width * this.canvasRatio : this.width;
         var h = this.canvasRatio < 1 ? this.height * this.canvasRatio : this.height;
         this.contextPattern.attr("width", w)
@@ -375,12 +381,16 @@ var MatrixVisualization = (function () {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(0xffffff, 1);
+        this.initTextureFramebuffer();
         this.canvas = this.renderer.domElement;
         this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
         this.canvas.addEventListener('mousedown', this.mouseDownHandler);
         this.canvas.addEventListener('mouseup', this.mouseUpHandler);
         this.canvas.addEventListener('click', this.clickHandler);
         glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
+    };
+    MatrixVisualization.prototype.initTextureFramebuffer = function () {
+        this.bufferTexture = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
     };
     MatrixVisualization.prototype.initGeometry = function () {
         var vertexShaderProgram = "\n      attribute vec4 customColor;\n      varying vec4 vColor;\n      void main() {\n        vColor = customColor;\n        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );\n      }";
@@ -443,11 +453,26 @@ var MatrixVisualization = (function () {
         this.scene.add(this.mesh);
         this.render();
         if (getImageData) {
+            var smallDim = Math.min(this.height, this.width);
+            this.resizeCanvas(smallDim, smallDim);
+            this.matrix.hideCellLabel();
+            this.render();
             var imgData = this.canvas.toDataURL();
             this.matrix.updateOverviewImage(imgData);
+            this.resizeCanvas(this.width, this.height);
         }
         this.updateGuideLines();
         this.render();
+    };
+    MatrixVisualization.prototype.resizeCanvas = function (width, height) {
+        this.camera.position.x = width / 2;
+        this.camera.position.y = -height / 2;
+        this.camera.left = width / -2;
+        this.camera.right = width / 2;
+        this.camera.top = height / 2;
+        this.camera.bottom = height / -2;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
     };
     MatrixVisualization.prototype.addCell = function (row, col, pair) {
         var links;
@@ -686,7 +711,6 @@ var Matrix = (function () {
     };
     Matrix.prototype.setVis = function (matrixVis) {
         this.visualization = matrixVis;
-        this.overview.setCanvasRatio(this.visualization.width / this.visualization.height);
         this.resetTransform();
     };
     Matrix.prototype.setLabels = function (matrixLabels) {
@@ -706,6 +730,9 @@ var Matrix = (function () {
     };
     Matrix.prototype.updateOverviewImage = function (dataImg) {
         this.overview.updateOverviewImage(dataImg);
+    };
+    Matrix.prototype.hideCellLabel = function () {
+        this.cellLabel.hideCellLabel();
     };
     Matrix.prototype.updateCellSize = function (value) {
         var scale = value / this.initialCellSize;

@@ -24,17 +24,17 @@ function loadVisualizationList() {
     visualizations.forEach(function (v) {
         $('#visualizationList')
             .append('<li class="visLink" title="Show ' + v[0] + ' visualization.">\
-                        <button onclick="loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip" >\
+                        <button onclick="loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
                             <img src="logos/vis-' + v[1] + '.png" class="menuicon" />'
             + v[0] + '\
                         </button>\
                     </li>');
     });
     $('#visualizationList')
-        .append('<li class="visLink" title="Show matrix and node-link split-view."> <button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip"> <img src="logos/mat-nl.png" class="menuicon"/>Matrix + Node Link\
+        .append('<li class="visLink" title="Show matrix and node-link split-view."><button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip"><img src="logos/mat-nl.png" class="menuicon"/>Matrix + Node Link\
         </button></li>');
     $('#visualizationList')
-        .append('<li class="visLink" title="Show all visualizations."> <button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip"><img src="logos/tiled.png" class="menuicon"/>All\
+        .append('<li class="visLink" title="Show all visualizations."><button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip"><img src="logos/tiled.png" class="menuicon"/>All\
         </button></li>');
 }
 function loadTableList() {
@@ -66,9 +66,8 @@ function loadNetworkList() {
     });
 }
 function loadVisualization(visType) {
-	// VS: Clicks on each type of Visualization
-	trace.event("system", "ts_" + visType, "CCC", "DDD");
-	window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
+    trace.event("system", "ts_" + visType, "CCC", "DDD");
+    window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
 }
 function createNetwork() {
     var networkIds = storage.getNetworkIds(SESSION_NAME);
