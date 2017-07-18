@@ -1,7 +1,7 @@
 (function() {
 
     var _traceq = _traceq || [];
-    var traceUrl = "http://vizatt.saclay.inria.fr/";
+    var traceUrl = "https://vizatt.saclay.inria.fr/";
     // "http://localhost:5000/trace";
     var _sending = null;
     var sessionId;
