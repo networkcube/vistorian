@@ -163,9 +163,10 @@
 
         <script>
             
-            SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+            SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
             SERVER = SERVER.split('web/')[0]
-
+      
+      
 
             $( document ).ready(function() {
 
