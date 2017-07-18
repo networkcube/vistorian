@@ -40,10 +40,10 @@
                 © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="15px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="15px">
     </div>
 	<script>
-       
-        SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
         SERVER = SERVER.split('web/')[0]
-
+  
+     
         $( document ).ready(function() {
             var width = window.innerWidth -30;
             width_col1 = 220;

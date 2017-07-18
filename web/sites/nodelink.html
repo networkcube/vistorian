@@ -41,10 +41,10 @@
     </div>
 	<script>
 
-        SERVER = "http://" + window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
         SERVER = SERVER.split('web/')[0]
-
-      
+  
+       
         $( document ).ready(function() {
             var width = window.innerWidth -30;
             width_col1 = 220;
