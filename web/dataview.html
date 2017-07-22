@@ -5,10 +5,13 @@
     <meta content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff" http-equiv="Content-Type" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <title>Data view</title>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="traces/trace.js"></script>
+	
     <link rel="stylesheet" type="text/css" href="./styles.css"/>
     <link rel="stylesheet" type="text/css" href="./dataview_styles.css"/>
     <link rel="stylesheet" type="text/css" href="./tablestyle.css"/>
-    <script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+    <script src="../core/networkcube.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
     <link rel="stylesheet" href="lib/jquery-ui.css">
@@ -16,6 +19,9 @@
 </head>
 
 <body>
+	<!-- VS: Call to trace_test_130529 -->
+	<script type="text/javascript" src="traces/trace_test_130529.js"></script>
+	
     <table id="main">
         <tr>
         <td id="menu">
@@ -28,6 +34,7 @@
             <div id="visualizationListDiv">
                 <h2>Visualizations</h2>
                 <ul id="visualizationList" class="nointent"></ul>
+				
             </div>
 
             <div id="networkListDiv">

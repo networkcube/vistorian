@@ -4,17 +4,24 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff">
     <title>Networkcube</title>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="traces/trace.js"></script>
+	
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
-</head>    
+</head>  
+
 <body>
 
-        <script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+        <script src="../core/networkcube.js"></script>
         <script src="lib/jstorage.js"></script>
         <script src="classes/storage.js"></script>
         <script src="classes/utils.js"></script>
+		<!-- VS: Call to trace_test_130529 -->
+		<script type="text/javascript" src="traces/trace_test_130529.js"></script>
+		
         <script src="classes/vistorian.js"></script>
 
 
@@ -50,13 +57,20 @@
                         <a href="dataview.html?session=0" target="_blank"><img src="logos/soccer.png" class="menuicon"/>Example Session</a>
                     </li>
                     <li>
-                        <a id="resumeSessionLink2" target="_blank"><img src="logos/network.png" class="menuicon" />Your Session</a>
+						<!-- VS: Clicks on Your Session -->
+                        <a id="resumeSessionLink2" target="_blank" onclick="trace.event('system', 'ts_YourSession', 'CCC', 'DDD')"> 
+						<!-- VS: Old code -->
+						<!-- <a id="resumeSessionLink2" target="_blank"> -->
+						<img src="logos/network.png" class="menuicon" />Your Session</a>
+												
                     </li>
                     <br/>
                     <br/>
                     <br/>
                     <li>
-                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank"><img src="logos/configuration12.png" class="menuicon" target="_blank"/>Manual</a>
+						<!-- VS: Clicks on Manual -->
+                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank" onclick="trace.event('help', 'ts_VisManual', 'CCC', 'DDD')">
+						<img src="logos/configuration12.png" class="menuicon" target="_blank"/>Manual</a>
                     </li>
                     <li>
                         <a href="http://github.com/networkcube/networkcube" target="_blank"><img src="logos/favourite15.png" class="menuicon" />Github</a>
@@ -106,7 +120,7 @@
 
                     <ul>
                         <li>a <a href="https://github.com/networkcube/networkcube/tree/master/core">javascript library</a> for importing, storing, and querying dynamic networks in your browser cache, </li> 
-                        <li>a <a href="https://networkcube.github.io/networkcube/web/demo.html?session=0&datasetName=demo_scientists">set of online visualizations</a> build on top of that library, and</li> 
+                        <li>a <a href="demo.html?session=0&datasetName=demo_scientists">set of online visualizations</a> build on top of that library, and</li> 
                         <li>a ready-to-use web application (this website).</li>
                     </ul>
                     
@@ -252,23 +266,23 @@
             $('#resumeSessionLink').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
             $('#resumeSessionLink2').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
             $('#resumeSessionLink3').attr('href', 'dataview.html?session=' + PREVIOUS_SESSION);
-
-            biblio = "<ol>";
-            $.get("/pubdata/biblio.json", function (data) {
-                console.log('Data', data);
-                var newContent = '';
-                data.forEach(function ($row, i) {
-                    newContent+='<li class="bibentry">';
-                    newContent+= '<b>'+ $row['title'] +', </b>' ;
-                    newContent+= $row['authors'];
-                    newContent+= ' ('+ $row['year'] + '), ';
-                    newContent+= '<i>'+ $row['journal'] +'</i>' ;
-                    newContent+= '</li>' ;
-                });
-                biblio+= newContent ;
-                biblio+= "</ol>" ;
-                $('#biblio').append(biblio);
-            });
+		// VS: folder not found
+          //  biblio = "<ol>";
+            //$.get("/pubdata/biblio.json", function (data) {
+              //  console.log('Data', data);
+                //var newContent = '';
+                //data.forEach(function ($row, i) {
+                  //  newContent+='<li class="bibentry">';
+                    //newContent+= '<b>'+ $row['title'] +', </b>' ;
+                    //newContent+= $row['authors'];
+                    //newContent+= ' ('+ $row['year'] + '), ';
+                    //newContent+= '<i>'+ $row['journal'] +'</i>' ;
+                    //newContent+= '</li>' ;
+                //});
+                //biblio+= newContent ;
+                //biblio+= "</ol>" ;
+                //$('#biblio').append(biblio);
+            //});
 
 
             // Load demo data

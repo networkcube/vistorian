@@ -62,8 +62,10 @@ class MatrixMenu{
       .append('<select id="labelOrdering"></select>')
   
 
-    $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
-
+    //$("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace_help()">Manual</a>');
+    // VS: Clicks on Manual
+    $("#networkcube-matrix-menu")
+      .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
 
     $('#labelOrdering').change(this.reorderHandler);
     $('#labelOrdering').append('<option value="none">---</option>');
@@ -138,8 +140,13 @@ class CellLabel{
       .data([{id:0}])
       .append('text')
       .style('opacity', 0)
-      .attr('z', 2)
+      .attr('z', -1)
       .style('font-size', 12)
+  }
+  hideCellLabel(){
+    this.cellLabelBackground.style('opacity', 0);
+    this.cellLabel.attr('z', -1)
+      .style('opacity', 0);
   }
   updateCellLabel(mx: number, my: number, val: number, fw: number){
     this.cellLabel
@@ -147,6 +154,7 @@ class CellLabel{
       .attr('y', -my)
       .style('opacity', 1)
       .text(val? val: 0)
+      .attr('z', 2)
       .style('font-size', fw);
     this.cellLabelBackground
       .attr('x', mx + 10)
@@ -191,12 +199,14 @@ class MatrixOverview{
     this.contextPattern = g.append("defs")
       .append("pattern")
       .attr("id", "bg")
-      .attr('patternUnits', 'userSpaceOnUse');
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr("width", this.width)
+      .attr("height", this.height);
 
 
     this.contextImg = this.contextPattern.append("image")
-      .attr("x", 0)
-      .attr("y", 0);
+      .attr("width", this.width)
+      .attr("height", this.height);
 
 
     this.context = g.append("rect")
@@ -227,7 +237,7 @@ class MatrixOverview{
   }
 
   setCanvasRatio(canvasRatio: number){
-    this.canvasRatio = canvasRatio;
+    this.canvasRatio = 1;
     let w = this.canvasRatio>1? this.width*this.canvasRatio: this.width;
     let h = this.canvasRatio<1? this.height*this.canvasRatio: this.height;
     this.contextPattern.attr("width", w)
@@ -423,6 +433,7 @@ class MatrixVisualization{
   private cellHighlightFrames: {[id: number]: THREE.Mesh[]};
   private cellSelectionFrames: THREE.Mesh[];
   private linkWeightScale: D3.Scale.LinearScale;
+  private bufferTexture: THREE.WebGLRenderTarget;
 
 
   private data:  {[id: number]: {[id: number]: networkcube.NodePair}};
@@ -480,6 +491,8 @@ class MatrixVisualization{
     this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0xffffff, 1);
 
+    this.initTextureFramebuffer();
+
     // position canvas element containing cells
     this.canvas = this.renderer.domElement;
 
@@ -491,6 +504,9 @@ class MatrixVisualization{
 
     // init glutils renderer for D3 wrapper
     glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
+  }
+  initTextureFramebuffer() {
+    this.bufferTexture = new THREE.WebGLRenderTarget( 256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
   }
 
   initGeometry(){
@@ -526,7 +542,7 @@ class MatrixVisualization{
   }
   render() {
     let d = new Date();
-    let begin = d.getTime()
+    let begin = d.getTime();
     this.renderer.render(this.scene, this.camera)
     d = new Date();
     // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
@@ -584,11 +600,60 @@ class MatrixVisualization{
     this.scene.add(this.mesh);
     this.render();
     if(getImageData){
+
+
+      let smallDim = Math.min(this.height, this.width);
+
+      this.resizeCanvas(smallDim, smallDim);
+      //
+      // this.renderer.render(this.scene, this.camera, this.bufferTexture);
+      // // Read the contents of the framebuffer
+      //
+      // console.log(this.bufferTexture);
+      // // this.bufferTexture.__webglTexture.flipY = false;
+      //
+      // var dat = new Uint8Array(this.bufferTexture.width * this.bufferTexture.height * 4);
+      //
+      //
+      // this.renderer.readRenderTargetPixels(this.bufferTexture, 0, 0, this.bufferTexture.width, this.bufferTexture.height, dat);
+      //
+      // // Create a 2D canvas to store the result
+      // var canvas = document.createElement('canvas');
+      // canvas.width = this.bufferTexture.width;
+      // canvas.height = this.bufferTexture.height;
+      // var context = canvas.getContext('2d');
+      //
+      // // Copy the pixels to a 2D canvas
+      // var imageData = context.createImageData(this.bufferTexture.width, this.bufferTexture.height);
+      // imageData.data.set(dat);
+      // context.putImageData(imageData, 0, 0, 0, 0, canvas.width, canvas.height);
+
+
+      this.matrix.hideCellLabel();
+      this.render();
+
+      // let imgData = this.canvas.toDataURL();
       let imgData = this.canvas.toDataURL();
       this.matrix.updateOverviewImage(imgData);
+
+      this.resizeCanvas(this.width, this.height);
+
     }
     this.updateGuideLines();
     this.render();
+  }
+
+
+  resizeCanvas(width: number, height: number){
+
+    this.camera.position.x = width / 2;
+    this.camera.position.y = -height / 2;
+    this.camera.left = width / -2;
+    this.camera.right = width / 2;
+    this.camera.top = height/ 2;
+    this.camera.bottom = height/ -2;
+    this.camera.updateProjectionMatrix ();
+    this.renderer.setSize(width, height);
   }
 
   addCell(row: number, col: number, pair: networkcube.NodePair){
@@ -872,7 +937,7 @@ class Matrix{
   }
   setVis(matrixVis: MatrixVisualization){
     this.visualization = matrixVis;
-    this.overview.setCanvasRatio(this.visualization.width/this.visualization.height);
+    // this.overview.setCanvasRatio(this.visualization.width/this.visualization.height);
     this.resetTransform();
   }
   setLabels(matrixLabels: MatrixLabels){
@@ -892,6 +957,10 @@ class Matrix{
   }
   updateOverviewImage(dataImg){
     this.overview.updateOverviewImage(dataImg);
+  }
+
+  hideCellLabel(){
+    this.cellLabel.hideCellLabel();
   }
 
   updateCellSize(value: number){
