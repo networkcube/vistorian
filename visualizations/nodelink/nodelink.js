@@ -487,7 +487,10 @@ function captureState() {
     json['nodePosY'] = nodePosY;
     json['timeStart'] = time_start;
     json['timeEnd'] = time_end;
-    return json;
+    json['visualization'] = 'nodelink';
+    networkcube.recordState(json);
+    console.log('json', json);
+    return null;
 }
 function restoreState(json) {
 }
