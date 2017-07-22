@@ -184,7 +184,7 @@ module networkcube {
                 case '':
                     return copyPropsShallow(v, new LinkArray());
                 case 'weights':
-                    return copyTimeSeries(v, function () { return new ScalarTimeSeries<any>(); });
+                    return copyTimeSeries(v, function () { return new ScalarTimeSeries<number>(); });
                 default:
                     return v;
             }
@@ -820,7 +820,7 @@ module networkcube {
                     this.linkArrays.target[linkId] = row[data.linkSchema.target];
                     this.linkArrays.linkType[linkId] = row[data.linkSchema.linkType];
                     this.linkArrays.directed[linkId] = row[data.linkSchema.directed];
-                    this.linkArrays.weights[linkId] = new ScalarTimeSeries<any>();
+                    this.linkArrays.weights[linkId] = new ScalarTimeSeries<number>();
                     this.linkArrays.presence[linkId] = [];
                     this.linkArrays.selections.push([]);
                     this.linkArrays.nodePair.push(undefined);
@@ -846,8 +846,9 @@ module networkcube {
 
                 // set weight if applies
                 // console.log('data.linkSchema.weight', data.linkSchema.weight)
-                if (isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) {
-                    this.linkArrays.weights[linkId].set(time, data.linkTable[i][data.linkSchema.weight])
+                if (isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) 
+                {
+                    this.linkArrays.weights[linkId].set(time, parseFloat(data.linkTable[i][data.linkSchema.weight]))
                     this.minWeight = Math.min(this.minWeight, data.linkTable[i][data.linkSchema.weight])
                     this.maxWeight = Math.max(this.maxWeight, data.linkTable[i][data.linkSchema.weight])
                 } else {
@@ -1843,7 +1844,7 @@ module networkcube {
         presence: number[][] = [];
         // array of weights per time this link is present. This is a generic field
         // that can be used for weights, e.g.
-        weights: ScalarTimeSeries<any>[] = [];
+        weights: ScalarTimeSeries<number>[] = [];
         selections: Selection[][] = [];
         filter: boolean[] = [];
         attributes: Object = new Object; // arbitrary attributes (key -> value)

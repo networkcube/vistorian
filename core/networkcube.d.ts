@@ -499,7 +499,7 @@ declare module networkcube {
         directed: boolean[];
         nodePair: number[];
         presence: number[][];
-        weights: ScalarTimeSeries<any>[];
+        weights: ScalarTimeSeries<number>[];
         selections: Selection[][];
         filter: boolean[];
         attributes: Object;

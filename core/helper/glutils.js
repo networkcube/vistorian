@@ -1161,4 +1161,3 @@ var geometry;
     }
     geometry.setLength = setLength;
 })(geometry || (geometry = {}));
-//# sourceMappingURL=glutils.js.map

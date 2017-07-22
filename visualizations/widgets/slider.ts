@@ -4,7 +4,7 @@ class Slider {
 
     /* VISUALIZATION PARAMETERS */
     BAR_WIDTH: number = 5;
-    RADIUS_HANDLE: number = 4;
+    RADIUS_HANDLE: number = 5;
 
     LEFT: number = this.RADIUS_HANDLE;
     RIGHT: number = this.RADIUS_HANDLE;

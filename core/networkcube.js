@@ -10731,7 +10731,7 @@ var networkcube;
                 time = this._times[timeId];
                 this.linkArrays.presence[linkId].push(timeId);
                 if (networkcube.isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) {
-                    this.linkArrays.weights[linkId].set(time, data.linkTable[i][data.linkSchema.weight]);
+                    this.linkArrays.weights[linkId].set(time, parseFloat(data.linkTable[i][data.linkSchema.weight]));
                     this.minWeight = Math.min(this.minWeight, data.linkTable[i][data.linkSchema.weight]);
                     this.maxWeight = Math.max(this.maxWeight, data.linkTable[i][data.linkSchema.weight]);
                 }

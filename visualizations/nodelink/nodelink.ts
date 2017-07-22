@@ -491,7 +491,8 @@
 
     }
     
-    function updateLinks(){
+    function updateLinks()
+    {
         visualLinks
             .style('stroke', function(d){
                 var color = networkcube.getPriorityColor(d);            
