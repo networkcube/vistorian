@@ -184,7 +184,7 @@ var glutils;
             this.interactor.isHorizontalPanEnabled = b;
         };
         return WebGL;
-    })();
+    }());
     glutils.WebGL = WebGL;
     var webgl;
     function initWebGL(parentId, width, height, params) {
@@ -490,7 +490,7 @@ var glutils;
             }
         };
         return WebGLElementQuery;
-    })();
+    }());
     glutils.WebGLElementQuery = WebGLElementQuery;
     function setStyle(element, attr, v, query) {
         switch (attr) {
@@ -588,7 +588,7 @@ var glutils;
             this.children = [];
         }
         return GroupElement;
-    })();
+    }());
     function createCirclesNoShader(dataElements, scene) {
         var material;
         var geometry;
@@ -997,7 +997,7 @@ var glutils;
             }
         };
         return WebGLInteractor;
-    })();
+    }());
     glutils.WebGLInteractor = WebGLInteractor;
     function mouseToWorldCoordinates(mouseX, mouseY) {
         var rect = webgl.canvas.getBoundingClientRect();
@@ -1056,7 +1056,7 @@ var glutils;
             }
         };
         return CheckBox;
-    })();
+    }());
     glutils.CheckBox = CheckBox;
 })(glutils || (glutils = {}));
 var THREEx = THREEx || {};

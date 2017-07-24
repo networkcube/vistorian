@@ -9,7 +9,7 @@ var NMargin = (function () {
         this.top = v;
     };
     return NMargin;
-})();
+}());
 var MatrixMenu = (function () {
     function MatrixMenu(elem, matrix) {
         this.elem = elem;
@@ -23,8 +23,7 @@ var MatrixMenu = (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-        $("#networkcube-matrix-menu")
-            .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
+        $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace_help()">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
         $('#labelOrdering').append('<option value="none">---</option>');
         $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
@@ -46,7 +45,7 @@ var MatrixMenu = (function () {
         $('#cellSizeBox').val(val);
     };
     return MatrixMenu;
-})();
+}());
 var MatrixTimeSlider = (function () {
     function MatrixTimeSlider(elem, matrix, width) {
         this.elem = elem;
@@ -67,7 +66,7 @@ var MatrixTimeSlider = (function () {
         this.timeSlider.set(sT, eT);
     };
     return MatrixTimeSlider;
-})();
+}());
 var CellLabel = (function () {
     function CellLabel() {
         this.cellLabelBackground = glutils.selectAll()
@@ -108,7 +107,7 @@ var CellLabel = (function () {
             .style('opacity', .8);
     };
     return CellLabel;
-})();
+}());
 var MatrixOverview = (function () {
     function MatrixOverview(svg, width, height, matrix) {
         var _this = this;
@@ -189,7 +188,7 @@ var MatrixOverview = (function () {
         this.context.attr("fill", "url(#bg)");
     };
     return MatrixOverview;
-})();
+}());
 var MatrixLabels = (function () {
     function MatrixLabels(svg, margin, matrix) {
         this.svg = svg;
@@ -286,7 +285,7 @@ var MatrixLabels = (function () {
         }
     };
     return MatrixLabels;
-})();
+}());
 var MatrixVisualization = (function () {
     function MatrixVisualization(elem, width, height, matrix) {
         var _this = this;
@@ -616,7 +615,7 @@ var MatrixVisualization = (function () {
         this.matrix.updateTransform(z, tr);
     };
     return MatrixVisualization;
-})();
+}());
 var Matrix = (function () {
     function Matrix() {
         var _this = this;
@@ -905,7 +904,7 @@ var Matrix = (function () {
         this.cellLabel.updateCellLabel(mx, my, val, fw);
     };
     return Matrix;
-})();
+}());
 var matrix = new Matrix();
 var vizWidth = window.innerWidth - 10;
 var vizHeight = window.innerHeight - 115;
