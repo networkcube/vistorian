@@ -914,3 +914,6 @@ declare module geometry {
     function normalize(v: number[]): number[];
     function setLength(v: number[], l: number): number[];
 }
+declare function createCookie(name: any, value: any, days: any): void;
+declare function readCookie(name: any): string;
+declare function eraseCookie(name: any): void;

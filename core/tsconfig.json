@@ -37,6 +37,7 @@
         "./classes/ordering.ts",
         "./classes/search.ts",
         "./classes/main.ts",
-        "./helper/glutils.ts"
+        "./helper/glutils.ts",
+        "./lib/trace.ts"
     ]
 }
