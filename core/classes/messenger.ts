@@ -375,7 +375,7 @@ module networkcube {
     localStorage[MESSAGE_KEY] = undefined;
 
     export function distributeMessage(message: Message, ownView?: boolean) {
-     
+
         if (ownView == undefined || ownView)
             processMessage(message);
 

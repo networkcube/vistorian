@@ -1,5 +1,5 @@
 /// <reference path="./classes/storage.ts"/>
-/// <reference path="../networkcube/core/networkcube.d.ts"/>
+/// <reference path="../core/networkcube.d.ts"/>
 /// <reference path="./classes/vistorian.ts" />
 
 var DATA_TABLE_MAX_LENGTH = 200;
