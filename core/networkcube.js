@@ -13034,6 +13034,7 @@ var networkcube;
     var MESSAGE_KEY = 'networkcube_message';
     localStorage[MESSAGE_KEY] = undefined;
     function distributeMessage(message, ownView) {
+        trace.event(null, 'LinkFunctionUse', message.type);
         if (ownView == undefined || ownView)
             processMessage(message);
         if (MESSENGER_PROPAGATE) {

@@ -66,7 +66,7 @@ function loadNetworkList() {
     });
 }
 function loadVisualization(visType) {
-    trace.event("system", "ts_" + visType, "CCC", "DDD");
+    trace.event(null, "ToolLaunch", "Launch" + visType);
     window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
 }
 function createNetwork() {

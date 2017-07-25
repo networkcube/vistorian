@@ -6,9 +6,16 @@
     var _sending = null;
     var sessionId;
     var starting = true;
-    var debug = false;
+    var debug = false; 
+    var pagename = null;
+    var disabled = false;
 
     trace = {version: "0.3"};
+
+    //VS: for the consent
+    trace.disable = function(value) {
+    	disabled = (value != false);
+    }
 
     trace.url = function(url) {
 	if (!arguments.length) return url;
@@ -26,18 +33,29 @@
 	return trace;
     };
 
-	var uuid = function() 
-	{
-	var uuid = "", i, random;
-	for (i = 0; i < 32; i++) {
-	    random = Math.random() * 16 | 0;
-
-	    if (i == 8 || i == 12 || i == 16 || i == 20) {
-		uuid += "-";
-	    }
-	    uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
+    //VS: to get user's current page
+    function getName(s) {
+    	return s.replace(/^.*[\\\/]/, '');
 	}
-	return uuid;
+
+	function getPageName() {
+		if (pagename == null) {
+			pagename = getName(document.location.pathname);
+		}
+		return pagename;
+	}
+
+    var uuid = function() {
+		var uuid = "", i, random;
+		for (i = 0; i < 32; i++) {
+			random = Math.random() * 16 | 0;
+
+			if (i == 8 || i == 12 || i == 16 || i == 20) {
+			uuid += "-";
+			}
+			uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
+		}
+		return uuid;
 	};
 
     var sendLogs_ = function(list) {
@@ -107,6 +125,7 @@
     }
 
     function traceEvent(cat, action, label, value) {
+    if (disabled) return;
 	if (starting) {
 	    starting = false;
 	    _sending = [];
@@ -121,6 +140,9 @@
 	    window.console && console.log("Track["+cat+","+action+","+label+"]");
 	}
 	var ts = Date.now();
+	if (cat == null) {
+		cat = getPageName();
+	}
 	_traceq.push({"session": sessionId,
 		      "ts": ts,
 		      "cat": cat,
@@ -150,5 +172,44 @@
     trace.event = traceEvent;
     trace.eventDeferred = traceEventDeferred;
     trace.eventClear = traceEventClear;
-    sessionId = uuid();
+    sessionId = readCookie("uuid");
+    if(sessionId == null)
+    {
+    	sessionId = uuid();
+    	createCookie("uuid", sessionId, 1)
+    }
 })();
+
+// COOKIE STUFF
+function createCookie(name,value,days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name,"",-1);
+}
+
+
+trace.debug(true);
+
+
+//function trace_help(s) {
+//	trace.event(null, "Help", s, )
+//}

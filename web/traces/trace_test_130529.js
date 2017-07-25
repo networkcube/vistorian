@@ -24,9 +24,3 @@ function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 
-trace.debug(true);
-
-
-function trace_help() {
-	trace.event("help", "ts_matrixVisManual", "CCC", "DDD")
-}

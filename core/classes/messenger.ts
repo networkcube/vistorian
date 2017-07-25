@@ -3,6 +3,7 @@
 /// <reference path="./search.ts" />
 /// <reference path="../scripts/jquery.d.ts" />
 
+
 module networkcube {
 
     export var MESSAGE_HIGHLIGHT = 'highlight';
@@ -375,6 +376,9 @@ module networkcube {
     localStorage[MESSAGE_KEY] = undefined;
 
     export function distributeMessage(message: Message, ownView?: boolean) {
+     
+        //VS: Link Function Use
+        trace.event(null, 'LinkFunctionUse', message.type, );
 
         if (ownView == undefined || ownView)
             processMessage(message);

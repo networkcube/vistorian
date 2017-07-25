@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff">
     <title>Networkcube</title>
-	<!-- VS: Call to trace.js -->
+   	<!-- VS: Call to trace.js -->
 	<script type="text/javascript" src="traces/trace.js"></script>
 	
     <link rel="stylesheet" type="text/css" href="styles.css">
@@ -19,10 +19,7 @@
         <script src="lib/jstorage.js"></script>
         <script src="classes/storage.js"></script>
         <script src="classes/utils.js"></script>
-		<!-- VS: Call to trace_test_130529 -->
-		<script type="text/javascript" src="traces/trace_test_130529.js"></script>
-		
-        <script src="classes/vistorian.js"></script>
+		<script src="classes/vistorian.js"></script>
 
 
            <div id="main">
@@ -58,7 +55,7 @@
                     </li>
                     <li>
 						<!-- VS: Clicks on Your Session -->
-                        <a id="resumeSessionLink2" target="_blank" onclick="trace.event('system', 'ts_YourSession', 'CCC', 'DDD')"> 
+                        <a id="resumeSessionLink2" target="_blank" onclick="trace.event(null, 'WorkSessionStart', 'YourSession', )"> 
 						<!-- VS: Old code -->
 						<!-- <a id="resumeSessionLink2" target="_blank"> -->
 						<img src="logos/network.png" class="menuicon" />Your Session</a>
@@ -69,7 +66,7 @@
                     <br/>
                     <li>
 						<!-- VS: Clicks on Manual -->
-                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank" onclick="trace.event('help', 'ts_VisManual', 'CCC', 'DDD')">
+                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank" onclick="trace.event(null, 'Help', 'OpenManual', )">
 						<img src="logos/configuration12.png" class="menuicon" target="_blank"/>Manual</a>
                     </li>
                     <li>
