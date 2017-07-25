@@ -23,7 +23,7 @@ var MatrixMenu = (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-        $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace_help()">Manual</a>');
+        $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace.event(null, \'Help\', \'MatrixManual\')">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
         $('#labelOrdering').append('<option value="none">---</option>');
         $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');

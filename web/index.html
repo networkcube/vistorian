@@ -55,7 +55,7 @@
                     </li>
                     <li>
 						<!-- VS: Clicks on Your Session -->
-                        <a id="resumeSessionLink2" target="_blank" onclick="trace.event(null, 'WorkSessionStart', 'YourSession', )"> 
+                        <a id="resumeSessionLink2" target="_blank" onclick="trace.event(null, 'WorkSessionStart', 'YourSession')"> 
 						<!-- VS: Old code -->
 						<!-- <a id="resumeSessionLink2" target="_blank"> -->
 						<img src="logos/network.png" class="menuicon" />Your Session</a>
@@ -66,7 +66,7 @@
                     <br/>
                     <li>
 						<!-- VS: Clicks on Manual -->
-                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank" onclick="trace.event(null, 'Help', 'OpenManual', )">
+                        <a href="http://github.com/networkcube/networkcube/wiki/Visualization-Manual" target="_blank" onclick="trace.event(null, 'Help', 'OpenManual')">
 						<img src="logos/configuration12.png" class="menuicon" target="_blank"/>Manual</a>
                     </li>
                     <li>
@@ -287,7 +287,7 @@
                 function (data)
                 {   
                     vistorian.importData(JSON.parse(data), 0);            
-                    vistorian.importIntoNetworkcube(JSON.parse(data), 0) 
+                    vistorian.importIntoNetworkcube(JSON.parse(data), 0)
                 });
 
         </script>
