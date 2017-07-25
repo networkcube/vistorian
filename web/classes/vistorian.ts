@@ -1,5 +1,5 @@
 /// <reference path="./storage.ts"/>
-/// <reference path="../../networkcube/core/networkcube.d.ts"/>
+/// <reference path="../../core/networkcube.d.ts"/>
 
 /*
 Convenient class that provides an API to the vistorian "framework"

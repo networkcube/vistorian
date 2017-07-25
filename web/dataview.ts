@@ -1,5 +1,5 @@
 /// <reference path="./classes/storage.ts"/>
-/// <reference path="../networkcube/core/networkcube.d.ts"/>
+/// <reference path="../core/networkcube.d.ts"/>
 /// <reference path="./classes/vistorian.ts" />
 
 var DATA_TABLE_MAX_LENGTH = 200;
@@ -106,7 +106,7 @@ function loadNetworkList() {
 
 // creates a new visualization of the passed type
 function loadVisualization(visType) {
-    trace.event(null, "ToolLaunch", "Launch" + visType, );
+    trace.event(null, "ToolLaunch", "Launch" + visType);
     window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
 }
 
