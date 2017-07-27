@@ -12845,6 +12845,7 @@ var networkcube;
     function highlight(action, elementCompound) {
         var g = networkcube.getDynamicGraph();
         var idCompound = networkcube.makeIdCompound(elementCompound);
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_HIGHLIGHT, elementCompound);
         if (!elementCompound == undefined)
             action = 'reset';
         var m;
@@ -12873,6 +12874,7 @@ var networkcube;
         if (!selectionId)
             selectionId = g.currentSelection_id;
         var selection = g.getSelection(selectionId);
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION, compound);
         var idCompound = networkcube.makeIdCompound(compound);
         var m = new SelectionMessage(action, idCompound, selectionId);
         distributeMessage(m);
@@ -12893,6 +12895,7 @@ var networkcube;
         var m = new TimeRangeMessage(startUnix, endUnix);
         if (propagate == undefined)
             propagate = false;
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_TIME_RANGE);
         if (propagate)
             distributeMessage(m);
         else
@@ -12910,6 +12913,7 @@ var networkcube;
     })(Message);
     networkcube.TimeRangeMessage = TimeRangeMessage;
     function createSelection(type, name) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_CREATE);
         var g = networkcube.getDynamicGraph();
         var b = g.createSelection(type);
         b.name = name;
@@ -12928,6 +12932,7 @@ var networkcube;
     })(Message);
     networkcube.CreateSelectionMessage = CreateSelectionMessage;
     function setCurrentSelection(b) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_SET_CURRENT);
         var g = networkcube.getDynamicGraph();
         var m = new SetCurrentSelectionIdMessage(b);
         distributeMessage(m);
@@ -12943,6 +12948,7 @@ var networkcube;
     })(Message);
     networkcube.SetCurrentSelectionIdMessage = SetCurrentSelectionIdMessage;
     function showSelectionColor(selection, showColor) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_SET_COLORING_VISIBILITY);
         var m = new ShowSelectionColorMessage(selection, showColor);
         distributeMessage(m);
     }
@@ -12958,6 +12964,7 @@ var networkcube;
     })(Message);
     networkcube.ShowSelectionColorMessage = ShowSelectionColorMessage;
     function filterSelection(selection, filter) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_FILTER);
         var m = new FilterSelectionMessage(selection, filter);
         distributeMessage(m);
     }
@@ -12973,6 +12980,7 @@ var networkcube;
     })(Message);
     networkcube.FilterSelectionMessage = FilterSelectionMessage;
     function swapPriority(s1, s2) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_PRIORITY);
         var m = new SelectionPriorityMessage(s1, s2, s2.priority, s1.priority);
         distributeMessage(m);
     }
@@ -12990,6 +12998,7 @@ var networkcube;
     })(Message);
     networkcube.SelectionPriorityMessage = SelectionPriorityMessage;
     function deleteSelection(selection) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_DELETE);
         var m = new DeleteSelectionMessage(selection);
         distributeMessage(m);
     }
@@ -13004,6 +13013,7 @@ var networkcube;
     })(Message);
     networkcube.DeleteSelectionMessage = DeleteSelectionMessage;
     function setSelectionColor(s, color) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_COLORING);
         distributeMessage(new SelectionColorMessage(s, color));
     }
     networkcube.setSelectionColor = setSelectionColor;
@@ -13017,6 +13027,7 @@ var networkcube;
         return SelectionColorMessage;
     })(Message);
     function search(term, type) {
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SEARCH_RESULT, term);
         var idCompound = networkcube.searchForTerm(term, networkcube.getDynamicGraph(), type);
         distributeMessage(new SearchResultMessage(term, idCompound));
     }
@@ -13034,7 +13045,6 @@ var networkcube;
     var MESSAGE_KEY = 'networkcube_message';
     localStorage[MESSAGE_KEY] = undefined;
     function distributeMessage(message, ownView) {
-        trace.event(null, 'LinkFunctionUse', message.type);
         if (ownView == undefined || ownView)
             processMessage(message);
         if (MESSENGER_PROPAGATE) {
@@ -14609,7 +14619,8 @@ var geometry;
         }
         var ts = Date.now();
         if (cat == null) {
-            cat = getPageName();
+            cat = getPageName() + "/" + networkcube.getDynamicGraph().name;
+            console.log(">> CAT: " + cat);
         }
         _traceq.push({ "session": sessionId,
             "ts": ts,

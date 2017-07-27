@@ -211,4 +211,6 @@ function saveSearchResultAsSelection(type:string){
 function clearSearchSelection(){
 	networkcube.highlight('reset');
 	$('#searchResults').empty();
+	$('#searchField').val("Search...");
+
 }

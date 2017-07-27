@@ -162,7 +162,9 @@
 		var ts = Date.now();
 		if (cat == null) 
 		{
-			cat = getPageName();
+			cat = getPageName() + "/" + networkcube.getDynamicGraph().name;
+			console.log(">> CAT: " + cat);
+			//cat = getPageName();
 		}
 		
 		_traceq.push({"session": sessionId,
