@@ -97,6 +97,13 @@ module networkcube {
     /// SPECIFIC MESSAGES ///
     /////////////////////////
 
+    function isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
+    }
 
 
     // HIGHLIGHT
@@ -105,7 +112,14 @@ module networkcube {
         var g: DynamicGraph = networkcube.getDynamicGraph();
         var idCompound: IDCompound = makeIdCompound(elementCompound);
 
-        trace.event(null, 'toolFunctionUse', MESSAGE_HIGHLIGHT, elementCompound);
+
+        var highlightAnyElement = false;
+        if(elementCompound != null && !isEmpty(elementCompound)){
+            highlightAnyElement = true;
+        }
+        console.log('>>>>' + highlightAnyElement);
+
+        trace.event(null, 'toolFunctionUse', MESSAGE_HIGHLIGHT, highlightAnyElement );
 
         if (!elementCompound == undefined)
             action = 'reset';

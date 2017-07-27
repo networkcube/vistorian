@@ -208,9 +208,11 @@ function saveSearchResultAsSelection(type:string){
 }
 
 // clear search field and highlighted nodes
-function clearSearchSelection(){
+function clearSearchSelection()
+{
 	networkcube.highlight('reset');
 	$('#searchResults').empty();
 	$('#searchField').val("Search...");
 
+	trace.event(null, 'toolFunctionUse', 'CLEAR_SEARCH');
 }

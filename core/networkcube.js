@@ -12842,10 +12842,22 @@ var networkcube;
         distributeMessage(m, true);
     }
     networkcube.sendMessage = sendMessage;
+    function isEmpty(obj) {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
+    }
     function highlight(action, elementCompound) {
         var g = networkcube.getDynamicGraph();
         var idCompound = networkcube.makeIdCompound(elementCompound);
-        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_HIGHLIGHT, elementCompound);
+        var highlightAnyElement = false;
+        if (elementCompound != null && !isEmpty(elementCompound)) {
+            highlightAnyElement = true;
+        }
+        console.log('>>>>' + highlightAnyElement);
+        trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_HIGHLIGHT, highlightAnyElement);
         if (!elementCompound == undefined)
             action = 'reset';
         var m;
