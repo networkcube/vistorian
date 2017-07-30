@@ -79,6 +79,7 @@ module storage{
 
     export function getTableNames(sessionid:string):string[]{
         var names:string[] = $.jStorage.get<string[]>(sessionid + SEP + SESSION_TABLENAMES);
+        console.log('>>>names',names, sessionid + SEP + SESSION_TABLENAMES )
         if(names == undefined)
             names = []
         return names;
@@ -156,9 +157,16 @@ module storage{
     }
 
     export function deleteNetwork(network:vistorian.Network, sessionid:string){
+        console.log('deleteNetworkById', network.id, sessionid);
+        networkcube.deleteData(network.name);
         deleteNetworkById(network.id, sessionid);
+
     }
     export function deleteNetworkById(id:number, sessionid:string){
+        console.log('deleteNetworkById', id, sessionid);
+
+        // remove network tables from local storage: 
+
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + id, {});
         $.jStorage.deleteKey(sessionid + SEP + SESSION_NETWORK + SEP + id);
 

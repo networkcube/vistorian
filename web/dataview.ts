@@ -6,6 +6,8 @@ var DATA_TABLE_MAX_LENGTH = 200;
 
 
 document.getElementById('files').addEventListener('change', getFileInfos, false);
+document.getElementById('nodeTableUpload').addEventListener('change', uploadNodeTable, false);
+document.getElementById('linkTableUpload').addEventListener('change', uploadLinkTable, false);
 
 var SESSION_NAME = utils.getUrlVars()['session'];
 storage.saveSessionId(SESSION_NAME); // save id for later retrieve
@@ -20,7 +22,7 @@ var currentNetwork: vistorian.Network;
 var visualizations = [
     ['Node Link', 'nodelink'],
     ['Adjacency Matrix', 'matrix'],
-    ['Dynamic Ego Network', 'dynamicego'],
+    ['Time Arcs', 'dynamicego'],
     ['Map', 'map'],
 ]
 
@@ -51,16 +53,20 @@ function loadVisualizationList() {
         $('#visualizationList')
             .append('<li class="visLink" title="Show '+v[0]+' visualization.">\
                         <button onclick="loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
-                            <img src="logos/vis-' + v[1] + '.png" class="menuicon" />' 
-                            + v[0] + '\
+                            <img src="figures/' + v[1] + '.png" class="menuicon"/>\
+                            <p>' + v[0] + '</p>\
                         </button>\
                     </li>')
     })
     $('#visualizationList')
-        .append('<li class="visLink" title="Show matrix and node-link split-view."><button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip"><img src="logos/mat-nl.png" class="menuicon"/>Matrix + Node Link\
+        .append('<li class="visLink" title="Show matrix and node-link split-view.">\
+            <button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
+            <img src="logos/mat-nl.png" class="menuicon"/><p>Matrix + Node Link</p>\
         </button></li>')
     $('#visualizationList')
-        .append('<li class="visLink" title="Show all visualizations."><button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip"><img src="logos/tiled.png" class="menuicon"/>All\
+        .append('<li class="visLink" title="Show all visualizations.">\
+        <button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip">\
+        <img src="logos/tiled.png" class="menuicon"/><p>All</p>\
         </button></li>')
 }
 
@@ -71,7 +77,6 @@ function loadTableList()
 {
     $('#tableList').empty()
     var tableNames = storage.getTableNames(SESSION_NAME)
-    console.log('tableNames', tableNames, SESSION_NAME)
     tableNames.forEach(t => {
         var shownName = t;
         if(t.length > 30)
@@ -122,11 +127,14 @@ function createNetwork() {
     var id = new Date().getTime();
 
     currentNetwork = new vistorian.Network(id);
-    currentNetwork.name = 'New Network ' + currentNetwork.id;
+    currentNetwork.name = 'Network-' + currentNetwork.id;
     storage.saveNetwork(currentNetwork,SESSION_NAME);
 
-    $('#chooseNetworktype').css('display', 'block')
-    $('#networkTables').css('display', 'none')
+    // $('#chooseNetworktype').css('display', 'block')
+    // $('#networkTables').css('display', 'block')
+    showNetwork(currentNetwork.id);
+
+    loadNetworkList();
 }
 
 
@@ -136,7 +144,7 @@ function setNodeTable(list)
     if (tableName != '---') {
         var table: vistorian.VTable = storage.getUserTable(tableName,SESSION_NAME);
         currentNetwork.userNodeTable = table;
-        console.log('currentNetwork.userNodeTable', currentNetwork.userNodeTable)
+        // console.log('currentNetwork.userNodeTable', currentNetwork.userNodeTable)
         showTable(table, '#nodeTableDiv', false, currentNetwork.userNodeSchema)
     } else {
         unshowTable('#nodeTableDiv');
@@ -173,7 +181,7 @@ function setLocationTable(list) {
 // saves/updates and normalizes current network.
 function saveCurrentNetwork(failSilently: boolean) {
 
-    console.log('Save current network')
+    // console.log('Save current network')
 
     var networkcubeDataSet: networkcube.DataSet;
 
@@ -206,6 +214,8 @@ function saveCurrentNetwork(failSilently: boolean) {
     // check dates if apply
     checkTimeFormatting(currentNetwork);
 
+    storage.saveNetwork(currentNetwork, SESSION_NAME);
+
     if (!currentNetwork.userNodeTable && !currentNetwork.userLinkTable) 
     {
         if (!failSilently)
@@ -214,371 +224,6 @@ function saveCurrentNetwork(failSilently: boolean) {
     }
 
     vistorian.importIntoNetworkcube(currentNetwork, SESSION_NAME, failSilently)
-
-    // // trim cell entries (remove overhead white space)
-    // if (currentNetwork.userNodeTable)
-    //     vistorian.cleanTable(currentNetwork.userNodeTable.data);
-    // if (currentNetwork.userLinkTable)
-    //     vistorian.cleanTable(currentNetwork.userLinkTable.data);
-
-
-    // // get references to normalized tables
-    // // var normalizedNodeTable: any[] = currentNetwork.networkCubeDataSet.nodeTable;
-    // // var normalizedLinkTable: any[] = currentNetwork.networkCubeDataSet.linkTable;
-    // // var normalizedLocationTable: any[] = currentNetwork.networkCubeDataSet.locationTable;
-    // var normalizedNodeTable: any[] = [];
-    // var normalizedLinkTable: any[] = [];
-    // var normalizedLocationTable: any[] = [];
-
-    // var networkcubeNodeSchema: networkcube.NodeSchema = currentNetwork.networkCubeDataSet.nodeSchema;
-    // var networkcubeLinkSchema: networkcube.LinkSchema = currentNetwork.networkCubeDataSet.linkSchema;
-    // var networkcubeLocationSchema: networkcube.LocationSchema = currentNetwork.networkCubeDataSet.locationSchema;
-
-    // // if(normalizedLocationTable)       
-    // // displayLocationTable();
-
-    // var locationLabels: string[] = [];
-    // if (currentNetwork.userLocationTable != undefined) {
-    //     for (var i = 1; i < currentNetwork.userLocationTable.data.length; i++) {
-    //         locationLabels.push(currentNetwork.userLocationTable.data[i][currentNetwork.userLocationSchema.label]);
-    //     }
-    // }
-    // console.log('locationLabels', locationLabels);
-
-
-    // // CONVERT SINGLE-LINK TABLE 
-
-    // var nodeIds: number[] = [];
-    // var names: string[] = [];
-    // var nodeLocations: number[][] = [];
-    // var nodeTimes: number[][] = [];
-    
-    // if (currentNetwork.userNodeTable == undefined) 
-    // {
-    //     console.log('no node table found, create node table')
-    //     var linkData = currentNetwork.userLinkTable.data;
-    //     var id_source: number;
-    //     var id_target: number;
-    //     var name: string;
-    //     var loc: string;
-    //     var linkSchema: vistorian.VLinkSchema = currentNetwork.userLinkSchema;
-    //     var timeString: string;
-    //     var timeFormatted: string;
-
-    //     // Create node table
-    //     for (var i = 1; i < linkData.length; i++) {
-
-    //         // source
-    //         name = linkData[i][linkSchema.source];
-    //         if (names.indexOf(name) < 0) {
-    //             id_source = nodeIds.length
-    //             names.push(name);
-    //             nodeIds.push(id_source);
-    //             nodeLocations.push([]);
-    //             nodeTimes.push([]);
-    //         }
-
-    //         // target
-    //         name = linkData[i][linkSchema.target];
-    //         if (names.indexOf(name) < 0) {
-    //             id_target = nodeIds.length;
-    //             names.push(name);
-    //             nodeIds.push(id_target);
-    //             nodeLocations.push([]);
-    //             nodeTimes.push([]);
-    //         }
-    //     }
-
-    //     // create new link table and replace source label by source id
-    //     normalizedLinkTable = [];
-    //     var linkTime: string;
-    //     var found: boolean = true;
-    //     for (var i = 0; i < linkData.length; i++) {
-    //         normalizedLinkTable.push([])
-    //         for (var j = 0; j < linkData[i].length; j++) {
-    //             normalizedLinkTable[i].push(linkData[i][j])
-    //         }
-
-    //         // replace node names by node IDs, i.e. references to node table.
-    //         if (networkcube.isValidIndex(linkSchema.source)) {
-    //             normalizedLinkTable[i][linkSchema.source] = nodeIds[names.indexOf(linkData[i][linkSchema.source])]
-    //         }
-    //         if (networkcube.isValidIndex(linkSchema.target)) {
-    //             normalizedLinkTable[i][linkSchema.target] = nodeIds[names.indexOf(linkData[i][linkSchema.target])]
-    //         }
-
-    //         id_source = names.indexOf(linkData[i][linkSchema.source]);
-    //         id_target = names.indexOf(linkData[i][linkSchema.target]);
-
-    //         if (id_source == -1 || id_target == -1)
-    //             continue;
-
-    //         // if source and target locations are available, set to indices.
-    //         //source location
-    //         if (linkSchema.location_source > -1) {
-    //             loc = linkData[i][linkSchema.location_source].trim();
-    //             id = locationLabels.indexOf(loc);
-    //             if (id == -1)
-    //                 continue;
-
-    //             // console.log('source_location id: ', loc, id_source, id)                    
-    //             // check if entry already exists for this node and this time, if not, add this location to the nodes locations.
-    //             found = false;
-    //             for (var t = 0; t < nodeTimes[id_source].length; t++) {
-    //                 if (nodeTimes[id_source][t] == linkData[i][linkSchema.time]) {
-    //                     found = true;
-    //                     break;
-    //                 }
-    //             }
-    //             if (!found) {
-    //                 nodeTimes[id_source].push(linkData[i][linkSchema.time])
-    //                 nodeLocations[id_source].push(id)
-    //             }
-    //             normalizedLinkTable[i][linkSchema.location_source] = id;
-    //         }
-    //         //target location
-    //         if (linkSchema.location_target > -1) {
-
-    //             loc = linkData[i][linkSchema.location_target].trim();
-    //             id = locationLabels.indexOf(loc);
-    //             if (id == -1)
-    //                 continue;
-
-    //             console.log('source_location id: ', loc, id_target, id)
-    //             // check if entry already exists for this time, if yes, discard this one.           
-    //             found = false;
-    //             for (var t = 0; t < nodeTimes[id_target].length; t++) {
-    //                 if (nodeTimes[id_target][t] == linkData[i][linkSchema.time]) {
-    //                     found = true;
-    //                     break;
-    //                 }
-    //             }
-    //             if (!found) {
-    //                 nodeTimes[id_target].push(linkData[i][linkSchema.time])
-    //                 nodeLocations[id_target].push(id)
-    //             }
-    //             normalizedLinkTable[i][linkSchema.location_target] = id;
-    //         }
-
-    //     }
-    //     // remove header information from user table
-    //     normalizedLinkTable.shift();
-
-    //     // create normalizedNodeTable
-    //     var time: string;
-    //     normalizedNodeTable = [];
-    //     networkcubeNodeSchema.label = 1;
-
-    //     var locationsFound: boolean = false;
-    //     var timeFound: boolean = false;
-    //     if (nodeLocations.length > 0) {
-    //         networkcubeNodeSchema.location = 4;
-    //     }
-    //     if (nodeTimes.length > 0) {
-    //         networkcubeNodeSchema.location = 3;
-    //     }
-
-
-    //     for (var i = 0; i < nodeIds.length; i++) {
-    //         // duplicate node entry if there is temporal information (currently e.g.: location)
-    //         // console.log('nodeTimes[i]', nodeLocations[i].length)
-    //         if (nodeLocations[i].length > 0) {
-    //             locationsFound = true;
-    //             for (var j = 0; j < nodeLocations[i].length; j++) {
-    //                 time = undefined;
-    //                 if (nodeTimes[i][j]) {
-    //                     time = nodeTimes[i][j].toString();
-    //                 }
-    //                 normalizedNodeTable.push([nodeIds[i], names[i], nodeTimes[i][j], nodeLocations[i][j]]);
-    //             }
-    //         } else {
-    //             // no locations specified
-    //             if (networkcube.isValidIndex(currentNetwork.userNodeSchema.time)) {
-    //                 // time specified in schema
-    //                 normalizedNodeTable.push([nodeIds[i], names[i], undefined, undefined]);
-    //             } else {
-    //                 // no time specified in schema
-    //                 normalizedNodeTable.push([nodeIds[i], names[i], undefined]);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // if (currentNetwork.userNodeTable) 
-    // {
-    //     networkcubeNodeSchema = new networkcube.NodeSchema(0);
-    //     networkcubeNodeSchema.id = currentNetwork.userNodeSchema.id;
-    //     networkcubeNodeSchema.label = currentNetwork.userNodeSchema.label;
-    //     if (networkcube.isValidIndex(currentNetwork.userNodeSchema.time)) {
-    //         networkcubeNodeSchema.time = currentNetwork.userNodeSchema.time;
-    //     }
-    //     if (networkcube.isValidIndex(currentNetwork.userNodeSchema.location)) {
-    //         networkcubeNodeSchema.location = currentNetwork.userNodeSchema.location;
-    //     }
-    //     if (networkcube.isValidIndex(currentNetwork.userNodeSchema.nodeType)) {
-    //         networkcubeNodeSchema.nodeType = currentNetwork.userNodeSchema.nodeType;
-    //     }
-    // } 
-    // else 
-    // {
-    //     networkcubeNodeSchema = new networkcube.NodeSchema(0);
-    //     networkcubeNodeSchema.id = 0;
-    //     networkcubeNodeSchema.label = 1;
-    //     if (networkcube.isValidIndex(currentNetwork.userLinkSchema.time)) {
-    //         networkcubeNodeSchema.time = 2;
-    //     }
-    //     if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_source) || networkcube.isValidIndex(currentNetwork.userLinkSchema.location_target)) {
-    //         networkcubeNodeSchema.location = 3;
-    //     }
-
-    // }
-
-    // // CHECK FOR SINGLE NODE-TABLE
-
-    // if (currentNetwork.userLinkTable == undefined) 
-    // {
-    //     console.log('Create and fill link table')
-    //     // create link table and fill
-    //     var nodeData = currentNetwork.userNodeTable.data;
-    //     console.log('nodeData', nodeData)
-    //     var nodeSchema: vistorian.VNodeSchema = currentNetwork.userNodeSchema;
-    //     var id: number;
-    //     var relCol: number;
-    //     var newRow: any[];
-    //     var nodeId: number;
-    //     var newNodeId: number = nodeData.length + 1;
-
-    //     // networkcubeLinkSchema = new networkcube.LinkSchema(0, 1, 2)
-    //     networkcubeLinkSchema.linkType = 3;
-    //     if (networkcube.isValidIndex(nodeSchema.time))
-    //         networkcubeLinkSchema.time = 4;
-
-
-    //     // copy existing nodes into normalizedTable
-    //     for (var i = 1; i < nodeData.length; i++) {
-    //         newRow = [];
-    //         id = parseInt(nodeData[i][nodeSchema.id]);
-    //         while (normalizedNodeTable.length < (id + 1)) {
-    //             // insert empty rows if index is too small
-    //             normalizedNodeTable.push([]);
-    //         }
-    //         newRow.push(id);
-    //         newRow.push(nodeData[i][nodeSchema.label]);
-    //         normalizedNodeTable[id] = newRow;
-    //     }
-    //     networkcubeNodeSchema.label = 1;
-
-
-
-    //     console.log('Create new links: ' + (nodeData.length * nodeSchema.relation.length), nodeData, nodeSchema.relation)
-    //     for (var i = 1; i < nodeData.length; i++) {
-
-    //         // create relations in link table
-    //         for (var j = 0; j < nodeSchema.relation.length; j++) {
-    //             relCol = nodeSchema.relation[j];
-
-    //             // dont create relation if field entry is empty;
-    //             if (nodeData[i][relCol].length == 0)
-    //                 continue;
-
-    //             // check if node already exist
-    //             nodeId = -1;
-    //             for (var k = 0; k < normalizedNodeTable.length; k++) {
-    //                 // console.log('check node existance: ', normalizedNodeTable[k][1], nodeData[i][relCol])
-    //                 if (normalizedNodeTable[k][1] == nodeData[i][relCol]) {
-    //                     nodeId = k;
-    //                     break;
-    //                 }
-    //             }
-    //             if (nodeId < 0) {
-    //                 // create new node in node table
-    //                 nodeId = normalizedNodeTable.length;
-    //                 newRow = [];
-    //                 newRow.push(nodeId);
-    //                 newRow.push(nodeData[i][relCol]);
-    //                 newRow.push(undefined); // time
-    //                 newRow.push(undefined); // location
-    //                 normalizedNodeTable.push(newRow)
-    //                 // console.log('create node', nodeId,  nodeData[i][relCol]);
-    //             }
-
-    //             // create entry in link table
-    //             newRow = []
-    //             // edge id
-    //             newRow.push(normalizedLinkTable.length);
-    //             // source id
-    //             newRow.push(parseInt(nodeData[i][nodeSchema.id]));
-    //             // target id
-    //             newRow.push(nodeId);
-    //             // relation type
-    //             newRow.push(nodeData[0][relCol]);
-    //             // time
-    //             if (nodeSchema.time > -1)
-    //                 newRow.push(nodeData[i][nodeSchema.time]);
-
-    //             normalizedLinkTable.push(newRow);
-    //             // console.log('create edge row', newRow);
-
-    //         }
-    //     }
-    //     console.log('normalizedLinkTable', normalizedLinkTable)
-    // }
-
-
-
-    // // set networkcube link schema
-    // if (currentNetwork.userLinkTable) {
-    //     for (var field in currentNetwork.userLinkSchema) {
-    //         if (field == 'name') continue;
-    //         networkcubeLinkSchema[field] = currentNetwork.userLinkSchema[field];
-    //     }
-    // }
-
-    // // format times into ISO standart time
-    // if (currentNetwork.hasOwnProperty('timeFormat') && currentNetwork.timeFormat != undefined && currentNetwork.timeFormat.length > 0) {
-    //     var format = currentNetwork.timeFormat;
-    //     if (networkcubeLinkSchema.time != undefined && networkcubeLinkSchema.time > -1) {
-    //         for (var i = 0; i < normalizedLinkTable.length; i++) {
-    //             time = moment(normalizedLinkTable[i][networkcubeLinkSchema.time], format).format(networkcube.timeFormat())
-    //             if (time.indexOf('Invalid') > -1)
-    //                 time = undefined;
-    //             normalizedLinkTable[i][networkcubeLinkSchema.time] = time;
-    //         }
-    //     }
-
-    //     if (networkcubeNodeSchema.time != undefined && networkcubeNodeSchema.time > -1) {
-    //         for (var i = 0; i < normalizedNodeTable.length; i++) {
-    //             time = moment(normalizedNodeTable[i][networkcubeNodeSchema.time], format).format(networkcube.timeFormat());
-    //             if (time.indexOf('Invalid') > -1)
-    //                 time = undefined;
-    //             normalizedNodeTable[i][networkcubeNodeSchema.time] = time
-    //         }
-    //     }
-    // }
-
-    // // sync location tables
-    // if (currentNetwork.userLocationTable) {
-    //     currentNetwork.networkCubeDataSet.locationTable = currentNetwork.userLocationTable.data.slice(0);
-    //     currentNetwork.networkCubeDataSet.locationTable.shift();
-    //     currentNetwork.networkCubeDataSet.locationSchema = currentNetwork.userLocationSchema;
-    // }
-
-    // // to be save    
-    // currentNetwork.networkCubeDataSet.nodeTable = normalizedNodeTable;
-    // currentNetwork.networkCubeDataSet.linkTable = normalizedLinkTable;
-    // currentNetwork.networkCubeDataSet.linkSchema = networkcubeLinkSchema;
-    // currentNetwork.networkCubeDataSet.nodeSchema = networkcubeNodeSchema;
-
-    // console.log('locationTable', currentNetwork.networkCubeDataSet.locationTable)
-
-    // // console.log('[vistorian] network created', networkcubeDataSet);
-
-    // storage.saveNetwork(currentNetwork,SESSION_NAME);
-
-    // networkcube.setDataManagerOptions({ keepOnlyOneSession: true });
-    // console.log('>> START IMPORT');
-    // networkcube.importData(SESSION_NAME, currentNetwork.networkCubeDataSet);
-    // console.log('>> IMPORTED: ', currentNetwork.networkCubeDataSet);
 
     loadNetworkList();
 }
@@ -648,8 +293,14 @@ function saveCurrentNetwork(failSilently: boolean) {
 // }
 
 
-function deleteCurrentNetwork() {
+function deleteCurrentNetwork() 
+{
+    // removes the network from the vistorian front-ed
     storage.deleteNetwork(currentNetwork,SESSION_NAME);
+
+    // deletes the network from the networkcube
+    networkcube.deleteData(currentNetwork.name);
+
     unshowNetwork();
     loadNetworkList();
 }
@@ -658,8 +309,8 @@ function deleteCurrentNetwork() {
 function showNetwork(networkId: number) {
 
     unshowNetwork();
-    $('#noNetworkTables').css('display', 'none');
-    console.log('networkId', networkId)
+    // $('#noNetworkTables').css('display', 'none');
+    // console.log('networkId', networkId)
     currentNetwork = storage.getNetwork(networkId,SESSION_NAME);
 
     if (currentNetwork == null)
@@ -675,7 +326,6 @@ function showNetwork(networkId: number) {
     // get all tables for this user so that he can select those 
     // he wants to create his network from.
     var tables = storage.getUserTables(SESSION_NAME)
-    console.log('usertables', tables, tables.length)
 
     $('#nodetableSelect').append('<option class="tableSelection">---</option>')
     $('#linktableSelect').append('<option class="tableSelection">---</option>')
@@ -700,7 +350,7 @@ function showNetwork(networkId: number) {
 
 
     tables.forEach(t => {
-        console.log('attach: ', t.name)
+        // console.log('attach: ', t.name)
 
         $('#nodetableSelect')
             .append('<option value="' + t.name + '">' + t.name + '</option>')
@@ -736,7 +386,7 @@ function showNetwork(networkId: number) {
 
 // removes a displayed table from the DOM
 function unshowNetwork() {
-    $('#noNetworkTables').css('display', 'block');
+    // $('#noNetworkTables').css('display', 'block');
 
     $('#nodetableSelect').empty();
     $('#linktableSelect').empty();
@@ -770,7 +420,7 @@ function showSingleTable(tableName: string) {
     showTable(currentTable, '#individualTable', false);
     $('#individualTables').css('display', 'inline');
     $('#networkTables').css('display', 'none');
-    $('#noNetworkTables').css('display', 'none');
+    // $('#noNetworkTables').css('display', 'none');
 
 }
 
@@ -812,12 +462,12 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
     tableMenu.append(csvExportButton);
 
     // location extraction button
-    var extractLocationCoordinatesButton
-    if (isLocationTable) {
-        tableMenu.append($('<button class="tableMenuButton" onclick="updateLocations()">Update location coordinates</button>'))
-    }else{
-        tableMenu.append($('<button class="tableMenuButton" onclick="extractLocations()">Extract locations</button>'))
-    }
+    // var extractLocationCoordinatesButton
+    // if (isLocationTable) {
+    //     tableMenu.append($('<button class="tableMenuButton" onclick="updateLocations()">Update location coordinates</button>'))
+    // }else{
+    //     tableMenu.append($('<button class="tableMenuButton" onclick="extractLocations()">Extract locations</button>'))
+    // }
 
     
     // replace function
@@ -862,7 +512,6 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
             tr.append(td);
             td.html(data[r][c])
             td.blur(function() {
-                console.log('td.blur');
                 if ($(this).html().length == 0) {
                     $(this).addClass('emptyTableCell')
                 } else {
@@ -870,12 +519,12 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
                 }
             });
             td.focusin(function(e) {
-                console.log('td.focusin');
+                // console.log('td.focusin');
                 saveCellChanges();
                 currentCell = $(this);
             });
             td.focusout(function(e) {
-                console.log('td.focusout');
+                // console.log('td.focusout');
                 saveCellChanges();
             });
             if (typeof data[r][c] == 'string' && data[r][c].trim().length == 0)
@@ -902,7 +551,7 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
     // Add schema selection to table, if a schema is passed
     if (schema) {
 
-        console.log('Schema', schema);
+        // console.log('Schema', schema);
 
         // add schema header
         var schemaRow = $('<tr class="schemaRow"></tr>');
@@ -1128,7 +777,7 @@ function deleteCurrentTable() {
 // called when the user assigns a schema in an table
 function schemaSelectionChanged(field: string, columnNumber: number, schemaName: string, parent: HTMLElement) {
 
-    console.log('schemaSelectionChanged', field, columnNumber, schemaName)
+    // console.log('schemaSelectionChanged', field, columnNumber, schemaName)
 
     // reset schema:
     for (var field2 in currentNetwork[schemaName]) {
@@ -1137,7 +786,7 @@ function schemaSelectionChanged(field: string, columnNumber: number, schemaName:
             currentNetwork[schemaName][field2].slice(arr.indexOf(columnNumber), 0);
         } else {
             if (currentNetwork[schemaName][field2] == columnNumber) {
-                console.log('set ', field2, 'to -1');
+                // console.log('set ', field2, 'to -1');
                 currentNetwork[schemaName][field2] = -1;
             }
         }
@@ -1149,7 +798,7 @@ function schemaSelectionChanged(field: string, columnNumber: number, schemaName:
     } else if (field != '---') {
         currentNetwork[schemaName][field] = columnNumber;
     }
-    console.log("currentNetwork[schemaName]", currentNetwork[schemaName])
+    // console.log("currentNetwork[schemaName]", currentNetwork[schemaName])
 
     saveCurrentNetwork(false);
     showNetwork(currentNetwork.id)
@@ -1158,7 +807,7 @@ function schemaSelectionChanged(field: string, columnNumber: number, schemaName:
 
 function checkTimeFormatting(network: vistorian.Network) {
 
-    console.log('checkTimeFormatting');
+    // console.log('checkTimeFormatting');
 
     var corruptedNodeTimes: number[] = [];
     if (network.userNodeTable && network.userNodeTable && network.userNodeSchema && network.userNodeSchema['timeFormat']) {
@@ -1166,7 +815,7 @@ function checkTimeFormatting(network: vistorian.Network) {
             network.userNodeTable,
             network.userNodeSchema['time'],
             network.userNodeSchema['timeFormat']);
-        console.log('corruptedTimes', corruptedNodeTimes);
+        // console.log('corruptedTimes', corruptedNodeTimes);
     }
 
     var corruptedLinkTimes: number[] = [];
@@ -1175,7 +824,7 @@ function checkTimeFormatting(network: vistorian.Network) {
             network.userLinkTable,
             network.userLinkSchema['time'],
             network.userLinkSchema['timeFormat']);
-        console.log('corruptedTimes', corruptedLinkTimes);
+        // console.log('corruptedTimes', corruptedLinkTimes);
     }
 
     // return corruptedNodeTimes.length > 0 || corruptedLinkTimes.length > 0;
@@ -1196,8 +845,7 @@ function getFileInfos(e) {
     filesToUpload = [];
     
     var files: File[] = e.target.files; // FileList object
-    console.log('upload', files.length, 'files')
-
+    
     // files is a FileList of File objects. List some properties.
     var output = [];
     for (var i = 0, f; f = files[i]; i++) {
@@ -1206,24 +854,59 @@ function getFileInfos(e) {
             showMessage("Uploaded file is not a .csv file. Please chose another file.", 4000)
             return;
         } else {
-            // output.push('<li><strong>',
-            //     f.name, '</strong> (', f.type || 'n/a', ') - ',
-            //     f.size, ' bytes, last modified: ',
-            //     f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-            //     '</li>');
             filesToUpload.push(f);
         }
     }
 
-    uploadFiles()
+    uploadFiles(loadTableList);
+}
+function uploadNodeTable(e)
+{
+    filesToUpload = [e.target.files[0]];
+    uploadFiles(()=>{
+        var tables = storage.getUserTables(SESSION_NAME)
+        var lastTable = tables[tables.length-1];
+
+        $('#nodetableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+        $('#nodetableSelect').val(lastTable.name);
+
+        setNodeTable({value: lastTable.name})
+        showTable(currentNetwork.userNodeTable, '#nodeTableDiv', false, currentNetwork.userNodeSchema);
+        saveCurrentNetwork(false);
+
+        loadTableList();
+
+    });
+        
+}
+function uploadLinkTable(e)
+{
+    filesToUpload = [e.target.files[0]];
+    uploadFiles(()=>{
+        var tables = storage.getUserTables(SESSION_NAME)
+        var lastTable = tables[tables.length-1];
+
+        $('#linktableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+        $('#linktableSelect').val(lastTable.name);
+
+        setLinkTable({value: lastTable.name})
+        showTable(currentNetwork.userLinkTable, '#linkTableDiv', false, currentNetwork.userLinkSchema);
+        saveCurrentNetwork(false);
+
+        var element = document.getElementById('leaveCode');
+    
+        loadTableList();
+    });
 }
 
-function uploadFiles() {
-    console.log('uploadFiles', SESSION_NAME)
-    vistorian.loadCSV(filesToUpload, () => {
-        loadTableList();
-    }, SESSION_NAME);
+        
+}
 
+function uploadFiles(handler:Function)
+{
+    vistorian.loadCSV(filesToUpload, () => {
+        handler();
+    }, SESSION_NAME);
 }
 
 function exportCurrentTableCSV(tableName: string) {
@@ -1261,8 +944,8 @@ function exportCurrentTableCSV(tableName: string) {
 function replaceCellContents(tableId) {
     var replace_pattern = $('#div_'+tableId+' #replace_pattern').val();
     var replace_value = $('#div_'+tableId+' #replace_value').val();
-    console.log('replace_pattern', replace_pattern)
-    console.log('replace_value', replace_value)
+    // console.log('replace_pattern', replace_pattern)
+    // console.log('replace_value', replace_value)
     var arr: any[][];
     
     if(tableId.startsWith('datatable_'))
@@ -1276,7 +959,7 @@ function replaceCellContents(tableId) {
     } else {
         arr = table;
     }
-    console.log('table', table)
+    // console.log('table', table)
 
     var replaceCount = 0
     for (var i = 0; i < arr.length; i++) {
@@ -1307,19 +990,21 @@ function replaceCellContents(tableId) {
 /** Extracts locations from node and link tabe**/
 function extractLocations() {
 
+    console.log('>>>> Extracting locations') 
     showMessage('Extracting locations...', false);
 
-    if (currentNetwork.userLocationTable == undefined) {
+    if (currentNetwork.userLocationTable == undefined) 
+    {
         var tableName = currentNetwork.name.replace(/ /g, "_");
         currentNetwork.userLocationTable = new vistorian.VTable(tableName + '-locations', []);
         currentNetwork.userLocationSchema = new networkcube.LocationSchema(0, 1, 2, 3, 4);
         currentNetwork.userLocationTable.data.push(['Id', 'User Label', 'Geo Name', 'Longitude', 'Latitude']);
+
         // save table as a user's table 
         storage.saveUserTable(currentNetwork.userLocationTable, SESSION_NAME);
         tables = storage.getUserTables(SESSION_NAME);
     }
 
-    // console.log('currentNetwork.userLocationTable', currentNetwork.userLocationTable);
     var locationTable = currentNetwork.userLocationTable;
     var locationSchema = currentNetwork.userLocationSchema;
 
@@ -1349,6 +1034,7 @@ function extractLocations() {
             }
         }
     }
+
     if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_target)) {
         // check if location table exists
         if (linkTable != undefined) {
@@ -1363,7 +1049,6 @@ function extractLocations() {
 
     saveCurrentNetwork(false);
     showNetwork(currentNetwork.id);
-
 
     if (locationsFound > 0)
         showMessage(locationsFound + ' locations found.', 2000);
@@ -1396,7 +1081,7 @@ function updateLocations() {
 
     vistorian.updateLocationTable(currentNetwork.userLocationTable, currentNetwork.networkCubeDataSet.locationSchema,
         function(nothingImportant) {
-            console.log('currentNetwork.userLocationTable', currentNetwork.userLocationTable.data)
+            // console.log('currentNetwork.userLocationTable', currentNetwork.userLocationTable.data)
             saveCurrentNetwork(false);
             showNetwork(currentNetwork.id);
             showMessage('Locations updated successfully!', 2000);
@@ -1434,7 +1119,7 @@ function saveCellChanges() {
         data = currentCell.data('table').data,
         value;
 
-    console.log('saveCellChanges', selectedCell_row, selectedCell_col);
+    // console.log('saveCellChanges', selectedCell_row, selectedCell_col);
 
     if (selectedCell_row != undefined && selectedCell_col != undefined) {
         value = currentCell.text().trim();
@@ -1448,9 +1133,9 @@ function clearCache(){
     unshowNetwork();
     // networkcube.clearAllDataManagerSessionCaches();    
     
-    // localStorage.clear();
+    localStorage.clear();
     // vistorian.clearCache();
-    networkcube.clearAllDataManagerSessionCaches();
+    // networkcube.clearAllDataManagerSessionCaches();
 
     location.reload()
     // showMessage('Cache cleared', 2000)
@@ -1462,13 +1147,43 @@ function removeNetwork(networkId:string){
     deleteCurrentNetwork();
 }
 
-function removeTable(tableId:string){
-    var table = storage.getUserTable(tableId,SESSION_NAME);
-    storage.deleteTable(table,SESSION_NAME)
-    
-    unshowTable('#individualTables')
-    loadTableList();
+function removeTable(tableId:string)
+{
+    console.log('>> REMOVE TABLE');
 
+    var table = storage.getUserTable(tableId,SESSION_NAME);
+    unshowTable('#individualTables')
+
+    if(currentNetwork.userNodeTable != undefined 
+    && currentNetwork.userNodeTable.name == table.name){
+        currentNetwork.userNodeTable = undefined;
+        currentNetwork.userNodeSchema = undefined;
+        $('#nodetableSelect').val(0);
+        $("#nodetableSelect option[value='" +table.name+"']").remove()
+        $('#nodeTableDiv').empty()
+    }
+
+    if(currentNetwork.userLinkTable 
+    && currentNetwork.userLinkTable.name == table.name){
+        currentNetwork.userLinkTable = undefined;
+        currentNetwork.userLinkSchema = undefined;
+        $('#linktableSelect').val(0);
+        $("#linktableSelect option[value='" +table.name+"']").remove()
+        $('#linkTableDiv').empty()
+    }
+
+    if(currentNetwork.userLocationTable != undefined 
+    && currentNetwork.userLocationTable.name == table.name){
+        currentNetwork.userLocationTable = undefined;
+        currentNetwork.userLinkSchema = undefined;
+        $('#locationtableSelect').val(0);
+        $("#locationtableSelect option[value='" +table.name+"']").remove()
+        $('#locationTableDiv').empty()
+    }
+
+    storage.deleteTable(table,SESSION_NAME)
+    loadTableList();
+    saveCurrentNetwork(true);
 }
 
 function exportNetwork(networkId:number){
@@ -1479,7 +1194,7 @@ function setNetworkConfig(string){
 
     currentNetwork.networkConfig = string;
 
-    $('#chooseNetworktype').css('display', 'none')
+    // $('#chooseNetworktype').css('display', 'none')
     
     storage.saveNetwork(currentNetwork,SESSION_NAME);
     loadNetworkList();

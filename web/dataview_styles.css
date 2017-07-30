@@ -3,21 +3,17 @@ div#noNetworkTables{
     height: 100px;
 }
 
-div.tableMenu{
-    height: 25px;
-}
-
 .nobr {
     white-space: nowrap;
 }
 
-td{
-    /*border: 1px dashed #777777;*/
+table#main{
+    border-collapse: collapse;
+    min-width: 1110px;
 }
 
-td#main{
-    margin:auto;
-
+#firstRow{
+    border-bottom: 1px solid #ddd;  
 }
 
 td#menu{
@@ -27,11 +23,20 @@ td#menu{
     max-width:250px;
 }
 
-td#{
-    width: 400px;
-    margin:20px;
+td#lists{
+    padding: 30px;
+}
+
+#center{
+    /* width: 400px; */
+    /* margin:20px; */
     padding: 20px;
-    padding-left:40px;
+    padding-top: 30px;  
+    /* padding-left:40px; */
+} 
+
+h2{
+    margin-top: 5px;
 }
 
 h3{
@@ -39,30 +44,28 @@ h3{
 }
 
 
-p.title{
+div.title{
     font-weight: 100;
     font-size: 12pt;
-    /*background-color: #E17F3E;*/
-    background-color: #999;
-    color:  #ffffff;
-    padding:7px;
-    padding-left: 20px;
-    border-radius: 2px;
+    background-color: #eee;
+    border-style: none;
+    padding:5px;
+    padding: 20px;
+    border-radius: 20px;
+    padding-top: 10px;
 }
 
-#networkInfoDiv p{
-    font-size: 16pt;
-    font-weight: 700;
+div.tableDiv{
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
+
+
 
 img.controlIcon{
     height: 10px;
     margin-left: 10px;
     cursor:pointer;
-}
-
-.visLink{
-    margin-top: 5px;
 }
 
 
@@ -75,7 +78,7 @@ img.controlIcon{
 }
 
 .tableMenuButton{
-    float:right;
+    float:right; 
     margin-left: 10px;
     /*background-color:#E17F3E;*/
     background-color:#bbb;
@@ -99,19 +102,20 @@ input#replaceButton{
 }
 
 .menuButton{
-    background-color:#eee;
-    border-radius:10px;
+    background-color:#bbb;
+    border-radius:15px;
     border: none;
     display:inline-block;
     cursor:pointer;
-    color:#111;
+    color:#fff;
     font-size:12px;
-    float:right;
-    font-weight: 400;
-    padding-top: 2px;
+    font-weight: normal;
+    padding-top: 0px;
     padding-right: 6px;
-    padding-bottom: 3px;
+    padding-bottom: 0px;
     padding-left: 6px;
+    margin-left: 5px;
+
 }
 
 
@@ -121,7 +125,7 @@ input#replaceButton{
     opacity: 0;
     overflow: hidden;
     position: absolute;
-    z-index: -1;
+    /* z-index: -1; */
     font-weight: 500;
 }
 

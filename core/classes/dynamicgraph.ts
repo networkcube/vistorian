@@ -342,6 +342,36 @@ module networkcube {
             dataMgr.saveToStorage(this.name, this.locationArrays_NAME, this.locationArrays, this.standardArrayReplacer);
         }
 
+        // Removes this graph from the cache.
+        delete(dataMgr: DataManager){
+            dataMgr.removeFromStorage(this.name, this.gran_min_NAME);
+            dataMgr.removeFromStorage(this.name, this.gran_max_NAME);
+            dataMgr.removeFromStorage(this.name, this.minWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.maxWeight_NAME);
+
+            dataMgr.removeFromStorage(this.name, this.matrix_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeArrays_NAME);
+            // when we tried to persist the entire linkArrays, javascript threw an
+            // exception, so for now we will simply try to save out the parts. 
+            dataMgr.removeFromStorage(this.name, this.linkArrays_NAME);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"source", this.linkArrays.source, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"target", this.linkArrays.target, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"linkType", this.linkArrays.linkType, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"directed", this.linkArrays.directed, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"nodePair", this.linkArrays.nodePair, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"presence", this.linkArrays.presence, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"weights", this.linkArrays.weights, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"filter", this.linkArrays.filter, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"attributes", this.linkArrays.attributes, this.standardReplacer);
+
+            dataMgr.removeFromStorage(this.name, this.nodePairArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.timeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.locationArrays_NAME);
+            
+        }
+
         debugCompareTo(other: DynamicGraph): boolean {
             var result: boolean = true;
 
@@ -1080,9 +1110,12 @@ module networkcube {
                 // this.addToSelection(selection, this._nodes[i].id(), 'node');
             }
             if (nodeSelections.length == 1) {
-                console.log('nodeSelections[0]:', nodeSelections[0])
+                // console.log('nodeSelections[0]:', nodeSelections[0])
                 nodeSelections[0].color = '#444';
             }
+
+
+
 
             // create selections for link type
             types = [];

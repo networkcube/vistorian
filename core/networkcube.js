@@ -10375,6 +10375,20 @@ var networkcube;
             dataMgr.saveToStorage(this.name, this.nodeTypeArrays_NAME, this.nodeTypeArrays, this.standardArrayReplacer);
             dataMgr.saveToStorage(this.name, this.locationArrays_NAME, this.locationArrays, this.standardArrayReplacer);
         };
+        DynamicGraph.prototype.delete = function (dataMgr) {
+            dataMgr.removeFromStorage(this.name, this.gran_min_NAME);
+            dataMgr.removeFromStorage(this.name, this.gran_max_NAME);
+            dataMgr.removeFromStorage(this.name, this.minWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.maxWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.matrix_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodePairArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.timeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.locationArrays_NAME);
+        };
         DynamicGraph.prototype.debugCompareTo = function (other) {
             var result = true;
             if (this.name != other.name) {
@@ -13200,6 +13214,10 @@ var networkcube;
         dataManager.importData(sessionName, data);
     }
     networkcube.importData = importData;
+    function deleteData(dataSetName) {
+        getDynamicGraph(dataSetName).delete(dataManager);
+    }
+    networkcube.deleteData = deleteData;
     function clearAllDataManagerSessionCaches() {
         dataManager.clearAllSessionData();
     }

@@ -34,7 +34,8 @@ module networkcube {
         sessionDataPrefix: string = "ncubesession";
         // sessionDataPrefix: string = "";
 
-        clearSessionData(session: string): void {
+        clearSessionData(session: string): void 
+        {
             var searchPrefix = this.sessionDataPrefix + this.SEP + session;
             // var searchPrefix = session;
             var keysToClear: string[] = [];
@@ -150,6 +151,9 @@ module networkcube {
             }
         }
 
+        
+
+
         // udpates the passed dataset, i.e. stores tables and schemas as indicated.
         // updateData(data: DataSet) {
         //     console.log('[datamanager] Update dataset', this.session, data.name)
@@ -260,7 +264,7 @@ module networkcube {
                 return undefined;
             }
         }
-
+        
         removeFromStorage(dataName: string, valueName: string): void {
             // console.log('saveNodeTable', table, this.session + this.SEP + dataname + this.SEP + this.NODE_TABLE);
             localStorage.removeItem(this.sessionDataPrefix
@@ -301,6 +305,8 @@ module networkcube {
             return true;
         }
     }
+
+    export function 
     
 
     export function getDefaultNodeSchema(): NodeSchema {

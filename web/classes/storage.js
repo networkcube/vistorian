@@ -56,6 +56,7 @@ var storage;
     storage.getUserTable = getUserTable;
     function getTableNames(sessionid) {
         var names = $.jStorage.get(sessionid + SEP + SESSION_TABLENAMES);
+        console.log('>>>names', names, sessionid + SEP + SESSION_TABLENAMES);
         if (names == undefined)
             names = [];
         return names;
@@ -124,10 +125,13 @@ var storage;
     }
     storage.getNetwork = getNetwork;
     function deleteNetwork(network, sessionid) {
+        console.log('deleteNetworkById', network.id, sessionid);
+        networkcube.deleteData(network.name);
         deleteNetworkById(network.id, sessionid);
     }
     storage.deleteNetwork = deleteNetwork;
     function deleteNetworkById(id, sessionid) {
+        console.log('deleteNetworkById', id, sessionid);
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + id, {});
         $.jStorage.deleteKey(sessionid + SEP + SESSION_NETWORK + SEP + id);
         var networkIds = getNetworkIds(sessionid);

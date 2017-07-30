@@ -408,6 +408,7 @@ declare module networkcube {
         static locationArrayReviver(k: string, v: any, s: DynamicGraph): any;
         loadDynamicGraph(dataMgr: DataManager, dataSetName: string): void;
         saveDynamicGraph(dataMgr: DataManager): void;
+        delete(dataMgr: DataManager): void;
         debugCompareTo(other: DynamicGraph): boolean;
         initDynamicGraph(data: DataSet): void;
         createSelections(shouldCreateArrays: boolean): void;
@@ -586,6 +587,7 @@ declare module networkcube {
         getGraph(session: string, dataname: string): DynamicGraph;
         isSchemaWellDefined(data: DataSet): boolean;
     }
+    function (): any;
     function getDefaultNodeSchema(): NodeSchema;
     function getDefaultLinkSchema(): LinkSchema;
     function getDefaultLocationSchema(): LocationSchema;
@@ -770,6 +772,7 @@ declare module networkcube {
     function setDataManagerOptions(options: DataManagerOptions): void;
     function isSessionCached(session: string, dataSetName: string): boolean;
     function importData(sessionName: string, data: DataSet): void;
+    function deleteData(dataSetName: string): void;
     function clearAllDataManagerSessionCaches(): void;
     function getDynamicGraph(dataName?: string, session?: string): DynamicGraph;
     function openVisualizationWindow(session: string, visUri: string, dataName: string): void;

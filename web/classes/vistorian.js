@@ -304,10 +304,12 @@ var vistorian;
     }
     vistorian.importData = importData;
     function importIntoNetworkcube(currentNetwork, sessionid, s) {
-        if (currentNetwork.userNodeTable)
+        if (currentNetwork.userNodeTable) {
             vistorian.cleanTable(currentNetwork.userNodeTable.data);
-        if (currentNetwork.userLinkTable)
+        }
+        if (currentNetwork.userLinkTable) {
             vistorian.cleanTable(currentNetwork.userLinkTable.data);
+        }
         var normalizedNodeTable = [];
         var normalizedLinkTable = [];
         var normalizedLocationTable = [];
@@ -320,13 +322,12 @@ var vistorian;
                 locationLabels.push(currentNetwork.userLocationTable.data[i][currentNetwork.userLocationSchema.label]);
             }
         }
-        console.log('locationLabels', locationLabels);
         var nodeIds = [];
         var names = [];
         var nodeLocations = [];
         var nodeTimes = [];
-        if (currentNetwork.userNodeTable == undefined) {
-            console.log('no node table found, create node table');
+        if (currentNetwork.userNodeTable == undefined
+            && currentNetwork.userLinkTable != undefined) {
             var linkData = currentNetwork.userLinkTable.data;
             var id_source;
             var id_target;
@@ -466,8 +467,8 @@ var vistorian;
                 networkcubeNodeSchema.location = 3;
             }
         }
-        if (currentNetwork.userLinkTable == undefined) {
-            console.log('Create and fill link table');
+        if (currentNetwork.userLinkTable == undefined
+            && currentNetwork.userNodeTable != undefined) {
             var nodeData = currentNetwork.userNodeTable.data;
             console.log('nodeData', nodeData);
             var nodeSchema = currentNetwork.userNodeSchema;
@@ -559,7 +560,6 @@ var vistorian;
         currentNetwork.networkCubeDataSet.linkTable = normalizedLinkTable;
         currentNetwork.networkCubeDataSet.linkSchema = networkcubeLinkSchema;
         currentNetwork.networkCubeDataSet.nodeSchema = networkcubeNodeSchema;
-        console.log('locationTable', currentNetwork.networkCubeDataSet.locationTable);
         storage.saveNetwork(currentNetwork, sessionid);
         networkcube.setDataManagerOptions({ keepOnlyOneSession: false });
         console.log('>> START IMPORT');
