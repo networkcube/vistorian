@@ -106,8 +106,9 @@ function loadNetworkList() {
 
 // creates a new visualization of the passed type
 function loadVisualization(visType) {
-    trace.event(null, "ToolLaunch", "Launch" + visType);
+    trace.event('dataview.html/' + currentNetwork.name, "ToolLaunch", "Launch" + visType);
     window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
+    console.log('dataview.html/' + currentNetwork.name);
 }
 
 

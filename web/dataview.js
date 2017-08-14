@@ -66,8 +66,9 @@ function loadNetworkList() {
     });
 }
 function loadVisualization(visType) {
-    trace.event(null, "ToolLaunch", "Launch" + visType);
+    trace.event('dataview.html/' + currentNetwork.name, "ToolLaunch", "Launch" + visType);
     window.open('sites/' + visType + '.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name);
+    console.log('dataview.html/' + currentNetwork.name);
 }
 function createNetwork() {
     var networkIds = storage.getNetworkIds(SESSION_NAME);
