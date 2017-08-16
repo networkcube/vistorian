@@ -1,5 +1,34 @@
 <!DOCTYPE html>
 <html>
+<style>
+.black_overlay {
+  display: none;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 150%;
+  height: 250%;
+  background-color: black;
+  z-index: 1001;
+  -moz-opacity: 0.8;
+  opacity: .80;
+  filter: alpha(opacity=80);
+}
+.white_content {
+  display: none;
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 65%;
+  height: 77%;
+  padding: 10px;
+  border: 10px solid orange;
+  background-color: white;
+  z-index: 1002;
+  overflow: auto;
+}
+
+</style>
 <head>
 <link rel="stylesheet" type="text/css" href="../../styles.css">
 <link rel="stylesheet" type="text/css" href="styles.css">
@@ -8,6 +37,7 @@
 </head>
 <title></title>
 <body>
+         
 	<div id="searchDiv">
 		<input id="searchField" type="text" name="searchInput" value="Search ..." onfocus="if (this.value == 'Search ...') {this.value = '';}" width="100%"/>
 		</br>

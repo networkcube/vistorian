@@ -283,6 +283,50 @@ var vistorian;
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> ' + datasetname + '</h2>');
         $('#' + elementId).append(dataname);
+        $('#' + elementId).append('<div>\
+                    <button id="submit" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
+                    <button id="submit" onclick="endOfActivityClicked()">End of the activity</button>\
+                    <script>\
+                        function mailmeButtonClicked()\
+                        {\
+                            trace.event(null, "Questionnaires", "MailMe");\
+                            $("#mailmeQuestionnaireDiv").css("visibility", "visible")\
+                        }\
+                        function endOfActivityClicked()\
+                        {\
+                            trace.event(null, "Questionnaires", "EndActivity");\
+                            $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")\
+                        }\
+                    </script>\
+                    <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
+                        <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
+                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                    </div>\
+                    <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
+                        <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
+                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                    </div>\
+                </div>\
+                <style type="text/css">\
+                    #submit {\
+                    background-color: #ccc;\
+                    padding: 6px;\
+                    margin:4px;\
+                    -moz-border-radius: 5px;\
+                    -webkit-border-radius: 5px;\
+                    border-radius: 5px;\
+                    color: #fff;\
+                    font-size: 12px;\
+                    text-decoration: none;\
+                    border: none;\
+                    }\
+\
+                    #submit:hover {\
+                    border: none;\
+                    background: orange;\
+                    box-shadow: 0px 0px 1px #777;\
+                    }\
+            </style>');
         var vars = networkcube.getUrlVars();
         $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
         $('#' + elementId).append('<br/><br/>');

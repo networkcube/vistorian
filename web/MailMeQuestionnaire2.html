@@ -1,0 +1,245 @@
+<html>
+<head>
+    <script src="lib/jquery.js"></script>
+    <script src="../core/networkcube.js"></script>
+    <script src="../core/lib/trace.js"></script>
+<style>
+
+    body{
+      opacity: 1;
+      background-color: #fff;
+    }
+
+
+            a{text-decoration: none; color:white;}
+
+            .button1 {
+                background-color: orange; 
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+            }
+
+            .button2 {
+                background-color: green;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;} 
+
+            .buttonClose {
+                background-color: #cc0000;
+                border: none;
+                color: white;}
+
+            .wrapper {
+                text-align: center;
+            }
+
+            hr {
+                display: block;
+                height: 1px;
+                border: 0;
+                border-top: 1px solid #ccc;
+                margin: 1em 0;
+                padding: 0; 
+            }
+
+</style>
+</head>
+
+<body>
+
+ <!-- <form action="https://webpagefx.createsend.com/t/y/s/ajrhjy/" method="post" class="sign-up-form sticky-bottom-form" id="sticky-bottom-form" onSubmit="_gaq.push(['_trackEvent', 'blog', 'newsletter-signup', 'slider-signup']);" > -->
+                    
+                    <fieldset style = "width: 750px; margin-top: 0px auto;">
+                    
+                    <button type="button" onclick="closeWindow()" class="buttonClose" id="signup-close" style="position: absolute;right:-5px;top:-5px;outline:5px solid #fff"color = red>X</button>
+                    <script>
+                        function closeWindow()
+                        {
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+                    </script>
+
+                   
+                   
+                      <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><big>X</big></a>
+                                                </button>
+
+                    <h3> <font size="5">Mail me a screenshot (Part 2: for "Analyze data")</font></h3>
+                    <p>Answer and click CONTINUE or press ESC to skip this additional questionnaire and send the email</p>
+                    <hr>
+                    <h3> <small>How helpful was the tool to analyze your data in this session?</small></h3>
+                    <!-- Multiple Radios (inline) -->
+                    <div class="form-group">
+                       <div class="col-md-12"> 
+                          <label class="col-md-0 control-label" for="radios">Not helpful</label>
+                          <label class="radio-inline" for="radios-1">
+                          <input type="radio" name="radios-1" id="radios-1-1" value="1" checked="checked">
+                          1
+                        </label> 
+                        <label class="radio-inline" for="radios-2">
+                          <input type="radio" name="radios-1" id="radios-1-2" value="2">
+                          2
+                        </label> 
+                        <label class="radio-inline" for="radios-3">
+                          <input type="radio" name="radios-1" id="radios-1-3" value="3">
+                          3
+                        </label> 
+                        <label class="radio-inline" for="radios-4">
+                          <input type="radio" name="radios-1" id="radios-1-4" value="4">
+                          4
+                        </label>
+                        <label class="radio-inline" for="radios-5">
+                          <input type="radio" name="radios-1" id="radios-1-5" value="4">
+                          5
+                        </label>
+                        <label class="radio-inline" for="radios-6">
+                          <input type="radio" name="radios-1" id="radios-1-6" value="5">
+                          6
+                        </label>
+                        <label class="radio-inline" for="radios-7">
+                          <input type="radio" name="radios-1" id="radios-1-7" value="6">
+                          7
+                        </label>
+                        <label class="radio-inline" for="radios-8">
+                          <input type="radio" name="radios-1" id="radios-1-8" value="7">
+                          8
+                        </label>
+                        <label class="radio-inline" for="radios-9">
+                          <input type="radio" name="radios-1" id="radios-1-9" value="8">
+                          9
+                        </label>
+                        <label class="radio-inline" for="radios-10">
+                          <input type="radio" name="radios-1" id="radios-1-10" value="9">
+                          10
+                        </label>
+                        <label class="col-md-11 control-label" for="radios">Very helpful</label>
+                      </div>
+                     
+                    </div>
+
+                     
+                    <p> </p>
+                                                      
+                    <table> <td>
+                    <fieldset style="border:1px dashed #555555; vertical-align:top; width: 550px;">
+
+                     <h3> <small>Characterize the analysis you conducted:</small></h3>
+                     <div class="radio">
+                        <label for="radios-0">
+                          <input type="radio" name="radios-2" id="radios-2-1" value="1" checked="checked">
+                          Review data quality
+                        </label>
+                      </div>
+                      <div class="radio">
+                        <label for="radios-1">
+                          <input type="radio" name="radios-2" id="radios-2-2" value="2">
+                          Test a particular hypothesis
+                        </label>
+                      </div>
+                       <div class="radio">
+                        <label for="radios-1">
+                          <input type="radio" name="radios-2" id="radios-2-3" value="2">
+                          Compare
+                        </label>
+                      </div>
+                       <div class="radio">
+                        <label for="radios-1">
+                          <input type="radio" name="radios-2" id="radios-2-4" value="2">
+                          Retrieve specific details
+                        </label>
+                      </div>
+                       <div class="radio">
+                        <label for="radios-1">
+                          <input type="radio" name="radios-2" id="radios-2-5" value="2">
+                          Repeat an analysis with new data
+                        </label>
+                      </div>
+                       <div class="radio">
+                        <label for="radios-1">
+                          <input type="radio" name="radios-2" id="radios-2-6" value="2">
+                          Other
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    </td>
+
+
+                    <td> 
+                        <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
+                        <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the CONTINUE button</font></p>
+                        </fieldset> 
+                    </td>
+                    </table>
+                    <hr>
+                    <p>Next you will be able to add comments in the email message</p>
+                    
+                    <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
+                    <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
+                    <p></p>
+                    <div class="wrapper">
+                    <!-- <button id="button1id" name="button1id" class="button1">Cancel (Esc)</button> -->
+                    <button id="button1id" name="button1id" class="button1">
+                        <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Skip the questionnaire (Esc)</a>
+                    </button>
+                    
+                    <button id="button2id" name="button2id" class="button2"
+                      onclick="submitQuestionnaireResults()">Continue</button>
+                    </div>
+                    <script>
+                      function submitQuestionnaireResults()
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        localStorage.getItem('traces_format')
+                        localStorage.getItem('traces_addLegend')
+                        localStorage.getItem('traces_sendCopyToVistorian')
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ST QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-1-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-1-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-1-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-1-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-1-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-1-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-1-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-1-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-1-10').is(':checked')){ helpfullScore = 10;}
+
+                        var analysisType;
+                        if($('#radios-2-1').is(':checked')){ analysisType = 'Review data quality';}
+                        if($('#radios-2-2').is(':checked')){ analysisType = 'Test a particular hypothesis';}
+                        if($('#radios-2-3').is(':checked')){ analysisType = 'Compare';}
+                        if($('#radios-2-4').is(':checked')){ analysisType = 'Retrieve specific details';}
+                        if($('#radios-2-5').is(':checked')){ analysisType = 'Repeat an analysis with new data';}
+                        if($('#radios-2-6').is(':checked')){ analysisType = 'Other';}
+                      
+                        // SEND RESULTS TO THE SERVER
+                        
+
+                      }
+                    </script>
+                    </fieldset>
+                <!-- </form> -->
+
+</body>
+</html>
