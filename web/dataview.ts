@@ -1202,15 +1202,9 @@ function getFileInfos(e) {
     var output = [];
     for (var i = 0, f; f = files[i]; i++) {
         if (f.name.split('.')[1] != 'csv') {
-            // output.push('<li style="color:#f00;"><strong>', f.name, '</strong> is not a CSV file.</li>');
             showMessage("Uploaded file is not a .csv file. Please chose another file.", 4000)
             return;
         } else {
-            // output.push('<li><strong>',
-            //     f.name, '</strong> (', f.type || 'n/a', ') - ',
-            //     f.size, ' bytes, last modified: ',
-            //     f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-            //     '</li>');
             filesToUpload.push(f);
         }
     }

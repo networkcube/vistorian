@@ -135,11 +135,11 @@ module vistorian {
         var tables: VTable[] = [];
         var fileContents: any[] = []
         var readers: FileReader[] = [];
-        for (var i = 0, f: File; f = files[i]; i++) {
+        for (var i = 0, f: File; f = files[i]; i++)
+        {
             var reader = new FileReader();
             reader.filename = f.name.split('_')[0];
             readers[i] = reader;
-
             reader.onload = function(f) {
                 var obj: Object = {
                     content: f.target.result,
