@@ -119,7 +119,7 @@ module networkcube {
         }
         console.log('>>>>' + highlightAnyElement);
 
-        trace.event(null, 'toolFunctionUse', MESSAGE_HIGHLIGHT, highlightAnyElement );
+        trace.event(null, 'toolFunctionUse', MESSAGE_HIGHLIGHT, highlightAnyElement);
 
         if (!elementCompound == undefined)
             action = 'reset';

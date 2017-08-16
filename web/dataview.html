@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <style>
 .black_overlay {
   display: none;
@@ -83,8 +84,8 @@
               <button id="submit" class="button hastooltip" href="javascript:void(0)" onclick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">Mail me a screenshot
               </button>
 
-              <!-- VS: Questionnaire1 -->
-              <div id="light" class="white_content" href="Questionnaire1.html">
+              <!-- VS: MailMeQuestionnaire1 -->
+              <div id="light" class="white_content" href="MailMeQuestionnaire1.html">
 
 
                 
@@ -251,10 +252,10 @@
                                                 <p></p>
                                                 <div class="wrapper">
                                                 <button class="button1">
-                                                 <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Cancel (Esc)</a>
+                                                 <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Skip the questionnaire (Esc)</a>
                                                 </button>
                                                 <button class="button2">
-                                                <a href="Questionnaire2.html" target="_blank" onclick="trace.event(null, 'Questionnaire2', 'MailMe')">Continue</a>
+                                                <a href="MailMeQuestionnaire2.html" target="_blank" onclick="trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2')">Continue</a>
                                                 </button>
                                                 </div>
                                                 </fieldset>
@@ -269,9 +270,16 @@
               
 
             <p> </p>
-            <button id="submit" onclick="trace.event(null, 'WorkSessionEnd', 'EndOfActivity')" class="button hastooltip">End of the activity 
+            <script language="javascript" type="text/javascript">
+            function windowClose() {
+              trace.event(null, 'WorkSessionEnd', 'EndOfActivity');
+              window.close();
+            }
+            </script>
+            <button id="submit" class="button hastooltip" onclick="windowClose()">Report end of the activity
             </button>
-
+            <p> </p>
+            
               <p>This is the main content. To display a lightbox click <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">here</a>
               </p>
               <div id="light" class="white_content">This is the lightbox content. <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Close</a>
@@ -285,23 +293,30 @@
             </div>
 
             <div id="networkListDiv">
+            <script type="text/javascript">
+                      function someFunc () {
+                        createNetwork();
+                        trace.event(null, 'WorkSessionStart', 'CreateNewNetwork');
+                       }
+            </script>
                 <h2>
                     Networks 
-                    <input type="button" class="menuButton hastooltip" value="New" onclick="createNetwork()""
+                    <input type="button" class="menuButton hastooltip" value="New" onclick="someFunc()"
                     title="Create new network from one or more tables."/>
                 </h2>
-                <ul id="networkList" class="nointent"></ul>
+                <ul id="networkList" class="nointent" onclick="trace.event(null, 'WorkSessionStart', 'SelectExistingNetwork')"></ul>
             </div>
 
             <div id="tableListDiv">
                 <h2>My Data Tables
                 <input id="files" type="file" name="file" class="inputfile" value="Upload" name="files[]" data-multiple-caption="{count} files selected" multiple />
-                <label for="files" class="menuButton hastooltip" title="Upload a new table in CSV file.">
+                <label for="files" class="menuButton hastooltip" title="Upload a new table in CSV file." onclick="trace.event(null, 'WorkSessionStart', 'UpLoadData')">
                     Upload
                 </label>
                 </h2>
-                <ul id="tableList" class="nointent"></ul>
+                <ul id="tableList" class="nointent" onclick="trace.event(null, 'WorkSessionStart', 'SelectExistingData')"></ul>
             </div>
+
             <div>
                 <input id="clearCacheButton" type="button" class=" hastooltip" value="Clear temporary cache" title="Removes networks from chache without deleting them. Networks to be visualized must be saved again, before visualizing." onclick="clearCache()"></button>
             </div>
