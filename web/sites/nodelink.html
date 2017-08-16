@@ -19,11 +19,35 @@
 </head>
 <title>Node link</title>
 <body>
+    <style type="text/css">
+            #submit {
+              background-color: #bbb;
+              padding: .5em;
+              -moz-border-radius: 5px;
+              -webkit-border-radius: 5px;
+              border-radius: 6px;
+              color: #fff;
+              font-family: 'Oswald';
+              font-size: 15px;
+              text-decoration: none;
+              border: none;
+            }
+
+            #submit:hover {
+              border: none;
+              background: orange;
+              box-shadow: 0px 0px 1px #777;
+            }
+            </style>
 
     <table>
         <tr>
             <td width="220px">
                 <div id="logoFrame"></div>
+                <div>
+                    <button id="submit" onclick="trace.event(null, 'Questionnaires', 'MailMe')">Mail me a screenshot</button>
+                    <button id="submit" onclick="trace.event(null, 'Questionnaires', 'EndActivity')">End of the activity</button>
+                </div>
                 <div width="220" id="bookmarkFrame"></div>
             </td>    
             <td width="220px">
