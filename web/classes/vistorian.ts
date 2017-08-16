@@ -485,7 +485,6 @@ module vistorian {
         $('#'+elementId).append('<br/><br/>');
     }
 
-
     export function exportNetwork(network:vistorian.Network){
         
         // // CONVERT NODES

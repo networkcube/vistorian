@@ -9,6 +9,33 @@
 <title></title>
 <body>
 
+         <!-- VS: Mail me -->
+            <style type="text/css">
+            #submit {
+              background-color: #bbb;
+              padding: .5em;
+              -moz-border-radius: 5px;
+              -webkit-border-radius: 5px;
+              border-radius: 6px;
+              color: #fff;
+              font-family: 'Oswald';
+              font-size: 15px;
+              text-decoration: none;
+              border: none;
+            }
+
+            #submit:hover {
+              border: none;
+              background: orange;
+              box-shadow: 0px 0px 1px #777;
+            }
+            </style>
+
+            <button id="submit" onclick="trace.event(null, 'Questionnaires', 'MailMe')">Mail me a screenshot</button>
+            <p> </p>
+            <button id="submit" onclick="trace.event(null, 'Questionnaires', 'EndActivity')">End of the activity</button>
+            <p> </p>
+
 	<div id="searchDiv">
 		<input id="searchField" type="text" name="searchInput" value="Search ..." onfocus="if (this.value == 'Search ...') {this.value = '';}" width="100%"/>
 		</br>
