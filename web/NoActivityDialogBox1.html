@@ -1,0 +1,52 @@
+<html>
+   <head>
+      <script src="lib/jquery.js"></script>
+      <script src="../core/networkcube.js"></script>
+      <script src="../core/lib/trace.js"></script>
+      
+      <script type="text/javascript">
+         <!--
+            function getConfirmation(){
+               var retVal = confirm("Do you want to continue ?");
+               if( retVal == true ){
+                  document.write ("User wants to continue!");
+                  return true;
+               }
+               else{
+                  document.write ("User does not want to continue!");
+                  return false;
+               }
+            }
+         //-->
+      </script>
+      
+   </head>
+   
+   <body>
+      <h3> <font size="5">No activity</font></h3>
+      <hr>    
+                      <font size="4">No Vistorian activity for more than 15 minutes.</font>
+                      <p>
+                      <font size="4">Still there?</font>
+                      <p></p>              
+                                                         
+                     <div class="click">
+
+                          <button id="button1" type="button" style="height:35px;width:200px" class="myBtn" 
+                            onclick="toggleButton('button1')">
+                            <label for="my-checkbox"><font size="2">I am BACK</font></label>
+                          </button>
+                          <p></p>
+
+                          <button id="button2" type="button" style="height:35px;width:200px"
+                            onclick="toggleButton('button2')">
+                            <label for="my-checkbox"><font size="2">DONE: report on recent activity</font></label>
+                          </button>
+                          <p></p>
+      
+      <form>
+         <input type="button" value="Click Me" onclick="getConfirmation();" />
+      </form>
+      
+   </body>
+</html>
