@@ -480,7 +480,7 @@ module vistorian {
         
         $('#'+elementId).append('<div>\
                     <button id="submit" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
-                    <button id="submit" onclick="endOfActivityClicked()">End of the activity</button>\
+                    <button id="submit" onclick="endOfActivityClicked()">Report end of the activity</button>\
                     <script>\
                         function mailmeButtonClicked()\
                         {\

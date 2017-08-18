@@ -72,7 +72,7 @@
                       <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><big>X</big></a>
                     </button> -->
 
-                    <h3> <font size="5">Mail me a screenshot (Part 2: for "Analyze data")</font></h3>
+                    <h3> <font size="5">Please help us understand the context of use: (Part 2: for "Analyze data")</font></h3>
                     <p><font size="4">Answer and click CONTINUE or press ESC to skip this additional questionnaire and send the email</font></p>
                     <hr>
                     <h3> <font size="4">How helpful was the tool to analyze your data in this session?</font></h3>
@@ -203,8 +203,10 @@
                     </td>
                     </table>
                     <hr>
-                    <p><font size="4">Next you will be able to add comments in the email message</font></p>
-                    
+                    <p><font size="4">Add comments:</font></p>
+                    <form>
+                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
+                    </form>
                     <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
                     <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
                     <p></p>
@@ -219,9 +221,6 @@
                       {
                         // GET RESULTS FROM 1ST QUESTIONNAIRE
                         // Read stuff from local storage
-                        localStorage.getItem('traces_format')
-                        localStorage.getItem('traces_addLegend')
-                        localStorage.getItem('traces_sendCopyToVistorian')
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -260,8 +259,10 @@
                         var analysisCharac6;
                         if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other';}
 
+                        var Comments = document.getElementById('comments');
+                        console.log(Comments.value);
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2');
 
-                      
                         // SEND RESULTS TO THE SERVER
                         
 

@@ -72,49 +72,8 @@
                         }
                     </script>
 
-                    <h3> <font size="5">Mail me a screenshot</font></h3>
-                    <label>Email address: </label><input type="text" size="70" id="emailInput"></input>
+                    <h3> <font size="5">Please help us understand the context of use:</font></h3>
                     <hr>
-                    <!-- Multiple Radios -->
-                    <div class="form-group">
-                      <label class="col-md-4 control-label" for="radios" style="margin-left:0em;"><b><font size="4">Format</font></b></label>
-                      <div class="col-md-4">
-                      <div class="radio">
-                        <label for="radios-0">
-                          <input type="radio" name="radios" id="radios-0" value="1" checked="checked">
-                          <font size="4">PNG</font>
-                        </label>
-                      </div>
-                      <div class="radio">
-                        <label for="radios-1">
-                          <input type="radio" name="radios" id="radios-1" value="2">
-                         <font size="4">SVG</font>
-                        </label>
-                      </div>
-                      </div>
-                    </div>
-                    <p> </p>
-                    <!-- Multiple Checkboxes -->
-                    <div class="form-group">
-                      <label class="col-md-4 control-label" for="checkboxes"></label>
-                      <div class="col-md-4">
-                      <div class="checkbox">
-                        <label for="checkboxes-0">
-                          <input type="checkbox" name="checkboxes" id="checkboxes-0" value="1" checked>
-                          <font size="4">Add legend in separate file</font>
-                        </label>
-                      </div>
-                      <div class="checkbox">
-                        <label for="checkboxes-1">
-                          <input type="checkbox" name="checkboxes" id="checkboxes-1" value="2" checked>
-                          <font size="4">Send copy to the Vistorian team</font>
-                        </label>
-                      </div>
-                      </div>
-                    </div>
-                    <hr>
-                    <p> <font size="4">Please help us understand the context of use:</font></p>
-
                    
                     <table> <td>
                     <fieldset style="border:1px dashed #555555; vertical-align:top; width: 550px;">
@@ -188,47 +147,25 @@
                     <p></p>
                     <div class="wrapper">
 
-                    <button class="button1" onclick="sendMailButtonClicked()"><font size="3">Skip the questionnaire (Esc)</font></button>
+                    <button class="button1" onclick="closeWindow()"><font size="3">Skip the questionnaire (Esc)</font></button>
                     <button class="button2" onclick="continueBtnPressed()"><font size="3">Continue</font></button>
                     <script>
-                        function sendMailButtonClicked()
-                        {
-                          // SEND EMAIL
-                          sendEmail();
-
-                          // Close window
-                          closeWindow();
-                        }
 
                         function continueBtnPressed()
                         { 
                             // STORE DATA in LOCAL STORAGE
-                            localStorage.setItem('traces_email', $('#emailInput').val())
-                            var format = 'PNG'
-                            if($('#radios-1').is(':checked'))
-                              format = 'SVG';
-                            localStorage.setItem('traces_format', format)
-                            localStorage.setItem('traces_addLegend', $('checkboxes-0').is(':checked'))
-                            localStorage.setItem('traces_sendCopyToVistorian', $('checkboxes-1').is(':checked'))
                             localStorage.setItem('traces_button1', $('button1').is(':checked'))
                             localStorage.setItem('traces_button2', $('button2').is(':checked'))
                             localStorage.setItem('traces_button3', $('button3').is(':checked'))
                             localStorage.setItem('traces_button4', $('button4').is(':checked'))
                             localStorage.setItem('traces_button5', $('button5').is(':checked'))
 
-                            sendEmail();
-
-                            trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2');
-                            trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2');
-                            window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', '../MailMeQuestionnaire2.html');
+                            trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2');
+                            window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', '../EndActivityQuestionnaire2.html');
                         }
 
-                        function sendEmail()
-                        {
-                            // SEND EMAIL WITH SCREENSHOT
-                        }
                     </script>
-                      </button>
+                    </button>
                     </div>
                     </fieldset>
 </body>
