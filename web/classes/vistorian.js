@@ -326,7 +326,26 @@ var vistorian;
                     background: orange;\
                     box-shadow: 0px 0px 1px #777;\
                     }\
-            </style>');
+            </style>\
+            <script type="text/javascript">\
+                var idleTime = 0;\
+                $(document).ready(function () {\
+                    //Increment the idle time counter every minute.\
+                    var idleInterval = setInterval(timerIncrement, 60000); // 1 minute\
+                    $(this).mousemove(function (e) {\
+                        idleTime = 0;\
+                    });\
+                    $(this).keypress(function (e) {\
+                        idleTime = 0;\
+                    });\
+                });\
+                function timerIncrement() {\
+                    idleTime = idleTime + 1;\
+                    if (idleTime > 14) { // 15 minutes\
+                        window.location.reload();\
+                    }\
+                }\
+                </script>');
         var vars = networkcube.getUrlVars();
         $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
         $('#' + elementId).append('<br/><br/>');
