@@ -285,6 +285,8 @@ var vistorian;
         $('#' + elementId).append(dataname);
         $('#' + elementId).append('<div>\
                     <script src="..\/lib\/bootbox.min.js"><\/script>\
+                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
+                    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">\
                     <button id="submit" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
                     <button id="submit" onclick="endOfActivityClicked()">Report end of the activity</button>\
                     <script>\
@@ -332,7 +334,7 @@ var vistorian;
                     var idleTime = 0;\
                     $(document).ready(function () {\
                         console.log("START TIMER");\
-                        var idleInterval = setInterval(timerIncrement, 10000);\
+                        var idleInterval = setInterval(timerIncrement, 1000);\
                         $(this).mousemove(function (e) {\
                             idleTime = 0;\
                         });\
@@ -342,10 +344,8 @@ var vistorian;
                     });\
                     function timerIncrement() {\
                         idleTime = idleTime + 1;\
-                        console.log("idleTime: " + idleTime);\
-                        if (idleTime > 2) {\
+                        if (idleTime > 60 * 14 ) {\
                             showInactivityBox();\
-                            console.log("ONE MINUTE PASSED");\
                         }\
                     }\
                     function showInactivityBox() {\
