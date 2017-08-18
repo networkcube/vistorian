@@ -479,6 +479,7 @@ module vistorian {
         $('#'+elementId).append(dataname);
         
         $('#'+elementId).append('<div>\
+                    <script src="..\/lib\/bootbox.min.js"><\/script>\
                     <button id="submit" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
                     <button id="submit" onclick="endOfActivityClicked()">Report end of the activity</button>\
                     <script>\
@@ -515,31 +516,51 @@ module vistorian {
                     text-decoration: none;\
                     border: none;\
                     }\
-\
+                    \
                     #submit:hover {\
                     border: none;\
                     background: orange;\
                     box-shadow: 0px 0px 1px #777;\
                     }\
-            </style>\
-            <script type="text/javascript">\
-                var idleTime = 0;\
-                $(document).ready(function () {\
-                    //Increment the idle time counter every minute.\
-                    var idleInterval = setInterval(timerIncrement, 60000); // 1 minute\
-                    $(this).mousemove(function (e) {\
-                        idleTime = 0;\
+                </style>\
+                <script type="text/javascript">\
+                    var idleTime = 0;\
+                    $(document).ready(function () {\
+                        console.log("START TIMER");\
+                        var idleInterval = setInterval(timerIncrement, 10000);\
+                        $(this).mousemove(function (e) {\
+                            idleTime = 0;\
+                        });\
+                        $(this).keypress(function (e) {\
+                            idleTime = 0;\
+                        });\
                     });\
-                    $(this).keypress(function (e) {\
-                        idleTime = 0;\
-                    });\
-                });\
-                function timerIncrement() {\
-                    idleTime = idleTime + 1;\
-                    if (idleTime > 14) { // 15 minutes\
-                        window.location.reload();\
+                    function timerIncrement() {\
+                        idleTime = idleTime + 1;\
+                        console.log("idleTime: " + idleTime);\
+                        if (idleTime > 2) {\
+                            showInactivityBox();\
+                            console.log("ONE MINUTE PASSED");\
+                        }\
                     }\
-                }\
+                    function showInactivityBox() {\
+                        bootbox.confirm({\
+                            message: "No Vistorian activity for more than 15 minutes. Are you still there?",\
+                            buttons: {\
+                                confirm: {\
+                                    label: "I want to continue working",\
+                                    className:  "btn-success"\
+                                },\
+                                cancel: {\
+                                    label:  "DONE: report on recent activity",\
+                                    className:  "btn-warning"\
+                                }\
+                            },\
+                            callback: function (result) {\
+                                console.log("This was logged in the callback: " + result);\
+                            }\
+                        });\
+                    }\
                 </script>');
 
         var vars = networkcube.getUrlVars();
