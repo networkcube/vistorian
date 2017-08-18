@@ -332,9 +332,8 @@ var vistorian;
                 </style>\
                 <script type="text/javascript">\
                     var idleTime = 0;\
+                    var idleInterval = setInterval(timerIncrement, 1000);\
                     $(document).ready(function () {\
-                        console.log("START TIMER");\
-                        var idleInterval = setInterval(timerIncrement, 1000);\
                         $(this).mousemove(function (e) {\
                             idleTime = 0;\
                         });\
@@ -346,6 +345,7 @@ var vistorian;
                         idleTime = idleTime + 1;\
                         if (idleTime > 60 * 14 ) {\
                             showInactivityBox();\
+                            window.clearInterval(idleInterval);\
                         }\
                     }\
                     function showInactivityBox() {\
