@@ -7,18 +7,15 @@ var storage;
     var SESSION_SESSIONID = "vistorian.lastSessionId";
     var SEP = "#";
     function saveSessionId(sessionid) {
-        console.log('save session', sessionid);
         $.jStorage.set(SESSION_SESSIONID, sessionid);
     }
     storage.saveSessionId = saveSessionId;
     function getLastSessionId() {
         var session = $.jStorage.get(SESSION_SESSIONID);
-        console.log('get session, ', session);
         return session;
     }
     storage.getLastSessionId = getLastSessionId;
     function saveUserTable(table, sessionid) {
-        console.log('[vistorian] Save user table', table.name, sessionid);
         var tableNames = getTableNames(sessionid);
         var found = false;
         if (!tableNames) {
@@ -38,7 +35,6 @@ var storage;
         else {
         }
         $.jStorage.set(sessionid + SEP + SESSION_TABLE + SEP + table.name, table);
-        console.log('\tTable', table.name, 'added.', getTableNames(sessionid).length + ' tables stored.', getUserTable(table.name, sessionid));
     }
     storage.saveUserTable = saveUserTable;
     function getUserTables(sessionid) {
@@ -83,7 +79,6 @@ var storage;
             tableNames.splice(tableNames.indexOf(table.name), 1);
             saveTableNames(tableNames, sessionid);
         }
-        console.log('table deleted', getTableNames(sessionid));
     }
     storage.deleteTable = deleteTable;
     function saveNetwork(network, sessionid) {
@@ -102,7 +97,6 @@ var storage;
         if (!found) {
             networkIds.push(network.id);
             saveNetworkIds(networkIds, sessionid);
-            console.log('Save imported networkId', network.id);
         }
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + network.id, network);
     }
@@ -111,7 +105,6 @@ var storage;
         var ids = $.jStorage.get(sessionid + SEP + SESSION_NETWORKIDS);
         if (ids == undefined)
             ids = [];
-        console.log('getNetworkIds :', sessionid, ids);
         return ids;
     }
     storage.getNetworkIds = getNetworkIds;
@@ -124,6 +117,7 @@ var storage;
     }
     storage.getNetwork = getNetwork;
     function deleteNetwork(network, sessionid) {
+        networkcube.deleteData(network.name);
         deleteNetworkById(network.id, sessionid);
     }
     storage.deleteNetwork = deleteNetwork;

@@ -62,8 +62,10 @@ class MatrixMenu{
       .append('<select id="labelOrdering"></select>')
   
 
-    $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
-
+    //$("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace_help()">Manual</a>');
+    // VS: Clicks on Manual
+    $("#networkcube-matrix-menu")
+      .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
 
     $('#labelOrdering').change(this.reorderHandler);
     $('#labelOrdering').append('<option value="none">---</option>');
@@ -123,30 +125,30 @@ class CellLabel{
   private cellLabelBackground;
   private cellLabel;
   constructor(){
-    this.cellLabelBackground = glutils.selectAll()
-      .data([{id:0}])
-      .append('rect')
-      .attr('width',70)
-      .attr('height',22)
-      .attr('x', -100)
-      .attr('y', -100)
-      .style('fill', 0xffffff)
-      .style('stroke', 0xffffff)
-      .style('opacity', 0);
-
-    this.cellLabel = glutils.selectAll()
+   this.cellLabelBackground = glutils.selectAll()
       .data([{id:0}])
       .append('text')
       .style('opacity', 0)
       .attr('z', -1)
       .style('font-size', 12)
-  }
+      .style('stroke', '#fff')
+      .style('stroke-width', 2.5)
+       
+      
+   this.cellLabel = glutils.selectAll()
+      .data([{id:0}])
+      .append('text')
+      .style('opacity', 0)
+      .attr('z', -1)
+      .style('font-size', 12)
+    }
   hideCellLabel(){
     this.cellLabelBackground.style('opacity', 0);
     this.cellLabel.attr('z', -1)
       .style('opacity', 0);
   }
   updateCellLabel(mx: number, my: number, val: number, fw: number){
+
     this.cellLabel
       .attr('x', mx + 40)
       .attr('y', -my)
@@ -155,11 +157,18 @@ class CellLabel{
       .attr('z', 2)
       .style('font-size', fw);
     this.cellLabelBackground
-      .attr('x', mx + 10)
-      .attr('y', -my + 11)
-      .attr("width",70)
-      .attr("height", 22)
-      .style('opacity', .8);
+      .attr('x', mx + 40)
+      .attr('y', -my)
+      .style('opacity', 1)
+      .text(val? val: 0)
+      .attr('z', 2)
+      .style('font-size', fw);
+    // this.cellLabelBackground
+    //   .attr('x', mx + 10)
+    //   .attr('y', -my + 11)
+    //   .attr("width",70)
+    //   .attr("height", 22)
+    //   .style('opacity', .8);
   }
 }
 class MatrixOverview{
@@ -817,6 +826,9 @@ class MatrixVisualization{
     if(this.toHoverLinks.length > 0){
       this.matrix.highlightLinks(this.toHoverLinks);
       this.matrix.updateCellLabel(this.toHoverLinks[0], mpos.x, mpos.y);
+    }else{
+      this.matrix.highlightLinks([]);
+      this.matrix.updateCellLabel(-1, -1000, -1000);
     }
   }
 
@@ -1149,7 +1161,12 @@ class Matrix{
     }else
       networkcube.highlight('reset');
   }
-  updateCellLabel(linkId: number, mx: number, my: number){
+  updateCellLabel(linkId: number, mx: number, my: number)
+  {
+    if(linkId < 0){
+      this.cellLabel.updateCellLabel(-1000, -1000, null, 0);
+      return;
+    }
     let link = this._dgraph.link(linkId);
     let val = link.weights(this.startTime, this.endTime).get(0);
     val = Math.round(val * 1000)/1000;

@@ -3,20 +3,24 @@
 <head>
 <link rel="stylesheet" type="text/css" href="../../styles.css">
 <link rel="stylesheet" type="text/css" href="styles.css">
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="../../web/traces/trace.js"></script>
 <!-- <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>    -->
 <!-- <script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?sensor=true"></script>    -->
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLqH0fxzF-b2Z6uxbzqGKJy09tUQ3C3IM"></script>
-<script src="../../../networkcube/core/networkcube.js"></script>
+<script src="../../core/networkcube.js"></script>
 <script src="lib/d3.js"></script>
 <script src="lib/seedrandom.js"></script>
 </head>
 <title>Map</title>
 <body>
-
+		<!-- VS: Call to trace_test_130529 -->
+		<script type="text/javascript" src="../../web/traces/trace_test_130529.js"></script>
     <div>
         <div id="menuDiv">
-            <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#geomap-visualization-map">Manual</a>
+            <!-- VS: Clicks on Manual -->
+			<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#geomap-visualization-map" onclick="trace.event('help', 'ts_mapVisManual', 'CCC', 'DDD')">Manual</a>
         </div>
         <div id="timelineDiv">
         </div>

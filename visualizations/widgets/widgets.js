@@ -1,7 +1,7 @@
 var Slider = (function () {
     function Slider(x, y, width, minValue, maxValue, stepWidth) {
         this.BAR_WIDTH = 5;
-        this.RADIUS_HANDLE = 4;
+        this.RADIUS_HANDLE = 5;
         this.LEFT = this.RADIUS_HANDLE;
         this.RIGHT = this.RADIUS_HANDLE;
         this.HEIGHT = 10;

@@ -184,7 +184,7 @@ module networkcube {
                 case '':
                     return copyPropsShallow(v, new LinkArray());
                 case 'weights':
-                    return copyTimeSeries(v, function () { return new ScalarTimeSeries<any>(); });
+                    return copyTimeSeries(v, function () { return new ScalarTimeSeries<number>(); });
                 default:
                     return v;
             }
@@ -342,6 +342,36 @@ module networkcube {
             dataMgr.saveToStorage(this.name, this.locationArrays_NAME, this.locationArrays, this.standardArrayReplacer);
         }
 
+        // Removes this graph from the cache.
+        delete(dataMgr: DataManager){
+            dataMgr.removeFromStorage(this.name, this.gran_min_NAME);
+            dataMgr.removeFromStorage(this.name, this.gran_max_NAME);
+            dataMgr.removeFromStorage(this.name, this.minWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.maxWeight_NAME);
+
+            dataMgr.removeFromStorage(this.name, this.matrix_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeArrays_NAME);
+            // when we tried to persist the entire linkArrays, javascript threw an
+            // exception, so for now we will simply try to save out the parts. 
+            dataMgr.removeFromStorage(this.name, this.linkArrays_NAME);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"source", this.linkArrays.source, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"target", this.linkArrays.target, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"linkType", this.linkArrays.linkType, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"directed", this.linkArrays.directed, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"nodePair", this.linkArrays.nodePair, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"presence", this.linkArrays.presence, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"weights", this.linkArrays.weights, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"filter", this.linkArrays.filter, this.standardReplacer);
+            // dataMgr.saveToStorage(this.name, this.linkArrays_NAME+"attributes", this.linkArrays.attributes, this.standardReplacer);
+
+            dataMgr.removeFromStorage(this.name, this.nodePairArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.timeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.locationArrays_NAME);
+            
+        }
+
         debugCompareTo(other: DynamicGraph): boolean {
             var result: boolean = true;
 
@@ -471,7 +501,7 @@ module networkcube {
         initDynamicGraph(data: DataSet): void {
 
             this.clearSelections();
-            console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data)
+            // console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data)
 
             //this.data = data;
             this.name = data.name;
@@ -639,6 +669,7 @@ module networkcube {
                 }
             }
 
+            // console.log('data.nodeTable.length', data.nodeTable.length)
             for (var i = 0; i < data.nodeTable.length; i++) {
                 row = data.nodeTable[i];
 
@@ -684,7 +715,8 @@ module networkcube {
                 // check locations
                 if (isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
-                    if (locId == null || locId == undefined)
+                    console.log('locId', locId)
+                    if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);
                 }
@@ -820,7 +852,7 @@ module networkcube {
                     this.linkArrays.target[linkId] = row[data.linkSchema.target];
                     this.linkArrays.linkType[linkId] = row[data.linkSchema.linkType];
                     this.linkArrays.directed[linkId] = row[data.linkSchema.directed];
-                    this.linkArrays.weights[linkId] = new ScalarTimeSeries<any>();
+                    this.linkArrays.weights[linkId] = new ScalarTimeSeries<number>();
                     this.linkArrays.presence[linkId] = [];
                     this.linkArrays.selections.push([]);
                     this.linkArrays.nodePair.push(undefined);
@@ -846,8 +878,9 @@ module networkcube {
 
                 // set weight if applies
                 // console.log('data.linkSchema.weight', data.linkSchema.weight)
-                if (isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) {
-                    this.linkArrays.weights[linkId].set(time, data.linkTable[i][data.linkSchema.weight])
+                if (isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) 
+                {
+                    this.linkArrays.weights[linkId].set(time, parseFloat(data.linkTable[i][data.linkSchema.weight]))
                     this.minWeight = Math.min(this.minWeight, data.linkTable[i][data.linkSchema.weight])
                     this.maxWeight = Math.max(this.maxWeight, data.linkTable[i][data.linkSchema.weight])
                 } else {
@@ -1079,9 +1112,12 @@ module networkcube {
                 // this.addToSelection(selection, this._nodes[i].id(), 'node');
             }
             if (nodeSelections.length == 1) {
-                console.log('nodeSelections[0]:', nodeSelections[0])
+                // console.log('nodeSelections[0]:', nodeSelections[0])
                 nodeSelections[0].color = '#444';
             }
+
+
+
 
             // create selections for link type
             types = [];
@@ -1644,7 +1680,7 @@ module networkcube {
                     return timeId;
                 }
             }
-            console.error('Time object for unix time', unixTime, 'not found!')
+            // console.error('Time object for unix time', unixTime, 'not found!')
             return undefined;
         }
 
@@ -1843,7 +1879,7 @@ module networkcube {
         presence: number[][] = [];
         // array of weights per time this link is present. This is a generic field
         // that can be used for weights, e.g.
-        weights: ScalarTimeSeries<any>[] = [];
+        weights: ScalarTimeSeries<number>[] = [];
         selections: Selection[][] = [];
         filter: boolean[] = [];
         attributes: Object = new Object; // arbitrary attributes (key -> value)

@@ -8,7 +8,6 @@ body{
 
 div#main{
     margin: 0 auto;
-	/*background: #fff;*/
 	width: 1000px;
 	text-align: center;
 }
@@ -119,6 +118,7 @@ img.menuicon{
 	height: 40px;
 	margin-right: 10px;
 }
+
 
 
 
@@ -269,6 +269,14 @@ p.error_msg{
 	margin-bottom: -11px;
 }
 
+.visLink{
+    margin-top: 5px;
+}
+
+.visLink{
+	float: left;
+}
+
 .visbutton{
 	background-color:transparent;
 	border: none;
@@ -279,6 +287,8 @@ p.error_msg{
 	text-decoration: underline;
 	font-weight: 100;
 }
+
+
 
 #tileViewLink{
 	margin-left: 6px;
@@ -319,6 +329,8 @@ pre{
 #biblio b{
 	text-decoration: underline;
 }
+
+
 
 
 

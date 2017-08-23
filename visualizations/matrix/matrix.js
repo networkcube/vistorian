@@ -23,7 +23,8 @@ var MatrixMenu = (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-        $("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix">Manual</a>');
+        $("#networkcube-matrix-menu")
+            .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
         $('#labelOrdering').append('<option value="none">---</option>');
         $('#labelOrdering').append('<option value="alphanumerical">Alphanumerical</option>');
@@ -71,34 +72,39 @@ var CellLabel = (function () {
     function CellLabel() {
         this.cellLabelBackground = glutils.selectAll()
             .data([{ id: 0 }])
-            .append('rect')
-            .attr('width', 70)
-            .attr('height', 22)
-            .attr('x', -100)
-            .attr('y', -100)
-            .style('fill', 0xffffff)
-            .style('stroke', 0xffffff)
-            .style('opacity', 0);
+            .append('text')
+            .style('opacity', 0)
+            .attr('z', -1)
+            .style('font-size', 12)
+            .style('stroke', '#fff')
+            .style('stroke-width', 2.5);
         this.cellLabel = glutils.selectAll()
             .data([{ id: 0 }])
             .append('text')
             .style('opacity', 0)
-            .attr('z', 2)
+            .attr('z', -1)
             .style('font-size', 12);
     }
+    CellLabel.prototype.hideCellLabel = function () {
+        this.cellLabelBackground.style('opacity', 0);
+        this.cellLabel.attr('z', -1)
+            .style('opacity', 0);
+    };
     CellLabel.prototype.updateCellLabel = function (mx, my, val, fw) {
         this.cellLabel
             .attr('x', mx + 40)
             .attr('y', -my)
             .style('opacity', 1)
             .text(val ? val : 0)
+            .attr('z', 2)
             .style('font-size', fw);
         this.cellLabelBackground
-            .attr('x', mx + 10)
-            .attr('y', -my + 11)
-            .attr("width", 70)
-            .attr("height", 22)
-            .style('opacity', .8);
+            .attr('x', mx + 40)
+            .attr('y', -my)
+            .style('opacity', 1)
+            .text(val ? val : 0)
+            .attr('z', 2)
+            .style('font-size', fw);
     };
     return CellLabel;
 })();
@@ -125,10 +131,12 @@ var MatrixOverview = (function () {
         this.contextPattern = g.append("defs")
             .append("pattern")
             .attr("id", "bg")
-            .attr('patternUnits', 'userSpaceOnUse');
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr("width", this.width)
+            .attr("height", this.height);
         this.contextImg = this.contextPattern.append("image")
-            .attr("x", 0)
-            .attr("y", 0);
+            .attr("width", this.width)
+            .attr("height", this.height);
         this.context = g.append("rect")
             .attr("class", "context")
             .attr("width", this.width)
@@ -145,7 +153,7 @@ var MatrixOverview = (function () {
         this.focus.call(this.zoom);
     };
     MatrixOverview.prototype.setCanvasRatio = function (canvasRatio) {
-        this.canvasRatio = canvasRatio;
+        this.canvasRatio = 1;
         var w = this.canvasRatio > 1 ? this.width * this.canvasRatio : this.width;
         var h = this.canvasRatio < 1 ? this.height * this.canvasRatio : this.height;
         this.contextPattern.attr("width", w)
@@ -269,10 +277,10 @@ var MatrixLabels = (function () {
             return 100;
         })
             .style('font-size', Math.min(this.cellSize, 20));
-        for (var i = 0; i < highlightedLinks.length; i++) {
-            d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
+        for (var i_1 = 0; i_1 < highlightedLinks.length; i_1++) {
+            d3.selectAll('#nodeLabel_left_' + highlightedLinks[i_1])
                 .style('font-weight', 900);
-            d3.selectAll('#nodeLabel_top_' + highlightedLinks[i])
+            d3.selectAll('#nodeLabel_top_' + highlightedLinks[i_1])
                 .style('font-weight', 900);
         }
     };
@@ -304,6 +312,10 @@ var MatrixVisualization = (function () {
             if (_this.toHoverLinks.length > 0) {
                 _this.matrix.highlightLinks(_this.toHoverLinks);
                 _this.matrix.updateCellLabel(_this.toHoverLinks[0], mpos.x, mpos.y);
+            }
+            else {
+                _this.matrix.highlightLinks([]);
+                _this.matrix.updateCellLabel(-1, -1000, -1000);
             }
         };
         this.mouseDownHandler = function (e) {
@@ -372,12 +384,16 @@ var MatrixVisualization = (function () {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(0xffffff, 1);
+        this.initTextureFramebuffer();
         this.canvas = this.renderer.domElement;
         this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
         this.canvas.addEventListener('mousedown', this.mouseDownHandler);
         this.canvas.addEventListener('mouseup', this.mouseUpHandler);
         this.canvas.addEventListener('click', this.clickHandler);
         glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
+    };
+    MatrixVisualization.prototype.initTextureFramebuffer = function () {
+        this.bufferTexture = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
     };
     MatrixVisualization.prototype.initGeometry = function () {
         var vertexShaderProgram = "\n      attribute vec4 customColor;\n      varying vec4 vColor;\n      void main() {\n        vColor = customColor;\n        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1 );\n      }";
@@ -421,8 +437,8 @@ var MatrixVisualization = (function () {
                     this.scene.remove(frame);
                 }
         }
-        for (var i = 0; i < this.guideLines.length; i++) {
-            this.scene.remove(this.guideLines[i]);
+        for (var i_2 = 0; i_2 < this.guideLines.length; i_2++) {
+            this.scene.remove(this.guideLines[i_2]);
         }
         this.vertexPositions = [];
         this.vertexColors = [];
@@ -440,11 +456,26 @@ var MatrixVisualization = (function () {
         this.scene.add(this.mesh);
         this.render();
         if (getImageData) {
+            var smallDim = Math.min(this.height, this.width);
+            this.resizeCanvas(smallDim, smallDim);
+            this.matrix.hideCellLabel();
+            this.render();
             var imgData = this.canvas.toDataURL();
             this.matrix.updateOverviewImage(imgData);
+            this.resizeCanvas(this.width, this.height);
         }
         this.updateGuideLines();
         this.render();
+    };
+    MatrixVisualization.prototype.resizeCanvas = function (width, height) {
+        this.camera.position.x = width / 2;
+        this.camera.position.y = -height / 2;
+        this.camera.left = width / -2;
+        this.camera.right = width / 2;
+        this.camera.top = height / 2;
+        this.camera.bottom = height / -2;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
     };
     MatrixVisualization.prototype.addCell = function (row, col, pair) {
         var links;
@@ -519,7 +550,7 @@ var MatrixVisualization = (function () {
         var mat = new THREE.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
         var x, y;
         var j = 0;
-        for (var i = 0; i <= h; i += this.cellSize) {
+        for (var i_3 = 0; i_3 <= h; i_3 += this.cellSize) {
             pos = j * this.cellSize + this.offset[1];
             m = new THREE.Line(geometry1, mat);
             m.position.set(0, -pos, 0);
@@ -528,7 +559,7 @@ var MatrixVisualization = (function () {
             j++;
         }
         j = 0;
-        for (var i = 0; i <= w; i += this.cellSize) {
+        for (var i_4 = 0; i_4 <= w; i_4 += this.cellSize) {
             pos = j * this.cellSize + this.offset[0];
             m = new THREE.Line(geometry2, mat);
             m.position.set(pos, 0, 0);
@@ -597,18 +628,18 @@ var Matrix = (function () {
             var highlightedLinksIds = [];
             var highlightedLinks = _this._dgraph.links().highlighted().toArray();
             if (highlightedLinks.length > 0) {
-                for (var i = 0; i < highlightedLinks.length; i++) {
-                    if (!highlightedLinks[i].isVisible())
+                for (var i_5 = 0; i_5 < highlightedLinks.length; i_5++) {
+                    if (!highlightedLinks[i_5].isVisible())
                         continue;
-                    highlightedNodesIds.push(highlightedLinks[i].source.id());
-                    highlightedNodesIds.push(highlightedLinks[i].target.id());
-                    highlightedLinksIds.push(highlightedLinks[i].id());
+                    highlightedNodesIds.push(highlightedLinks[i_5].source.id());
+                    highlightedNodesIds.push(highlightedLinks[i_5].target.id());
+                    highlightedLinksIds.push(highlightedLinks[i_5].id());
                 }
             }
             else {
                 var highlightedNodes = _this._dgraph.nodes().highlighted().toArray();
-                for (var i = 0; i < highlightedNodes.length; i++) {
-                    var node = highlightedNodes[i];
+                for (var i_6 = 0; i_6 < highlightedNodes.length; i_6++) {
+                    var node = highlightedNodes[i_6];
                     if (node.isVisible()) {
                         for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
                             var link = _a[_i];
@@ -683,7 +714,6 @@ var Matrix = (function () {
     };
     Matrix.prototype.setVis = function (matrixVis) {
         this.visualization = matrixVis;
-        this.overview.setCanvasRatio(this.visualization.width / this.visualization.height);
         this.resetTransform();
     };
     Matrix.prototype.setLabels = function (matrixLabels) {
@@ -703,6 +733,9 @@ var Matrix = (function () {
     };
     Matrix.prototype.updateOverviewImage = function (dataImg) {
         this.overview.updateOverviewImage(dataImg);
+    };
+    Matrix.prototype.hideCellLabel = function () {
+        this.cellLabel.hideCellLabel();
     };
     Matrix.prototype.updateCellSize = function (value) {
         var scale = value / this.initialCellSize;
@@ -738,15 +771,15 @@ var Matrix = (function () {
         if (orderType == 'alphanumerical') {
             var nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_7 = 0; i_7 < nodes2.length; i_7++) {
+                this.nodeOrder[nodes2[i_7].id()] = i_7;
             }
         }
         else if (orderType == 'reverse-alpha') {
             var nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_8 = 0; i_8 < nodes2.length; i_8++) {
+                this.nodeOrder[nodes2[i_8].id()] = i_8;
             }
         }
         else if (orderType == 'degree') {
@@ -755,8 +788,8 @@ var Matrix = (function () {
                 return n.neighbors().length;
             })
                 .sort('degree').toArray();
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_9 = 0; i_9 < nodes2.length; i_9++) {
+                this.nodeOrder[nodes2[i_9].id()] = i_9;
             }
         }
         else if (orderType == 'similarity') {
@@ -770,8 +803,8 @@ var Matrix = (function () {
         else {
             var visibleNodes = this._dgraph.nodes().visible().toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < visibleNodes.length; i++) {
-                this.nodeOrder[visibleNodes[i].id()] = i;
+            for (var i_10 = 0; i_10 < visibleNodes.length; i_10++) {
+                this.nodeOrder[visibleNodes[i_10].id()] = i_10;
             }
         }
         this.resetTransform();
@@ -806,8 +839,8 @@ var Matrix = (function () {
         var visibleData = {};
         var row, col;
         var node;
-        for (var i = 0; i < leftNodes.length; i++) {
-            node = leftNodes[i];
+        for (var i_11 = 0; i_11 < leftNodes.length; i_11++) {
+            node = leftNodes[i_11];
             if (node.isVisible()) {
                 row = this.nodeOrder[node.id()] - this.bbox.y0;
                 for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
@@ -867,6 +900,10 @@ var Matrix = (function () {
             networkcube.highlight('reset');
     };
     Matrix.prototype.updateCellLabel = function (linkId, mx, my) {
+        if (linkId < 0) {
+            this.cellLabel.updateCellLabel(-1000, -1000, null, 0);
+            return;
+        }
         var link = this._dgraph.link(linkId);
         var val = link.weights(this.startTime, this.endTime).get(0);
         val = Math.round(val * 1000) / 1000;
@@ -908,4 +945,3 @@ matrix.setCellLabel(cellLabel);
 matrix.setOverview(matrixOverview);
 matrix.setVis(matrixVis);
 networkcube.addEventListener('timeRange', matrix.timeRangeHandler);
-//# sourceMappingURL=matrix.js.map

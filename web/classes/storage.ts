@@ -16,13 +16,13 @@ module storage{
 
     // SESSION
     export function saveSessionId(sessionid:string){
-        console.log('save session', sessionid )
+        // console.log('save session', sessionid )
         $.jStorage.set(SESSION_SESSIONID, sessionid);
     }
 
     export function getLastSessionId():string{
         var session:string = $.jStorage.get<string>(SESSION_SESSIONID);
-        console.log('get session, ', session)
+        // console.log('get session, ', session)
         return session;
     }
 
@@ -35,7 +35,7 @@ module storage{
 
     // Stores all user's tables (tables must be in json format)
     export function saveUserTable(table, sessionid:string){
-        console.log('[vistorian] Save user table', table.name, sessionid);
+        // console.log('[vistorian] Save user table', table.name, sessionid);
 
         // add name to table names if not yet there.
         var tableNames:string[] = getTableNames(sessionid);
@@ -57,7 +57,7 @@ module storage{
             // console.log('\tTable', table.name, 'found. Replace table')
         }
         $.jStorage.set(sessionid + SEP + SESSION_TABLE + SEP + table.name, table);
-        console.log('\tTable', table.name, 'added.', getTableNames(sessionid).length + ' tables stored.', getUserTable(table.name, sessionid))
+        // console.log('\tTable', table.name, 'added.', getTableNames(sessionid).length + ' tables stored.', getUserTable(table.name, sessionid))
 
     }
 
@@ -79,6 +79,7 @@ module storage{
 
     export function getTableNames(sessionid:string):string[]{
         var names:string[] = $.jStorage.get<string[]>(sessionid + SEP + SESSION_TABLENAMES);
+        // console.log('>>>names',names, sessionid + SEP + SESSION_TABLENAMES )
         if(names == undefined)
             names = []
         return names;
@@ -104,7 +105,7 @@ module storage{
             tableNames.splice(tableNames.indexOf(table.name), 1);
             saveTableNames(tableNames,sessionid);
         }
-        console.log('table deleted', getTableNames(sessionid));
+        // console.log('table deleted', getTableNames(sessionid));
     }
 
 
@@ -133,7 +134,7 @@ module storage{
         if(!found){
             networkIds.push(network.id);
             saveNetworkIds(networkIds,sessionid);
-            console.log('Save imported networkId', network.id)
+            // console.log('Save imported networkId', network.id)
        }
         // console.log('save network', network)
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + network.id, network);
@@ -143,22 +144,29 @@ module storage{
         var ids:number[] = $.jStorage.get<number[]>(sessionid + SEP + SESSION_NETWORKIDS);
         if(ids == undefined)
             ids = []
-        console.log('getNetworkIds :', sessionid, ids)
+        // console.log('getNetworkIds :', sessionid, ids)
         return ids;
     }
     export function saveNetworkIds(networkIds, sessionid:string){
         $.jStorage.set(sessionid + SEP + SESSION_NETWORKIDS, networkIds);
     }
 
-    export function getNetwork(networkId:number, sessionid:string):vistorian.Network
+    export function getNetwork(networkId:string, sessionid:string):vistorian.Network
     {
         return $.jStorage.get<vistorian.Network>(sessionid + SEP + SESSION_NETWORK + SEP + networkId);
     }
 
     export function deleteNetwork(network:vistorian.Network, sessionid:string){
+        // console.log('deleteNetworkById', network.id, sessionid);
+        networkcube.deleteData(network.name);
         deleteNetworkById(network.id, sessionid);
+
     }
     export function deleteNetworkById(id:number, sessionid:string){
+        // console.log('deleteNetworkById', id, sessionid);
+
+        // remove network tables from local storage: 
+
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + id, {});
         $.jStorage.deleteKey(sessionid + SEP + SESSION_NETWORK + SEP + id);
 

@@ -106,9 +106,12 @@
             .attr('width', width)
             .attr('height', TIMELINE_HEIGHT)
 
-    var timeSlider:networkcube.TimeSlider = new TimeSlider(dgraph, width-50);
-    timeSlider.appendTo(timeSvg);
-    networkcube.addEventListener('timeRange', timeChangedHandler)
+    if(dgraph.times().size() > 1)
+    {
+        var timeSlider:networkcube.TimeSlider = new TimeSlider(dgraph, width-50);
+        timeSlider.appendTo(timeSvg);
+        networkcube.addEventListener('timeRange', timeChangedHandler)
+    }
 
 
     
@@ -491,7 +494,8 @@
 
     }
     
-    function updateLinks(){
+    function updateLinks()
+    {
         visualLinks
             .style('stroke', function(d){
                 var color = networkcube.getPriorityColor(d);            

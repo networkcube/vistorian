@@ -10375,6 +10375,20 @@ var networkcube;
             dataMgr.saveToStorage(this.name, this.nodeTypeArrays_NAME, this.nodeTypeArrays, this.standardArrayReplacer);
             dataMgr.saveToStorage(this.name, this.locationArrays_NAME, this.locationArrays, this.standardArrayReplacer);
         };
+        DynamicGraph.prototype.delete = function (dataMgr) {
+            dataMgr.removeFromStorage(this.name, this.gran_min_NAME);
+            dataMgr.removeFromStorage(this.name, this.gran_max_NAME);
+            dataMgr.removeFromStorage(this.name, this.minWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.maxWeight_NAME);
+            dataMgr.removeFromStorage(this.name, this.matrix_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodePairArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.timeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.linkTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.nodeTypeArrays_NAME);
+            dataMgr.removeFromStorage(this.name, this.locationArrays_NAME);
+        };
         DynamicGraph.prototype.debugCompareTo = function (other) {
             var result = true;
             if (this.name != other.name) {
@@ -10478,7 +10492,6 @@ var networkcube;
         };
         DynamicGraph.prototype.initDynamicGraph = function (data) {
             this.clearSelections();
-            console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data);
             this.name = data.name;
             this.gran_min = 0;
             this.gran_max = 0;
@@ -10650,7 +10663,8 @@ var networkcube;
                     time = this._times[0];
                 if (networkcube.isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
-                    if (locId == null || locId == undefined)
+                    console.log('locId', locId);
+                    if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);
                 }
@@ -10731,7 +10745,7 @@ var networkcube;
                 time = this._times[timeId];
                 this.linkArrays.presence[linkId].push(timeId);
                 if (networkcube.isValidIndex(data.linkSchema.weight) && data.linkTable[i][data.linkSchema.weight] != undefined) {
-                    this.linkArrays.weights[linkId].set(time, data.linkTable[i][data.linkSchema.weight]);
+                    this.linkArrays.weights[linkId].set(time, parseFloat(data.linkTable[i][data.linkSchema.weight]));
                     this.minWeight = Math.min(this.minWeight, data.linkTable[i][data.linkSchema.weight]);
                     this.maxWeight = Math.max(this.maxWeight, data.linkTable[i][data.linkSchema.weight]);
                 }
@@ -10881,7 +10895,6 @@ var networkcube;
                 this.addElementToSelection(selection, this._nodes[i]);
             }
             if (nodeSelections.length == 1) {
-                console.log('nodeSelections[0]:', nodeSelections[0]);
                 nodeSelections[0].color = '#444';
             }
             types = [];
@@ -11180,7 +11193,6 @@ var networkcube;
                     return timeId;
                 }
             }
-            console.error('Time object for unix time', unixTime, 'not found!');
             return undefined;
         };
         DynamicGraph.prototype.addNodeOrdering = function (name, order) {
@@ -11517,7 +11529,6 @@ var networkcube;
         };
         DataManager.prototype.importData = function (session, data) {
             this.session = session;
-            console.log('import data set', data.name, data);
             if (!data.nodeTable && !data.linkTable) {
                 console.log('Empty tables. No data imported.');
                 return;
@@ -11644,13 +11655,15 @@ var networkcube;
     }
     networkcube.getDefaultLinkSchema = getDefaultLinkSchema;
     function getDefaultLocationSchema() {
-        return new LocationSchema(0, 1, 2, 3, 4, 5, 6, 7, 8);
+        return new LocationSchema(0, 1, 2, 3, 4);
     }
     networkcube.getDefaultLocationSchema = getDefaultLocationSchema;
     var DataSet = (function () {
         function DataSet(params) {
             this.locationTable = [];
             this.selections = [];
+            if (params == undefined)
+                return;
             this.name = params.name;
             this.nodeTable = params.nodeTable;
             this.linkTable = params.linkTable;
@@ -13200,6 +13213,10 @@ var networkcube;
         dataManager.importData(sessionName, data);
     }
     networkcube.importData = importData;
+    function deleteData(dataSetName) {
+        getDynamicGraph(dataSetName).delete(dataManager);
+    }
+    networkcube.deleteData = deleteData;
     function clearAllDataManagerSessionCaches() {
         dataManager.clearAllSessionData();
     }

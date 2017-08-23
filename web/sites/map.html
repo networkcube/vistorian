@@ -8,13 +8,19 @@
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 
-<script src="https://networkcube.github.io/networkcube/core/networkcube.js"></script>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="../traces/trace.js"></script>
+	
+<script src="../../core/networkcube.js"></script>
 <script src="../classes/vistorian.js"></script>
 
 </head>
 <title>Map</title>
 <body>
 
+	<!-- VS: Call to trace_test_130529 -->
+	<script type="text/javascript" src="../traces/trace_test_130529.js"></script>
+	
     <table>
         <tr>
             <td width="220px">
@@ -34,7 +40,9 @@
                 © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="20px">
     </div>
 	<script>
-        
+        SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
+        SERVER = SERVER.split('web/')[0]
+  
         $( document ).ready(function() {
             var width = window.innerWidth -30;
             width_col1 = 220;
@@ -47,12 +55,12 @@
             console.log(params)
             networkcube.createVisualizationIFrame(
                 'bookmarkFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/bookmarkbrowser/index.html',
+                SERVER + 'visualizations/bookmarkbrowser/index.html',
                 params['session'], params['datasetName'], 
                 width_col1, height)
             networkcube.createVisualizationIFrame(
                 'visFrame', 
-                'https://networkcube.github.io/networkcube/visualizations/map/index.html',
+                SERVER + 'visualizations/map/index.html',
                 params['session'], params['datasetName'], 
                 width_col2, height)
 

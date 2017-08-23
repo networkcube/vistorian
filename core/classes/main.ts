@@ -46,6 +46,11 @@ module networkcube {
         session = sessionName;
         dataManager.importData(sessionName, data);
     }
+
+    export function deleteData(dataSetName: string){
+        // deletes a network
+        getDynamicGraph(dataSetName).delete(dataManager);
+    }
     
     export function clearAllDataManagerSessionCaches(){
         dataManager.clearAllSessionData();

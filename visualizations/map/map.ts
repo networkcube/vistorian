@@ -344,8 +344,10 @@ function init(){
         for( var i=0 ; i <nodes.length ; i++){
             n = nodes[i];
             positions = n.locationSerie().serie;
+            // console.log('>', n.locationSerie().serie)
             serie = new networkcube.ScalarTimeSeries<Object>();
             nodePositionObjectsLookupTable.push(serie);
+            // console.log('ITERATE ALL NODES', positions.length);
             for(var tId in positions){
                 // console.log('tId', tId)
                 googleLatLng = new google.maps.LatLng(
@@ -359,7 +361,7 @@ function init(){
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng
-                console.log('tId', tId, parseInt(tId) )
+                console.log('>>>>', positions[tId].latitude(), positions[tId].longitude() )
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
             }
@@ -1060,11 +1062,14 @@ var timeSvg = d3.select('#timelineDiv')
     .attr('width', width)
     .attr('height', TIMELINE_HEIGHT)
 
-networkcube.addEventListener('timeRange', timeChangedHandler);
 
 var OVERLAP_SLIDER_WIDTH = 100;
-var timeSlider: TimeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
-timeSlider.appendTo(timeSvg);
+if(dgraph.times().size() > 1)
+{
+    var timeSlider: TimeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
+    timeSlider.appendTo(timeSvg);
+    networkcube.addEventListener('timeRange', timeChangedHandler);
+}
 
 // OVERLAP SLIDER    
 var menuDiv = d3.select('#menuDiv');
@@ -1131,8 +1136,9 @@ function timeChangedHandler(m:networkcube.TimeRangeMessage) {
 }
 
 
-function updateEvent(m: networkcube.Message) {
-    if (m && m.type == 'timeRange') {
+function updateEvent(m: networkcube.Message)
+{    
+    if (m && m.type == 'timeRange' && dgraph.times().size() > 1) {
         time_start = dgraph.time(m.startId);
         time_end = dgraph.time(m.endId);
         timeSlider.set(time_start, time_end);
@@ -1269,7 +1275,7 @@ function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object
 {
     var s = this.nodePositionObjectsLookupTable[n.id()]
     var npo;
-    console.log('s.serie[tId]', tId, s.serie[tId])
+    // console.log('s.serie[tId]', tId, s.serie[tId])
     
     if(s.serie[tId] == undefined)
     {
