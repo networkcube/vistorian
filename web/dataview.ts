@@ -61,12 +61,12 @@ function loadVisualizationList() {
     $('#visualizationList')
         .append('<li class="visLink" title="Show matrix and node-link split-view.">\
             <button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
-            <img src="logos/mat-nl.png" class="visicon"/><p>Matrix + Node Link</p>\
+            <img src="figures/nl+mat.png" class="visicon"/><p>Matrix + Node Link</p>\
         </button></li>')
     $('#visualizationList')
         .append('<li class="visLink" title="Show all visualizations.">\
         <button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip">\
-        <img src="logos/tiled.png" class="visicon"/><p>All</p>\
+        <img src="figures/all.png" class="visicon"/><p>All</p>\
         </button></li>')
 }
 
