@@ -344,8 +344,10 @@ function init(){
         for( var i=0 ; i <nodes.length ; i++){
             n = nodes[i];
             positions = n.locationSerie().serie;
+            // console.log('>', n.locationSerie().serie)
             serie = new networkcube.ScalarTimeSeries<Object>();
             nodePositionObjectsLookupTable.push(serie);
+            // console.log('ITERATE ALL NODES', positions.length);
             for(var tId in positions){
                 // console.log('tId', tId)
                 googleLatLng = new google.maps.LatLng(
@@ -359,6 +361,7 @@ function init(){
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng
+                console.log('>>>>', positions[tId].latitude(), positions[tId].longitude() )
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
             }
@@ -1133,15 +1136,16 @@ function timeChangedHandler(m:networkcube.TimeRangeMessage) {
 }
 
 
-function updateEvent(m: networkcube.Message) {
-    // if (m && m.type == 'timeRange') {
-    //     time_start = dgraph.time(m.startId);
-    //     time_end = dgraph.time(m.endId);
-    //     timeSlider.set(time_start, time_end);
-    // }
+function updateEvent(m: networkcube.Message)
+{    
+    if (m && m.type == 'timeRange' && dgraph.times().size() > 1) {
+        time_start = dgraph.time(m.startId);
+        time_end = dgraph.time(m.endId);
+        timeSlider.set(time_start, time_end);
+    }
 
-    // updateLinks();
-    // updateNodes();
+    updateLinks();
+    updateNodes();
 }
 
 

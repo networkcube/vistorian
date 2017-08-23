@@ -55,8 +55,8 @@ var vistorian;
         __extends(VLinkSchema, _super);
         function VLinkSchema() {
             _super.call(this, 'userLinkSchema');
-            this.source_location = -1;
-            this.target_location = -1;
+            this.location_source = -1;
+            this.location_target = -1;
             this.id = 0;
             this.source = -1;
             this.target = -1;
@@ -360,8 +360,8 @@ var vistorian;
                     && p != 'id'
                     && p != 'source'
                     && p != 'target'
-                    && p != 'target_location'
-                    && p != 'source_location') {
+                    && p != 'location_source'
+                    && p != 'location_source') {
                     normalizedLinkSchema[p] = linkColCount++;
                 }
             }
@@ -491,8 +491,10 @@ var vistorian;
             var time;
             var locationsFound = false;
             var timeFound = false;
-            if (networkcube.isValidIndex(userLinkSchema.source_location)
-                || networkcube.isValidIndex(userLinkSchema.target_location)) {
+            console.log('userLinkSchema', userLinkSchema);
+            if (networkcube.isValidIndex(userLinkSchema.location_source)
+                || networkcube.isValidIndex(userLinkSchema.location_target)) {
+                console.log('>> SET LOCATIONS');
                 normalizedNodeSchema.location = nodeColCount++;
                 for (var i = 0; i < normalizedNodeTable.length; i++) {
                     normalizedNodeTable[i].push('');
@@ -506,9 +508,9 @@ var vistorian;
                 for (var i = 1; i < userLinkData.length; i++) {
                     var nodeRow, rowToDuplicate;
                     nodeName = userLinkData[i][userLinkSchema.source];
-                    if (networkcube.isValidIndex(userLinkSchema.source_location)
-                        && userLinkData[i][userLinkSchema.source_location]
-                        && userLinkData[i][userLinkSchema.source_location] != '') {
+                    if (networkcube.isValidIndex(userLinkSchema.location_source)
+                        && userLinkData[i][userLinkSchema.location_source]
+                        && userLinkData[i][userLinkSchema.location_source] != '') {
                         var len = normalizedNodeTable.length;
                         for (var j = 0; j < len; j++) {
                             nodeRow = normalizedNodeTable[j];
@@ -530,7 +532,7 @@ var vistorian;
                                     }
                                 }
                                 else {
-                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location];
+                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source];
                                     j = len;
                                     break;
                                 }
@@ -538,7 +540,7 @@ var vistorian;
                         }
                         if (rowToDuplicate) {
                             if (rowToDuplicate[normalizedNodeSchema.location] == '') {
-                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location];
+                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source];
                                 rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time];
                             }
                             else {
@@ -546,19 +548,19 @@ var vistorian;
                                 for (var c = 0; c < rowToDuplicate.length; c++) {
                                     newRowNode.push(rowToDuplicate[c]);
                                 }
-                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location];
+                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source];
                                 newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time];
                                 normalizedNodeTable.push(newRowNode);
                             }
                         }
-                        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.source_location]) == -1) {
-                            locationLabels.push(userLinkData[i][userLinkSchema.source_location]);
+                        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1) {
+                            locationLabels.push(userLinkData[i][userLinkSchema.location_source]);
                         }
                     }
                     nodeName = userLinkData[i][userLinkSchema.target];
-                    if (networkcube.isValidIndex(userLinkSchema.target_location)
-                        && userLinkData[i][userLinkSchema.target_location]
-                        && userLinkData[i][userLinkSchema.target_location] != '') {
+                    if (networkcube.isValidIndex(userLinkSchema.location_target)
+                        && userLinkData[i][userLinkSchema.location_target]
+                        && userLinkData[i][userLinkSchema.location_target] != '') {
                         var len = normalizedNodeTable.length;
                         for (var j = 0; j < len; j++) {
                             nodeRow = normalizedNodeTable[j];
@@ -580,7 +582,7 @@ var vistorian;
                                     }
                                 }
                                 else {
-                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location];
+                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target];
                                     j = len;
                                     break;
                                 }
@@ -588,7 +590,7 @@ var vistorian;
                         }
                         if (rowToDuplicate) {
                             if (rowToDuplicate[normalizedNodeSchema.location] == '') {
-                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location];
+                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target];
                                 rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time];
                             }
                             else {
@@ -596,13 +598,13 @@ var vistorian;
                                 for (var c = 0; c < rowToDuplicate.length; c++) {
                                     newRowNode.push(rowToDuplicate[c]);
                                 }
-                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location];
+                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target];
                                 newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time];
                                 normalizedNodeTable.push(newRowNode);
                             }
                         }
-                        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.target_location]) == -1) {
-                            locationLabels.push(userLinkData[i][userLinkSchema.target_location]);
+                        if (locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1) {
+                            locationLabels.push(userLinkData[i][userLinkSchema.location_target]);
                         }
                     }
                 }

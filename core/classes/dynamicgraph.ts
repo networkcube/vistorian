@@ -669,6 +669,7 @@ module networkcube {
                 }
             }
 
+            // console.log('data.nodeTable.length', data.nodeTable.length)
             for (var i = 0; i < data.nodeTable.length; i++) {
                 row = data.nodeTable[i];
 
@@ -714,6 +715,7 @@ module networkcube {
                 // check locations
                 if (isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
+                    console.log('locId', locId)
                     if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);

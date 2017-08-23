@@ -257,6 +257,7 @@ function init() {
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng;
+                console.log('>>>>', positions[tId].latitude(), positions[tId].longitude());
                 npo.timeIds.push(parseInt(tId));
                 serie.set(dgraph.time(parseInt(tId)), npo);
             }
@@ -788,6 +789,13 @@ function timeChangedHandler(m) {
     updateLinks();
 }
 function updateEvent(m) {
+    if (m && m.type == 'timeRange' && dgraph.times().size() > 1) {
+        time_start = dgraph.time(m.startId);
+        time_end = dgraph.time(m.endId);
+        timeSlider.set(time_start, time_end);
+    }
+    updateLinks();
+    updateNodes();
 }
 function reorderLabels() {
     console.log('updateEvents');

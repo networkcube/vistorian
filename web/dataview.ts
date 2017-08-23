@@ -1065,22 +1065,22 @@ function extractLocations() {
         }
     }
     // check link table
-    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.source_location)) {
+    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_source)) {
         var linkTable = currentNetwork.userLinkTable.data;
         if (linkTable != undefined) {
             // check if location table exists
             for (var i = 1; i < linkTable.length; i++) {
-                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.target_location], locationTable.data)
+                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.location_target], locationTable.data)
             }
         }
     }
 
-    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.target_location)) {
+    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_target)) {
         // check if location table exists
         if (linkTable != undefined) {
             // locationsFound = true;
             for (var i = 1; i < linkTable.length; i++) {
-                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.target_location], locationTable.data)
+                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.location_target], locationTable.data)
             }
         }
     }

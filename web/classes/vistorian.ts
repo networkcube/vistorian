@@ -76,8 +76,8 @@ module vistorian {
         };
     }
     export class VLinkSchema extends VTableSchema {
-        source_location: number = -1; // location of source node
-        target_location: number = -1; // location of target node
+        location_source: number = -1; // location of source node
+        location_target: number = -1; // location of target node
         id: number = 0;
         source: number = -1;
         target: number = -1;
@@ -660,8 +660,8 @@ module vistorian {
                 && p != 'id'
                 && p != 'source'
                 && p != 'target'
-                && p != 'target_location'
-                && p != 'source_location'
+                && p != 'location_source'
+                && p != 'location_source'
             ){
                     normalizedLinkSchema[p] = linkColCount++;
                 }
@@ -901,9 +901,11 @@ module vistorian {
             var locationsFound: boolean = false;
             var timeFound: boolean = false;
 
-            if(networkcube.isValidIndex(userLinkSchema.source_location) 
-            || networkcube.isValidIndex(userLinkSchema.target_location))
+            console.log('userLinkSchema', userLinkSchema)
+            if(networkcube.isValidIndex(userLinkSchema.location_source) 
+            || networkcube.isValidIndex(userLinkSchema.location_target))
             {
+                console.log('>> SET LOCATIONS')
                 // set location schema index to next new column
                 normalizedNodeSchema.location = nodeColCount++;
                 // append new field to each row in node table
@@ -930,9 +932,9 @@ module vistorian {
                     var nodeRow, rowToDuplicate;
                     // do for source location
                     nodeName = userLinkData[i][userLinkSchema.source]
-                    if(networkcube.isValidIndex(userLinkSchema.source_location)
-                    && userLinkData[i][userLinkSchema.source_location] 
-                    && userLinkData[i][userLinkSchema.source_location] != '')
+                    if(networkcube.isValidIndex(userLinkSchema.location_source)
+                    && userLinkData[i][userLinkSchema.location_source] 
+                    && userLinkData[i][userLinkSchema.location_source] != '')
                     {
                         var len = normalizedNodeTable.length
                         for(var j=0 ; j < len ; j++)
@@ -960,7 +962,7 @@ module vistorian {
                                     }
                                 }else{
                                     // just insert, no dupliation required
-                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location]
+                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source]
                                     j = len; // go to end of table
                                     break;
                                 }
@@ -971,29 +973,29 @@ module vistorian {
                         {
                             if(rowToDuplicate[normalizedNodeSchema.location] == '')
                             {
-                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location]
+                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source]
                                 rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
                             }else{
                                 var newRowNode = []
                                 for(var c=0 ; c < rowToDuplicate.length ; c++){
                                     newRowNode.push(rowToDuplicate[c])
                                 }
-                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.source_location]
+                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_source]
                                 newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
                                 normalizedNodeTable.push(newRowNode);
                             }
                         }
-                        if(locationLabels.indexOf(userLinkData[i][userLinkSchema.source_location]) == -1)
+                        if(locationLabels.indexOf(userLinkData[i][userLinkSchema.location_source]) == -1)
                         {
-                            locationLabels.push(userLinkData[i][userLinkSchema.source_location])
+                            locationLabels.push(userLinkData[i][userLinkSchema.location_source])
                         }
                     }
 
                     // do for target location
                     nodeName = userLinkData[i][userLinkSchema.target]
-                    if(networkcube.isValidIndex(userLinkSchema.target_location)
-                    && userLinkData[i][userLinkSchema.target_location] 
-                    && userLinkData[i][userLinkSchema.target_location] != '')
+                    if(networkcube.isValidIndex(userLinkSchema.location_target)
+                    && userLinkData[i][userLinkSchema.location_target] 
+                    && userLinkData[i][userLinkSchema.location_target] != '')
                     {
                         var len = normalizedNodeTable.length
                         for(var j=0 ; j < len ; j++)
@@ -1021,7 +1023,7 @@ module vistorian {
                                     }
                                 }else{
                                     // just insert, no dupliation required
-                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location]
+                                    nodeRow[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                                     j = len; // go to end of table
                                     break;
                                 }
@@ -1032,7 +1034,7 @@ module vistorian {
                         {
                             if(rowToDuplicate[normalizedNodeSchema.location] == '')
                             {
-                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location]
+                                rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                                 rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
                                 // console.log('LOCATION INFO: ', rowToDuplicate[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
                             }else{
@@ -1041,16 +1043,16 @@ module vistorian {
                                 for(var c=0 ; c < rowToDuplicate.length ; c++){
                                     newRowNode.push(rowToDuplicate[c])
                                 }
-                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.target_location]
+                                newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                                 newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
                                 // console.log('LOCATION INFO: ', newRowNode[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
                    
                                 normalizedNodeTable.push(newRowNode);
                             }                                
                         }
-                        if(locationLabels.indexOf(userLinkData[i][userLinkSchema.target_location]) == -1)
+                        if(locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1)
                         {
-                            locationLabels.push(userLinkData[i][userLinkSchema.target_location])
+                            locationLabels.push(userLinkData[i][userLinkSchema.location_target])
                         }
                     }
                 } 

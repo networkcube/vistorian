@@ -10663,6 +10663,7 @@ var networkcube;
                     time = this._times[0];
                 if (networkcube.isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
+                    console.log('locId', locId);
                     if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);
