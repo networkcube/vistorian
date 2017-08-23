@@ -112,11 +112,9 @@ var vistorian;
                 fileContents[i] = obj;
                 var content = fileContents[i].content.replace(', "', ',"').replace('" ,', '",');
                 table = new VTable(files[i].name.replace('.csv', '').replace(' ', '_').trim(), Papa.parse(content).data);
-                console.log('>', table.data[59]);
                 formatTable(table);
                 storage.saveUserTable(table, sessionid);
                 loadCount++;
-                console.log(loadCount, files.length);
                 if (loadCount == files.length)
                     callBack();
             };
@@ -184,7 +182,6 @@ var vistorian;
     function checkTime(table, timeCol, timeFormat) {
         var timeString;
         var error = [];
-        console.log('table', table);
         for (var i = 0; i < table.data.length; i++) {
             timeString = table.data[i][timeCol];
             if (timeString.length == 0) {
@@ -210,7 +207,6 @@ var vistorian;
         requestsRunning = 0;
         fullGeoNames = [];
         for (var i = 1; i < data.length; i++) {
-            console.log('send update request ', data[i][locationSchema.geoname]);
             updateEntryToLocationTableOSM(i, data[i][locationSchema.geoname], userLocationTable, locationSchema);
         }
         requestTimer = setInterval(function () {
@@ -262,7 +258,6 @@ var vistorian;
                 if (geoname == '')
                     return;
                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-                console.log('update', geoname, undefined, undefined);
             }
         })
             .always(function () {
@@ -438,7 +433,6 @@ var vistorian;
         var nodeNames = [];
         if (currentNetwork.userNodeTable == undefined
             && currentNetwork.userLinkTable != undefined) {
-            console.log('Create node table from scratch');
             var nodeLocations = [];
             var nodeTimes = [];
             var nodeTypes = [];
@@ -491,10 +485,8 @@ var vistorian;
             var time;
             var locationsFound = false;
             var timeFound = false;
-            console.log('userLinkSchema', userLinkSchema);
             if (networkcube.isValidIndex(userLinkSchema.location_source)
                 || networkcube.isValidIndex(userLinkSchema.location_target)) {
-                console.log('>> SET LOCATIONS');
                 normalizedNodeSchema.location = nodeColCount++;
                 for (var i = 0; i < normalizedNodeTable.length; i++) {
                     normalizedNodeTable[i].push('');

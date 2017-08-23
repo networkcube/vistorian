@@ -185,7 +185,7 @@ module vistorian {
                     // }
                 ).data
                 )
-                console.log('>', table.data[59])
+                // console.log('>', table.data[59])
 
                 // remove white spaces, extra cols and rows etc..
                 formatTable(table);
@@ -193,7 +193,7 @@ module vistorian {
                 storage.saveUserTable(table, sessionid);
                 loadCount++;
 
-                console.log(loadCount, files.length);
+                // console.log(loadCount, files.length);
                 if (loadCount == files.length)
                     callBack();
             }
@@ -285,7 +285,7 @@ module vistorian {
     export function checkTime(table: VTable, timeCol: number, timeFormat: string): number[] {
         var timeString: string;
         var error: number[] = [];
-        console.log('table', table)
+        // console.log('table', table)
         for (var i = 0; i < table.data.length; i++) {
             timeString = table.data[i][timeCol];
 
@@ -312,7 +312,7 @@ module vistorian {
         requestsRunning = 0;
         fullGeoNames = [];
         for (var i = 1; i < data.length; i++) {
-            console.log('send update request ', data[i][locationSchema.geoname])
+            // console.log('send update request ', data[i][locationSchema.geoname])
             updateEntryToLocationTableOSM(i, data[i][locationSchema.geoname], userLocationTable, locationSchema);
         }
         // wait for all requests to be returned, until continue
@@ -479,7 +479,7 @@ module vistorian {
                 if (geoname == '')
                     return;
                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-                console.log('update', geoname, undefined, undefined);
+                // console.log('update', geoname, undefined, undefined);
             }
         })
             .always(function () {
@@ -812,7 +812,7 @@ module vistorian {
         if (currentNetwork.userNodeTable == undefined 
         && currentNetwork.userLinkTable != undefined) 
         {
-            console.log('Create node table from scratch')
+            // console.log('Create node table from scratch')
             var nodeLocations: number[][] = [];
             var nodeTimes: number[][] = [];
             var nodeTypes: string[] = [];
@@ -901,11 +901,10 @@ module vistorian {
             var locationsFound: boolean = false;
             var timeFound: boolean = false;
 
-            console.log('userLinkSchema', userLinkSchema)
+
             if(networkcube.isValidIndex(userLinkSchema.location_source) 
             || networkcube.isValidIndex(userLinkSchema.location_target))
             {
-                console.log('>> SET LOCATIONS')
                 // set location schema index to next new column
                 normalizedNodeSchema.location = nodeColCount++;
                 // append new field to each row in node table
