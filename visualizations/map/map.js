@@ -257,7 +257,6 @@ function init() {
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng;
-                console.log('tId', tId, parseInt(tId));
                 npo.timeIds.push(parseInt(tId));
                 serie.set(dgraph.time(parseInt(tId)), npo);
             }
@@ -734,10 +733,12 @@ var timeSvg = d3.select('#timelineDiv')
     .append('svg')
     .attr('width', width)
     .attr('height', TIMELINE_HEIGHT);
-networkcube.addEventListener('timeRange', timeChangedHandler);
 var OVERLAP_SLIDER_WIDTH = 100;
-var timeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
-timeSlider.appendTo(timeSvg);
+if (dgraph.times().size() > 1) {
+    var timeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
+    timeSlider.appendTo(timeSvg);
+    networkcube.addEventListener('timeRange', timeChangedHandler);
+}
 var menuDiv = d3.select('#menuDiv');
 networkcube.makeSlider(menuDiv, 'Node Overlap', 100, MENU_HEIGHT, OVERLAP_FRACTION, -.05, 3, function (value) {
     OVERLAP_FRACTION = value;
@@ -787,13 +788,6 @@ function timeChangedHandler(m) {
     updateLinks();
 }
 function updateEvent(m) {
-    if (m && m.type == 'timeRange') {
-        time_start = dgraph.time(m.startId);
-        time_end = dgraph.time(m.endId);
-        timeSlider.set(time_start, time_end);
-    }
-    updateLinks();
-    updateNodes();
 }
 function reorderLabels() {
     console.log('updateEvents');
@@ -895,7 +889,6 @@ function getNodePositionObjectsForLocation(n, long, lat) {
 function getNodePositionObjectAtTime(n, tId) {
     var s = this.nodePositionObjectsLookupTable[n.id()];
     var npo;
-    console.log('s.serie[tId]', tId, s.serie[tId]);
     if (s.serie[tId] == undefined) {
         if (emptyNodePositions[n.id()] != undefined) {
             npo = emptyNodePositions[n.id()];

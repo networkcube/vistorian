@@ -501,7 +501,7 @@ module networkcube {
         initDynamicGraph(data: DataSet): void {
 
             this.clearSelections();
-            console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data)
+            // console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data)
 
             //this.data = data;
             this.name = data.name;
@@ -714,7 +714,7 @@ module networkcube {
                 // check locations
                 if (isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
-                    if (locId == null || locId == undefined)
+                    if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);
                 }
@@ -1678,7 +1678,7 @@ module networkcube {
                     return timeId;
                 }
             }
-            console.error('Time object for unix time', unixTime, 'not found!')
+            // console.error('Time object for unix time', unixTime, 'not found!')
             return undefined;
         }
 

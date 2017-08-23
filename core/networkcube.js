@@ -10492,7 +10492,6 @@ var networkcube;
         };
         DynamicGraph.prototype.initDynamicGraph = function (data) {
             this.clearSelections();
-            console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data);
             this.name = data.name;
             this.gran_min = 0;
             this.gran_max = 0;
@@ -10664,7 +10663,7 @@ var networkcube;
                     time = this._times[0];
                 if (networkcube.isValidIndex(data.nodeSchema.location)) {
                     var locId = row[data.nodeSchema.location];
-                    if (locId == null || locId == undefined)
+                    if (locId == null || locId == undefined || locId == -1)
                         continue;
                     this.nodeArrays.locations[nodeId_data].set(time, locId);
                 }
@@ -10895,7 +10894,6 @@ var networkcube;
                 this.addElementToSelection(selection, this._nodes[i]);
             }
             if (nodeSelections.length == 1) {
-                console.log('nodeSelections[0]:', nodeSelections[0]);
                 nodeSelections[0].color = '#444';
             }
             types = [];
@@ -11194,7 +11192,6 @@ var networkcube;
                     return timeId;
                 }
             }
-            console.error('Time object for unix time', unixTime, 'not found!');
             return undefined;
         };
         DynamicGraph.prototype.addNodeOrdering = function (name, order) {
@@ -11531,7 +11528,6 @@ var networkcube;
         };
         DataManager.prototype.importData = function (session, data) {
             this.session = session;
-            console.log('import data set', data.name, data);
             if (!data.nodeTable && !data.linkTable) {
                 console.log('Empty tables. No data imported.');
                 return;
@@ -11658,13 +11654,15 @@ var networkcube;
     }
     networkcube.getDefaultLinkSchema = getDefaultLinkSchema;
     function getDefaultLocationSchema() {
-        return new LocationSchema(0, 1, 2, 3, 4, 5, 6, 7, 8);
+        return new LocationSchema(0, 1, 2, 3, 4);
     }
     networkcube.getDefaultLocationSchema = getDefaultLocationSchema;
     var DataSet = (function () {
         function DataSet(params) {
             this.locationTable = [];
             this.selections = [];
+            if (params == undefined)
+                return;
             this.name = params.name;
             this.nodeTable = params.nodeTable;
             this.linkTable = params.linkTable;

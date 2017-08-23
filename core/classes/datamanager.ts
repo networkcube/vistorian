@@ -81,7 +81,7 @@ module networkcube {
             this.session = session;
 
             // console.log('import data set', data.name, data.nodeTable, data.linkTable);
-            console.log('import data set', data.name, data);
+            // console.log('import data set', data.name, data);
 
             // check if all data (tables + schemas) are there
             if (!data.nodeTable && !data.linkTable) {
@@ -316,7 +316,7 @@ module networkcube {
         return new LinkSchema(0, 1, 2);
     }
     export function getDefaultLocationSchema(): LocationSchema {
-        return new LocationSchema(0, 1, 2, 3, 4, 5, 6, 7, 8);
+        return new LocationSchema(0, 1, 2, 3, 4);
     }
 
     // data set / graph with name
@@ -332,7 +332,10 @@ module networkcube {
         timeFormat: string;
 
         // constructor(name:string, nodeTable:any[], linkTable:any[], nodeSchema:NodeSchema, linkSchema:LinkSchema, locationTable?:any, locationSchema?:LocationSchema){
-        constructor(params) {
+        constructor(params?) {
+            if(params == undefined)
+                return;
+            
             this.name = params.name;
             this.nodeTable = params.nodeTable;
             this.linkTable = params.linkTable;
@@ -388,6 +391,8 @@ module networkcube {
         linkType: number = -1;
         directed: number = -1;
         time: number = -1
+        // source_location: number = -1;
+        // target_location: number = -1;
         constructor(id: number, source: number, target: number) {
             super('linkSchema');
             this.source = source;

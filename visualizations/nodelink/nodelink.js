@@ -75,9 +75,11 @@ var timeSvg = d3.select('#timelineDiv')
     .append('svg')
     .attr('width', width)
     .attr('height', TIMELINE_HEIGHT);
-var timeSlider = new TimeSlider(dgraph, width - 50);
-timeSlider.appendTo(timeSvg);
-networkcube.addEventListener('timeRange', timeChangedHandler);
+if (dgraph.times().size() > 1) {
+    var timeSlider = new TimeSlider(dgraph, width - 50);
+    timeSlider.appendTo(timeSvg);
+    networkcube.addEventListener('timeRange', timeChangedHandler);
+}
 $('#visDiv').append('<svg id="visSvg" width="' + (width - 20) + '" height="' + (height - 20) + '"></svg>');
 var mouseStart;
 var panOffsetLocal = [0, 0];

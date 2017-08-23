@@ -359,7 +359,6 @@ function init(){
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng
-                console.log('tId', tId, parseInt(tId) )
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
             }
@@ -1060,11 +1059,14 @@ var timeSvg = d3.select('#timelineDiv')
     .attr('width', width)
     .attr('height', TIMELINE_HEIGHT)
 
-networkcube.addEventListener('timeRange', timeChangedHandler);
 
 var OVERLAP_SLIDER_WIDTH = 100;
-var timeSlider: TimeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
-timeSlider.appendTo(timeSvg);
+if(dgraph.times().size() > 1)
+{
+    var timeSlider: TimeSlider = new TimeSlider(dgraph, width - OVERLAP_SLIDER_WIDTH - 20);
+    timeSlider.appendTo(timeSvg);
+    networkcube.addEventListener('timeRange', timeChangedHandler);
+}
 
 // OVERLAP SLIDER    
 var menuDiv = d3.select('#menuDiv');
@@ -1132,14 +1134,14 @@ function timeChangedHandler(m:networkcube.TimeRangeMessage) {
 
 
 function updateEvent(m: networkcube.Message) {
-    if (m && m.type == 'timeRange') {
-        time_start = dgraph.time(m.startId);
-        time_end = dgraph.time(m.endId);
-        timeSlider.set(time_start, time_end);
-    }
+    // if (m && m.type == 'timeRange') {
+    //     time_start = dgraph.time(m.startId);
+    //     time_end = dgraph.time(m.endId);
+    //     timeSlider.set(time_start, time_end);
+    // }
 
-    updateLinks();
-    updateNodes();
+    // updateLinks();
+    // updateNodes();
 }
 
 
@@ -1269,7 +1271,7 @@ function getNodePositionObjectAtTime(n:networkcube.Node, tId:number):Object
 {
     var s = this.nodePositionObjectsLookupTable[n.id()]
     var npo;
-    console.log('s.serie[tId]', tId, s.serie[tId])
+    // console.log('s.serie[tId]', tId, s.serie[tId])
     
     if(s.serie[tId] == undefined)
     {

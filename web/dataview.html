@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="traces/trace.js"></script>
 	
     <link rel="stylesheet" type="text/css" href="./styles.css"/>
-    <link rel="stylesheet" type="text/css" href="./dataview_styles.css"/>
+     <link rel="stylesheet" type="text/css" href="./dataview_styles.css"/> 
     <link rel="stylesheet" type="text/css" href="./tablestyle.css"/>
     <script src="../core/networkcube.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
@@ -71,11 +71,13 @@
                 <div id="networkTables" style="display:none;">
 
                     <div id="networkInfoDiv">
-                        <h2>Network <input id="saveNetworkButton" class="tableMenuButton" type="button" value="Save Network" onclick="saveCurrentNetwork(false)"/>
+                        <h2>Network
+                            <input id="saveNetworkButton" class="tableMenuButton" type="button" value="Save Network" onclick="saveCurrentNetwork(false)"/>
                             <input id="deleteNetworkButton" class="tableMenuButton" type="button" value="Delete Network" onclick="deleteCurrentNetwork()"/>
                         </h2>
                         <p>Name: <input id="networknameInput" type="text" size="50"/>
                         </p>
+                        <p id="networkStatus"></p> 
                     </div>
 
                     <!-- Show Node table here -->
@@ -127,10 +129,10 @@
                                  <option value="---">---</option>
                            </select>
                             or 
-                            <button class="tableMenuButton" onclick="extractLocations()">Extract locations from node and link tables</button>
-                            
-                            <button class="tableMenuButton" onclick="updateLocations()">Update location coordinates</button>
+                            <button class="menuButton" onclick="extractLocations()">Extract locations from node and link tables</button> 
+                            <button class="menuButton" onclick="updateLocations()">Update location coordinates</button>
                         </div>
+
                         <div id="locationTableDiv" class="tableDiv"></div>
                     </div>
                 </div>
@@ -197,7 +199,6 @@
             var inputs = document.querySelectorAll( '.inputfile' );
             Array.prototype.forEach.call( inputs, function( input )
             {
-                console.log('input', input)
                 var label    = input.nextElementSibling,
                     labelVal = label.innerHTML;
 

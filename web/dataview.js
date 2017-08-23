@@ -27,7 +27,7 @@ function loadVisualizationList() {
         $('#visualizationList')
             .append('<li class="visLink" title="Show ' + v[0] + ' visualization.">\
                         <button onclick="loadVisualization(\'' + v[1] + '\')" class="visbutton hastooltip">\
-                            <img src="figures/' + v[1] + '.png" class="menuicon"/>\
+                            <img src="figures/' + v[1] + '.png" class="visicon"/>\
                             <p>' + v[0] + '</p>\
                         </button>\
                     </li>');
@@ -35,12 +35,12 @@ function loadVisualizationList() {
     $('#visualizationList')
         .append('<li class="visLink" title="Show matrix and node-link split-view.">\
             <button onclick="loadVisualization(\'mat-nl\')" class="visbutton hastooltip">\
-            <img src="logos/mat-nl.png" class="menuicon"/><p>Matrix + Node Link</p>\
+            <img src="logos/mat-nl.png" class="visicon"/><p>Matrix + Node Link</p>\
         </button></li>');
     $('#visualizationList')
         .append('<li class="visLink" title="Show all visualizations.">\
         <button onclick="loadVisualization(\'tileview\')" class="visbutton hastooltip">\
-        <img src="logos/tiled.png" class="menuicon"/><p>All</p>\
+        <img src="logos/tiled.png" class="visicon"/><p>All</p>\
         </button></li>');
 }
 function loadTableList() {
@@ -121,22 +121,8 @@ function setLocationTable(list) {
     }
 }
 function saveCurrentNetwork(failSilently) {
-    var networkcubeDataSet;
     saveCellChanges();
-    if (currentNetwork.networkCubeDataSet == undefined) {
-        networkcubeDataSet = new networkcube.DataSet({
-            name: currentNetwork.name,
-            nodeTable: [],
-            linkTable: [],
-            locationTable: []
-        });
-        currentNetwork.networkCubeDataSet = networkcubeDataSet;
-    }
-    else {
-        networkcubeDataSet = currentNetwork.networkCubeDataSet;
-    }
     currentNetwork.name = $('#networknameInput').val();
-    currentNetwork.networkCubeDataSet.name = $('#networknameInput').val();
     if (currentNetwork.userNodeSchema.time != -1) {
         currentNetwork.timeFormat = $('#timeFormatInput_' + currentNetwork.userNodeSchema.name).val();
     }
@@ -150,7 +136,21 @@ function saveCurrentNetwork(failSilently) {
             showMessage("Cannot save without a Node table or a Link Table", 2000);
         return;
     }
-    vistorian.importIntoNetworkcube(currentNetwork, SESSION_NAME, failSilently);
+    var dataset = vistorian.importIntoNetworkcube(currentNetwork, SESSION_NAME, failSilently);
+    updateNetworkStatusIndication();
+    if (dataset
+        && !currentNetwork.userLocationTable && dataset.locationTable && dataset.locationTable.length > 0) {
+        currentNetwork.userLocationTable = new vistorian.VTable('userLocationTable', dataset.locationTable);
+        currentNetwork.userLocationTable.data.splice(0, 0, ['Id', 'User Name', 'Geoname', 'Longitude', 'Latitude']);
+        currentNetwork.userLocationSchema = dataset.locationSchema;
+        storage.saveUserTable(currentNetwork.userLocationTable, SESSION_NAME);
+        showTable(currentNetwork.userLocationTable, '#locationTableDiv', true, currentNetwork.userLocationSchema);
+        $('#locationtableSelect')
+            .append('<option value="userLocationTable">User Location Table</option>');
+        $('#locationtableSelect').val('userLocationTable');
+        loadTableList();
+        storage.saveNetwork(currentNetwork, SESSION_NAME);
+    }
     loadNetworkList();
 }
 function deleteCurrentNetwork() {
@@ -205,6 +205,21 @@ function showNetwork(networkId) {
     }
     $('#tileViewLink').attr('href', 'sites/tileview.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name.split(' ').join('___'));
     $('#mat-nlViewLink').attr('href', 'sites/mat-nl.html?session=' + SESSION_NAME + '&datasetName=' + currentNetwork.name.split(' ').join('___'));
+    updateNetworkStatusIndication();
+}
+function updateNetworkStatusIndication() {
+    if (currentNetwork.ready) {
+        $('#networkStatus')
+            .text('Ready for visualization. Select a visualization from the menu on the top.')
+            .css('color', '#fff')
+            .css('background', '#2b0');
+    }
+    else {
+        $('#networkStatus')
+            .text('Network not ready for visualization. Table or Schema specifications missing.')
+            .css('background', '#f63')
+            .css('color', '#fff');
+    }
 }
 function unshowNetwork() {
     $('#nodetableSelect').empty();
@@ -317,10 +332,10 @@ function showTable(table, elementName, isLocationTable, schema) {
                     case 'target':
                         fieldName = 'Target Node';
                         break;
-                    case 'location_source':
+                    case 'source_location':
                         fieldName = 'Source Node Location';
                         break;
-                    case 'location_target':
+                    case 'target_location':
                         fieldName = 'Target Node Location';
                         break;
                     case 'linkType':
@@ -372,8 +387,13 @@ function deleteCurrentTable() {
 function schemaSelectionChanged(field, columnNumber, schemaName, parent) {
     for (var field2 in currentNetwork[schemaName]) {
         if (field2 == 'relation' && currentNetwork[schemaName][field2].indexOf(columnNumber) > -1) {
-            var arr = currentNetwork[schemaName][field];
-            currentNetwork[schemaName][field2].slice(arr.indexOf(columnNumber), 0);
+            if (field == '(Not visualized)') {
+                currentNetwork[schemaName][field2].splice(currentNetwork[schemaName][field2].indexOf(columnNumber), 1);
+            }
+            else {
+                var arr = currentNetwork[schemaName][field];
+                currentNetwork[schemaName][field2].slice(arr.indexOf(columnNumber), 0);
+            }
         }
         else {
             if (currentNetwork[schemaName][field2] == columnNumber) {
@@ -506,7 +526,6 @@ function replaceCellContents(tableId) {
     showMessage('Replaced ' + replaceCount + ' occurrences of ' + replace_pattern + ' with ' + replace_value + '.', 2000);
 }
 function extractLocations() {
-    console.log('>>>> Extracting locations');
     showMessage('Extracting locations...', false);
     if (currentNetwork.userLocationTable == undefined) {
         var tableName = currentNetwork.name.replace(/ /g, "_");
@@ -531,18 +550,18 @@ function extractLocations() {
             }
         }
     }
-    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_source)) {
+    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.source_location)) {
         var linkTable = currentNetwork.userLinkTable.data;
         if (linkTable != undefined) {
             for (var i = 1; i < linkTable.length; i++) {
-                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.location_target], locationTable.data);
+                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.target_location], locationTable.data);
             }
         }
     }
-    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.location_target)) {
+    if (networkcube.isValidIndex(currentNetwork.userLinkSchema.target_location)) {
         if (linkTable != undefined) {
             for (var i = 1; i < linkTable.length; i++) {
-                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.location_target], locationTable.data);
+                createLocationEntry(linkTable[i][currentNetwork.userLinkSchema.target_location], locationTable.data);
             }
         }
     }
@@ -568,7 +587,7 @@ function createLocationEntry(name, rows) {
 }
 function updateLocations() {
     showMessage('Retrieving and updating location coordinates...', false);
-    vistorian.updateLocationTable(currentNetwork.userLocationTable, currentNetwork.networkCubeDataSet.locationSchema, function (nothingImportant) {
+    vistorian.updateLocationTable(currentNetwork.userLocationTable, currentNetwork.userLocationSchema, function (nothingImportant) {
         saveCurrentNetwork(false);
         showNetwork(currentNetwork.id);
         showMessage('Locations updated successfully!', 2000);

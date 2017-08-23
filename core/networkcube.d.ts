@@ -601,7 +601,7 @@ declare module networkcube {
         locationSchema: LocationSchema;
         selections: Selection[];
         timeFormat: string;
-        constructor(params: any);
+        constructor(params?: any);
     }
     class TableSchema {
         name: string;
