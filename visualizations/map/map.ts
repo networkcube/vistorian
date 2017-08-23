@@ -361,7 +361,7 @@ function init(){
                     positions[tId].npos.push(npo);
                 }
                 npo.geoPos = googleLatLng
-                console.log('>>>>', positions[tId].latitude(), positions[tId].longitude() )
+                // console.log('>>>>', positions[tId].latitude(), positions[tId].longitude() )
                 npo.timeIds.push(parseInt(tId))
                 serie.set(dgraph.time(parseInt(tId)), npo)    
             }
