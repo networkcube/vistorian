@@ -106,29 +106,29 @@
     }
 
     function traceEvent(cat, action, label, value) {
-	if (starting) {
-	    starting = false;
-	    _sending = [];
-	    traceEvent("_trace", "document.location", "href", document.location.href);
-	    traceEvent("_trace", "browser", "userAgent", navigator.userAgent);
-	    traceEvent("_trace", "screen", "size", "w:"+screen.width+";h:"+screen.height);
-	    traceEvent("_trace", "window", "innerSize", "w:"+window.innerWidth+";h:"+window.innerHeight);
-	    _sending = null;
-	}
+	// if (starting) {
+	//     starting = false;
+	//     _sending = [];
+	//     traceEvent("_trace", "document.location", "href", document.location.href);
+	//     traceEvent("_trace", "browser", "userAgent", navigator.userAgent);
+	//     traceEvent("_trace", "screen", "size", "w:"+screen.width+";h:"+screen.height);
+	//     traceEvent("_trace", "window", "innerSize", "w:"+window.innerWidth+";h:"+window.innerHeight);
+	//     _sending = null;
+	// }
 
-	if (debug) {
-	    window.console && console.log("Track["+cat+","+action+","+label+"]");
-	}
-	var ts = Date.now();
-	_traceq.push({"session": sessionId,
-		      "ts": ts,
-		      "cat": cat,
-		      "action": action,
-		      "label": label,
-		      "value": value});
-	if (_sending == null)
-	    sendLogs();
-	return trace;
+	// if (debug) {
+	//     window.console && console.log("Track["+cat+","+action+","+label+"]");
+	// }
+	// var ts = Date.now();
+	// _traceq.push({"session": sessionId,
+	// 	      "ts": ts,
+	// 	      "cat": cat,
+	// 	      "action": action,
+	// 	      "label": label,
+	// 	      "value": value});
+	// if (_sending == null)
+	//     sendLogs();
+	// return trace;
     }
 
     //    console.log("Trace initialized with sessionId=%s", sessionId);
