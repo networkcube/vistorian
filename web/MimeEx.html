@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>MIME JS</title>
+    <script src="base64.js" type="text/javascript"></script>
+    <script src="mime-js.js" type="text/javascript"></script>
+</head>
+<body>
+    <b>Mail obj:</b>
+    <pre id="mail"></pre>
+    <hr/>
+    <h2>MimeTxt</h2>
+    <div id="mimeTxt"></div>
+    <hr/>
+    <h2>MimeObj</h2>
+    <div id="mimeObj"></div>
+
+    <script type="application/javascript">
+        var originalMail = {
+            "to": "vanessaserr@gmail.com",
+            "subject": "Mail me a screenshot",
+            "fromName": "Vistorian team",
+            "from": "vanessaserr@gmail.com",
+            "body": "This is your screenshot. See the image attached.",
+            "cids": [],
+            "attaches" : []
+        };
+        var mimeTxt = Mime.toMimeTxt(originalMail);
+        var mimeObj = Mime.toMimeObj(mimeTxt);
+        document.getElementById("mail" ).innerText = JSON.stringify(originalMail);
+        document.getElementById("mimeTxt").innerText = mimeTxt;
+        document.getElementById("mimeObj").innerText = JSON.stringify(mimeObj);
+    </script>
+</body>
+</html>

@@ -487,12 +487,12 @@ module vistorian {
                     <script>\
                         function mailmeButtonClicked()\
                         {\
-                            trace.event(null, "Questionnaires", "MailMe");\
+                            trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");\
                             $("#mailmeQuestionnaireDiv").css("visibility", "visible")\
                         }\
                         function endOfActivityClicked()\
                         {\
-                            trace.event(null, "Questionnaires", "EndActivity");\
+                            trace.event(null, "MiniQuestionnaires", "EndActivityQuestionnaire1");\
                             $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")\
                         }\
                     </script>\
@@ -502,7 +502,7 @@ module vistorian {
                     </div>\
                     <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
                         <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
-                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                        <iframe src="../EndActivityQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
                     </div>\
                 </div>\
                 <style type="text/css">\
@@ -530,8 +530,7 @@ module vistorian {
                     var idleInterval = setInterval(timerIncrement, 1000);\
                     $(document).ready(function () {\
                         $(this).mousemove(function (e) {\
-                            idleTime = 0;\
-                        });\
+                            idleTime = 0                        });\
                         $(this).keypress(function (e) {\
                             idleTime = 0;\
                         });\
@@ -540,24 +539,34 @@ module vistorian {
                         idleTime = idleTime + 1;\
                         if (idleTime > 60 * 14 ) {\
                             showInactivityBox();\
+                            trace.event(null, "NoActivity", "NoActivityDialogBox");\
                             window.clearInterval(idleInterval);\
                         }\
                     }\
                     function showInactivityBox() {\
                         bootbox.confirm({\
-                            message: "No Vistorian activity for more than 15 minutes. Are you still there?",\
+                            size: "big",\
+                            class="text-left",\
+                            position: "left",\
+                            title: "Are you still there?",\
+                            message: "<p>No Vistorian activity for more than 15 minutes.</p>",\
                             buttons: {\
                                 confirm: {\
                                     label: "I want to continue working",\
-                                    className:  "btn-success"\
+                                    className:  "btn-success pull-right"\
                                 },\
                                 cancel: {\
                                     label:  "DONE: report on recent activity",\
-                                    className:  "btn-warning"\
+                                    className:  "btn-warning pull-left"\
                                 }\
                             },\
                             callback: function (result) {\
-                                console.log("This was logged in the callback: " + result);\
+                                if (result == false){\
+                                    endOfActivityClicked();\
+                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "DONE");\
+                                }else{\
+                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "BACK");\
+                                }\
                             }\
                         });\
                     }\

@@ -30,16 +30,16 @@
                 <br/>    
 
                 <div id="vistiles">                    
-                    <a href="sites/nodelink.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <a href="sites/nodelink.html?session=0&datasetName=demo_scientists" target="_blank" onclick="trace.event(null, 'Training', 'ExampleSession', 'nodelink')">
                         <img class="visimage" src="figures/nodelink.png"/>
                     </a>
-                    <a href="sites/dynamicego.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <a href="sites/dynamicego.html?session=0&datasetName=demo_scientists" target="_blank" onclick="trace.event(null, 'Training', 'ExampleSession', 'ego')">
                         <img class="visimage" src="figures/ego.png" />
                     </a>
-                    <a href="sites/matrix.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <a href="sites/matrix.html?session=0&datasetName=demo_scientists" target="_blank" onclick="trace.event(null, 'Training', 'ExampleSession', 'matrix')">
                         <img class="visimage" src="figures/matrix.png" />
                     </a>
-                    <a href="sites/map.html?session=0&datasetName=demo_scientists" target="_blank">
+                    <a href="sites/map.html?session=0&datasetName=demo_scientists" target="_blank" onclick="trace.event(null, 'Training', 'ExampleSession', 'map')">
                         <img class="visimage" src="figures/map.png" />
                     </a>
 
@@ -100,10 +100,10 @@
                 </video>  
                 <script>
                       var play = $('.playbutton');
-                      var video = $(‘video’)
+                      var video = $('video')
                       video.click(function(){
                       video.get(0).play();
-                      console.log(‘BUTTON PRESSED’);
+                      console.log('BUTTON PRESSED');
                       trace.event(null, 'Help', 'PlayVideo'); 
                       })
                        
@@ -296,7 +296,7 @@ training
 
 
             // Load demo data
-            $.get("https://raw.githubusercontent.com/networkcube/vistorian/master/demo/demo_scientists.vistorian",
+            $.get("//raw.githubusercontent.com/networkcube/vistorian/master/demo/demo_scientists.vistorian",
                 function (data)
                 {   
                     vistorian.importData(JSON.parse(data), 0);            

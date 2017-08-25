@@ -1,6 +1,7 @@
 <html>
 <head>
     <script src="lib/jquery.js"></script>
+    <script src="classes/vistorian.js"></script>
     <script src="../core/networkcube.js"></script>
     <script src="../core/lib/trace.js"></script>
 <style>
@@ -59,11 +60,17 @@
                     
                     <fieldset style = "width: 750px; margin-top: 0px auto;">
                     
-                    <button type="button" onclick="closeWindow()" class="buttonClose" id="signup-close" style="position: absolute;right:225px;top:15px;outline:5px solid #fff" color = red>X</button>
+                    <button type="button" onclick="closeWindow2()" class="buttonClose" id="signup-close" style="position: absolute;right:225px;top:15px;outline:5px solid #fff" color = red>X</button>
                     <script>
                         function closeWindow()
                         {
-                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+
+                        function closeWindow2()
+                        {
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
                         }
                     </script>
 
@@ -73,7 +80,7 @@
                     </button> -->
 
                     <h3> <font size="5">Please help us understand the context of use: (Part 2: for "Analyze data")</font></h3>
-                    <p><font size="4">Answer and click CONTINUE or press ESC to skip this additional questionnaire and send the email</font></p>
+                    <p><font size="4">Answer and click FINISH AND SUBMIT or press ESC to skip this additional questionnaire</font></p>
                     <hr>
                     <h3> <font size="4">How helpful was the tool to analyze your data in this session?</font></h3>
                     <!-- Multiple Radios (inline) -->
@@ -134,37 +141,37 @@
                      <h3> <font size="4">Characterize the analysis you conducted:</font></h3>
                      <div class="checkbox">
                         <label for="checkbox-0">
-                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" onclick="toggleboxes('checkbox1')">
+                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" ondblclick="doubleClick(1)" onclick="toggleboxes('checkbox1')">
                           <font size="4">Review data quality</font>
                         </label>
                       </div>
                       <div class="checkbox">
                         <label for="checkbox-1">
-                          <input type="checkbox" name="checkbox" id="checkbox2" value="2" onclick="toggleboxes('checkbox2')">
+                          <input type="checkbox" name="checkbox" id="checkbox2" value="2" ondblclick="doubleClick(2)" onclick="toggleboxes('checkbox2')">
                           <font size="4">Test a particular hypothesis</font>
                         </label>
                       </div>
                        <div class="checkbox">
                         <label for="checkbox-1">
-                          <input type="checkbox" name="checkbox" id="checkbox3" value="2" onclick="toggleboxes('checkbox3')">
+                          <input type="checkbox" name="checkbox" id="checkbox3" value="2" ondblclick="doubleClick(3)" onclick="toggleboxes('checkbox3')">
                           <font size="4">Compare</font>
                         </label>
                       </div>
                        <div class="checkbox">
                         <label for="checkbox-1">
-                          <input type="checkbox" name="checkbox" id="checkbox4" value="2" onclick="toggleboxes('checkbox4')">
+                          <input type="checkbox" name="checkbox" id="checkbox4" value="2" ondblclick="doubleClick(4)" onclick="toggleboxes('checkbox4')">
                           <font size="4">Retrieve specific details</font>
                         </label>
                       </div>
                        <div class="checkbox">
                         <label for="checkbox-1">
-                          <input type="checkbox" name="checkbox" id="checkbox5" value="2" onclick="toggleboxes('checkbox5')">
+                          <input type="checkbox" name="checkbox" id="checkbox5" value="2" ondblclick="doubleClick(5)" onclick="toggleboxes('checkbox5')">
                           <font size="4">Repeat an analysis with new data</font>
                         </label>
                       </div>
                        <div class="checkbox">
                         <label for="checkbox-1">
-                          <input type="checkbox" name="checkbox" id="checkbox6" value="2" onclick="toggleboxes('checkbox6')">
+                          <input type="checkbox" name="checkbox" id="checkbox6" value="2" ondblclick="doubleClick(6)" onclick="toggleboxes('checkbox6')">
                           <font size="4">Other</font>
                         </label>
                       </div>
@@ -198,7 +205,7 @@
                     <td> 
                         <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
                         <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
-                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the CONTINUE button</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the FINISH AND SUBMIT button</font></p>
                         </fieldset> 
                     </td>
                     </table>
@@ -221,6 +228,9 @@
                       {
                         // GET RESULTS FROM 1ST QUESTIONNAIRE
                         // Read stuff from local storage
+                        var Comments = document.getElementById('comments').value;
+                        var Commentstext = String(Comments);
+                        localStorage.setItem('traces_comments', $('#comments').val())
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -230,42 +240,105 @@
                         // GET RESULTS FROM 2ND QUESTIONNAIRE
                         // Read stuff from html field
                         var helpfullScore;
-                        if($('#radios-1-1').is(':checked')){ helpfullScore = 1;}
-                        if($('#radios-1-2').is(':checked')){ helpfullScore = 2;}
-                        if($('#radios-1-3').is(':checked')){ helpfullScore = 3;}
-                        if($('#radios-1-4').is(':checked')){ helpfullScore = 4;}
-                        if($('#radios-1-5').is(':checked')){ helpfullScore = 5;}
-                        if($('#radios-1-6').is(':checked')){ helpfullScore = 6;}
-                        if($('#radios-1-7').is(':checked')){ helpfullScore = 7;}
-                        if($('#radios-1-8').is(':checked')){ helpfullScore = 8;}
-                        if($('#radios-1-9').is(':checked')){ helpfullScore = 9;}
-                        if($('#radios-1-10').is(':checked')){ helpfullScore = 10;}
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
 
                         var analysisCharac1;
-                        if($('#checkbox1').is(':checked')){ analysisCharac1 = 'Review data quality';}
+                        if($('#checkbox1').is(':checked')){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
                         
                         var analysisCharac2;
-                        if($('#checkbox2').is(':checked')){ analysisCharac2 = 'Test a particular hypothesis';}
+                        if($('#checkbox2').is(':checked')){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
 
                          var analysisCharac3;
-                        if($('#checkbox3').is(':checked')){ analysisCharac3 = 'Compare';}
+                        if($('#checkbox3').is(':checked')){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
 
                          var analysisCharac4;
-                        if($('#checkbox4').is(':checked')){ analysisCharac4 = 'Retrieve specific details';}
+                        if($('#checkbox4').is(':checked')){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
 
                         var analysisCharac5;
-                        if($('#checkbox5').is(':checked')){ analysisCharac5 = 'Repeat an analysis with new data';}
+                        if($('#checkbox5').is(':checked')){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
 
                         var analysisCharac6;
-                        if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other';}
-
-                        var Comments = document.getElementById('comments');
-                        console.log(Comments.value);
-                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2');
+                        if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
 
                         // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
+                        console.log(Comments);
                         
+                        closeWindow2();
+                        //window.history.back();
+                      }
 
+                      function doubleClick(checkboxNumber)
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ND QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
+
+                        localStorage.setItem('traces_checkbox1', checkboxNumber == 1)
+                        localStorage.setItem('traces_checkbox2', checkboxNumber == 2)
+                        localStorage.setItem('traces_checkbox3', checkboxNumber == 3)
+                        localStorage.setItem('traces_checkbox4', checkboxNumber == 4)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 5)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 6)
+
+                        var analysisCharac1;
+                        if(checkboxNumber == 1){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
+                        
+                        var analysisCharac2;
+                        if(checkboxNumber == 2){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
+
+                         var analysisCharac3;
+                        if(checkboxNumber == 3){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
+
+                         var analysisCharac4;
+                        if(checkboxNumber == 4){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
+
+                        var analysisCharac5;
+                        if(checkboxNumber == 5){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
+
+                        var analysisCharac6;
+                        if(checkboxNumber == 6){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
+
+                      
+                        // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+
+                        //window.history.back();
+                        closeWindow2();
                       }
 
                     </script>

@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var vistorian;
 (function (vistorian) {
     var head = $('head');
@@ -27,60 +32,63 @@ var vistorian;
             this.data = data;
         }
         return VTable;
-    })();
+    }());
     vistorian.VTable = VTable;
     var VTableSchema = (function () {
         function VTableSchema(name) {
             this.name = name;
         }
         return VTableSchema;
-    })();
+    }());
     vistorian.VTableSchema = VTableSchema;
     var VNodeSchema = (function (_super) {
         __extends(VNodeSchema, _super);
         function VNodeSchema() {
-            _super.call(this, 'userNodeSchema');
-            this.relation = [];
-            this.location = -1;
-            this.id = 0;
-            this.label = -1;
-            this.time = -1;
-            this.nodeType = -1;
+            var _this = _super.call(this, 'userNodeSchema') || this;
+            _this.relation = [];
+            _this.location = -1;
+            _this.id = 0;
+            _this.label = -1;
+            _this.time = -1;
+            _this.nodeType = -1;
+            return _this;
         }
         ;
         return VNodeSchema;
-    })(VTableSchema);
+    }(VTableSchema));
     vistorian.VNodeSchema = VNodeSchema;
     var VLinkSchema = (function (_super) {
         __extends(VLinkSchema, _super);
         function VLinkSchema() {
-            _super.call(this, 'userLinkSchema');
-            this.location_source = -1;
-            this.location_target = -1;
-            this.id = 0;
-            this.source = -1;
-            this.target = -1;
-            this.weight = -1;
-            this.time = -1;
-            this.linkType = -1;
+            var _this = _super.call(this, 'userLinkSchema') || this;
+            _this.location_source = -1;
+            _this.location_target = -1;
+            _this.id = 0;
+            _this.source = -1;
+            _this.target = -1;
+            _this.weight = -1;
+            _this.time = -1;
+            _this.linkType = -1;
+            return _this;
         }
         ;
         return VLinkSchema;
-    })(VTableSchema);
+    }(VTableSchema));
     vistorian.VLinkSchema = VLinkSchema;
     var VLocationSchema = (function (_super) {
         __extends(VLocationSchema, _super);
         function VLocationSchema() {
-            _super.call(this, 'userLocationSchema');
-            this.id = 0;
-            this.label = 1;
-            this.geoname = 2;
-            this.longitude = 3;
-            this.latitude = 4;
+            var _this = _super.call(this, 'userLocationSchema') || this;
+            _this.id = 0;
+            _this.label = 1;
+            _this.geoname = 2;
+            _this.longitude = 3;
+            _this.latitude = 4;
+            return _this;
         }
         ;
         return VLocationSchema;
-    })(VTableSchema);
+    }(VTableSchema));
     vistorian.VLocationSchema = VLocationSchema;
     var Network = (function () {
         function Network(id) {
@@ -90,7 +98,7 @@ var vistorian;
             this.userLinkSchema = new VLinkSchema();
         }
         return Network;
-    })();
+    }());
     vistorian.Network = Network;
     function loadCSV(files, callBack, sessionid) {
         var loadCount = 0;
@@ -292,12 +300,12 @@ var vistorian;
                     <script>\
                         function mailmeButtonClicked()\
                         {\
-                            trace.event(null, "Questionnaires", "MailMe");\
+                            trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");\
                             $("#mailmeQuestionnaireDiv").css("visibility", "visible")\
                         }\
                         function endOfActivityClicked()\
                         {\
-                            trace.event(null, "Questionnaires", "EndActivity");\
+                            trace.event(null, "MiniQuestionnaires", "EndActivityQuestionnaire1");\
                             $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")\
                         }\
                     </script>\
@@ -307,7 +315,7 @@ var vistorian;
                     </div>\
                     <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
                         <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
-                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                        <iframe src="../EndActivityQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
                     </div>\
                 </div>\
                 <style type="text/css">\
@@ -335,8 +343,7 @@ var vistorian;
                     var idleInterval = setInterval(timerIncrement, 1000);\
                     $(document).ready(function () {\
                         $(this).mousemove(function (e) {\
-                            idleTime = 0;\
-                        });\
+                            idleTime = 0                        });\
                         $(this).keypress(function (e) {\
                             idleTime = 0;\
                         });\
@@ -345,24 +352,34 @@ var vistorian;
                         idleTime = idleTime + 1;\
                         if (idleTime > 60 * 14 ) {\
                             showInactivityBox();\
+                            trace.event(null, "NoActivity", "NoActivityDialogBox");\
                             window.clearInterval(idleInterval);\
                         }\
                     }\
                     function showInactivityBox() {\
                         bootbox.confirm({\
-                            message: "No Vistorian activity for more than 15 minutes. Are you still there?",\
+                            size: "big",\
+                            class="text-left",\
+                            position: "left",\
+                            title: "Are you still there?",\
+                            message: "<p>No Vistorian activity for more than 15 minutes.</p>",\
                             buttons: {\
                                 confirm: {\
                                     label: "I want to continue working",\
-                                    className:  "btn-success"\
+                                    className:  "btn-success pull-right"\
                                 },\
                                 cancel: {\
                                     label:  "DONE: report on recent activity",\
-                                    className:  "btn-warning"\
+                                    className:  "btn-warning pull-left"\
                                 }\
                             },\
                             callback: function (result) {\
-                                console.log("This was logged in the callback: " + result);\
+                                if (result == false){\
+                                    endOfActivityClicked();\
+                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "DONE");\
+                                }else{\
+                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "BACK");\
+                                }\
                             }\
                         });\
                     }\
