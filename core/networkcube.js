@@ -8473,6 +8473,116 @@ BSpline.prototype.calcAt = function (t) {
         return res;
     }
 };
+var saveAs = saveAs || function (e) {
+    "use strict";
+    if ("undefined" == typeof navigator || !/MSIE [1-9]\./.test(navigator.userAgent)) {
+        var t = e.document, n = function () { return e.URL || e.webkitURL || e; }, o = t.createElementNS("http://www.w3.org/1999/xhtml", "a"), r = "download" in o, i = function (e) { var t = new MouseEvent("click"); e.dispatchEvent(t); }, a = /Version\/[\d\.]+.*Safari/.test(navigator.userAgent), c = e.webkitRequestFileSystem, d = e.requestFileSystem || c || e.mozRequestFileSystem, u = function (t) { (e.setImmediate || e.setTimeout)(function () { throw t; }, 0); }, s = "application/octet-stream", f = 0, l = 4e4, v = function (e) { var t = function () { "string" == typeof e ? n().revokeObjectURL(e) : e.remove(); }; setTimeout(t, l); }, p = function (e, t, n) { t = [].concat(t); for (var o = t.length; o--;) {
+            var r = e["on" + t[o]];
+            if ("function" == typeof r)
+                try {
+                    r.call(e, n || e);
+                }
+                catch (i) {
+                    u(i);
+                }
+        } }, w = function (e) { return /^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type) ? new Blob(["\uFEFF", e], { type: e.type }) : e; }, y = function (t, u, l) { l || (t = w(t)); var y, m, S, h = this, R = t.type, O = !1, g = function () { p(h, "writestart progress write writeend".split(" ")); }, b = function () { if (m && a && "undefined" != typeof FileReader) {
+            var o = new FileReader;
+            return o.onloadend = function () { var e = o.result; m.location.href = "data:attachment/file" + e.slice(e.search(/[,;]/)), h.readyState = h.DONE, g(); }, o.readAsDataURL(t), void (h.readyState = h.INIT);
+        } if ((O || !y) && (y = n().createObjectURL(t)), m)
+            m.location.href = y;
+        else {
+            var r = e.open(y, "_blank");
+            void 0 === r && a && (e.location.href = y);
+        } h.readyState = h.DONE, g(), v(y); }, E = function (e) { return function () { return h.readyState !== h.DONE ? e.apply(this, arguments) : void 0; }; }, N = { create: !0, exclusive: !1 }; return h.readyState = h.INIT, u || (u = "download"), r ? (y = n().createObjectURL(t), void setTimeout(function () { o.href = y, o.download = u, i(o), g(), v(y), h.readyState = h.DONE; })) : (e.chrome && R && R !== s && (S = t.slice || t.webkitSlice, t = S.call(t, 0, t.size, s), O = !0), c && "download" !== u && (u += ".download"), (R === s || c) && (m = e), d ? (f += t.size, void d(e.TEMPORARY, f, E(function (e) { e.root.getDirectory("saved", N, E(function (e) { var n = function () { e.getFile(u, N, E(function (e) { e.createWriter(E(function (n) { n.onwriteend = function (t) { m.location.href = e.toURL(), h.readyState = h.DONE, p(h, "writeend", t), v(e); }, n.onerror = function () { var e = n.error; e.code !== e.ABORT_ERR && b(); }, "writestart progress write abort".split(" ").forEach(function (e) { n["on" + e] = h["on" + e]; }), n.write(t), h.abort = function () { n.abort(), h.readyState = h.DONE; }, h.readyState = h.WRITING; }), b); }), b); }; e.getFile(u, { create: !1 }, E(function (e) { e.remove(), n(); }), E(function (e) { e.code === e.NOT_FOUND_ERR ? n() : b(); })); }), b); }), b)) : void b()); }, m = y.prototype, S = function (e, t, n) { return new y(e, t, n); };
+        return "undefined" != typeof navigator && navigator.msSaveOrOpenBlob ? function (e, t, n) { return n || (e = w(e)), navigator.msSaveOrOpenBlob(e, t || "download"); } : (m.abort = function () { var e = this; e.readyState = e.DONE, p(e, "abort"); }, m.readyState = m.INIT = 0, m.WRITING = 1, m.DONE = 2, m.error = m.onwritestart = m.onprogress = m.onwrite = m.onabort = m.onerror = m.onwriteend = null, S);
+    }
+}("undefined" != typeof self && self || "undefined" != typeof window && window || this.content);
+"undefined" != typeof module && module.exports ? module.exports.saveAs = saveAs : "undefined" != typeof define && null !== define && null !== define.amd && define([], function () { return saveAs; });
+/*! @source http://purl.eligrey.com/github/canvas-toBlob.js/blob/master/canvas-toBlob.js */
+(function (view) {
+    "use strict";
+    var Uint8Array = view.Uint8Array, HTMLCanvasElement = view.HTMLCanvasElement, canvas_proto = HTMLCanvasElement && HTMLCanvasElement.prototype, is_base64_regex = /\s*;\s*base64\s*(?:;|$)/i, to_data_url = "toDataURL", base64_ranks, decode_base64 = function (base64) {
+        var len = base64.length, buffer = new Uint8Array(len / 4 * 3 | 0), i = 0, outptr = 0, last = [0, 0], state = 0, save = 0, rank, code, undef;
+        while (len--) {
+            code = base64.charCodeAt(i++);
+            rank = base64_ranks[code - 43];
+            if (rank !== 255 && rank !== undef) {
+                last[1] = last[0];
+                last[0] = code;
+                save = (save << 6) | rank;
+                state++;
+                if (state === 4) {
+                    buffer[outptr++] = save >>> 16;
+                    if (last[1] !== 61) {
+                        buffer[outptr++] = save >>> 8;
+                    }
+                    if (last[0] !== 61) {
+                        buffer[outptr++] = save;
+                    }
+                    state = 0;
+                }
+            }
+        }
+        return buffer;
+    };
+    if (Uint8Array) {
+        base64_ranks = new Uint8Array([
+            62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1,
+            -1, -1, 0, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+            -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+            36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
+        ]);
+    }
+    if (HTMLCanvasElement && (!canvas_proto.toBlob || !canvas_proto.toBlobHD)) {
+        if (!canvas_proto.toBlob)
+            canvas_proto.toBlob = function (callback, type) {
+                if (!type) {
+                    type = "image/png";
+                }
+                if (this.mozGetAsFile) {
+                    callback(this.mozGetAsFile("canvas", type));
+                    return;
+                }
+                if (this.msToBlob && /^\s*image\/png\s*(?:$|;)/i.test(type)) {
+                    callback(this.msToBlob());
+                    return;
+                }
+                var args = Array.prototype.slice.call(arguments, 1), dataURI = this[to_data_url].apply(this, args), header_end = dataURI.indexOf(","), data = dataURI.substring(header_end + 1), is_base64 = is_base64_regex.test(dataURI.substring(0, header_end)), blob;
+                if (Blob.fake) {
+                    blob = new Blob;
+                    if (is_base64) {
+                        blob.encoding = "base64";
+                    }
+                    else {
+                        blob.encoding = "URI";
+                    }
+                    blob.data = data;
+                    blob.size = data.length;
+                }
+                else if (Uint8Array) {
+                    if (is_base64) {
+                        blob = new Blob([decode_base64(data)], { type: type });
+                    }
+                    else {
+                        blob = new Blob([decodeURIComponent(data)], { type: type });
+                    }
+                }
+                callback(blob);
+            };
+        if (!canvas_proto.toBlobHD && canvas_proto.toDataURLHD) {
+            canvas_proto.toBlobHD = function () {
+                to_data_url = "toDataURLHD";
+                var blob = this.toBlob();
+                to_data_url = "toDataURL";
+                return blob;
+            };
+        }
+        else {
+            canvas_proto.toBlobHD = canvas_proto.toBlob;
+        }
+    }
+}(typeof self !== "undefined" && self || typeof window !== "undefined" && window || this.content || this));
 var colorSchemes;
 (function (colorSchemes) {
     colorSchemes.schema1 = [
@@ -8982,16 +9092,104 @@ var networkcube;
         }
     }
     networkcube.formatTimeAtGranularity = formatTimeAtGranularity;
-    function exportPNG(canvas, name) {
-        var dataURL = canvas.toDataURL('image/jpg', 1);
-        var blob = dataURItoBlob(dataURL);
+    function downloadPNGFromCanvas(canvas, name) {
+        var blob = getPNGFromCanvas(canvas);
         var fileNameToSaveAs = name + '_' + new Date().toUTCString() + '.png';
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
         downloadLink.href = window.webkitURL.createObjectURL(blob);
         downloadLink.click();
     }
-    networkcube.exportPNG = exportPNG;
+    networkcube.downloadPNGFromCanvas = downloadPNGFromCanvas;
+    function getPNGFromCanvas(canvas) {
+        var dataURL = canvas.toDataURL('image/jpg', 1);
+        var blob = dataURItoBlob(dataURL);
+    }
+    function downloadPNGFromSVG(name, svgId) {
+        var svgString = getSVGString(d3.select('#' + svgId).node());
+        console.log('svgString', svgString);
+        getPNGFromSVG(svgString, 800, 600, 'png', save);
+        function save(dataBlob, filesize) {
+            console.log('saveAs');
+            saveAs(dataBlob, 'D3 vis exported to PNG.png');
+        }
+    }
+    networkcube.downloadPNGFromSVG = downloadPNGFromSVG;
+    function getPNGFromSVG(svgString, width, height, format, callback) {
+        var format = format ? format : 'png';
+        var imgsrc = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        var canvas = document.createElement("canvas");
+        var context = canvas.getContext("2d");
+        canvas.width = width;
+        canvas.height = height;
+        var image = new Image();
+        image.onload = function () {
+            context.clearRect(0, 0, width, height);
+            context.drawImage(image, 0, 0, width, height);
+            canvas.toBlob(function (blob) {
+                var filesize = Math.round(blob.length / 1024) + ' KB';
+                if (callback)
+                    callback(blob, filesize);
+            });
+        };
+        image.src = imgsrc;
+    }
+    function getSVGString(svgNode) {
+        svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+        var cssStyleText = getCSSStyles(svgNode);
+        appendCSS(cssStyleText, svgNode);
+        var serializer = new XMLSerializer();
+        var svgString = serializer.serializeToString(svgNode);
+        svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink=');
+        svgString = svgString.replace(/NS\d+:href/g, 'xlink:href');
+        return svgString;
+        function getCSSStyles(parentElement) {
+            var selectorTextArr = [];
+            selectorTextArr.push('#' + parentElement.id);
+            for (var c = 0; c < parentElement.classList.length; c++)
+                if (!contains('.' + parentElement.classList[c], selectorTextArr))
+                    selectorTextArr.push('.' + parentElement.classList[c]);
+            var nodes = parentElement.getElementsByTagName("*");
+            for (var i = 0; i < nodes.length; i++) {
+                var id = nodes[i].id;
+                if (!contains('#' + id, selectorTextArr))
+                    selectorTextArr.push('#' + id);
+                var classes = nodes[i].classList;
+                for (var c = 0; c < classes.length; c++)
+                    if (!contains('.' + classes[c], selectorTextArr))
+                        selectorTextArr.push('.' + classes[c]);
+            }
+            var extractedCSSText = "";
+            for (var i = 0; i < document.styleSheets.length; i++) {
+                var s = document.styleSheets[i];
+                try {
+                    if (!s.cssRules)
+                        continue;
+                }
+                catch (e) {
+                    if (e.name !== 'SecurityError')
+                        throw e;
+                    continue;
+                }
+                var cssRules = s.cssRules;
+                for (var r = 0; r < cssRules.length; r++) {
+                    if (contains(cssRules[r].selectorText, selectorTextArr))
+                        extractedCSSText += cssRules[r].cssText;
+                }
+            }
+            return extractedCSSText;
+            function contains(str, arr) {
+                return arr.indexOf(str) === -1 ? false : true;
+            }
+        }
+        function appendCSS(cssText, element) {
+            var styleElement = document.createElement("style");
+            styleElement.setAttribute("type", "text/css");
+            styleElement.innerHTML = cssText;
+            var refNode = element.hasChildNodes() ? element.children[0] : null;
+            element.insertBefore(styleElement, refNode);
+        }
+    }
     function dataURItoBlob(dataURI) {
         var byteString;
         if (dataURI.split(',')[0].indexOf('base64') >= 0)

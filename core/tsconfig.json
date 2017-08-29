@@ -25,6 +25,8 @@
         "./lib/science.ts",
         "./lib/reorder.ts",
         "./lib/BSpline.ts",
+        "./lib/FileSaver.ts",
+        "./lib/canvas-toBlob.ts",
         "./classes/datamanager.ts",
         "./classes/motifs.ts",
         "./classes/analytics.ts",

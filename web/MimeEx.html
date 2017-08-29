@@ -7,6 +7,7 @@
     <script src="mime-js.js" type="text/javascript"></script>
 </head>
 <body>
+    <a id="mailmebutton">MAIL ME</a>
     <b>Mail obj:</b>
     <pre id="mail"></pre>
     <hr/>
@@ -18,7 +19,7 @@
 
     <script type="application/javascript">
         var originalMail = {
-            "to": "vanessaserr@gmail.com",
+            "to": "benj.bach@gmail.com,vanessaserr@gmail.com",
             "subject": "Mail me a screenshot",
             "fromName": "Vistorian team",
             "from": "vanessaserr@gmail.com",
@@ -28,9 +29,13 @@
         };
         var mimeTxt = Mime.toMimeTxt(originalMail);
         var mimeObj = Mime.toMimeObj(mimeTxt);
-        document.getElementById("mail" ).innerText = JSON.stringify(originalMail);
-        document.getElementById("mimeTxt").innerText = mimeTxt;
-        document.getElementById("mimeObj").innerText = JSON.stringify(mimeObj);
-    </script>
+        console.log(mimeTxt);
+        // document.getElementById("mail" ).innerText = JSON.stringify(originalMail);
+        // document.getElementById("mimeTxt").innerText = mimeTxt;
+        // document.getElementById("mimeObj").innerText = JSON.stringify(mimeObj);
+
+        // document.getElementById("mailmebutton").href = "mailto:"+email+'&subject='+emailSub+'&body='+ mimeTxt;
+
+</script>
 </body>
 </html>
