@@ -316,9 +316,9 @@
                             var legend = null
                             if($('#checkboxes-0').is(':checked'))
                               legend = 'Add legend in separate file';
-                            var sendCopy = null
+                            var sendCopy = 'false'
                             if($('#checkboxes-1').is(':checked'))
-                              sendCopy = 'Send copy to the Vistorian team';
+                              sendCopy = 'true';
                             localStorage.setItem('traces_format', format)
                             var formattext = String(format);
                             var legendtext = String(legend);
@@ -376,9 +376,59 @@
 
                         function sendEmail($toEmail, $fromEmail, $subject, $message)
                         {
-                          <form action="test.php">
-                          <input type="submit" value="click on me!">
-                          </form>
+
+                          console.log('Send Email')
+                            // create form
+                            var sendCopyString = '';
+                            if(localStorage.getItem('traces_sendCopyToVistorian'))
+                            {
+                              sendCopyString = '<input type="text" name="cc" value="benj.bach@gmail.com,vanessa.serrano@iqs.url.edu"\>';
+                            }
+
+                            $('body').append('<form id="infoForm" method="post" action="{{http://aviz.fr/sendmail}}">\
+                            <input type="text" name="from" value="'+localStorage.getItem('traces_email')+'"\>\
+                            <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
+                            ' + sendCopyString + '\
+                            <input type="text" name="format" value="'+localStorage.getItem('traces_format')+'"\>\
+                            <input type="text" name="copyToVistorian" value="'+localStorage.getItem('traces_sendCopyToVistorian')+'"\>\
+                            ');
+                          
+                            // submit form
+                            document.forms["infoForm"].submit();
+
+
+
+                            // SEND EMAIL WITH SCREENSHOT
+                            //var emailSub = "Mail me a screenshot";
+                            //var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
+
+                            // var email = document.getElementById('emailInput').value
+                            // var emailBody = "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team";
+                            // //location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
+                            // //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                            // var emailCC = "vanessa.serrano@iqs.edu";
+                            // var emailSub = "Mail me a screenshot";
+                            // var originalMail = {
+                            //     "to": email,
+                            //    //"Content-Type": "text/plain"; 
+                            //     //"file"="aviz.png"
+                            //     "subject": "Mail me a screenshot",
+                            //     "fromName": "Vistorian team",
+                            //     "from": "vanessaserr@gmail.com",
+                            //     "body": "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team",
+                            //     "cids": ["aviz.png"],
+                            //     "attaches" : []
+                            // };
+                            // var mimeTxt = Mime.toMimeTxt(originalMail);
+                            // var mimeObj = Mime.toMimeObj(mimeTxt);
+
+                            // console.log(mimeObj);
+                            // console.log(email);
+
+                            // //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ originalMail["body"];
+
+                            // location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ mimeTxt;
+
                         }
 
                     </script>
