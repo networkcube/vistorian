@@ -546,7 +546,7 @@ module vistorian {
                     function showInactivityBox() {\
                         bootbox.confirm({\
                             size: "big",\
-                            class="text-left",\
+                            class:"text-left",\
                             position: "left",\
                             title: "Are you still there?",\
                             message: "<p>No Vistorian activity for more than 15 minutes.</p>",\

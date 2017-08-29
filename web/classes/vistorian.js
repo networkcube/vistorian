@@ -1,13 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var vistorian;
 (function (vistorian) {
     var head = $('head');
@@ -32,63 +27,60 @@ var vistorian;
             this.data = data;
         }
         return VTable;
-    }());
+    })();
     vistorian.VTable = VTable;
     var VTableSchema = (function () {
         function VTableSchema(name) {
             this.name = name;
         }
         return VTableSchema;
-    }());
+    })();
     vistorian.VTableSchema = VTableSchema;
     var VNodeSchema = (function (_super) {
         __extends(VNodeSchema, _super);
         function VNodeSchema() {
-            var _this = _super.call(this, 'userNodeSchema') || this;
-            _this.relation = [];
-            _this.location = -1;
-            _this.id = 0;
-            _this.label = -1;
-            _this.time = -1;
-            _this.nodeType = -1;
-            return _this;
+            _super.call(this, 'userNodeSchema');
+            this.relation = [];
+            this.location = -1;
+            this.id = 0;
+            this.label = -1;
+            this.time = -1;
+            this.nodeType = -1;
         }
         ;
         return VNodeSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VNodeSchema = VNodeSchema;
     var VLinkSchema = (function (_super) {
         __extends(VLinkSchema, _super);
         function VLinkSchema() {
-            var _this = _super.call(this, 'userLinkSchema') || this;
-            _this.location_source = -1;
-            _this.location_target = -1;
-            _this.id = 0;
-            _this.source = -1;
-            _this.target = -1;
-            _this.weight = -1;
-            _this.time = -1;
-            _this.linkType = -1;
-            return _this;
+            _super.call(this, 'userLinkSchema');
+            this.location_source = -1;
+            this.location_target = -1;
+            this.id = 0;
+            this.source = -1;
+            this.target = -1;
+            this.weight = -1;
+            this.time = -1;
+            this.linkType = -1;
         }
         ;
         return VLinkSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLinkSchema = VLinkSchema;
     var VLocationSchema = (function (_super) {
         __extends(VLocationSchema, _super);
         function VLocationSchema() {
-            var _this = _super.call(this, 'userLocationSchema') || this;
-            _this.id = 0;
-            _this.label = 1;
-            _this.geoname = 2;
-            _this.longitude = 3;
-            _this.latitude = 4;
-            return _this;
+            _super.call(this, 'userLocationSchema');
+            this.id = 0;
+            this.label = 1;
+            this.geoname = 2;
+            this.longitude = 3;
+            this.latitude = 4;
         }
         ;
         return VLocationSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLocationSchema = VLocationSchema;
     var Network = (function () {
         function Network(id) {
@@ -98,7 +90,7 @@ var vistorian;
             this.userLinkSchema = new VLinkSchema();
         }
         return Network;
-    }());
+    })();
     vistorian.Network = Network;
     function loadCSV(files, callBack, sessionid) {
         var loadCount = 0;
@@ -359,7 +351,7 @@ var vistorian;
                     function showInactivityBox() {\
                         bootbox.confirm({\
                             size: "big",\
-                            class="text-left",\
+                            class:"text-left",\
                             position: "left",\
                             title: "Are you still there?",\
                             message: "<p>No Vistorian activity for more than 15 minutes.</p>",\

@@ -21,6 +21,7 @@ declare var LZString: {
     _decompress: (o: any, n: any, e: any) => string;
 };
 declare var BSpline: (points: any, degree: any, copy: any) => void;
+declare var saveAs: any;
 declare module colorSchemes {
     var schema1: string[];
     var schema2: string[];
@@ -86,7 +87,8 @@ declare module networkcube {
     function encapsulate(array: any[], attrName?: string): Object[];
     function isPointInPolyArray(poly: number[][], pt: number[]): boolean;
     function formatTimeAtGranularity(time: networkcube.Time, granualarity: number): number;
-    function exportPNG(canvas: any, name: string): void;
+    function downloadPNGFromCanvas(canvas: any, name: string): void;
+    function downloadPNGFromSVG(name: string, svgId?: string): void;
 }
 declare module networkcube {
     class BasicElement {
