@@ -1,5 +1,7 @@
 from flask import Flask, request
 from werkzeug.utils import secure_filename
+import werkzeug.exceptions
+
 import os.path
 import smtplib
 from email.mime.text import MIMEText
@@ -11,34 +13,46 @@ app = Flask(__name__)
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['png', 'svg'])
 
-app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.debug = True
+
+@app.errorhandler(werkzeug.exceptions.BadRequest)
+def handle_bad_request(e):
+    return 'bad request dude!'
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route("/")
 def hello():
     return '''
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data  action="send">
+    <form enctype=multipart/form-data method=post>
       <p><input type=text name=from>
          <input type=text name=to>
          <input type=text name=note>
          <input type=file name=image>
          <input type=file name=svg>
-         <input type=submit value=Upload>
+         <input type=submit>
     </form>
     '''
 
-@app.route("/send", methods=['GET', 'POST'])
+@app.route("/test", methods=['GET', 'POST'])
+def test():
+    return "test OK"
+
+
+@app.route("/", methods=['GET', 'POST'])
 def send():
-    send_from = request.form['from']
+    try:
+        send_from = request.form['from']
+    except Exception:
+        return hello()
     send_to = request.form['to']
-    send_cc = request.form['cc']
+    #send_cc = request.form['cc']
     send_note = request.form['note']
     if 'image' in request.files:
         send_image = request.files['image']        
@@ -87,8 +101,9 @@ def send():
         msg.attach(img)
 
     # Send the email via our own SMTP server.
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP('smtp.inria.fr')
     s.sendmail(send_from, send_to, msg.as_string())
     s.quit()
     
-    return hello()
+    return "Mail sent!"
+
