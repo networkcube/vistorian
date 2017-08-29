@@ -34,7 +34,7 @@ def hello():
     </form>
     '''
 
-@app.route("/send", methods=['POST'])
+@app.route("/send", methods=['GET', 'POST'])
 def send():
     send_from = request.form['from']
     send_to = request.form['to']
@@ -91,3 +91,4 @@ def send():
     s.sendmail(send_from, send_to, msg.as_string())
     s.quit()
     
+    return hello()
