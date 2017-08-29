@@ -366,13 +366,14 @@
                             //window.location.href = "mailto:vanessa.serrano@iqs.edu?subject=Mail me a screenshot";
                             //var emailTo = email;
                             var emailSub = "Mail me a screenshot";
-                            var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                            //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                            //var emailCC = "vanessa.serrano@iqs.edu";
                             //var emailBody = "%20%20%20%20%3Cb%3EMail%20obj%3A%3C%2Fb%3E%0A%20%20%20%20%3Cpre%20id%3D%22mail%22%3E%3C%2Fpre%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeTxt%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeTxt%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeObj%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeObj%22%3E%3C%2Fdiv%3E%0A%0A%20%20%20%20%3Cscript%20type%3D%22application%2Fjavascript%22%3E%0A%20%20%20%20%20%20%20%20var%20originalMail%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22to%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22subject%22%3A%20%22Mail%20me%20a%20screenshot%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22fromName%22%3A%20%22Vistorian%20team%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22from%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22body%22%3A%20%22This%20is%20your%20screenshot.%5CnTSee%20the%20image%20attached.%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22cids%22%3A%20%5B%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22attaches%22%20%3A%20%5B%5D%0A%20%20%20%20%20%20%20%20%7D%3B%0A%20%20%20%20%20%20%20%20var%20mimeTxt%20%3D%20Mime.toMimeTxt(originalMail)%3B%0A%20%20%20%20%20%20%20%20var%20mimeObj%20%3D%20Mime.toMimeObj(mimeTxt)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mail%22%20).innerText%20%3D%20JSON.stringify(originalMail)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeTxt%22).innerText%20%3D%20mimeTxt%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeObj%22).innerText%20%3D%20JSON.stringify(mimeObj)%3B%0A%20%20%20%20%3C%2Fscript%3E";
-                            var emailBody = "<a href="MimeEx.html">Press</a>";
+                            //var emailBody = "<a href="MimeEx.html">Press</a>";
                             var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
                             //var emailBody = "Hello,%0D%0ATis is your screenshot.%0D%0AThe image is attached.";
-                            //location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
-                            location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ emailBody;
+                            location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
+                            //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ emailBody;
                             //"https://vanessaserr.google.com/mail/?view=cm&fs=1&to=vanessaserr@domain.com";
                             //https://mail.google.com/mail/?view=cm&fs=1&to=email@domain.com 
                             //MimeEx.html;

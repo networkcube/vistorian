@@ -372,8 +372,11 @@
 
                         }
 
-                        function sendEmail()
+                    
+
+                        function sendEmail($toEmail, $fromEmail, $subject, $message)
                         {
+
                           console.log('Send Email')
                             // create form
                             var sendCopyString = '';
@@ -425,6 +428,7 @@
                             // //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ originalMail["body"];
 
                             // location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ mimeTxt;
+
                         }
 
                     </script>
