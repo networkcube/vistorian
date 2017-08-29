@@ -24,7 +24,7 @@ def hello():
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
+    <form method=post enctype=multipart/form-data  action="send">
       <p><input type=text name=from>
          <input type=text name=to>
          <input type=text name=note>
