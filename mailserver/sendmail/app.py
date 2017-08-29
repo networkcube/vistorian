@@ -20,6 +20,9 @@ app.debug = True
 def handle_bad_request(e):
     return 'bad request dude!'
 
+valid_dest = set()
+for valid in open('valid_emails.txt', 'r'):
+    valid_dest.add(valid)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -52,6 +55,8 @@ def send():
     except Exception:
         return hello()
     send_to = request.form['to']
+    if send_to not in valid_dest:
+        return "Invalid destination"
     #send_cc = request.form['cc']
     send_note = request.form['note']
     if 'image' in request.files:
