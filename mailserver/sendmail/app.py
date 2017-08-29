@@ -24,7 +24,7 @@ def hello():
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
+    <form method=post enctype=multipart/form-data  action="send">
       <p><input type=text name=from>
          <input type=text name=to>
          <input type=text name=note>
@@ -34,7 +34,7 @@ def hello():
     </form>
     '''
 
-@app.route("/send", methods=['POST'])
+@app.route("/send", methods=['GET', 'POST'])
 def send():
     send_from = request.form['from']
     send_to = request.form['to']
@@ -91,3 +91,4 @@ def send():
     s.sendmail(send_from, send_to, msg.as_string())
     s.quit()
     
+    return hello()
