@@ -15,7 +15,7 @@
         "../networkcube/core/networkcube.d.ts",
         "./classes/storage.ts",
         "./classes/utils.ts",
-        "./classes/vistorian.ts",
+        "./vistorian.ts",
         "./dataview.ts",
         "./scripts/jstorage.d.ts"
     ]

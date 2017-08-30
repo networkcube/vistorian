@@ -1,6 +1,6 @@
-/// <reference path="./classes/storage.ts"/>
+/// <reference path="classes/storage.ts"/>
 /// <reference path="../core/networkcube.d.ts"/>
-/// <reference path="./classes/vistorian.ts" />
+/// <reference path="vistorian.ts" />
 
 
 var DATA_TABLE_MAX_LENGTH = 200;
@@ -43,15 +43,36 @@ function init() {
     if(networkids.length > 0)
         showNetwork(networkids[0])
 
+    if(networkcube.isTrackingEnabled())
+    {
+        $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
+    }else{
+        $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');        
+    }
+
     var sessionId = parseInt(storage.getLastSessionId());
     console.log('networkcube.isTrackingSet ', networkcube.isTrackingSet())
     console.log('sessionId', sessionId)
     if ( !networkcube.isTrackingSet() && sessionId != 0){
         setupConditionalLogging();
     }
-
 }
 
+if(networkcube.isTrackingEnabled())
+{
+    $('#trackingContainer').load('traces/questionnaires-dataview.html');
+} else {
+    if($('#trackingButtonsDiv'))
+    {
+        $('#trackingButtonsDiv').remove()
+    }
+}
+
+function enableDisableTracking()
+{
+    setupConditionalLogging();
+}
+ 
 
 function setupConditionalLogging() {
     bootbox.confirm({
@@ -75,11 +96,15 @@ function setupConditionalLogging() {
             if (result == true)
             {
                 localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
+                $('#trackingContainer').load('traces/questionnaires-dataview.html');
+                $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
             }else{
+                localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
                 if($('#trackingButtonsDiv'))
                 {
                     $('#trackingButtonsDiv').remove()
                 }
+                $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');
             }
         }
     });

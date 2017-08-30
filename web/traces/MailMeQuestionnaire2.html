@@ -1,9 +1,8 @@
 <html>
 <head>
-    <script src="lib/jquery.js"></script>
-    <script src="classes/vistorian.js"></script>
-    <script src="../core/networkcube.js"></script>
-    <script src="../core/lib/trace.js"></script>
+    <script src="../lib/jquery.js"></script>
+    <script src="../../core/networkcube.js"></script>
+    <script src="../../core/lib/trace.js"></script>
 <style>
 
     body{
@@ -18,8 +17,8 @@
                 background-color: orange; 
                 border: none;
                 color: white;
-                padding: 10px 20px;
-                text-align: center;
+                padding: 10px 10px;
+                text-align: left;
                 text-decoration: none;
                 display: inline-block;
                 cursor: pointer;
@@ -34,6 +33,16 @@
                 text-decoration: none;
                 display: inline-block;
                 cursor: pointer;} 
+
+            .button3 {
+                background-color: white;
+                border: none;
+                color: black;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;}
 
             .buttonClose {
                 background-color: #cc0000;
@@ -54,23 +63,23 @@
             }
 
 </style>
+
 </head>
 
 <body>
                     
                     <fieldset style = "width: 750px; margin-top: 0px auto;">
                     
-                    <button type="button" onclick="closeWindow2()" class="buttonClose" id="signup-close" style="position: absolute;right:225px;top:15px;outline:5px solid #fff" color = red>X</button>
+                    <button type="button" onclick="closeWindow2()" class="buttonClose" id="signup-close" style="position: absolute;right:235px;top:15px;outline:5px solid #fff" color = red>X</button>
                     <script>
                         function closeWindow()
                         {
-                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
                         }
-
                         function closeWindow2()
                         {
-                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
-                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
                         }
                     </script>
 
@@ -79,8 +88,8 @@
                       <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><big>X</big></a>
                     </button> -->
 
-                    <h3> <font size="5">Please help us understand the context of use: (Part 2: for "Analyze data")</font></h3>
-                    <p><font size="4">Answer and click FINISH AND SUBMIT or press ESC to skip this additional questionnaire</font></p>
+                    <h3> <font size="5">Mail me a screenshot (Part 2: for "Analyze data")</font></h3>
+                    <p><font size="4">Answer and click CONTINUE or press ESC to skip this additional questionnaire and send the email</font></p>
                     <hr>
                     <h3> <font size="4">How helpful was the tool to analyze your data in this session?</font></h3>
                     <!-- Multiple Radios (inline) -->
@@ -141,7 +150,7 @@
                      <h3> <font size="4">Characterize the analysis you conducted:</font></h3>
                      <div class="checkbox">
                         <label for="checkbox-0">
-                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" ondblclick="doubleClick(1)" onclick="toggleboxes('checkbox1')">
+                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" ondblclick="doubleClick(1)" onclick="toggleboxes('checkbox1')" data-ctrl="JSCtrl">
                           <font size="4">Review data quality</font>
                         </label>
                       </div>
@@ -205,15 +214,13 @@
                     <td> 
                         <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
                         <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
-                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the FINISH AND SUBMIT button</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the CONTINUE button</font></p>
                         </fieldset> 
                     </td>
                     </table>
                     <hr>
-                    <p><font size="4">Add comments:</font></p>
-                    <form>
-                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
-                    </form>
+                    <p><font size="4">Next you will be able to add comments in the email message</font></p>
+                    
                     <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
                     <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
                     <p></p>
@@ -228,9 +235,10 @@
                       {
                         // GET RESULTS FROM 1ST QUESTIONNAIRE
                         // Read stuff from local storage
-                        var Comments = document.getElementById('comments').value;
-                        var Commentstext = String(Comments);
-                        localStorage.setItem('traces_comments', $('#comments').val())
+                        email = localStorage.getItem('traces_email', $('#emailInput').val())
+                        localStorage.getItem('traces_format')
+                        localStorage.getItem('traces_addLegend')
+                        localStorage.getItem('traces_sendCopyToVistorian')
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -271,20 +279,24 @@
                         var analysisCharac6;
                         if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
 
+                      
                         // SEND RESULTS TO THE SERVER
-                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
                         console.log(helpfullScore);
-                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
-                        console.log(Comments);
-                        
-                        closeWindow2();
+
                         //window.history.back();
+                        sendEmail();
+                        closeWindow2();
                       }
 
                       function doubleClick(checkboxNumber)
                       {
                         // GET RESULTS FROM 1ST QUESTIONNAIRE
                         // Read stuff from local storage
+                        email = localStorage.getItem('traces_email', $('#emailInput').val())
+                        localStorage.getItem('traces_format')
+                        localStorage.getItem('traces_addLegend')
+                        localStorage.getItem('traces_sendCopyToVistorian')
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -315,34 +327,57 @@
                         localStorage.setItem('traces_checkbox5', checkboxNumber == 6)
 
                         var analysisCharac1;
-                        if(checkboxNumber == 1){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
+                        if(checkboxNumber == 1){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac1);}
                         
                         var analysisCharac2;
-                        if(checkboxNumber == 2){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
+                        if(checkboxNumber == 2){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac2);}
 
                          var analysisCharac3;
-                        if(checkboxNumber == 3){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
+                        if(checkboxNumber == 3){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac3);}
 
                          var analysisCharac4;
-                        if(checkboxNumber == 4){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
+                        if(checkboxNumber == 4){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac4);}
 
                         var analysisCharac5;
-                        if(checkboxNumber == 5){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
+                        if(checkboxNumber == 5){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac5);}
 
                         var analysisCharac6;
-                        if(checkboxNumber == 6){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
+                        if(checkboxNumber == 6){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac6);}
 
                       
                         // SEND RESULTS TO THE SERVER
-                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
                         console.log(helpfullScore);
 
                         //window.history.back();
+                        
+                        sendEmail();
                         closeWindow2();
                       }
 
-                    </script>
-                    </fieldset>
+                      function sendEmail()
+                      {
+                            // SEND EMAIL WITH SCREENSHOT
+                            //window.location.href = "mailto:vanessa.serrano@iqs.edu.com?subject=Mail me a screenshot";
+                            //window.location.href = "mailto:vanessa.serrano@iqs.edu?subject=Mail me a screenshot";
+                            //var emailTo = email;
+                            var emailSub = "Mail me a screenshot";
+                            //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                            //var emailCC = "vanessa.serrano@iqs.edu";
+                            //var emailBody = "%20%20%20%20%3Cb%3EMail%20obj%3A%3C%2Fb%3E%0A%20%20%20%20%3Cpre%20id%3D%22mail%22%3E%3C%2Fpre%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeTxt%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeTxt%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeObj%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeObj%22%3E%3C%2Fdiv%3E%0A%0A%20%20%20%20%3Cscript%20type%3D%22application%2Fjavascript%22%3E%0A%20%20%20%20%20%20%20%20var%20originalMail%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22to%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22subject%22%3A%20%22Mail%20me%20a%20screenshot%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22fromName%22%3A%20%22Vistorian%20team%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22from%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22body%22%3A%20%22This%20is%20your%20screenshot.%5CnTSee%20the%20image%20attached.%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22cids%22%3A%20%5B%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22attaches%22%20%3A%20%5B%5D%0A%20%20%20%20%20%20%20%20%7D%3B%0A%20%20%20%20%20%20%20%20var%20mimeTxt%20%3D%20Mime.toMimeTxt(originalMail)%3B%0A%20%20%20%20%20%20%20%20var%20mimeObj%20%3D%20Mime.toMimeObj(mimeTxt)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mail%22%20).innerText%20%3D%20JSON.stringify(originalMail)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeTxt%22).innerText%20%3D%20mimeTxt%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeObj%22).innerText%20%3D%20JSON.stringify(mimeObj)%3B%0A%20%20%20%20%3C%2Fscript%3E";
+                            //var emailBody = "<a href="MimeEx.html">Press</a>";
+                            var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
+                            //var emailBody = "Hello,%0D%0ATis is your screenshot.%0D%0AThe image is attached.";
+                            location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
+                            //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ emailBody;
+                            //"https://vanessaserr.google.com/mail/?view=cm&fs=1&to=vanessaserr@domain.com";
+                            //https://mail.google.com/mail/?view=cm&fs=1&to=email@domain.com 
+                            //MimeEx.html;
+                      }
 
+                    </script>
+
+                    </fieldset>
+                    
 </body>
 </html>

@@ -1,9 +1,9 @@
 <html>
 <head>
-  <script src="lib/jquery.js"></script>
-  <script src="classes/vistorian.js"></script>
-  <script src="../core/networkcube.js"></script>
-  <script src="../core/lib/trace.js"></script>
+  <script src="../lib/jquery.js"></script>
+  <script src="../vistorian.js"></script>
+  <script src="../../core/networkcube.js"></script>
+  <script src="../../core/lib/trace.js"></script>
 <style>
 
     body{
@@ -145,7 +145,7 @@
 
                                 trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Analyze data'); 
                                 
-                                window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../EndActivityQuestionnaire2.html");
+                                window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../traces/EndActivityQuestionnaire2.html");
 
                                }else{
 
@@ -207,7 +207,7 @@
                               if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context4);}
                               var Context5;
                               if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context5);}
-                              window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../EndActivityQuestionnaire2.html");
+                              window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../traces/EndActivityQuestionnaire2.html");
                             }else{
                               var Context1;
                               if(checkedButtons["button1"] == true){Context1 = 'Analyze data'; console.log(Context1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context1);}

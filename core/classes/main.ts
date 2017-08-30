@@ -245,6 +245,7 @@ module networkcube {
     export function isTrackingSet():Boolean 
     {
         var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
+        // console.log('isTrackingSet', value)
         return value === null ? false : true;
     }
 }
