@@ -477,14 +477,14 @@ module vistorian {
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
         $('#'+elementId).append(dataname);
-        
-        $('#'+elementId).append('<div>\
+        if(localStorage(“TRACKING_ENABLED”)){} 
+        $('#'+elementId).append('<div id="trackingButtonsDiv">\
                     <script src="..\/lib\/bootbox.min.js"><\/script>\
                     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
                     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">\
-                    <button id="submit" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
-                    <button id="submit" onclick="endOfActivityClicked()">Report end of the activity</button>\
-                    <script>\
+                    <button id="submit" name="MailMe" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
+                    <button id="submit" name="End" onclick="endOfActivityClicked()">Report end of the activity</button>\
+                    <script type="text/javascript">\
                         function mailmeButtonClicked()\
                         {\
                             trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");\
@@ -498,7 +498,7 @@ module vistorian {
                     </script>\
                     <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
                         <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
-                        <iframe src="../MailMeQuestionnaire1.php" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
                     </div>\
                     <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
                         <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\

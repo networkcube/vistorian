@@ -43,7 +43,40 @@ function init() {
     if(networkids.length > 0)
         showNetwork(networkids[0])
 
+
+    var sessionId = storage.getLastSessionId();
+    if (sessionId == undefined || sessionId == 0){
+    ConditionalLogging();
+    }
+
 }
+
+
+                        function ConditionalLogging() {
+                            bootbox.confirm({
+                                size: "big",
+                                class:"text-left",
+                                position: "left",
+                                title: "User consent form.",
+                                message: "<p> If you agree your activity will be logged. The information provided will remain anonymous, it will be used solely for this project.</p>",
+                                buttons: {
+                                    confirm: {
+                                        label: "I agree",
+                                        className:  "btn-success pull-right"
+                                    },
+                                    cancel: {
+                                        label:  "I do not agree",
+                                        className:  "btn-warning pull-left"
+                                    }
+                                },
+                                callback: function (result) {
+                                    if (result == false){
+                                        document.getElementById("submit").disabled = true;
+                                    }
+                                }
+                            });
+                        }
+       
 
 // loads the list of available visualizations and displays them on the left
 function loadVisualizationList() {
