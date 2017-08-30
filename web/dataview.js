@@ -19,12 +19,14 @@ function init() {
     var networkids = storage.getNetworkIds(SESSION_NAME);
     if (networkids.length > 0)
         showNetwork(networkids[0]);
-    var sessionId = storage.getLastSessionId();
-    if (sessionId == undefined || sessionId == 0) {
-        ConditionalLogging();
+    var sessionId = parseInt(storage.getLastSessionId());
+    console.log('networkcube.isTrackingSet ', networkcube.isTrackingSet());
+    console.log('sessionId', sessionId);
+    if (!networkcube.isTrackingSet() && sessionId != 0) {
+        setupConditionalLogging();
     }
 }
-function ConditionalLogging() {
+function setupConditionalLogging() {
     bootbox.confirm({
         size: "big",
         class: "text-left",
@@ -42,8 +44,13 @@ function ConditionalLogging() {
             }
         },
         callback: function (result) {
-            if (result == false) {
-                document.getElementById("submit").disabled = true;
+            if (result == true) {
+                localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
+            }
+            else {
+                if ($('#trackingButtonsDiv')) {
+                    $('#trackingButtonsDiv').remove();
+                }
             }
         }
     });

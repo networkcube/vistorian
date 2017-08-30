@@ -13,7 +13,6 @@ module storage{
     var SEP:string = "#";
 
 
-
     // SESSION
     export function saveSessionId(sessionid:string){
         console.log('save session', sessionid )

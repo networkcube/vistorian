@@ -8,14 +8,14 @@
     var starting = true;
     var debug = false; 
     var pagename = null;
-    var disabled = false;
+    // var disabled = false;
 
     trace = {version: "0.3"};
 
-    //VS: for the consent
-    trace.disable = function(value) {
-    	disabled = (value != false);
-    }
+    // //VS: for the consent
+    // trace.disable = function(value) {
+    // 	disabled = (value != false);
+    // }
 
 	trace.url = function(url) 
 	{
@@ -144,7 +144,9 @@
 
 	function traceEvent(cat, action, label, value) 
 	{
-		if (disabled) return;
+		if (!networkcube.isTrackingEnabled()) 
+			return;
+
 		if (starting) {
 			starting = false;
 			_sending = [];
@@ -176,6 +178,7 @@
 		
 		if (_sending == null)
 			sendLogs();
+
 		return trace;
 	}
 

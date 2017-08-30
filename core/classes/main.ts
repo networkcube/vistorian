@@ -234,4 +234,17 @@ module networkcube {
 
     /// UTILITY FUNCTIONS
     export enum OrderType { Local, Global, Data };
+
+    export function isTrackingEnabled():Boolean 
+    {
+        var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
+        console.log('>>>>>>>', value);
+        return value == 'true' ? true : false;
+    }
+
+    export function isTrackingSet():Boolean 
+    {
+        var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
+        return value === null ? false : true;
+    }
 }

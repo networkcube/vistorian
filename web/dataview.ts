@@ -43,39 +43,47 @@ function init() {
     if(networkids.length > 0)
         showNetwork(networkids[0])
 
-
-    var sessionId = storage.getLastSessionId();
-    if (sessionId == undefined || sessionId == 0){
-    ConditionalLogging();
+    var sessionId = parseInt(storage.getLastSessionId());
+    console.log('networkcube.isTrackingSet ', networkcube.isTrackingSet())
+    console.log('sessionId', sessionId)
+    if ( !networkcube.isTrackingSet() && sessionId != 0){
+        setupConditionalLogging();
     }
 
 }
 
 
-                        function ConditionalLogging() {
-                            bootbox.confirm({
-                                size: "big",
-                                class:"text-left",
-                                position: "left",
-                                title: "User consent form.",
-                                message: "<p> If you agree your activity will be logged. The information provided will remain anonymous, it will be used solely for this project.</p>",
-                                buttons: {
-                                    confirm: {
-                                        label: "I agree",
-                                        className:  "btn-success pull-right"
-                                    },
-                                    cancel: {
-                                        label:  "I do not agree",
-                                        className:  "btn-warning pull-left"
-                                    }
-                                },
-                                callback: function (result) {
-                                    if (result == false){
-                                        document.getElementById("submit").disabled = true;
-                                    }
-                                }
-                            });
-                        }
+function setupConditionalLogging() {
+    bootbox.confirm({
+        size: "big",
+        class:"text-left",
+        position: "left",
+        title: "User consent form.",
+        message: "<p> If you agree your activity will be logged. The information provided will remain anonymous, it will be used solely for this project.</p>",
+        buttons: {
+            confirm: {
+                label: "I agree",
+                className:  "btn-success pull-right"
+            },
+            cancel: {
+                label:  "I do not agree",
+                className:  "btn-warning pull-left"
+            }
+        },
+        callback: function (result) 
+        {
+            if (result == true)
+            {
+                localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
+            }else{
+                if($('#trackingButtonsDiv'))
+                {
+                    $('#trackingButtonsDiv').remove()
+                }
+            }
+        }
+    });
+}
        
 
 // loads the list of available visualizations and displays them on the left

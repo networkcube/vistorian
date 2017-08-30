@@ -1,13 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var vistorian;
 (function (vistorian) {
     var head = $('head');
@@ -32,63 +27,60 @@ var vistorian;
             this.data = data;
         }
         return VTable;
-    }());
+    })();
     vistorian.VTable = VTable;
     var VTableSchema = (function () {
         function VTableSchema(name) {
             this.name = name;
         }
         return VTableSchema;
-    }());
+    })();
     vistorian.VTableSchema = VTableSchema;
     var VNodeSchema = (function (_super) {
         __extends(VNodeSchema, _super);
         function VNodeSchema() {
-            var _this = _super.call(this, 'userNodeSchema') || this;
-            _this.relation = [];
-            _this.location = -1;
-            _this.id = 0;
-            _this.label = -1;
-            _this.time = -1;
-            _this.nodeType = -1;
-            return _this;
+            _super.call(this, 'userNodeSchema');
+            this.relation = [];
+            this.location = -1;
+            this.id = 0;
+            this.label = -1;
+            this.time = -1;
+            this.nodeType = -1;
         }
         ;
         return VNodeSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VNodeSchema = VNodeSchema;
     var VLinkSchema = (function (_super) {
         __extends(VLinkSchema, _super);
         function VLinkSchema() {
-            var _this = _super.call(this, 'userLinkSchema') || this;
-            _this.location_source = -1;
-            _this.location_target = -1;
-            _this.id = 0;
-            _this.source = -1;
-            _this.target = -1;
-            _this.weight = -1;
-            _this.time = -1;
-            _this.linkType = -1;
-            return _this;
+            _super.call(this, 'userLinkSchema');
+            this.location_source = -1;
+            this.location_target = -1;
+            this.id = 0;
+            this.source = -1;
+            this.target = -1;
+            this.weight = -1;
+            this.time = -1;
+            this.linkType = -1;
         }
         ;
         return VLinkSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLinkSchema = VLinkSchema;
     var VLocationSchema = (function (_super) {
         __extends(VLocationSchema, _super);
         function VLocationSchema() {
-            var _this = _super.call(this, 'userLocationSchema') || this;
-            _this.id = 0;
-            _this.label = 1;
-            _this.geoname = 2;
-            _this.longitude = 3;
-            _this.latitude = 4;
-            return _this;
+            _super.call(this, 'userLocationSchema');
+            this.id = 0;
+            this.label = 1;
+            this.geoname = 2;
+            this.longitude = 3;
+            this.latitude = 4;
         }
         ;
         return VLocationSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLocationSchema = VLocationSchema;
     var Network = (function () {
         function Network(id) {
@@ -98,7 +90,7 @@ var vistorian;
             this.userLinkSchema = new VLinkSchema();
         }
         return Network;
-    }());
+    })();
     vistorian.Network = Network;
     function loadCSV(files, callBack, sessionid) {
         var loadCount = 0;
@@ -291,100 +283,106 @@ var vistorian;
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> ' + datasetname + '</h2>');
         $('#' + elementId).append(dataname);
-        if (localStorage(TRACKING_ENABLED)) { }
-        $('#' + elementId).append('<div id="trackingButtonsDiv">\
-                    <script src="..\/lib\/bootbox.min.js"><\/script>\
-                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
-                    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">\
-                    <button id="submit" name="MailMe" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
-                    <button id="submit" name="End" onclick="endOfActivityClicked()">Report end of the activity</button>\
-                    <script type="text/javascript">\
-                        function mailmeButtonClicked()\
-                        {\
-                            trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");\
-                            $("#mailmeQuestionnaireDiv").css("visibility", "visible")\
-                        }\
-                        function endOfActivityClicked()\
-                        {\
-                            trace.event(null, "MiniQuestionnaires", "EndActivityQuestionnaire1");\
-                            $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")\
-                        }\
-                    </script>\
-                    <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
-                        <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
-                        <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
-                    </div>\
-                    <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
-                        <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
-                        <iframe src="../EndActivityQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
-                    </div>\
-                </div>\
-                <style type="text/css">\
-                    #submit {\
-                    background-color: #ccc;\
-                    padding: 6px;\
-                    margin:4px;\
-                    -moz-border-radius: 5px;\
-                    -webkit-border-radius: 5px;\
-                    border-radius: 5px;\
-                    color: #fff;\
-                    font-size: 12px;\
-                    text-decoration: none;\
-                    border: none;\
-                    }\
-                    \
-                    #submit:hover {\
-                    border: none;\
-                    background: orange;\
-                    box-shadow: 0px 0px 1px #777;\
-                    }\
-                </style>\
+        if (networkcube.isTrackingEnabled()) {
+            $('#' + elementId).append('<div id="trackingButtonsDiv">\
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
+                <script src="../lib/bootbox.min.js"><\/script>\
+                <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">\
+                <button id="submit" name="MailMe" onclick="mailmeButtonClicked()">Mail me a screenshot</button>\
+                <button id="emailMeBtn" name="End" onclick="endOfActivityClicked()">Report end of the activity</button>\
                 <script type="text/javascript">\
-                    var idleTime = 0;\
-                    var idleInterval = setInterval(timerIncrement, 1000);\
-                    $(document).ready(function () {\
-                        $(this).mousemove(function (e) {\
-                            idleTime = 0                        });\
-                        $(this).keypress(function (e) {\
-                            idleTime = 0;\
-                        });\
+                    function mailmeButtonClicked()\
+                    {\
+                        trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");\
+                        $("#mailmeQuestionnaireDiv").css("visibility", "visible")\
+                    }\
+                    function endOfActivityClicked()\
+                    {\
+                        trace.event(null, "MiniQuestionnaires", "EndActivityQuestionnaire1");\
+                        $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")\
+                    }\
+                </script>\
+                <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
+                    <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
+                    <iframe src="../MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                </div>\
+                <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">\
+                    <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>\
+                    <iframe src="../EndActivityQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>\
+                </div>\
+            </div>\
+            <style type="text/css">\
+                #submit, #emailMeBtn {\
+                background-color: #ccc;\
+                padding: 6px;\
+                margin:4px;\
+                -moz-border-radius: 5px;\
+                -webkit-border-radius: 5px;\
+                border-radius: 5px;\
+                color: #fff;\
+                font-size: 12px;\
+                text-decoration: none;\
+                border: none;\
+                }\
+                \
+                #submit:hover {\
+                border: none;\
+                background: orange;\
+                box-shadow: 0px 0px 1px #777;\
+                }\
+            </style>\
+            <script type="text/javascript">\
+                var idleTime = 0;\
+                var idleInterval = setInterval(timerIncrement, 1000);\
+                $(document).ready(function () {\
+                    $(this).mousemove(function (e) {\
+                        idleTime = 0                        });\
+                    $(this).keypress(function (e) {\
+                        idleTime = 0;\
                     });\
-                    function timerIncrement() {\
-                        idleTime = idleTime + 1;\
-                        if (idleTime > 60 * 14 ) {\
-                            showInactivityBox();\
-                            trace.event(null, "NoActivity", "NoActivityDialogBox");\
-                            window.clearInterval(idleInterval);\
-                        }\
+                });\
+                function timerIncrement() {\
+                    idleTime = idleTime + 1;\
+                    if (idleTime > 60 * 14 ) {\
+                        showInactivityBox();\
+                        trace.event(null, "NoActivity", "NoActivityDialogBox");\
+                        window.clearInterval(idleInterval);\
                     }\
-                    function showInactivityBox() {\
-                        bootbox.confirm({\
-                            size: "big",\
-                            class:"text-left",\
-                            position: "left",\
-                            title: "Are you still there?",\
-                            message: "<p>No Vistorian activity for more than 15 minutes.</p>",\
-                            buttons: {\
-                                confirm: {\
-                                    label: "I want to continue working",\
-                                    className:  "btn-success pull-right"\
-                                },\
-                                cancel: {\
-                                    label:  "DONE: report on recent activity",\
-                                    className:  "btn-warning pull-left"\
-                                }\
+                }\
+                function showInactivityBox() {\
+                    bootbox.confirm({\
+                        size: "big",\
+                        class:"text-left",\
+                        position: "left",\
+                        title: "Are you still there?",\
+                        message: "<p>No Vistorian activity for more than 15 minutes.</p>",\
+                        buttons: {\
+                            confirm: {\
+                                label: "I want to continue working",\
+                                className:  "btn-success pull-right"\
                             },\
-                            callback: function (result) {\
-                                if (result == false){\
-                                    endOfActivityClicked();\
-                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "DONE");\
-                                }else{\
-                                    trace.event(null, "NoActivity", "NoActivityDialogBox", "BACK");\
-                                }\
+                            cancel: {\
+                                label:  "DONE: report on recent activity",\
+                                className:  "btn-warning pull-left"\
                             }\
-                        });\
-                    }\
-                </script>');
+                        },\
+                        callback: function (result) {\
+                            if (result == false){\
+                                endOfActivityClicked();\
+                                trace.event(null, "NoActivity", "NoActivityDialogBox", "DONE");\
+                            }else{\
+                                trace.event(null, "NoActivity", "NoActivityDialogBox", "BACK");\
+                            }\
+                        }\
+                    });\
+                }\
+            </script>');
+        }
+        else {
+            if ($('#trackingButtonsDiv')) {
+                $('#trackingButtonsDiv').remove();
+            }
+        }
         var vars = networkcube.getUrlVars();
         $('#' + elementId).append('<a href="../dataview.html?session=' + vars['session'] + '&datasetName' + vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
         $('#' + elementId).append('<br/><br/>');

@@ -785,6 +785,8 @@ declare module networkcube {
         Global = 1,
         Data = 2,
     }
+    function isTrackingEnabled(): Boolean;
+    function isTrackingSet(): Boolean;
 }
 declare module glutils {
     function makeAlphaBuffer(array: number[], stretch: number): Float32Array;

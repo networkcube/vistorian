@@ -13540,6 +13540,17 @@ var networkcube;
     })(networkcube.OrderType || (networkcube.OrderType = {}));
     var OrderType = networkcube.OrderType;
     ;
+    function isTrackingEnabled() {
+        var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
+        console.log('>>>>>>>', value);
+        return value == 'true' ? true : false;
+    }
+    networkcube.isTrackingEnabled = isTrackingEnabled;
+    function isTrackingSet() {
+        var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
+        return value === null ? false : true;
+    }
+    networkcube.isTrackingSet = isTrackingSet;
 })(networkcube || (networkcube = {}));
 var glutils;
 (function (glutils) {
@@ -14712,11 +14723,7 @@ var geometry;
     var starting = true;
     var debug = false;
     var pagename = null;
-    var disabled = false;
     trace = { version: "0.3" };
-    trace.disable = function (value) {
-        disabled = (value != false);
-    };
     trace.url = function (url) {
         if (!arguments.length)
             return url;
@@ -14813,7 +14820,7 @@ var geometry;
         return traceEvent("_trace", action, label, value);
     }
     function traceEvent(cat, action, label, value) {
-        if (disabled)
+        if (!networkcube.isTrackingEnabled())
             return;
         if (starting) {
             starting = false;
