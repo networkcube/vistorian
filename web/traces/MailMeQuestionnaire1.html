@@ -375,7 +375,7 @@
                         function sendEmail($toEmail, $fromEmail, $subject, $message)
                         {
 
-                          console.log('Send Email')
+                            console.log('Send Email')
                             // create form
                             var sendCopyString = '';
                             if(localStorage.getItem('traces_sendCopyToVistorian'))
@@ -383,12 +383,12 @@
                               sendCopyString = '<input type="text" name="cc" value="benj.bach@gmail.com,vanessa.serrano@iqs.url.edu"\>';
                             }
 
-                            $('body').append('<form id="infoForm" method="post" action="{{http://aviz.fr/sendmail}}">\
-                            <input type="text" name="from" value="'+localStorage.getItem('traces_email')+'"\>\
-                            <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
-                            ' + sendCopyString + '\
-                            <input type="text" name="format" value="'+localStorage.getItem('traces_format')+'"\>\
-                            <input type="text" name="copyToVistorian" value="'+localStorage.getItem('traces_sendCopyToVistorian')+'"\>\
+                            $('body').append('\
+                            <form id="infoForm" method="post" enctype="multipart/form-data" action="http://aviz.fr/sendmail">\
+                              <input type="text" name="from" value="benj.bach@mail.com"\>\
+                              <input type="text" name="to" value="vanessa.serrano@iqs.url.edu"\>\
+                              <input type="text" name="note">\
+                            </form>\
                             ');
                           
                             // submit form

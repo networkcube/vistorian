@@ -16,6 +16,7 @@ ALLOWED_EXTENSIONS = set(['png', 'svg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.debug = True
 
+
 @app.errorhandler(werkzeug.exceptions.BadRequest)
 def handle_bad_request(e):
     return 'bad request dude!'
@@ -50,6 +51,7 @@ def test():
 
 @app.route("/", methods=['GET', 'POST'])
 def send():
+    print('app.send()')
     try:
         send_from = request.form['from']
     except Exception:
