@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from werkzeug.utils import secure_filename
+from werkzeug.debug import DebuggedApplication
 import werkzeug.exceptions
 
 import os.path
@@ -16,14 +17,17 @@ ALLOWED_EXTENSIONS = set(['png', 'svg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.debug = True
 
-
 @app.errorhandler(werkzeug.exceptions.BadRequest)
 def handle_bad_request(e):
     return 'bad request dude!'
 
+app = DebuggedApplication(app, evalex=True)
+
 valid_dest = set()
-for valid in open('valid_emails.txt', 'r'):
-    valid_dest.add(valid)
+
+with open('valid_emails.txt', 'r') as f:
+    for valid in f:
+        valid_dest.add(valid.rstrip('\n'))
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -53,16 +57,16 @@ def test():
 def send():
     print('app.send()')
     try:
-        send_from = request.form['from']
+        send_from = request.form['from'].strip()
     except Exception:
         return hello()
-    send_to = request.form['to']
+    send_to = request.form['to'].strip()
     if send_to not in valid_dest:
-        return "Invalid destination"
+        return "Invalid destination: "+send_to #+" valids:"+",".join(list(valid_dest))
     #send_cc = request.form['cc']
-    send_note = request.form['note']
+    send_note = request.form['note'].strip()
     if 'image' in request.files:
-        send_image = request.files['image']        
+        send_image = request.files['image']
         if allowed_file(send_image.filename):
             filename = secure_filename(send_image.filename)
             filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -92,6 +96,9 @@ def send():
     msg['To'] = send_to
     msg.preamble = send_note
 
+    note = MIMEText(send_note)
+    msg.attach(note)
+
     # Assume we know that the image files are all in PNG format
     # Open the files in binary mode.  Let the MIMEImage class automatically
     # guess the specific image type.
@@ -111,6 +118,10 @@ def send():
     s = smtplib.SMTP('smtp.inria.fr')
     s.sendmail(send_from, send_to, msg.as_string())
     s.quit()
-    
-    return "Mail sent!"
+
+    response = "Mail sent!"
+    response = make_response(response)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
 
