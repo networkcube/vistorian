@@ -208,7 +208,7 @@
 
                                 trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'Analyze data'); 
                                 
-                                window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "../traces/MailMeQuestionnaire2.html");
+                                window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
 
                               }else{
                                 var Context2;
@@ -348,7 +348,7 @@
                               if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', Context4);}
                               var Context5;
                               if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', Context5);}
-                              window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "../traces/MailMeQuestionnaire2.html");
+                              window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
                             }else{
                               trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', emailtext);
                               trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', formattext);
@@ -380,7 +380,7 @@
                             var sendCopyString = '';
                             if(localStorage.getItem('traces_sendCopyToVistorian'))
                             {
-                              sendCopyString = '<input type="text" name="cc" value="benj.bach@gmail.com,vanessa.serrano@iqs.url.edu"\>';
+                              sendCopyString = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
                             }
 
                             $('body').append('<form id="infoForm" method="post" action="{{http://aviz.fr/sendmail}}">\
@@ -388,7 +388,7 @@
                             <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
                             ' + sendCopyString + '\
                             <input type="text" name="format" value="'+localStorage.getItem('traces_format')+'"\>\
-                            <input type="text" name="copyToVistorian" value="'+localStorage.getItem('traces_sendCopyToVistorian')+'"\>\
+                            <input type="text" name="note" value="This is your screenshot."\>\
                             ');
                           
                             // submit form
