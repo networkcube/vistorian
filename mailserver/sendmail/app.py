@@ -1,6 +1,6 @@
 from flask import Flask, request, make_response
 from werkzeug.utils import secure_filename
-from werkzeug.debug import DebuggedApplication
+#from werkzeug.debug import DebuggedApplication
 import werkzeug.exceptions
 
 import os.path
@@ -17,11 +17,11 @@ ALLOWED_EXTENSIONS = set(['png', 'svg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.debug = True
 
-@app.errorhandler(werkzeug.exceptions.BadRequest)
-def handle_bad_request(e):
-    return 'bad request dude!'
+#@app.errorhandler(werkzeug.exceptions.BadRequest)
+#def handle_bad_request(e):
+#    return 'bad request dude!'
 
-app = DebuggedApplication(app, evalex=True)
+#app = DebuggedApplication(app, evalex=True)
 
 valid_dest = set()
 
