@@ -1,7 +1,5 @@
 from flask import Flask, request, make_response
 from werkzeug.utils import secure_filename
-#from werkzeug.debug import DebuggedApplication
-import werkzeug.exceptions
 
 import os.path
 import smtplib
@@ -16,12 +14,6 @@ ALLOWED_EXTENSIONS = set(['png', 'svg'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.debug = True
-
-#@app.errorhandler(werkzeug.exceptions.BadRequest)
-#def handle_bad_request(e):
-#    return 'bad request dude!'
-
-#app = DebuggedApplication(app, evalex=True)
 
 valid_dest = set()
 
@@ -64,7 +56,12 @@ def send():
     send_to = request.form['to'].strip()
     if send_to not in valid_dest:
         return "Invalid destination: "+send_to #+" valids:"+",".join(list(valid_dest))
-    #send_cc = request.form['cc']
+    if 'cc' in request.form:
+        send_cc = request.form['cc'].strip()
+    else:
+        send_cc = None
+    if 'CopyToVistorian' in request.form:
+        send_cc = "vistorian@inria.fr"
     send_note = request.form['note'].strip()
     if 'image' in request.files:
         send_image = request.files['image']
@@ -95,6 +92,9 @@ def send():
     # family = the list of all recipients' email addresses
     msg['From'] = send_from
     msg['To'] = send_to
+    if send_cc is not None:
+        msg['CC'] = send_cc
+
     msg.preamble = send_note
 
     note = MIMEText(send_note)
