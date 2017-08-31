@@ -6,6 +6,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from email.utils import getaddresses
 
 app = Flask(__name__)
 
@@ -115,9 +116,14 @@ def send():
         fp.close()
         msg.attach(img)
 
+    tos = msg.get_all('to', [])
+    ccs = msg.get_all('cc', [])
+    resent_tos = msg.get_all('resent-to', [])
+    resent_ccs = msg.get_all('resent-cc', [])
+    all_recipients = getaddresses(tos + ccs + resent_tos + resent_ccs)
     # Send the email via our own SMTP server.
     s = smtplib.SMTP('smtp.inria.fr')
-    s.sendmail(send_from, send_to, msg.as_string())
+    s.sendmail(send_from, all_recipients, msg.as_string())
     s.quit()
 
     response = "Mail sent!"
