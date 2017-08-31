@@ -42,6 +42,7 @@ def hello():
       <p><input type=text name=from>
          <input type=text name=to>
          <input type=text name=note>
+         <input type=checkbox name=CopyToVistorian value=Yes>
          <input type=file name=image>
          <input type=file name=svg>
          <input type=submit>
@@ -55,7 +56,7 @@ def test():
 
 @app.route("/", methods=['GET', 'POST'])
 def send():
-    print('app.send()')
+    #print('app.send()')
     try:
         send_from = request.form['from'].strip()
     except Exception:
