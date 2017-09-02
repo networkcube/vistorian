@@ -115,7 +115,7 @@ def send():
             img = MIMEImage(fp.read(), _subtype="svg+xml")
         msg.attach(img)
 
-        tos = msg.get_all('to', [])
+    tos = msg.get_all('to', [])
     ccs = msg.get_all('cc', [])
     resent_tos = msg.get_all('resent-to', [])
     resent_ccs = msg.get_all('resent-cc', [])
