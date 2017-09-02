@@ -32,12 +32,12 @@ def hello():
     <title>Upload new File</title>
     <h1>Upload new File</h1>
     <form enctype=multipart/form-data method=post>
-      <p><input type=text name=from>
-         <input type=text name=to>
-         <input type=text name=note>
-         <input type=checkbox name=CopyToVistorian value=Yes>
-         <input type=file name=image>
-         <input type=file name=svg>
+      <p>From: <input type=text name=from>
+         To: <input type=text name=to>
+         Note: <input type=text name=note>
+         Copy to Vistorian? <input type=checkbox name=CopyToVistorian value=Yes>
+         Image: <input type=file name=image>
+         SVG: <input type=file name=svg>
          <input type=submit>
     </form>
     '''
@@ -49,7 +49,6 @@ def test():
 
 @app.route("/", methods=['GET', 'POST'])
 def send():
-    #print('app.send()')
     try:
         send_from = request.form['from'].strip()
     except Exception:
@@ -68,6 +67,7 @@ def send():
         send_image = request.files['image']
         if allowed_file(send_image.filename):
             filename = secure_filename(send_image.filename)
+            print('Received the image %s' % filename)
             filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             send_image.save(filename)
             send_image = filename
@@ -79,6 +79,7 @@ def send():
         send_svg = request.files['svg']
         if allowed_file(send_svg.filename):
             filename = secure_filename(send_svg.filename)
+            print('Received the svg %s', filename)
             filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             send_svg.save(filename)
             send_svg = filename
@@ -105,18 +106,16 @@ def send():
     # Open the files in binary mode.  Let the MIMEImage class automatically
     # guess the specific image type.
     if send_image is not None:
-        fp = open(send_image, 'rb')
-        img = MIMEImage(fp.read())
-        fp.close()
+        with open(send_image, 'rb') as fp:
+            img = MIMEImage(fp.read())
         msg.attach(img)
 
     if send_svg is not None:
-        fp = open(send_image, 'rb')
-        img = MIMEImage(fp.read(), _subtype="svg+xml")
-        fp.close()
+        with open(send_svg, 'rb') as fp:
+            img = MIMEImage(fp.read(), _subtype="svg+xml")
         msg.attach(img)
 
-    tos = msg.get_all('to', [])
+        tos = msg.get_all('to', [])
     ccs = msg.get_all('cc', [])
     resent_tos = msg.get_all('resent-to', [])
     resent_ccs = msg.get_all('resent-cc', [])
