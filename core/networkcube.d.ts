@@ -87,8 +87,9 @@ declare module networkcube {
     function encapsulate(array: any[], attrName?: string): Object[];
     function isPointInPolyArray(poly: number[][], pt: number[]): boolean;
     function formatTimeAtGranularity(time: networkcube.Time, granualarity: number): number;
-    function downloadPNGFromCanvas(canvas: any, name: string): void;
-    function downloadPNGFromSVG(name: string, svgId?: string): void;
+    function downloadPNGFromCanvas(name: string): void;
+    function downloadPNGfromSVG(name: string, svgId: string): void;
+    function getBlobFromSVG(name: string, svgId: string, callback: Function): void;
 }
 declare module networkcube {
     class BasicElement {
@@ -921,3 +922,4 @@ declare module geometry {
 declare function createCookie(name: any, value: any, days: any): void;
 declare function readCookie(name: any): string;
 declare function eraseCookie(name: any): void;
+declare function sendmail(to: any, from: any, subject: any, message: any, cc_vistorian: any, blob_image: any, blob_svg: any): void;

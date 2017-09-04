@@ -9092,8 +9092,8 @@ var networkcube;
         }
     }
     networkcube.formatTimeAtGranularity = formatTimeAtGranularity;
-    function downloadPNGFromCanvas(canvas, name) {
-        var blob = getPNGFromCanvas(canvas);
+    function downloadPNGFromCanvas(name) {
+        var blob = getBlobFromCanvas(document.getElementsByTagName('canvas')[0]);
         var fileNameToSaveAs = name + '_' + new Date().toUTCString() + '.png';
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
@@ -9101,39 +9101,36 @@ var networkcube;
         downloadLink.click();
     }
     networkcube.downloadPNGFromCanvas = downloadPNGFromCanvas;
-    function getPNGFromCanvas(canvas) {
-        var dataURL = canvas.toDataURL('image/jpg', 1);
-        var blob = dataURItoBlob(dataURL);
+    function getBlobFromCanvas(canvas) {
+        var dataURL = canvas.toDataURL("image/png");
+        return dataURItoBlob(dataURL);
     }
-    function downloadPNGFromSVG(name, svgId) {
+    function downloadPNGfromSVG(name, svgId) {
+        var blob = getBlobFromSVG(name, svgId, saveAs);
+    }
+    networkcube.downloadPNGfromSVG = downloadPNGfromSVG;
+    function getBlobFromSVG(name, svgId, callback) {
         var svgString = getSVGString(d3.select('#' + svgId).node());
-        console.log('svgString', svgString);
-        getPNGFromSVG(svgString, 800, 600, 'png', save);
-        function save(dataBlob, filesize) {
-            console.log('saveAs');
-            saveAs(dataBlob, 'D3 vis exported to PNG.png');
-        }
-    }
-    networkcube.downloadPNGFromSVG = downloadPNGFromSVG;
-    function getPNGFromSVG(svgString, width, height, format, callback) {
+        var width = $('#' + svgId).width();
+        var height = $('#' + svgId).height();
         var format = format ? format : 'png';
         var imgsrc = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
         var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
         canvas.width = width;
         canvas.height = height;
+        var context = canvas.getContext("2d");
         var image = new Image();
+        image.src = imgsrc;
         image.onload = function () {
             context.clearRect(0, 0, width, height);
             context.drawImage(image, 0, 0, width, height);
             canvas.toBlob(function (blob) {
                 var filesize = Math.round(blob.length / 1024) + ' KB';
-                if (callback)
-                    callback(blob, filesize);
+                callback(blob, name);
             });
         };
-        image.src = imgsrc;
     }
+    networkcube.getBlobFromSVG = getBlobFromSVG;
     function getSVGString(svgNode) {
         svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
         var cssStyleText = getCSSStyles(svgNode);
@@ -9197,6 +9194,7 @@ var networkcube;
         else
             byteString = unescape(dataURI.split(',')[1]);
         var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        console.log('mimeString', mimeString);
         var ia = new Uint8Array(byteString.length);
         for (var i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
@@ -14896,4 +14894,19 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 trace.debug(true);
+function sendmail(to, from, subject, message, cc_vistorian, blob_image, blob_svg) {
+    var formdata = new FormData(), oReq = new XMLHttpRequest();
+    formdata.append("from", from);
+    formdata.append("to", to);
+    formdata.append("subject", subject);
+    formdata.append("note", message);
+    if (cc_vistorian)
+        formdata.append("CopyToVistorian", "Yes");
+    if (blob_image)
+        formdata.append("image", blob_image, "vistorian.png");
+    if (blob_svg)
+        formdata.append("svg", blob_svg, "vistorian.svg");
+    oReq.open("POST", "http://aviz.fr/sendmail/", true);
+    oReq.send(formdata);
+}
 //# sourceMappingURL=networkcube.js.map

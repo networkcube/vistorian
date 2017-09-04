@@ -247,6 +247,31 @@ function eraseCookie(name) {
 trace.debug(true);
 
 
+// sends an email to the server
+// takes PNG or SVG blob. 
+function sendmail(to, from, subject, message, cc_vistorian, blob_image, blob_svg) 
+{
+	var formdata = new FormData(),
+		oReq = new XMLHttpRequest();
+ 
+	formdata.append("from", from);
+	formdata.append("to", to);
+	formdata.append("subject", subject);
+	formdata.append("note", message);
+
+	if (cc_vistorian) 
+		formdata.append("CopyToVistorian", "Yes");
+	if (blob_image)
+		formdata.append("image",blob_image, "vistorian.png");
+	if (blob_svg)
+		formdata.append("svg", blob_svg, "vistorian.svg");
+
+	oReq.open("POST", "http://aviz.fr/sendmail/", true);
+	oReq.send(formdata);
+ }
+
+ 
+
 
 
 
