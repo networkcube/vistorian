@@ -430,11 +430,20 @@ module networkcube {
     }
 
 
+    ////////////////////////////
+    /// SCREENSHOT FUNCTIONS ///
+    ////////////////////////////
+
+
+    ///////////
+    /// PNG ///
+    ///////////
+
     // Downloads the content of the openGL canvas to the 
     // desktop.
-    export function downloadPNGFromCanvas(canvas, name:string)
+    export function downloadPNGFromCanvas(name:string)
     {
-        var blob = getPNGFromCanvas(canvas)
+        var blob = getBlobFromCanvas(document.getElementsByTagName('canvas')[0]);
         var fileNameToSaveAs = name + '_' + new Date().toUTCString() + '.png';
         var downloadLink = document.createElement("a")
         downloadLink.download = fileNameToSaveAs;
@@ -443,51 +452,108 @@ module networkcube {
     } 
 
     // Returns a blob from the passed canvas.
-    function getPNGFromCanvas(canvas){
-        var dataURL = canvas.toDataURL('image/jpg', 1);
-        var blob = dataURItoBlob(dataURL);
+    function getBlobFromCanvas(canvas):Blob
+    {
+        var dataURL = canvas.toDataURL("image/png")
+       return dataURItoBlob(dataURL);
     }
 
+    
+    
+    
+    ///////////
+    /// SVG ///
+    ///////////
 
-    export function downloadPNGFromSVG(name:string, svgId?:string)
+    // downloads a screenshot on the desktop from the passed svg
+    export function downloadPNGfromSVG(name:string, svgId:string)
     {
-        var svgString = getSVGString(d3.select('#'+svgId).node());
-        console.log('svgString',svgString)
-        getPNGFromSVG(svgString, 800,600,'png', save);
-        function save( dataBlob, filesize ){
-            console.log('saveAs')
-            saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
-        }
+        var blob = getBlobFromSVG(name, svgId, saveAs);
     }
 
-    function getPNGFromSVG( svgString, width, height, format, callback ) 
+    // creates an image blob from the passed svg and calls the 
+    // callback function with the blob as parameter
+    export function getBlobFromSVG(name:string, svgId:string, callback:Function)
     {
+        var width = $('#'+svgId).width(); 
+        var height = $('#'+svgId).height(); 
+        getBlobFromSVGString(name, getSVGString(d3.select('#'+svgId).node()), width, height, callback)
+    }
+    export function getBlobFromSVGNode(name:string, svgNode, width, height, callback:Function)
+    {
+        var string = getSVGString(svgNode);
+        getBlobFromSVGString(name, string, width, height, callback)
+    }
+    export function getBlobFromSVGString(name:string, svgString:string, width:number, height:number, callback:Function)
+    {
+        // get SVG string
+        // console.log('DRAW SVG: ', svgString)
+        // CREATE PNG
         var format = format ? format : 'png';
-    
+
+        // turn SVG in to PNG
         var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
-    
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
-    
+        
+        // Prepare canvas
+        var canvas = document.createElement("canvas");    
         canvas.width = width;
         canvas.height = height;
     
+        var context = canvas.getContext("2d");
         var image = new Image();
+        image.src = imgsrc;
+
+        console.log('image', image)
         image.onload = function() 
         {
             context.clearRect ( 0, 0, width, height );
             context.drawImage(image, 0, 0, width, height);
-    
-            canvas.toBlob( function(blob) {
-                var filesize = Math.round( blob.length/1024 ) + ' KB';
-                if ( callback ) callback( blob, filesize );
+        
+            canvas.toBlob(function(blob) 
+            {
+                console.log('BLOB', blob)
+                // var filesize = Math.round( blob.length/1024 ) + ' KB';
+                callback(blob, name)
             });            
         };
-    
-        image.src = imgsrc;
+
+        // return getBlobFromCanvas(canvas);
+
+        // var dataURL = canvas.toDataURL("image/png");
+        // // ?? 
+        // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
-    function getSVGString( svgNode ) {
+    // export function getPNGURL(svgId):String
+    // {
+    //     var svgString = getSVGString(d3.select('#'+svgId).node());
+    //     var obj = getPNGFromSVG(svgString, $('#'+svgId).width(), $('#'+svgId).height(), 'png');
+        
+    //     return obj.image;
+
+    // }
+
+    // function getPNGFromSVG( svgString, width, height, format):Object 
+    // {
+    //     var format = format ? format : 'png';
+    
+    //     var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
+    
+    //     var canvas = document.createElement("canvas");    
+    //     canvas.width = width;
+    //     canvas.height = height;
+    
+    //     var context = canvas.getContext("2d");
+
+    //     var image = new Image();
+ 
+    //     image.src = imgsrc;
+    //     return {image:image, canvas:canvas};
+    // }
+
+    // returns the svg string from an svg node.
+    export function getSVGString( svgNode ) {
+        console.log('SVG NODE', svgNode);
         svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
         var cssStyleText = getCSSStyles( svgNode );
         appendCSS( cssStyleText, svgNode );
@@ -559,8 +625,8 @@ module networkcube {
     }
 
 
-
-    function dataURItoBlob(dataURI) {
+    // returns a blob from a URL/URI
+    function dataURItoBlob(dataURI):Blob {
         // convert base64/URLEncoded data component to raw binary data held in a string
         var byteString;
         if (dataURI.split(',')[0].indexOf('base64') >= 0)
@@ -570,6 +636,7 @@ module networkcube {
 
         // separate out the mime component
         var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        console.log('mimeString', mimeString)
 
         // write the bytes of the string to a typed array
         var ia = new Uint8Array(byteString.length);

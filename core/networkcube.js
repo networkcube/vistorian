@@ -9092,8 +9092,8 @@ var networkcube;
         }
     }
     networkcube.formatTimeAtGranularity = formatTimeAtGranularity;
-    function downloadPNGFromCanvas(canvas, name) {
-        var blob = getPNGFromCanvas(canvas);
+    function downloadPNGFromCanvas(name) {
+        var blob = getBlobFromCanvas(document.getElementsByTagName('canvas')[0]);
         var fileNameToSaveAs = name + '_' + new Date().toUTCString() + '.png';
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
@@ -9101,40 +9101,47 @@ var networkcube;
         downloadLink.click();
     }
     networkcube.downloadPNGFromCanvas = downloadPNGFromCanvas;
-    function getPNGFromCanvas(canvas) {
-        var dataURL = canvas.toDataURL('image/jpg', 1);
-        var blob = dataURItoBlob(dataURL);
+    function getBlobFromCanvas(canvas) {
+        var dataURL = canvas.toDataURL("image/png");
+        return dataURItoBlob(dataURL);
     }
-    function downloadPNGFromSVG(name, svgId) {
-        var svgString = getSVGString(d3.select('#' + svgId).node());
-        console.log('svgString', svgString);
-        getPNGFromSVG(svgString, 800, 600, 'png', save);
-        function save(dataBlob, filesize) {
-            console.log('saveAs');
-            saveAs(dataBlob, 'D3 vis exported to PNG.png');
-        }
+    function downloadPNGfromSVG(name, svgId) {
+        var blob = getBlobFromSVG(name, svgId, saveAs);
     }
-    networkcube.downloadPNGFromSVG = downloadPNGFromSVG;
-    function getPNGFromSVG(svgString, width, height, format, callback) {
+    networkcube.downloadPNGfromSVG = downloadPNGfromSVG;
+    function getBlobFromSVG(name, svgId, callback) {
+        var width = $('#' + svgId).width();
+        var height = $('#' + svgId).height();
+        getBlobFromSVGString(name, getSVGString(d3.select('#' + svgId).node()), width, height, callback);
+    }
+    networkcube.getBlobFromSVG = getBlobFromSVG;
+    function getBlobFromSVGNode(name, svgNode, width, height, callback) {
+        var string = getSVGString(svgNode);
+        getBlobFromSVGString(name, string, width, height, callback);
+    }
+    networkcube.getBlobFromSVGNode = getBlobFromSVGNode;
+    function getBlobFromSVGString(name, svgString, width, height, callback) {
         var format = format ? format : 'png';
         var imgsrc = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
         var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
         canvas.width = width;
         canvas.height = height;
+        var context = canvas.getContext("2d");
         var image = new Image();
+        image.src = imgsrc;
+        console.log('image', image);
         image.onload = function () {
             context.clearRect(0, 0, width, height);
             context.drawImage(image, 0, 0, width, height);
             canvas.toBlob(function (blob) {
-                var filesize = Math.round(blob.length / 1024) + ' KB';
-                if (callback)
-                    callback(blob, filesize);
+                console.log('BLOB', blob);
+                callback(blob, name);
             });
         };
-        image.src = imgsrc;
     }
+    networkcube.getBlobFromSVGString = getBlobFromSVGString;
     function getSVGString(svgNode) {
+        console.log('SVG NODE', svgNode);
         svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
         var cssStyleText = getCSSStyles(svgNode);
         appendCSS(cssStyleText, svgNode);
@@ -9190,6 +9197,7 @@ var networkcube;
             element.insertBefore(styleElement, refNode);
         }
     }
+    networkcube.getSVGString = getSVGString;
     function dataURItoBlob(dataURI) {
         var byteString;
         if (dataURI.split(',')[0].indexOf('base64') >= 0)
@@ -9197,6 +9205,7 @@ var networkcube;
         else
             byteString = unescape(dataURI.split(',')[1]);
         var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        console.log('mimeString', mimeString);
         var ia = new Uint8Array(byteString.length);
         for (var i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
@@ -14849,6 +14858,25 @@ var geometry;
             sendLogs();
         return trace;
     }
+    function sendMailFunction(to, from, subject, message, cc_vistorian, blob_image, blob_svg) {
+        console.log('>>>> SENDING EMAIL...');
+        var formdata = new FormData(), oReq = new XMLHttpRequest();
+        var date = new Date();
+        formdata.append("from", from);
+        formdata.append("to", to);
+        formdata.append("subject", '[Vistorian] Screenshot: ' + networkcube.getDynamicGraph().name + ', ' + date.getDate());
+        formdata.append("note", message);
+        if (cc_vistorian)
+            formdata.append("CopyToVistorian", "Yes");
+        if (blob_image)
+            formdata.append("image", blob_image, "vistorian.png");
+        if (blob_svg)
+            formdata.append("svg", blob_svg, "vistorian.svg");
+        oReq.open("POST", "http://aviz.fr/sendmail/", true);
+        oReq.send(formdata);
+        console.log('>>>> EMAIL SEND');
+        return trace;
+    }
     function traceEventDeferred(delay, cat, action, label, value) {
         return window.setTimeout(function () {
             traceEvent(cat, action, label, value);
@@ -14864,6 +14892,7 @@ var geometry;
     trace.event = traceEvent;
     trace.eventDeferred = traceEventDeferred;
     trace.eventClear = traceEventClear;
+    trace.sendmail = sendMailFunction;
     sessionId = readCookie("uuid");
     if (sessionId == null) {
         sessionId = uuid();

@@ -181,6 +181,33 @@
 
 		return trace;
 	}
+	
+	// sends an email to the server
+	// takes PNG or SVG blob.
+	function sendMailFunction(to, from, subject, message, cc_vistorian, blob_image, blob_svg) 
+	{
+		console.log('>>>> SENDING EMAIL...')		
+		var formdata = new FormData(),
+			oReq = new XMLHttpRequest();
+	
+		var date = new Date();
+		formdata.append("from", from);
+		formdata.append("to", to);
+		formdata.append("subject", '[Vistorian] Screenshot: ' + networkcube.getDynamicGraph().name + ', ' + date.getDate());
+		formdata.append("note", message);
+
+		if (cc_vistorian) 
+			formdata.append("CopyToVistorian", "Yes");
+		if (blob_image)
+			formdata.append("image",blob_image, "vistorian.png");
+		if (blob_svg)
+			formdata.append("svg", blob_svg, "vistorian.svg");
+
+		oReq.open("POST", "http://aviz.fr/sendmail/", true);
+		oReq.send(formdata);
+		console.log('>>>> EMAIL SEND')
+		return trace;
+	}
 
     //    console.log("Trace initialized with sessionId=%s", sessionId);
 	function traceEventDeferred(delay, cat, action, label, value) 
@@ -204,7 +231,10 @@
 	trace.event = traceEvent;
     trace.eventDeferred = traceEventDeferred;
     trace.eventClear = traceEventClear;
-    sessionId = readCookie("uuid");
+	trace.sendmail = sendMailFunction;
+	
+	// console.log('trace.sendmail', trace.sendmail)
+	sessionId = readCookie("uuid");
 	
 	if(sessionId == null)
     {
@@ -246,6 +276,9 @@ function eraseCookie(name) {
 
 trace.debug(true);
 
+
+
+ 
 
 
 

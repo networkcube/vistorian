@@ -87,8 +87,12 @@ declare module networkcube {
     function encapsulate(array: any[], attrName?: string): Object[];
     function isPointInPolyArray(poly: number[][], pt: number[]): boolean;
     function formatTimeAtGranularity(time: networkcube.Time, granualarity: number): number;
-    function downloadPNGFromCanvas(canvas: any, name: string): void;
-    function downloadPNGFromSVG(name: string, svgId?: string): void;
+    function downloadPNGFromCanvas(name: string): void;
+    function downloadPNGfromSVG(name: string, svgId: string): void;
+    function getBlobFromSVG(name: string, svgId: string, callback: Function): void;
+    function getBlobFromSVGNode(name: string, svgNode: any, width: any, height: any, callback: Function): void;
+    function getBlobFromSVGString(name: string, svgString: string, width: number, height: number, callback: Function): void;
+    function getSVGString(svgNode: any): string;
 }
 declare module networkcube {
     class BasicElement {

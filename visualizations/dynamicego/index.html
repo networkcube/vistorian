@@ -13,14 +13,14 @@
 </head>
 <title>Ego Network Visualization</title>
 <body>
-
     <div>
         <div id="menu">
             <label>Select any node to show only this node's relations.</label></br>
             <label>Order labels by:</label>
             <!-- VS: Clicks on Manual -->
             <a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#dynamic-ego-network-visualization-dynamicego" onclick="trace.event(null, 'Help', 'EgoNetworkManual')">Manual</a>
-
+            <input type="button" class="exportPNG-button" value="Export PNG" onclick="networkcube.downloadPNGFromCanvas('dynamicEgo')"/>
+            
         </div>
         <div id="visDiv"></div>
     </div>

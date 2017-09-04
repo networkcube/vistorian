@@ -2,7 +2,7 @@
 <head>
   <script src="../lib/jquery.js"></script>
   <script src="../../core/networkcube.js"></script>
-  <script src="../../core/lib/trace.js"></script>
+  <!-- <script src="../../core/lib/trace.js"></script> -->
 
 <style>
 
@@ -251,7 +251,6 @@
                     <script>
                         function sendMailButtonClicked()
                         {
-                          
                             // STORE DATA in LOCAL STORAGE
                             var email = document.getElementById('emailInput').value;
                             var emailtext = String(email);
@@ -364,86 +363,94 @@
                               if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', Context4);}
                               var Context5;
                               if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', Context5);}
-                                sendEmail();
-                                closeWindow();
+                              // trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', false, null, null);
+                              sendEmail();
+                              closeWindow();
                             }
-
                         }
 
-                    
-
-                        function sendEmail($toEmail, $fromEmail, $subject, $message)
-                        {
-
-                            console.log('Send Email')
-                            // create form
-                            var sendCopyString = '';
-                            if(localStorage.getItem('traces_sendCopyToVistorian'))
+                        function sendEmail()
+                        {   
+                          var format = localStorage.getItem('traces_format'); 
+                          console.log('format', format);             
+                          if(format && format == 'PNG')
+                          {
+                            // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
+                            var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
+                            var d3Object = d3.select(svgString.get(0));
+                            console.log('>> svgNode', d3Object.node());
+                            networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
                             {
-                              sendCopyString = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
-                            }
+                              console.log('SEND EMAIL WITH BLOB')
+                             trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', false, blob, null);
+                            })
+                          }
+                        }
+                        
 
-                            var format = '';
-                            console.log(localStorage.getItem('traces_format'))
-                            if(localStorage.getItem('traces_format') == "PNG")
-                            {
-                              format = '<input type="file" name="image" name="C:/xampp/htdocs/networkcube-traces-new-bb-ok/web/traces/visualizations-all.png"\>';
-                            } else {
-                              format = '<input type="file" name="svg" src="../logos/europe.svg"\>';
-                            }
 
-                            $('body').append('\
-                            <form id="infoForm" method="post" enctype="multipart/form-data" action="http://aviz.fr/sendmail/">\
-                              <input type="text" name="from" value="vistorian@inria.fr"\>\
-                              <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
-                              ' + sendCopyString + '\
-                              ' + format + '\
-                              <input type="text" name="note" value="This is your screenshot.">\
-                            </form>\
-                            ');
-                            // <input type="text" name="from" value="'+localStorage.getItem('traces_email')+'"\>\
-                            //   <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
-                            // ' + sendCopyString + '\
-                            //   <input type="text" name="format" value="'+localStorage.getItem('traces_format')+'"\>\
-                            //   <input type="text" name="copyToVistorian" value="'+localStorage.getItem('traces_sendCopyToVistorian')+'"\>\
+
+                        // function sendEmail($toEmail, $fromEmail, $subject, $message)
+                        // {
+
+                        //     console.log('Send Email')
+                        //     // create form
+                        //     var sendCopyString = '';
+                        //     if(localStorage.getItem('traces_sendCopyToVistorian'))
+                        //     {
+                        //       sendCopyString = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                        //     }
+
+                        //     $('body').append('\
+                        //     <form id="infoForm" method="post" enctype="multipart/form-data" action="http://aviz.fr/sendmail/">\
+                        //       <input type="text" name="from" value="benj.bach@mail.com"\>\
+                        //       <input type="text" name="to" value="vanessa.serrano@iqs.url.edu"\>\
+                        //       <input type="text" name="note">\
+                        //     </form>\
+                        //     ');
+                        //     // <input type="text" name="from" value="'+localStorage.getItem('traces_email')+'"\>\
+                        //     //   <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
+                        //     // ' + sendCopyString + '\
+                        //     //   <input type="text" name="format" value="'+localStorage.getItem('traces_format')+'"\>\
+                        //     //   <input type="text" name="copyToVistorian" value="'+localStorage.getItem('traces_sendCopyToVistorian')+'"\>\
    
-                            // submit form
-                            document.forms["infoForm"].submit();
+                        //     // submit form
+                        //     document.forms["infoForm"].submit();
 
 
 
-                            // SEND EMAIL WITH SCREENSHOT
-                            //var emailSub = "Mail me a screenshot";
-                            //var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
+                        //     // SEND EMAIL WITH SCREENSHOT
+                        //     //var emailSub = "Mail me a screenshot";
+                        //     //var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
 
-                            // var email = document.getElementById('emailInput').value
-                            // var emailBody = "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team";
-                            // //location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
-                            // //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
-                            // var emailCC = "vanessa.serrano@iqs.edu";
-                            // var emailSub = "Mail me a screenshot";
-                            // var originalMail = {
-                            //     "to": email,
-                            //    //"Content-Type": "text/plain"; 
-                            //     //"file"="aviz.png"
-                            //     "subject": "Mail me a screenshot",
-                            //     "fromName": "Vistorian team",
-                            //     "from": "vanessaserr@gmail.com",
-                            //     "body": "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team",
-                            //     "cids": ["aviz.png"],
-                            //     "attaches" : []
-                            // };
-                            // var mimeTxt = Mime.toMimeTxt(originalMail);
-                            // var mimeObj = Mime.toMimeObj(mimeTxt);
+                        //     // var email = document.getElementById('emailInput').value
+                        //     // var emailBody = "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team";
+                        //     // //location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
+                        //     // //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                        //     // var emailCC = "vanessa.serrano@iqs.edu";
+                        //     // var emailSub = "Mail me a screenshot";
+                        //     // var originalMail = {
+                        //     //     "to": email,
+                        //     //    //"Content-Type": "text/plain"; 
+                        //     //     //"file"="aviz.png"
+                        //     //     "subject": "Mail me a screenshot",
+                        //     //     "fromName": "Vistorian team",
+                        //     //     "from": "vanessaserr@gmail.com",
+                        //     //     "body": "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AThe Vistorian team",
+                        //     //     "cids": ["aviz.png"],
+                        //     //     "attaches" : []
+                        //     // };
+                        //     // var mimeTxt = Mime.toMimeTxt(originalMail);
+                        //     // var mimeObj = Mime.toMimeObj(mimeTxt);
 
-                            // console.log(mimeObj);
-                            // console.log(email);
+                        //     // console.log(mimeObj);
+                        //     // console.log(email);
 
-                            // //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ originalMail["body"];
+                        //     // //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ originalMail["body"];
 
-                            // location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ mimeTxt;
+                        //     // location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ mimeTxt;
 
-                        }
+                        // }
 
                     </script>
                       </button>
