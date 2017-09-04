@@ -90,7 +90,9 @@ def send():
         send_svg = None
     
     msg = MIMEMultipart()
-    msg['Subject'] = 'Vistorian screenshot'
+    import datetime as dt
+    subject = dt.datetime.today()
+    msg['Subject'] = '[Vistorian screenshot]_' + str(subject)
     # me == the sender's email address
     # family = the list of all recipients' email addresses
     msg['From'] = send_from

@@ -163,6 +163,31 @@ ul#menu .menuicon{
 	box-shadow: 0px 0px 1px #777;
 }
 
+.enable {
+	background-color: blue;
+	padding: 6px;
+	margin:4px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	color: #fff;
+	font-size: 12px;
+	text-decoration: none;
+	border: none;
+}
+
+.disable {
+	background-color: white;
+	padding: 6px;
+	margin:4px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	color: black;
+	font-size: 12px;
+	text-decoration: none;
+	border: .5px solid black;
+}
 
 p.subtitle{
 	margin-bottom: 30px;

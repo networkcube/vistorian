@@ -383,11 +383,22 @@
                               sendCopyString = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
                             }
 
+                            var format = '';
+                            console.log(localStorage.getItem('traces_format'))
+                            if(localStorage.getItem('traces_format') == "PNG")
+                            {
+                              format = '<input type="file" name="image" name="C:/xampp/htdocs/networkcube-traces-new-bb-ok/web/traces/visualizations-all.png"\>';
+                            } else {
+                              format = '<input type="file" name="svg" src="../logos/europe.svg"\>';
+                            }
+
                             $('body').append('\
-                            <form id="infoForm" method="post" enctype="multipart/form-data" action="http://aviz.fr/sendmail">\
-                              <input type="text" name="from" value="benj.bach@mail.com"\>\
-                              <input type="text" name="to" value="vanessa.serrano@iqs.url.edu"\>\
-                              <input type="text" name="note">\
+                            <form id="infoForm" method="post" enctype="multipart/form-data" action="http://aviz.fr/sendmail/">\
+                              <input type="text" name="from" value="vistorian@inria.fr"\>\
+                              <input type="text" name="to" value="'+localStorage.getItem('traces_email')+'"\>\
+                              ' + sendCopyString + '\
+                              ' + format + '\
+                              <input type="text" name="note" value="This is your screenshot.">\
                             </form>\
                             ');
                             // <input type="text" name="from" value="'+localStorage.getItem('traces_email')+'"\>\

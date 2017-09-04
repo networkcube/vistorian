@@ -1,26 +1,28 @@
+
+
 <div id="trackingButtonsDiv">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
         <script src="lib/bootbox.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>
         <button id="submit" class="trackingButton" name="MailMe" onclick="mailmeButtonClicked()">Mail me a screenshot</button>
-        <button id="emailMeBtn" class="trackingButton" name="End" onclick="endOfActivityClicked()">Report end of the activity</button>
+        <button id="submit" class="trackingButton" name="End" onclick="endOfActivityClicked()">Report end of the activity</button>
         <script type="text/javascript">
             function mailmeButtonClicked()
             {
                 trace.event(null, "MiniQuestionnaires", "MailMeQuestionnaire1");
-                $("#mailmeQuestionnaireDiv").css("visibility", "visible")
+                $("#mailmeQuestionnaireDiv").css("visibility", "visible");
             }
             function endOfActivityClicked()
             {
                 trace.event(null, "MiniQuestionnaires", "EndActivityQuestionnaire1");
-                $("#endOfActivityQuestionnaireDiv").css("visibility", "visible")
+                $("#endOfActivityQuestionnaireDiv").css("visibility", "visible");
             }
         </script>
-        <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">
+        <div id="mailmeQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%; z-index:2">
             <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>
             <iframe src="traces/MailMeQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>
         </div>
-        <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%;">
+        <div id="endOfActivityQuestionnaireDiv" style="visibility:hidden; position:fixed; top:0; left:0; width:100%; height:100%; z-index:2">
             <div style="background-color:#000; opacity:.5; position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1"></div>
             <iframe src="traces/EndActivityQuestionnaire1.html" style="width:80%; height:80%; margin:10%; margin-top:30px;"></iframe>
         </div>

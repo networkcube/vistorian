@@ -59,7 +59,8 @@
             This is your data view. Below you find a list of visualizations and the 
             networks currently in your browser.
             </p>
-            <input id="enableDisableTrackingBtn" type="button" class="trackingButton" onclick="enableDisableTracking()" value="Enable tracking"></input>
+            <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="enableDisableTracking()" value="Enable tracking" color="blue"></input> 
+            <!-- <input id="enableDisableTrackingBtn" type="button" onclick="enableDisableTracking()" value="Enable tracking" color="blue"></input> -->
             <div id="trackingContainer">
             </div>
             <p> </p>
@@ -106,14 +107,14 @@
             </div>
         </td>
 
-        <td id="center">
-            <div id="noNetworkTables" style="display:block;">
+        <td z-index="0" id="center">
+            <div z-index="0" id="noNetworkTables" style="display:block;">
                 <p>No tables or networks selected. Select a table or network from the list on the left.
                 </p>
             </div>
-            <div id="networkTables" style="display:none;">
+            <div z-index="0" id="networkTables" style="display:none;">
 
-                <div id="networkInfoDiv">
+                <div z-index="0" id="networkInfoDiv">
                     <p class="title">Network Name: <input id="networknameInput" type="text" size="80"/>
                     <input id="saveNetworkButton" class="tableMenuButton" type="button" value="Save" onclick="saveCurrentNetwork(false)"/>
                     <input id="deleteNetworkButton" class="tableMenuButton" type="button" value="Delete" onclick="deleteCurrentNetwork()"/>
@@ -121,7 +122,7 @@
                 </div>
 
                 <!-- Show Node table here -->
-                <div id="nodeTableContainer">
+                <div z-index="0" id="nodeTableContainer">
                     <p class="title tableMenu" >Node Table:
                     <select id="nodetableSelect" onchange="setNodeTable(this)">
                         <option>---</option>
@@ -131,37 +132,37 @@
                 </div>
 
                 <!-- Show link table here -->
-                <div id="linkTableContainer">
+                <div z-index="0" id="linkTableContainer">
                     <p class="title tableMenu">Link Table: 
                     <select id="linktableSelect" onchange="setLinkTable(this)">
                         <option>---</option>
                     </select>
                     </p>
-                    <div id="linkTableDiv"></div>
+                    <div z-index="0" id="linkTableDiv"></div>
                 </div>
 
                 <!-- Show location table here -->
-                <div id="locationTableContainer">
+                <div z-index="0" id="locationTableContainer">
                     <p class="title tableMenu">Select Location Table: 
                         <select id="locationtableSelect" onchange="setLocationTable(this)">
                             <option>---</option>
                         </select>
                     </p>
-                    <div id="locationTableDiv"></div>
+                    <div z-index="0" id="locationTableDiv"></div>
                 </div>
 
             </div>
 
-            <div id="individualTables" style="display:none;">
-                <div id="tableInfoDiv">
+            <div z-index="0" id="individualTables" style="display:none;">
+                <div z-index="0" id="tableInfoDiv">
                     <input id="deleteTableButton" type="button" value="Delete" onclick="deleteCurrentTable()"/>
                     </p>
                 </div>
-                <div id="individualTable"></div>
+                <div z-index="0" id="individualTable"></div>
 
             </div>
 
-            <div id="chooseNetworktype" style="display:none;">
+            <div z-index="0" id="chooseNetworktype" style="display:none;">
                 <h2>Create new network</h2>
                 <p>Which of the below form has your data?</p>
 
@@ -181,7 +182,7 @@
         </div>
         </tr>
     </table>
-    <div id="footer">
+    <div z-index="0" id="footer">
                 <a class="footer" href="mailto:networkcube@microsoft.com" target="_top">Contact Us</a> |
                 <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a>   |
                 <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a>   |

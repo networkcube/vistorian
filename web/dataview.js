@@ -20,10 +20,10 @@ function init() {
     if (networkids.length > 0)
         showNetwork(networkids[0]);
     if (networkcube.isTrackingEnabled()) {
-        $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
+        $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
     }
     else {
-        $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');
+        $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');
     }
     var sessionId = parseInt(storage.getLastSessionId());
     console.log('networkcube.isTrackingSet ', networkcube.isTrackingSet());
@@ -64,14 +64,14 @@ function setupConditionalLogging() {
             if (result == true) {
                 localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
                 $('#trackingContainer').load('traces/questionnaires-dataview.html');
-                $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
+                $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
             }
             else {
                 localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
                 if ($('#trackingButtonsDiv')) {
                     $('#trackingButtonsDiv').remove();
                 }
-                $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');
+                $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');
             }
         }
     });
@@ -631,8 +631,8 @@ var msgBox;
 function showMessage(message, timeout) {
     if ($('.messageBox'))
         $('.messageBox').remove();
-    msgBox = $('<div class="messageBox"></div>');
-    msgBox.append('<div><p>' + message + '</p></div>');
+    msgBox = $('<div id="div" class="messageBox"></div>');
+    msgBox.append('<div id="div"><p>' + message + '</p></div>');
     $('body').append(msgBox);
     msgBox.click(function () {
         $('.messageBox').remove();

@@ -1,4 +1,4 @@
-/// <reference path="./classes/storage.ts"/>
+/// <reference path="classes/storage.ts"/>
 /// <reference path="../core/networkcube.d.ts"/>
 
 /*
@@ -473,25 +473,27 @@ module vistorian {
 
     export function setHeader(elementId:String, datasetname:String)
     {
-        var header = $('<a href="index.html"><img width="100%" src="../logos/logo-networkcube.png"/></a>')
+        var header = $('<a href="index.html"><img width="100%" src="logos/logo-networkcube.png"/></a>')
         $('#'+elementId).append(header);
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
         $('#'+elementId).append(dataname);
 
         $('#'+elementId).append('\
-            <script src="../lib/bootbox.min.js"></script>\
-            <input id="enableDisableTrackingBtn" type="button" class="trackingButton" onclick="vistorian.enableDisableTracking()" value="Enable tracking"></input>\
+            <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">\
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
+            <script src="lib/bootbox.min.js"></script>\
+            <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="enableDisableTracking()" value="Enable tracking"></input>\
             <div id="trackingContainer">\
             </div>\
         ');
 
         if(networkcube.isTrackingEnabled())
         {
-            $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
-            $('#trackingContainer').load('../traces/questionnaires-visualization.html');
+            $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
+            $('#trackingContainer').load('traces/questionnaires-visualization.html');
         }else{
-            $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');        
+            $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');        
             if($('#trackingButtonsDiv'))
             {
                 $('#trackingButtonsDiv').remove()
@@ -534,15 +536,15 @@ module vistorian {
                 if (result == true)
                 {
                     localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
-                    $('#trackingContainer').load('../traces/questionnaires-visualization.html');
-                    $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots');
+                    $('#trackingContainer').load('traces/questionnaires-visualization.html');
+                    $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
                 }else{
                     localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
                     if($('#trackingButtonsDiv'))
                     {
                         $('#trackingButtonsDiv').remove()
                     }
-                    $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots');
+                    $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');
                 }
             }
         });
