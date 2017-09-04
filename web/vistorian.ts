@@ -502,7 +502,7 @@ module vistorian {
         var vars = networkcube.getUrlVars();
 
         // VS: Clicks on Return to DataView
-        $('#'+elementId).append('<a href="dataview.html?session='+vars['session']+'&datasetName'+vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
+        $('#'+elementId).append('<a href="../dataview.html?session='+vars['session']+'&datasetName'+vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
         $('#'+elementId).append('<br/><br/>');
     }
 

@@ -475,11 +475,19 @@ module networkcube {
     // callback function with the blob as parameter
     export function getBlobFromSVG(name:string, svgId:string, callback:Function)
     {
-        // get SVG string
-        var svgString = getSVGString(d3.select('#'+svgId).node());
         var width = $('#'+svgId).width(); 
         var height = $('#'+svgId).height(); 
-
+        getBlobFromSVGString(name, getSVGString(d3.select('#'+svgId).node()), width, height, callback)
+    }
+    export function getBlobFromSVGNode(name:string, svgNode, width, height, callback:Function)
+    {
+        var string = getSVGString(svgNode);
+        getBlobFromSVGString(name, string, width, height, callback)
+    }
+    export function getBlobFromSVGString(name:string, svgString:string, width:number, height:number, callback:Function)
+    {
+        // get SVG string
+        // console.log('DRAW SVG: ', svgString)
         // CREATE PNG
         var format = format ? format : 'png';
 
@@ -495,6 +503,7 @@ module networkcube {
         var image = new Image();
         image.src = imgsrc;
 
+        console.log('image', image)
         image.onload = function() 
         {
             context.clearRect ( 0, 0, width, height );
@@ -502,7 +511,8 @@ module networkcube {
         
             canvas.toBlob(function(blob) 
             {
-                var filesize = Math.round( blob.length/1024 ) + ' KB';
+                console.log('BLOB', blob)
+                // var filesize = Math.round( blob.length/1024 ) + ' KB';
                 callback(blob, name)
             });            
         };
@@ -542,7 +552,8 @@ module networkcube {
     // }
 
     // returns the svg string from an svg node.
-    function getSVGString( svgNode ) {
+    export function getSVGString( svgNode ) {
+        console.log('SVG NODE', svgNode);
         svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
         var cssStyleText = getCSSStyles( svgNode );
         appendCSS( cssStyleText, svgNode );
