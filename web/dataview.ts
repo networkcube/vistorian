@@ -97,7 +97,7 @@ function setupConditionalLogging() {
         </ul>\
         <p>You can turn tracking OFF at any time, and email us to request all your tracking data to be erased.\
         <p>Thank you for agreeing to participate in our research\
-        <p>The Vistorian Team (vistorian@inria.fr)'
+        <p>The Vistorian Team (vistorian@inria.fr)',
         buttons: {
             confirm: {
                 label: "I AGREE",
