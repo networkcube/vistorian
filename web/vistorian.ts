@@ -486,15 +486,16 @@ module vistorian {
             <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>\
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
             <script src="../lib/bootbox.min.js"></script>\
-            <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="enableDisableTracking()" value="Enable tracking"></input>\
+            <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="vistorian.enableDisableTracking()" value="Enable tracking"></input>\
             <div id="trackingContainer">\
             </div>\
         ');
 
+        console.log('networkcube.isTrackingEnabled()', networkcube.isTrackingEnabled())
         if(networkcube.isTrackingEnabled())
         {
             $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
-            $('#trackingContainer').load('traces/questionnaires-visualization.html');
+            $('#trackingContainer').load('../traces/questionnaires-visualization.html');
         }else{
             $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');        
             if($('#trackingButtonsDiv'))
@@ -552,7 +553,7 @@ module vistorian {
                 if (result == true)
                 {
                     localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
-                    $('#trackingContainer').load('traces/questionnaires-visualization.html');
+                    $('#trackingContainer').load('../traces/questionnaires-visualization.html');
                     $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
                 }else{
                     localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
