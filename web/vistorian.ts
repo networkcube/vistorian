@@ -35,7 +35,7 @@ module vistorian {
     head.append("<link href='https://fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
     head.append("<link rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'>")
     head.append("<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js'></script>")    
-    head.append("<script src='lib/bootbox.min.js'></script>")
+    // head.append("<script src='../lib/bootbox.min.js'></script>")
 
     // append('./lib/xml2json.js');
     function append(url: string) {
@@ -476,16 +476,16 @@ module vistorian {
 
     export function setHeader(elementId:String, datasetname:String)
     {
-        var header = $('<a href="index.html"><img width="100%" src="logos/logo-networkcube.png"/></a>')
+        var header = $('<a href="index.html"><img width="100%" src="../logos/logo-networkcube.png"/></a>')
+
         $('#'+elementId).append(header);
-        var dataname = $('\
-        <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
+        var dataname = $('<p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
         $('#'+elementId).append(dataname);
 
         $('#'+elementId).append('\
             <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>\
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
-            <script src="lib/bootbox.min.js"></script>\
+            <script src="../lib/bootbox.min.js"></script>\
             <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="enableDisableTracking()" value="Enable tracking"></input>\
             <div id="trackingContainer">\
             </div>\
@@ -536,7 +536,7 @@ module vistorian {
             </ul>\
             <p>You can turn tracking OFF at any time, and email us to request all your tracking data to be erased.\
             <p>Thank you for agreeing to participate in our research\
-            <p>The Vistorian Team (vistorian@inria.fr)'
+            <p>The Vistorian Team (vistorian@inria.fr)',
             buttons: {
                 confirm: {
                     label: "I AGREE",
