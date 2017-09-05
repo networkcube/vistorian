@@ -72,22 +72,39 @@ function enableDisableTracking()
 {
     setupConditionalLogging();
 }
+
  
 
 function setupConditionalLogging() {
     bootbox.confirm({
-        size: "big",
+        size: "large",
         class:"text-left",
         position: "left",
-        title: "User consent form.",
-        message: "<p> If you agree your activity will be logged. The information provided will remain anonymous, it will be used solely for this project.</p>",
+        title: "Consent to tracking",
+        //show: false,
+        //message: boxMessage.html(),
+        //message: "<p> If you agree your activity will be logged. The information provided will remain anonymous, it will be used solely for this project.</p>",
+        message: 
+        '<p>When Tracking is ON, the Vistorian <strong>records information about which Vistorian features you use</strong> (e.g. when you create a node link diagram or a matrix, use filters, or when you upload a new file).\
+        <br> This allows us understand how the Vistorian is used and to improve it.\
+        <p>This tracking data will be saved on a secure INRIA server which is accessible only by the Vistorian team.\
+        <br>No personal information will be collected or saved with the tracking data.\
+        <br>Your research data remains on your computer and is not saved anywhere else. In other words no-one else can see your data unless you personally email a screenshot or file to someone.\
+        <p>If you agree to be tracked we will start tracking, and\
+        <ul>\
+        <li><strong>Contact you </strong>by email with a detailed consent form and a questionnaire, and answer all your questionsEsto es una lista no ordenada.\
+        <li><strong>Turn on the &#147email screenshot&#148 </strong>feature (which we hope will be useful to you, and allow us to see screenshots of the work you wish to share with us).\
+        </ul>\
+        <p>You can turn tracking OFF at any time, and email us to request all your tracking data to be erased.\
+        <p>Thank you for agreeing to participate in our research\
+        <p>The Vistorian Team (vistorian@inria.fr)'
         buttons: {
             confirm: {
-                label: "I agree",
+                label: "I AGREE",
                 className:  "btn-success pull-right"
             },
             cancel: {
-                label:  "I do not agree",
+                label:  "Cancel",
                 className:  "btn-warning pull-left"
             }
         },
