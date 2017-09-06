@@ -371,6 +371,20 @@
 
                         function sendEmail()
                         {   
+                          var cc_vistorian = '';
+                            if(localStorage.getItem('traces_sendCopyToVistorian'))
+                            {
+                              cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                            }
+
+                          var to = document.getElementById('emailInput').value;
+
+                          var from = "vistorian@inria.fr";
+
+                          var subject = "";
+
+                          var message = "Hello,%0D%0A%0D%0AThis is your screenshot.%0D%0AThe image is attached.%0D%0A%0D%0ABest,%0D%0AVistorian team";
+
                           var format = localStorage.getItem('traces_format'); 
                           console.log('format', format);             
                           if(format && format == 'PNG')
@@ -382,7 +396,7 @@
                             networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
                             {
                               console.log('SEND EMAIL WITH BLOB')
-                             trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', false, blob, null);
+                             trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
                             })
                           }
                         }
