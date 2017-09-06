@@ -397,7 +397,9 @@
                             networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
                             {
                               console.log('SEND EMAIL WITH BLOB')
-                             trace.sendmail(to, from, subject, message, "", blob, null);
+
+                            //  trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', true, blob, null);
+                            trace.sendmail(to, from, subject, message, "", blob, null);
                             })
                           }
                         }
