@@ -14899,8 +14899,6 @@ var geometry;
         formdata.append("subject", '[Vistorian] Screenshot: ' + networkcube.getDynamicGraph().name + ', ' + date.getDate());
         formdata.append("note", message);
         formdata.append("cc", cc_vistorian);
-        if (cc_vistorian)
-            formdata.append("CopyToVistorian", "Yes");
         if (blob_image)
             formdata.append("image", blob_image, "vistorian.png");
         if (blob_svg)

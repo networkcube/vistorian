@@ -57,13 +57,13 @@ def send():
     send_to = request.form['to'].strip()
     if send_to not in valid_dest:
         return "Invalid destination: "+send_to #+" valids:"+",".join(list(valid_dest))
-    if 'cc' in request.form:
+    # if 'cc' in request.form:
         send_cc = request.form['cc'].strip()
-    else:
-        send_cc = None
-    send_to = request.form['subject'].strip()
-    if 'CopyToVistorian' in request.form:
-        send_cc = "vistorian@inria.fr"
+    # else:
+    #     send_cc = None
+    send_subject = request.form['subject'].strip()
+    # if 'CopyToVistorian' in request.form:
+    #     send_cc = "vistorian@inria.fr"
     send_note = request.form['note'].strip()
     if 'image' in request.files:
         send_image = request.files['image']

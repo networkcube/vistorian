@@ -356,23 +356,32 @@
                       }
 
                       
-                        function sendEmail()
-                        {   
-                          var format = localStorage.getItem('traces_format'); 
-                          console.log('format', format);             
-                          if(format && format == 'PNG')
+                      function sendEmail()
+                      {   
+                        var cc_vistorian = '';
+                          if(localStorage.getItem('traces_sendCopyToVistorian'))
                           {
-                            // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
-                            var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
-                            var d3Object = d3.select(svgString.get(0));
-                            console.log('>> svgNode', d3Object.node());
-                            networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
-                            {
-                              console.log('SEND EMAIL WITH BLOB')
-                             trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', false, blob, null);
-                            })
+                            cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
                           }
+                        var to = document.getElementById('emailInput').value;
+                        var from = "vistorian@inria.fr";
+                        var subject = "";
+                        var message = "Hello,\nThis is your screenshot.\nThe image is attached.\nBest,\nThe Vistorian team";
+                        var format = localStorage.getItem('traces_format'); 
+                        console.log('format', format);             
+                        if(format && format == 'PNG')
+                        {
+                          // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
+                          var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
+                          var d3Object = d3.select(svgString.get(0));
+                          console.log('>> svgNode', d3Object.node());
+                          networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
+                          {
+                            console.log('SEND EMAIL WITH BLOB')
+                           trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
+                          })
                         }
+                      }
                         
                       //function sendEmail()
                       //{
