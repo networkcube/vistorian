@@ -34,6 +34,7 @@ def hello():
     <form enctype=multipart/form-data method=post>
       <p>From: <input type=text name=from>
          To: <input type=text name=to>
+         Subject: <input type=text name=subject>
          Note: <input type=text name=note>
          Copy to Vistorian? <input type=checkbox name=CopyToVistorian value=Yes>
          Image: <input type=file name=image>
@@ -60,6 +61,7 @@ def send():
         send_cc = request.form['cc'].strip()
     else:
         send_cc = None
+    send_to = request.form['subject'].strip()
     if 'CopyToVistorian' in request.form:
         send_cc = "vistorian@inria.fr"
     send_note = request.form['note'].strip()
@@ -89,9 +91,10 @@ def send():
         send_svg = None
     
     msg = MIMEMultipart()
-    import datetime as dt
-    subject = dt.datetime.today()
-    msg['Subject'] = '[Vistorian screenshot]_' + str(subject)
+    # import datetime as dt
+    # subject = dt.datetime.today()
+    # msg['Subject'] = '[Vistorian screenshot]_' + str(subject)
+     msg['Subject'] = send_subject
     # me == the sender's email address
     # family = the list of all recipients' email addresses
     msg['From'] = send_from

@@ -508,7 +508,7 @@ module vistorian {
         var vars = networkcube.getUrlVars();
 
         // VS: Clicks on Return to DataView
-        $('#'+elementId).append('<a href="dataview.html?session='+vars['session']+'&datasetName'+vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
+        $('#'+elementId).append('<a href="../dataview.html?session='+vars['session']+'&datasetName'+vars['datasetName'] + '" style="margin:5px;padding-left:5px;" onclick="trace.event(null, \'ToolLaunch\', \'ReturnToDataview\', );" target="_blank">Return to Dataview</a>');
         $('#'+elementId).append('<br/><br/>');
     }
 
@@ -525,7 +525,7 @@ module vistorian {
             position: "left",
             title: "Consent to tracking",
             message: 
-            '<p>When Tracking is ON, the Vistorian <strong>records information about which Vistorian features you use</strong> (e.g. when you create a node link diagram or a matrix, use filters, or when you upload a new file).\
+            '<p>When Tracking is ON, the Vistorian <strong>logs your activity</strong> (e.g. when you create a node link diagram or a matrix, use filters, or when you upload a new file).\
             <br> This allows us understand how the Vistorian is used and to improve it.\
             <p>This tracking data will be saved on a secure INRIA server which is accessible only by the Vistorian team.\
             <br>No personal information will be collected or saved with the tracking data.\
