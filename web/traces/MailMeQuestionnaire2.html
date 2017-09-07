@@ -357,31 +357,41 @@
 
                       
                       function sendEmail()
-                      {   
-                        var cc_vistorian = '';
-                          if(localStorage.getItem('traces_sendCopyToVistorian'))
+                        {   
+                          var cc_vistorian = '';
+                            if(localStorage.setItem('traces_sendCopyToVistorian', $('checkboxes-1').is(':checked')))
+                            {
+                              //cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                              cc_vistorian = "vistorian@inria.fr";
+                            }
+
+                          console.log(">>>>CC:", cc_vistorian);
+
+                          var to = email;
+
+                          var from = "vistorian@inria.fr";
+
+                          var subject = "";
+
+                          var message = "Hello,\n\nThis is your screenshot. You can find the file attached.\n\nBest,\nThe Vistorian team";
+
+                          var format = localStorage.getItem('traces_format'); 
+                          console.log('format', format);             
+                          if(format && format == 'PNG')
                           {
-                            cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                            // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
+                            var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
+                            var d3Object = d3.select(svgString.get(0));
+                            console.log('>> svgNode', d3Object.node());
+                            networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
+                            {
+                              console.log('SEND EMAIL WITH BLOB')
+
+                            //  trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', true, blob, null);
+                            trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
+                            })
                           }
-                        var to = document.getElementById('emailInput').value;
-                        var from = "vistorian@inria.fr";
-                        var subject = "";
-                        var message = "Hello,\nThis is your screenshot.\nThe image is attached.\nBest,\nThe Vistorian team";
-                        var format = localStorage.getItem('traces_format'); 
-                        console.log('format', format);             
-                        if(format && format == 'PNG')
-                        {
-                          // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
-                          var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
-                          var d3Object = d3.select(svgString.get(0));
-                          console.log('>> svgNode', d3Object.node());
-                          networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
-                          {
-                            console.log('SEND EMAIL WITH BLOB')
-                           trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
-                          })
                         }
-                      }
                         
                       //function sendEmail()
                       //{
