@@ -292,9 +292,11 @@
                         trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
                         console.log(helpfullScore);
                         trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
-                        console.log(Comments);
-                        trace.sendmail("vanessa.serrano@iqs.url.edu", email, "Comments", Comments, "", null, null);
-
+                        console.log(">>>>COMENTS:",Comments);
+                        if (Comments != ""){
+                          trace.sendmail("vanessa.serrano@iqs.url.edu", email, "[The Vistorian] Users comments or questions", Comments, "", null, null);
+                        }
+                        
                         //window.history.back();
                         sendEmail();
                         closeWindow();
