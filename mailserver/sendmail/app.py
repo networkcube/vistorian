@@ -52,19 +52,16 @@ def test():
 def send():
     try:
         send_from = request.form['from'].strip()
+        send_to = request.form['to'].strip()
+        send_cc = request.form['cc'].strip()
+        send_subject = request.form['subject'].strip()
+        send_note = request.form['note'].strip()
     except Exception:
         return hello()
-    send_to = request.form['to'].strip()
     if send_to not in valid_dest:
         return "Invalid destination: "+send_to #+" valids:"+",".join(list(valid_dest))
-    # if 'cc' in request.form:
-        send_cc = request.form['cc'].strip()
-    # else:
-    #     send_cc = None
-    send_subject = request.form['subject'].strip()
     # if 'CopyToVistorian' in request.form:
     #     send_cc = "vistorian@inria.fr"
-    send_note = request.form['note'].strip()
     if 'image' in request.files:
         send_image = request.files['image']
         if allowed_file(send_image.filename):
@@ -91,12 +88,7 @@ def send():
         send_svg = None
     
     msg = MIMEMultipart()
-    # import datetime as dt
-    # subject = dt.datetime.today()
-    # msg['Subject'] = '[Vistorian screenshot]_' + str(subject)
-     msg['Subject'] = send_subject
-    # me == the sender's email address
-    # family = the list of all recipients' email addresses
+    msg['Subject'] = send_subject
     msg['From'] = send_from
     msg['To'] = send_to
     if send_cc is not None:
