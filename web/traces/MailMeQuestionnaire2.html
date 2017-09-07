@@ -219,7 +219,12 @@
                     </td>
                     </table>
                     <hr>
-                    <p><font size="4">Next you will be able to add comments in the email message</font></p>
+                    <!--<p><font size="4">Next you will be able to add comments in the email message</font></p>-->
+
+                    <p><font size="4">Add comments or questions:</font></p>
+                    <form>
+                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
+                    </form>
                     
                     <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
                     <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
@@ -239,6 +244,9 @@
                         localStorage.getItem('traces_format')
                         localStorage.getItem('traces_addLegend')
                         localStorage.getItem('traces_sendCopyToVistorian')
+                        var Comments = document.getElementById('comments').value;
+                        var Commentstext = String(Comments);
+                        localStorage.setItem('traces_comments', $('#comments').val())
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -283,10 +291,15 @@
                         // SEND RESULTS TO THE SERVER
                         trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
                         console.log(helpfullScore);
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
+                        console.log(Comments);
+                        trace.sendmail("vanessa.serrano@iqs.url.edu", email, "Comments", Comments, "", null, null);
 
                         //window.history.back();
                         sendEmail();
-                        closeWindow2();
+                        closeWindow();
+                        window.parent.$('#mailmeQuestionnaireDiv2').css('visibility', 'hidden');
+
                       }
 
                       function doubleClick(checkboxNumber)
