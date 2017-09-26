@@ -38,10 +38,9 @@
                 © 2016 Microsoft <img src="../logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="../logos/logo-inria.png" height="20px">
     </div>
 	<script>
-
-        SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
+        var port_maybe =  location.port ? ":"+location.port : "";
+        SERVER = location.protocol + '//'+ window.location.hostname + port_maybe + window.location.pathname + '/';
         SERVER = SERVER.split('web/')[0]
-  
        
         $( document ).ready(function() {
             var width = window.innerWidth -30;
