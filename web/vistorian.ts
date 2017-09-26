@@ -34,6 +34,7 @@ module vistorian {
     head.append("<link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet' type='text/css'>")
     head.append("<link href='https://fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
     head.append("<link rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'>")
+    head.append("<script src='https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js'></script>")
     head.append("<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js'></script>")    
     // head.append("<script src='../lib/bootbox.min.js'></script>")
 
@@ -484,6 +485,7 @@ module vistorian {
 
         $('#'+elementId).append('\
             <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>\
+            <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>\
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
             <script src="../lib/bootbox.min.js"></script>\
             <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="vistorian.enableDisableTracking()" value="Enable tracking"></input>\
