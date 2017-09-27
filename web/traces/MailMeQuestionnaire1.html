@@ -369,11 +369,13 @@
                         function sendEmail()
                         {   
                           var cc_vistorian = '';
-                            if(localStorage.getItem('traces_sendCopyToVistorian'))
+                            if(localStorage.setItem('traces_sendCopyToVistorian', $('checkboxes-1').is(':checked')))
                             {
                               //cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
                               cc_vistorian = "vistorian@inria.fr";
                             }
+
+                          console.log(">>>>CC:", cc_vistorian);
 
                           var to = document.getElementById('emailInput').value;
 
@@ -396,7 +398,7 @@
                               console.log('SEND EMAIL WITH BLOB')
 
                             //  trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', true, blob, null);
-                            trace.sendmail(to, from, subject, message, "", blob, null);
+                            trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
                             })
                           }
                         }

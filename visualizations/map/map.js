@@ -39,7 +39,7 @@ var NodePositionObject = (function () {
         this.outNeighbors = [];
     }
     return NodePositionObject;
-})();
+}());
 var overlay;
 var map;
 var linkWeightScale = d3.scale.linear().range([0, 2]);
@@ -692,7 +692,8 @@ function updateLinkPaths() {
                 { x: sourceNPO.x, y: sourceNPO.y },
                 { x: cx1, y: cy1 },
                 { x: cx2, y: cy2 },
-                { x: targetNPO.x, y: targetNPO.y }];
+                { x: targetNPO.x, y: targetNPO.y }
+            ];
         }
         else {
             cx1 = center.x;
@@ -701,7 +702,8 @@ function updateLinkPaths() {
             cy2 = cy1;
             link['path'] = [
                 { x: sourceNPO.x, y: sourceNPO.y },
-                { x: targetNPO.x, y: targetNPO.y }];
+                { x: targetNPO.x, y: targetNPO.y }
+            ];
         }
     }
     visualLinks

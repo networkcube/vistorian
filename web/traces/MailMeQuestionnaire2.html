@@ -218,7 +218,12 @@
                     </td>
                     </table>
                     <hr>
-                    <p><font size="4">Next you will be able to add comments in the email message</font></p>
+                    <!--<p><font size="4">Next you will be able to add comments in the email message</font></p>-->
+
+                    <p><font size="4">Add comments or questions:</font></p>
+                    <form>
+                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
+                    </form>
                     
                     <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
                     <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
@@ -238,6 +243,9 @@
                         localStorage.getItem('traces_format')
                         localStorage.getItem('traces_addLegend')
                         localStorage.getItem('traces_sendCopyToVistorian')
+                        var Comments = document.getElementById('comments').value;
+                        var Commentstext = String(Comments);
+                        localStorage.setItem('traces_comments', $('#comments').val())
                         localStorage.getItem('traces_button1')
                         localStorage.getItem('traces_button2')
                         localStorage.getItem('traces_button3')
@@ -282,10 +290,17 @@
                         // SEND RESULTS TO THE SERVER
                         trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
                         console.log(helpfullScore);
-
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
+                        console.log(">>>>COMENTS:",Comments);
+                        if (Comments != ""){
+                          trace.sendmail("vanessa.serrano@iqs.url.edu", email, "[The Vistorian] Users comments or questions", Comments, "", null, null);
+                        }
+                        
                         //window.history.back();
                         sendEmail();
-                        closeWindow2();
+                        closeWindow();
+                        window.parent.$('#mailmeQuestionnaireDiv2').css('visibility', 'hidden');
+
                       }
 
                       function doubleClick(checkboxNumber)
@@ -356,31 +371,41 @@
 
                       
                       function sendEmail()
-                      {   
-                        var cc_vistorian = '';
-                          if(localStorage.getItem('traces_sendCopyToVistorian'))
+                        {   
+                          var cc_vistorian = '';
+                            if(localStorage.setItem('traces_sendCopyToVistorian', $('checkboxes-1').is(':checked')))
+                            {
+                              //cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                              cc_vistorian = "vistorian@inria.fr";
+                            }
+
+                          console.log(">>>>CC:", cc_vistorian);
+
+                          var to = email;
+
+                          var from = "vistorian@inria.fr";
+
+                          var subject = "";
+
+                          var message = "Hello,\n\nThis is your screenshot. You can find the file attached.\n\nBest,\nThe Vistorian team";
+
+                          var format = localStorage.getItem('traces_format'); 
+                          console.log('format', format);             
+                          if(format && format == 'PNG')
                           {
-                            cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                            // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
+                            var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
+                            var d3Object = d3.select(svgString.get(0));
+                            console.log('>> svgNode', d3Object.node());
+                            networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
+                            {
+                              console.log('SEND EMAIL WITH BLOB')
+
+                            //  trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', true, blob, null);
+                            trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
+                            })
                           }
-                        var to = document.getElementById('emailInput').value;
-                        var from = "vistorian@inria.fr";
-                        var subject = "";
-                        var message = "Hello,\nThis is your screenshot.\nThe image is attached.\nBest,\nThe Vistorian team";
-                        var format = localStorage.getItem('traces_format'); 
-                        console.log('format', format);             
-                        if(format && format == 'PNG')
-                        {
-                          // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
-                          var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
-                          var d3Object = d3.select(svgString.get(0));
-                          console.log('>> svgNode', d3Object.node());
-                          networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
-                          {
-                            console.log('SEND EMAIL WITH BLOB')
-                           trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
-                          })
                         }
-                      }
                         
                       //function sendEmail()
                       //{

@@ -25,16 +25,17 @@ module vistorian {
 
     // LOADING FONTS:
     var head = $('head');
-    head.append("<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300italic,700,300&subset=latin,latin-ext' rel='stylesheet' type='text/css'></head>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Great+Vibes' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Playfair+Display' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Lora' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet' type='text/css'>")
-    head.append("<link href='https://fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
-    head.append("<link rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'>")
-    head.append("<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js'></script>")    
+    head.append("<link href='//fonts.googleapis.com/css?family=Open+Sans+Condensed:300italic,700,300&subset=latin,latin-ext' rel='stylesheet' type='text/css'></head>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Great+Vibes' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Playfair+Display' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Lora' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=Caveat' rel='stylesheet' type='text/css'>")
+    head.append("<link href='//fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
+    head.append("<link rel='stylesheet' type='text/css' href='//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>")
+    head.append('<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>')
+    head.append("<script src='//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js'></script>")    
     // head.append("<script src='../lib/bootbox.min.js'></script>")
 
     // append('./lib/xml2json.js');
@@ -483,8 +484,9 @@ module vistorian {
         $('#'+elementId).append(dataname);
 
         $('#'+elementId).append('\
-            <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>\
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>\
+            <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"/>\
+            <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>\
+            <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>\
             <script src="../lib/bootbox.min.js"></script>\
             <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="vistorian.enableDisableTracking()" value="Enable tracking"></input>\
             <div id="trackingContainer">\
