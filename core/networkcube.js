@@ -1,14 +1,3 @@
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 !function (a, b) { "object" == typeof module && "object" == typeof module.exports ? module.exports = a.document ? b(a, !0) : function (a) { if (!a.document)
     throw new Error("jQuery requires a window with a document"); return b(a); } : b(a); }("undefined" != typeof window ? window : this, function (a, b) {
     var c = [], d = c.slice, e = c.concat, f = c.push, g = c.indexOf, h = {}, i = h.toString, j = h.hasOwnProperty, k = {}, l = "1.11.1", m = function (a, b) { return new m.fn.init(a, b); }, n = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, o = /^-ms-/, p = /-([\da-z])/gi, q = function (a, b) { return b.toUpperCase(); };
@@ -2666,6 +2655,7 @@ var __extends = (this && this.__extends) || (function () {
     var Xs = Zs.map(function (n) { return [n[0].utc, n[1]]; }), Bs = Os.multi([[".%L", function (n) { return n.getUTCMilliseconds(); }], [":%S", function (n) { return n.getUTCSeconds(); }], ["%I:%M", function (n) { return n.getUTCMinutes(); }], ["%I %p", function (n) { return n.getUTCHours(); }], ["%a %d", function (n) { return n.getUTCDay() && 1 != n.getUTCDate(); }], ["%b %d", function (n) { return 1 != n.getUTCDate(); }], ["%B", function (n) { return n.getUTCMonth(); }], ["%Y", Ae]]);
     Xs.year = ic.year.utc, ic.scale.utc = function () { return Xo(Go.scale.linear(), Xs, Bs); }, Go.text = Ct(function (n) { return n.responseText; }), Go.json = function (n, t) { return Nt(n, "application/json", Jo, t); }, Go.html = function (n, t) { return Nt(n, "text/html", Wo, t); }, Go.xml = Ct(function (n) { return n.responseXML; }), "function" == typeof define && define.amd ? define(Go) : "object" == typeof module && module.exports ? module.exports = Go : this.d3 = Go;
 }();
+"use strict";
 var netClustering = {
     version: "0.1"
 };
@@ -8878,32 +8868,23 @@ var networkcube;
         return arrayClone;
     }
     networkcube.copyTimeSeries = copyTimeSeries;
-    var Box = (function () {
-        function Box(x1, y1, x2, y2) {
+    class Box {
+        constructor(x1, y1, x2, y2) {
             this.x1 = Math.min(x1, x2);
             this.x2 = Math.max(x1, x2);
             this.y1 = Math.min(y1, y2);
             this.y2 = Math.max(y1, y2);
         }
-        Object.defineProperty(Box.prototype, "width", {
-            get: function () {
-                return this.x2 - this.x1;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Box.prototype, "height", {
-            get: function () {
-                return this.y2 - this.y1;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Box.prototype.isPoint = function () {
+        get width() {
+            return this.x2 - this.x1;
+        }
+        get height() {
+            return this.y2 - this.y1;
+        }
+        isPoint() {
             return (this.width == 0) && (this.height == 0);
-        };
-        return Box;
-    }());
+        }
+    }
     networkcube.Box = Box;
     function inBox(x, y, box) {
         return (x > box.x1
@@ -8932,27 +8913,25 @@ var networkcube;
         return a - b;
     }
     networkcube.sortNumber = sortNumber;
-    var ElementCompound = (function () {
-        function ElementCompound() {
+    class ElementCompound {
+        constructor() {
             this.nodes = [];
             this.links = [];
             this.times = [];
             this.nodePairs = [];
             this.locations = [];
         }
-        return ElementCompound;
-    }());
+    }
     networkcube.ElementCompound = ElementCompound;
-    var IDCompound = (function () {
-        function IDCompound() {
+    class IDCompound {
+        constructor() {
             this.nodeIds = [];
             this.linkIds = [];
             this.timeIds = [];
             this.nodePairIds = [];
             this.locationIds = [];
         }
-        return IDCompound;
-    }());
+    }
     networkcube.IDCompound = IDCompound;
     function cloneCompound(compound) {
         var result = new IDCompound();
@@ -8987,16 +8966,16 @@ var networkcube;
         var result = new IDCompound;
         if (elements != undefined) {
             if (elements.nodes) {
-                result.nodeIds = elements.nodes.map(function (n, i) { return n.id(); });
+                result.nodeIds = elements.nodes.map((n, i) => n.id());
             }
             if (elements.links) {
-                result.linkIds = elements.links.map(function (n, i) { return n.id(); });
+                result.linkIds = elements.links.map((n, i) => n.id());
             }
             if (elements.times) {
-                result.timeIds = elements.times.map(function (n, i) { return n.id(); });
+                result.timeIds = elements.times.map((n, i) => n.id());
             }
             if (elements.nodePairs) {
-                result.nodePairIds = elements.nodePairs.map(function (n, i) { return n.id(); });
+                result.nodePairIds = elements.nodePairs.map((n, i) => n.id());
             }
         }
         return result;
@@ -9006,16 +8985,16 @@ var networkcube;
         var result = new ElementCompound;
         if (elements != undefined) {
             if (elements.nodeIds) {
-                result.nodes = elements.nodeIds.map(function (id, i) { return g.node(id); });
+                result.nodes = elements.nodeIds.map((id, i) => g.node(id));
             }
             if (elements.linkIds) {
-                result.links = elements.linkIds.map(function (id, i) { return g.link(id); });
+                result.links = elements.linkIds.map((id, i) => g.link(id));
             }
             if (elements.timeIds) {
-                result.times = elements.timeIds.map(function (id, i) { return g.time(id); });
+                result.times = elements.timeIds.map((id, i) => g.time(id));
             }
             if (elements.nodePairIds) {
-                result.nodePairs = elements.nodePairIds.map(function (id, i) { return g.nodePair(id); });
+                result.nodePairs = elements.nodePairIds.map((id, i) => g.nodePair(id));
             }
         }
         return result;
@@ -9225,35 +9204,35 @@ var networkcube;
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
-    var BasicElement = (function () {
-        function BasicElement(id, type, dynamicGraph) {
+    class BasicElement {
+        constructor(id, type, dynamicGraph) {
             this._id = id;
             this.type = type;
             this.g = dynamicGraph;
         }
-        BasicElement.prototype.id = function () {
+        id() {
             return this._id;
-        };
-        BasicElement.prototype.attr = function (attr) {
+        }
+        attr(attr) {
             return this.g.attr(attr, this._id, this.type);
-        };
-        BasicElement.prototype.getSelections = function () {
+        }
+        getSelections() {
             return this.g.attributeArrays[this.type].selections[this._id];
-        };
-        BasicElement.prototype.addToSelection = function (b) {
+        }
+        addToSelection(b) {
             this.g.attributeArrays[this.type].selections[this._id].push(b);
-        };
-        BasicElement.prototype.removeFromSelection = function (b) {
+        }
+        removeFromSelection(b) {
             var arr = this.g.attributeArrays[this.type].selections[this._id];
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i] == b)
                     this.g.attributeArrays[this.type].selections[this._id].splice(i, 1);
             }
-        };
-        BasicElement.prototype.inSelection = function (s) {
+        }
+        inSelection(s) {
             return this.getSelections().indexOf(s) > -1;
-        };
-        BasicElement.prototype.isSelected = function (selection) {
+        }
+        isSelected(selection) {
             if (!selection)
                 return this.getSelections().length > 0;
             var selections = this.g.attributeArrays[this.type].selections[this._id];
@@ -9265,14 +9244,14 @@ var networkcube;
                     return true;
             }
             return false;
-        };
-        BasicElement.prototype.isHighlighted = function () {
+        }
+        isHighlighted() {
             return this.g.isHighlighted(this._id, this.type);
-        };
-        BasicElement.prototype.isFiltered = function () {
+        }
+        isFiltered() {
             return this.g.isFiltered(this._id, this.type);
-        };
-        BasicElement.prototype.isVisible = function () {
+        }
+        isVisible() {
             var selections = this.getSelections();
             if (selections.length == 0)
                 return true;
@@ -9281,8 +9260,8 @@ var networkcube;
                     return false;
             }
             return true;
-        };
-        BasicElement.prototype.presentIn = function (start, end) {
+        }
+        presentIn(start, end) {
             var presence = this.attr('presence');
             if (!end)
                 end = start;
@@ -9291,44 +9270,40 @@ var networkcube;
                     return true;
             }
             return false;
-        };
-        return BasicElement;
-    }());
+        }
+    }
     networkcube.BasicElement = BasicElement;
-    var Time = (function (_super) {
-        __extends(Time, _super);
-        function Time(id, dynamicGraph) {
-            return _super.call(this, id, 'time', dynamicGraph) || this;
+    class Time extends BasicElement {
+        constructor(id, dynamicGraph) {
+            super(id, 'time', dynamicGraph);
         }
-        Time.prototype.time = function () { return this.attr('momentTime'); };
-        Time.prototype.moment = function () { return this.attr('momentTime'); };
-        Time.prototype.label = function () { return this.attr('label'); };
-        Time.prototype.unixTime = function () { return this.attr('unixTime'); };
-        Time.prototype.links = function () {
+        time() { return this.attr('momentTime'); }
+        moment() { return this.attr('momentTime'); }
+        label() { return this.attr('label'); }
+        unixTime() { return this.attr('unixTime'); }
+        links() {
             return new LinkQuery(this.attr('links'), this.g);
-        };
-        Time.prototype.year = function () { return this.time().year(); };
-        Time.prototype.month = function () { return this.time().month(); };
-        Time.prototype.week = function () { return this.time().week(); };
-        Time.prototype.day = function () { return this.time().day(); };
-        Time.prototype.hour = function () { return this.time().hour(); };
-        Time.prototype.minute = function () { return this.time().minute(); };
-        Time.prototype.second = function () { return this.time().second(); };
-        Time.prototype.millisecond = function () { return this.time().millisecond(); };
-        Time.prototype.format = function (format) {
-            return this.time().format(format);
-        };
-        return Time;
-    }(BasicElement));
-    networkcube.Time = Time;
-    var Node = (function (_super) {
-        __extends(Node, _super);
-        function Node(id, graph) {
-            return _super.call(this, id, 'node', graph) || this;
         }
-        Node.prototype.label = function () { return '' + this.attr('label'); };
-        Node.prototype.nodeType = function () { return this.attr('nodeType'); };
-        Node.prototype.neighbors = function (t1, t2) {
+        year() { return this.time().year(); }
+        month() { return this.time().month(); }
+        week() { return this.time().week(); }
+        day() { return this.time().day(); }
+        hour() { return this.time().hour(); }
+        minute() { return this.time().minute(); }
+        second() { return this.time().second(); }
+        millisecond() { return this.time().millisecond(); }
+        format(format) {
+            return this.time().format(format);
+        }
+    }
+    networkcube.Time = Time;
+    class Node extends BasicElement {
+        constructor(id, graph) {
+            super(id, 'node', graph);
+        }
+        label() { return '' + this.attr('label'); }
+        nodeType() { return this.attr('nodeType'); }
+        neighbors(t1, t2) {
             if (t2 != undefined) {
                 return new NodeQuery(this.attr('neighbors').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9336,8 +9311,8 @@ var networkcube;
                 return new NodeQuery(this.attr('neighbors').get(t1), this.g);
             }
             return new NodeQuery(this.attr('neighbors').toFlatArray(), this.g);
-        };
-        Node.prototype.inNeighbors = function (t1, t2) {
+        }
+        inNeighbors(t1, t2) {
             if (t2 != undefined) {
                 return new NodeQuery(this.attr('inNeighbors').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9345,8 +9320,8 @@ var networkcube;
                 return new NodeQuery(this.attr('inNeighbors').get(t1), this.g);
             }
             return new NodeQuery(this.attr('inNeighbors').toFlatArray(true), this.g);
-        };
-        Node.prototype.outNeighbors = function (t1, t2) {
+        }
+        outNeighbors(t1, t2) {
             if (t2 != undefined) {
                 return new NodeQuery(this.attr('outNeighbors').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9354,8 +9329,8 @@ var networkcube;
                 return new NodeQuery(this.attr('outNeighbors').get(t1), this.g);
             }
             return new NodeQuery(this.attr('outNeighbors').toFlatArray(), this.g);
-        };
-        Node.prototype.links = function (t1, t2) {
+        }
+        links(t1, t2) {
             if (t2 != undefined) {
                 return new LinkQuery(this.attr('links').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9363,8 +9338,8 @@ var networkcube;
                 return new LinkQuery(this.attr('links').get(t1), this.g);
             }
             return new LinkQuery(this.attr('links').toFlatArray(true), this.g);
-        };
-        Node.prototype.inLinks = function (t1, t2) {
+        }
+        inLinks(t1, t2) {
             if (t2 != undefined) {
                 return new LinkQuery(this.attr('inLinks').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9372,8 +9347,8 @@ var networkcube;
                 return new LinkQuery(this.attr('inLinks').get(t1), this.g);
             }
             return new LinkQuery(this.attr('inLinks').toFlatArray(true), this.g);
-        };
-        Node.prototype.outLinks = function (t1, t2) {
+        }
+        outLinks(t1, t2) {
             if (t2 != undefined) {
                 return new LinkQuery(this.attr('outLinks').period(t1, t2).toFlatArray(true), this.g);
             }
@@ -9381,8 +9356,8 @@ var networkcube;
                 return new LinkQuery(this.attr('outLinks').get(t1), this.g);
             }
             return new LinkQuery(this.attr('outLinks').toFlatArray(true), this.g);
-        };
-        Node.prototype.locations = function (t1, t2) {
+        }
+        locations(t1, t2) {
             if (t2 != undefined) {
                 return new LocationQuery(this.attr('locations').period(t1, t2).toArray(), this.g);
             }
@@ -9390,8 +9365,8 @@ var networkcube;
                 return new LocationQuery([this.attr('locations').get(t1)], this.g);
             }
             return new LocationQuery(this.attr('locations').toArray(), this.g);
-        };
-        Node.prototype.locationSerie = function (t1, t2) {
+        }
+        locationSerie(t1, t2) {
             var serie;
             if (t2 != undefined)
                 serie = this.attr('locations').period(t1, t2);
@@ -9405,8 +9380,8 @@ var networkcube;
                 serie2.set(this.g.time(parseInt(t)), this.g.location(serie[t]));
             }
             return serie2;
-        };
-        Node.prototype.linksBetween = function (n) {
+        }
+        linksBetween(n) {
             var links = this.links().toArray();
             var finalLinks = [];
             var l;
@@ -9416,95 +9391,72 @@ var networkcube;
                     finalLinks.push(l);
             }
             return new LinkQuery(finalLinks, this.g);
-        };
-        return Node;
-    }(BasicElement));
-    networkcube.Node = Node;
-    var Link = (function (_super) {
-        __extends(Link, _super);
-        function Link(id, graph) {
-            return _super.call(this, id, 'link', graph) || this;
         }
-        Link.prototype.linkType = function () { return this.attr('linkType'); };
-        Object.defineProperty(Link.prototype, "source", {
-            get: function () { return this.g._nodes[this.attr('source')]; },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Link.prototype, "target", {
-            get: function () { return this.g._nodes[this.attr('target')]; },
-            enumerable: true,
-            configurable: true
-        });
-        Link.prototype.nodePair = function () { return this.g._nodePairs[this.attr('nodePair')]; };
-        Link.prototype.directed = function () { return this.attr('directed'); };
-        Link.prototype.other = function (n) {
+    }
+    networkcube.Node = Node;
+    class Link extends BasicElement {
+        constructor(id, graph) {
+            super(id, 'link', graph);
+        }
+        linkType() { return this.attr('linkType'); }
+        get source() { return this.g._nodes[this.attr('source')]; }
+        get target() { return this.g._nodes[this.attr('target')]; }
+        nodePair() { return this.g._nodePairs[this.attr('nodePair')]; }
+        directed() { return this.attr('directed'); }
+        other(n) {
             return this.source == n ? this.target : this.source;
-        };
-        Link.prototype.weights = function (start, end) {
+        }
+        weights(start, end) {
             if (start == undefined)
                 return new NumberQuery(this.attr('weights').toArray());
             if (end == undefined)
                 return new NumberQuery([this.attr('weights').get(start)]);
             return new NumberQuery(this.attr('weights').period(start, end).toArray());
-        };
-        Link.prototype.presentIn = function (start, end) {
+        }
+        presentIn(start, end) {
             var presence = this.weights(start, end).toArray();
             return presence.length > 0;
-        };
-        Link.prototype.times = function () {
-            return new TimeQuery(this.attr('presence'), this.g);
-        };
-        return Link;
-    }(BasicElement));
-    networkcube.Link = Link;
-    var NodePair = (function (_super) {
-        __extends(NodePair, _super);
-        function NodePair(id, graph) {
-            return _super.call(this, id, 'nodePair', graph) || this;
         }
-        Object.defineProperty(NodePair.prototype, "source", {
-            get: function () { return this.g._nodes[this.attr('source')]; },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NodePair.prototype, "target", {
-            get: function () { return this.g._nodes[this.attr('target')]; },
-            enumerable: true,
-            configurable: true
-        });
-        NodePair.prototype.links = function () { return new LinkQuery(this.attr('links'), this.g); };
-        NodePair.prototype.nodeType = function () { return this.attr('nodeType'); };
-        NodePair.prototype.presentIn = function (start, end) {
+        times() {
+            return new TimeQuery(this.attr('presence'), this.g);
+        }
+    }
+    networkcube.Link = Link;
+    class NodePair extends BasicElement {
+        constructor(id, graph) {
+            super(id, 'nodePair', graph);
+        }
+        get source() { return this.g._nodes[this.attr('source')]; }
+        get target() { return this.g._nodes[this.attr('target')]; }
+        links() { return new LinkQuery(this.attr('links'), this.g); }
+        nodeType() { return this.attr('nodeType'); }
+        presentIn(start, end) {
             for (var i = 0; i < this.links.length; i++) {
                 if (this.links[i].presentIn(start, end))
                     return true;
             }
             return false;
-        };
-        return NodePair;
-    }(BasicElement));
-    networkcube.NodePair = NodePair;
-    var Location = (function (_super) {
-        __extends(Location, _super);
-        function Location(id, graph) {
-            return _super.call(this, id, 'location', graph) || this;
         }
-        Location.prototype.label = function () { return this.attr('label') + ''; };
-        Location.prototype.longitude = function () { return this.attr('longitude'); };
-        Location.prototype.latitude = function () { return this.attr('latitude'); };
-        Location.prototype.x = function () { return this.attr('x'); };
-        Location.prototype.y = function () { return this.attr('y'); };
-        Location.prototype.z = function () { return this.attr('z'); };
-        Location.prototype.radius = function () { return this.attr('radius'); };
-        return Location;
-    }(BasicElement));
+    }
+    networkcube.NodePair = NodePair;
+    class Location extends BasicElement {
+        constructor(id, graph) {
+            super(id, 'location', graph);
+        }
+        label() { return this.attr('label') + ''; }
+        longitude() { return this.attr('longitude'); }
+        latitude() { return this.attr('latitude'); }
+        x() { return this.attr('x'); }
+        y() { return this.attr('y'); }
+        z() { return this.attr('z'); }
+        radius() { return this.attr('radius'); }
+    }
     networkcube.Location = Location;
-    var ScalarTimeSeries = (function () {
-        function ScalarTimeSeries() {
+    class ScalarTimeSeries {
+        constructor() {
             this.serie = {};
         }
-        ScalarTimeSeries.prototype.period = function (t1, t2) {
+        period(t1, t2) {
             var t1id = t1.id();
             var t2id = t2.id();
             var s = new ScalarTimeSeries();
@@ -9515,19 +9467,19 @@ var networkcube;
                 }
             }
             return s;
-        };
-        ScalarTimeSeries.prototype.set = function (t, element) {
+        }
+        set(t, element) {
             this.serie[t.id()] = element;
-        };
-        ScalarTimeSeries.prototype.get = function (t) {
+        }
+        get(t) {
             if (this.serie[t.id()] == undefined)
                 return;
             return this.serie[t.id()];
-        };
-        ScalarTimeSeries.prototype.size = function () {
+        }
+        size() {
             return this.toArray().length;
-        };
-        ScalarTimeSeries.prototype.toArray = function (removeDuplicates) {
+        }
+        toArray(removeDuplicates) {
             if (removeDuplicates == undefined)
                 removeDuplicates = false;
             var a = [];
@@ -9543,15 +9495,14 @@ var networkcube;
                 }
             }
             return a;
-        };
-        return ScalarTimeSeries;
-    }());
+        }
+    }
     networkcube.ScalarTimeSeries = ScalarTimeSeries;
-    var ArrayTimeSeries = (function () {
-        function ArrayTimeSeries() {
+    class ArrayTimeSeries {
+        constructor() {
             this.serie = {};
         }
-        ArrayTimeSeries.prototype.period = function (t1, t2) {
+        period(t1, t2) {
             var t1id = t1.id();
             var t2id = t1.id();
             var s = new ArrayTimeSeries();
@@ -9562,26 +9513,26 @@ var networkcube;
                 }
             }
             return s;
-        };
-        ArrayTimeSeries.prototype.add = function (t, element) {
+        }
+        add(t, element) {
             if (t == undefined) {
                 return;
             }
             if (!this.serie[t._id])
                 this.serie[t._id] = [];
             this.serie[t._id].push(element);
-        };
-        ArrayTimeSeries.prototype.get = function (t) {
+        }
+        get(t) {
             return this.serie[t._id];
-        };
-        ArrayTimeSeries.prototype.toArray = function () {
+        }
+        toArray() {
             var a = [];
             for (var prop in this.serie) {
                 a.push(this.serie[prop]);
             }
             return a;
-        };
-        ArrayTimeSeries.prototype.toFlatArray = function (removeDuplicates) {
+        }
+        toFlatArray(removeDuplicates) {
             if (removeDuplicates == undefined)
                 removeDuplicates = false;
             var a = [];
@@ -9593,12 +9544,11 @@ var networkcube;
                 }
             }
             return a;
-        };
-        return ArrayTimeSeries;
-    }());
+        }
+    }
     networkcube.ArrayTimeSeries = ArrayTimeSeries;
-    var Query = (function () {
-        function Query(elements) {
+    class Query {
+        constructor(elements) {
             this._elements = [];
             if (elements) {
                 for (var i = 0; i < elements.length; i++) {
@@ -9607,41 +9557,37 @@ var networkcube;
                 }
             }
         }
-        Query.prototype.contains = function (element) {
+        contains(element) {
             return this._elements.indexOf(element) > -1;
-        };
-        Query.prototype.addUnique = function (element) {
+        }
+        addUnique(element) {
             if (this._elements.indexOf(element) == -1)
                 this._elements.push(element);
-        };
-        Query.prototype.add = function (element) {
+        }
+        add(element) {
             this._elements.push(element);
-        };
-        Query.prototype.addAll = function (elements) {
+        }
+        addAll(elements) {
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i] != undefined)
                     this._elements.push(elements[i]);
             }
-        };
-        Query.prototype.addAllUnique = function (elements) {
+        }
+        addAllUnique(elements) {
             for (var i = 0; i < elements.length; i++) {
                 this.addUnique(elements[i]);
             }
-        };
-        Object.defineProperty(Query.prototype, "length", {
-            get: function () {
-                return this._elements.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
+        }
+        get length() {
+            return this._elements.length;
+        }
         ;
-        Query.prototype.size = function () { return this._elements.length; };
+        size() { return this._elements.length; }
         ;
-        Query.prototype.ids = function () {
+        ids() {
             return this._elements;
-        };
-        Query.prototype.removeDuplicates = function () {
+        }
+        removeDuplicates() {
             var elements = this._elements.slice(0);
             this._elements = [];
             for (var i = 0; i < elements.length; i++) {
@@ -9649,8 +9595,8 @@ var networkcube;
                     this._elements.push(elements[i]);
             }
             return this;
-        };
-        Query.prototype.generic_intersection = function (q) {
+        }
+        generic_intersection(q) {
             var intersection = [];
             for (var i = 0; i < this._elements.length; i++) {
                 for (var j = 0; j < q._elements.length; j++) {
@@ -9660,35 +9606,30 @@ var networkcube;
                 }
             }
             return new Query(intersection);
-        };
-        return Query;
-    }());
-    networkcube.Query = Query;
-    var NumberQuery = (function (_super) {
-        __extends(NumberQuery, _super);
-        function NumberQuery() {
-            return _super !== null && _super.apply(this, arguments) || this;
         }
-        NumberQuery.prototype.clone = function () {
+    }
+    networkcube.Query = Query;
+    class NumberQuery extends Query {
+        clone() {
             return this._elements.slice(0);
-        };
-        NumberQuery.prototype.min = function () {
+        }
+        min() {
             var min = this._elements[0];
             for (var i = 1; i < this._elements.length; i++) {
                 if (this._elements[i] != undefined)
                     min = Math.min(min, this._elements[i]);
             }
             return min;
-        };
-        NumberQuery.prototype.max = function () {
+        }
+        max() {
             var max = this._elements[0];
             for (var i = 1; i < this._elements.length; i++) {
                 if (this._elements[i] != undefined)
                     max = Math.max(max, this._elements[i]);
             }
             return max;
-        };
-        NumberQuery.prototype.mean = function () {
+        }
+        mean() {
             var v = 0;
             var count = 0;
             for (var i = 0; i < this._elements.length; i++) {
@@ -9698,8 +9639,8 @@ var networkcube;
                 }
             }
             return v / count;
-        };
-        NumberQuery.prototype.sum = function () {
+        }
+        sum() {
             var sum = 0;
             for (var i = 0; i < this._elements.length; i++) {
                 if (typeof this._elements[i] == 'number') {
@@ -9707,77 +9648,69 @@ var networkcube;
                 }
             }
             return sum;
-        };
-        NumberQuery.prototype.toArray = function () {
+        }
+        toArray() {
             return this._elements.slice(0);
-        };
-        NumberQuery.prototype.get = function (index) {
+        }
+        get(index) {
             return this._elements[index];
-        };
-        NumberQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this._elements[i], i);
             }
             return this;
-        };
-        return NumberQuery;
-    }(Query));
+        }
+    }
     networkcube.NumberQuery = NumberQuery;
-    var StringQuery = (function () {
-        function StringQuery(elements) {
+    class StringQuery {
+        constructor(elements) {
             if (elements)
                 this._elements = elements.slice(0);
         }
-        StringQuery.prototype.contains = function (element) {
+        contains(element) {
             return this._elements.indexOf(element) > -1;
-        };
-        StringQuery.prototype.addUnique = function (element) {
+        }
+        addUnique(element) {
             if (this._elements.indexOf(element) == -1)
                 this._elements.push(element);
-        };
-        StringQuery.prototype.add = function (element) {
+        }
+        add(element) {
             this._elements.push(element);
-        };
-        StringQuery.prototype.addAll = function (elements) {
+        }
+        addAll(elements) {
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i] != undefined)
                     this._elements.push(elements[i]);
             }
-        };
-        StringQuery.prototype.addAllUnique = function (elements) {
+        }
+        addAllUnique(elements) {
             for (var i = 0; i < elements.length; i++) {
                 this.addUnique(elements[i]);
             }
-        };
-        Object.defineProperty(StringQuery.prototype, "length", {
-            get: function () { return this._elements.length; },
-            enumerable: true,
-            configurable: true
-        });
+        }
+        get length() { return this._elements.length; }
         ;
-        StringQuery.prototype.size = function () { return this._elements.length; };
+        size() { return this._elements.length; }
         ;
-        StringQuery.prototype.toArray = function () {
+        toArray() {
             return this._elements.slice(0);
-        };
-        StringQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this._elements[i], i);
             }
             return this;
-        };
-        return StringQuery;
-    }());
-    networkcube.StringQuery = StringQuery;
-    var GraphElementQuery = (function (_super) {
-        __extends(GraphElementQuery, _super);
-        function GraphElementQuery(elements, g) {
-            var _this = _super.call(this, elements) || this;
-            _this.elementType = '';
-            _this.g = g;
-            return _this;
         }
-        GraphElementQuery.prototype.generic_filter = function (filter) {
+    }
+    networkcube.StringQuery = StringQuery;
+    class GraphElementQuery extends Query {
+        constructor(elements, g) {
+            super(elements);
+            this.elementType = '';
+            this.g = g;
+        }
+        generic_filter(filter) {
             var arr = [];
             for (var i = 0; i < this._elements.length; i++) {
                 try {
@@ -9789,8 +9722,8 @@ var networkcube;
                 }
             }
             return arr;
-        };
-        GraphElementQuery.prototype.generic_selected = function () {
+        }
+        generic_selected() {
             var arr = [];
             for (var i = 0; i < this._elements.length; i++) {
                 if (this.g.get(this.elementType, this._elements[i]).isSelected()) {
@@ -9798,8 +9731,8 @@ var networkcube;
                 }
             }
             return arr;
-        };
-        GraphElementQuery.prototype.generic_visible = function () {
+        }
+        generic_visible() {
             var arr = [];
             for (var i = 0; i < this._elements.length; i++) {
                 if (this.g.get(this.elementType, this._elements[i]).isVisible()) {
@@ -9807,8 +9740,8 @@ var networkcube;
                 }
             }
             return arr;
-        };
-        GraphElementQuery.prototype.generic_highlighted = function () {
+        }
+        generic_highlighted() {
             var arr = [];
             for (var i = 0; i < this._elements.length; i++) {
                 if (this.g.get(this.elementType, this._elements[i]).isHighlighted()) {
@@ -9816,8 +9749,8 @@ var networkcube;
                 }
             }
             return arr;
-        };
-        GraphElementQuery.prototype.generic_presentIn = function (start, end) {
+        }
+        generic_presentIn(start, end) {
             var arr = [];
             for (var i = 0; i < this._elements.length; i++) {
                 if (this.g.get(this.elementType, this._elements[i]).presentIn(start, end)) {
@@ -9825,20 +9758,19 @@ var networkcube;
                 }
             }
             return arr;
-        };
-        GraphElementQuery.prototype.generic_sort = function (attrName, asc) {
-            var _this = this;
+        }
+        generic_sort(attrName, asc) {
             if (this._elements.length == 0) {
                 return this;
             }
             var array = this._elements.slice(0);
-            array.sort(function (e1, e2) {
-                return networkcube.attributeSort(_this.g.get(_this.elementType, e1), _this.g.get(_this.elementType, e2), attrName, asc);
+            array.sort((e1, e2) => {
+                return networkcube.attributeSort(this.g.get(this.elementType, e1), this.g.get(this.elementType, e2), attrName, asc);
             });
             this._elements = array;
             return this;
-        };
-        GraphElementQuery.prototype.generic_removeDuplicates = function () {
+        }
+        generic_removeDuplicates() {
             var uniqueElements = [];
             for (var i = 0; i < this._elements.length; i++) {
                 if (uniqueElements.indexOf(this._elements[i]) == -1)
@@ -9846,84 +9778,81 @@ var networkcube;
             }
             this._elements = uniqueElements;
             return this;
-        };
-        return GraphElementQuery;
-    }(Query));
+        }
+    }
     networkcube.GraphElementQuery = GraphElementQuery;
-    var NodeQuery = (function (_super) {
-        __extends(NodeQuery, _super);
-        function NodeQuery(elements, g) {
-            var _this = _super.call(this, elements, g) || this;
-            _this.elementType = 'node';
+    class NodeQuery extends GraphElementQuery {
+        constructor(elements, g) {
+            super(elements, g);
+            this.elementType = 'node';
             if (elements.length > 0 && elements[0] instanceof networkcube.Node) {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i].id());
+                    this._elements.push(elements[i].id());
                 }
             }
             else if (elements.length > 0 && typeof elements[0] == 'number') {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i]);
+                    this._elements.push(elements[i]);
                 }
             }
-            _this.elementType = 'node';
-            return _this;
+            this.elementType = 'node';
         }
-        NodeQuery.prototype.contains = function (n) {
+        contains(n) {
             return this._elements.indexOf(n.id()) > -1;
-        };
-        NodeQuery.prototype.highlighted = function () {
-            return new NodeQuery(_super.prototype.generic_highlighted.call(this), this.g);
-        };
-        NodeQuery.prototype.visible = function () {
-            return new NodeQuery(_super.prototype.generic_visible.call(this), this.g);
-        };
-        NodeQuery.prototype.selected = function () {
-            return new NodeQuery(_super.prototype.generic_selected.call(this), this.g);
-        };
-        NodeQuery.prototype.filter = function (filter) {
-            return new NodeQuery(_super.prototype.generic_filter.call(this, filter), this.g);
-        };
-        NodeQuery.prototype.presentIn = function (t1, t2) {
-            return new NodeQuery(_super.prototype.generic_presentIn.call(this, t1, t2), this.g);
-        };
-        NodeQuery.prototype.sort = function (attributeName, asc) {
-            return _super.prototype.generic_sort.call(this, attributeName, asc);
-        };
-        NodeQuery.prototype.label = function () {
+        }
+        highlighted() {
+            return new NodeQuery(super.generic_highlighted(), this.g);
+        }
+        visible() {
+            return new NodeQuery(super.generic_visible(), this.g);
+        }
+        selected() {
+            return new NodeQuery(super.generic_selected(), this.g);
+        }
+        filter(filter) {
+            return new NodeQuery(super.generic_filter(filter), this.g);
+        }
+        presentIn(t1, t2) {
+            return new NodeQuery(super.generic_presentIn(t1, t2), this.g);
+        }
+        sort(attributeName, asc) {
+            return super.generic_sort(attributeName, asc);
+        }
+        label() {
             var q = new StringQuery();
             for (var i = 0; i < this._elements.length; i++) {
                 q.add('' + this.g.attr('label', this._elements[i], 'node'));
             }
             return q;
-        };
-        NodeQuery.prototype.neighbors = function (t1, t2) {
+        }
+        neighbors(t1, t2) {
             return new NodeQuery(getBulkAttributes('neighbors', this._elements, 'node', this.g, t1, t2), this.g);
-        };
-        NodeQuery.prototype.links = function (t1, t2) {
+        }
+        links(t1, t2) {
             return new LinkQuery(getBulkAttributes('links', this._elements, 'node', this.g, t1, t2), this.g);
-        };
-        NodeQuery.prototype.locations = function (t1, t2) {
+        }
+        locations(t1, t2) {
             return new LocationQuery(getBulkAttributes('locations', this._elements, 'node', this.g, t1, t2), this.g);
-        };
-        NodeQuery.prototype.nodeTypes = function () {
+        }
+        nodeTypes() {
             var q = new StringQuery();
             for (var i = 0; i < this._elements.length; i++) {
                 q.add(this.g.attr('nodeType', this._elements[i], 'node'));
             }
             return q;
-        };
-        NodeQuery.prototype.get = function (i) { return this.g._nodes[this._elements[i]]; };
-        NodeQuery.prototype.last = function () { return this.g._nodes[this._elements[this._elements.length - 1]]; };
-        NodeQuery.prototype.toArray = function () {
+        }
+        get(i) { return this.g._nodes[this._elements[i]]; }
+        last() { return this.g._nodes[this._elements[this._elements.length - 1]]; }
+        toArray() {
             var a = [];
             for (var i = 0; i < this._elements.length; i++) {
                 a.push(this.g._nodes[this._elements[i]]);
             }
             return a;
-        };
-        NodeQuery.prototype.createAttribute = function (attrName, f) {
+        }
+        createAttribute(attrName, f) {
             if (this.g.nodeArrays[attrName] == undefined) {
                 this.g.nodeArrays[attrName] = [];
                 for (var i = 0; i < this.g._nodes.length; i++) {
@@ -9934,79 +9863,76 @@ var networkcube;
                 this.g.nodeArrays[attrName][this._elements[i]] = f(this.g._nodes[this._elements[i]]);
             }
             return this;
-        };
-        NodeQuery.prototype.intersection = function (q) {
+        }
+        intersection(q) {
             return new NodeQuery(this.generic_intersection(q)._elements, this.g);
-        };
-        NodeQuery.prototype.removeDuplicates = function () {
+        }
+        removeDuplicates() {
             return new NodeQuery(this.generic_removeDuplicates()._elements, this.g);
-        };
-        NodeQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this.g.node(this._elements[i]), i);
             }
             return this;
-        };
-        return NodeQuery;
-    }(GraphElementQuery));
+        }
+    }
     networkcube.NodeQuery = NodeQuery;
-    var LinkQuery = (function (_super) {
-        __extends(LinkQuery, _super);
-        function LinkQuery(elements, g) {
-            var _this = _super.call(this, elements, g) || this;
-            _this.elementType = 'link';
+    class LinkQuery extends GraphElementQuery {
+        constructor(elements, g) {
+            super(elements, g);
+            this.elementType = 'link';
             if (elements.length > 0 && elements[0] instanceof networkcube.Link) {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i].id());
+                    this._elements.push(elements[i].id());
                 }
             }
             if (elements.length > 0 && typeof elements[0] == 'number') {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i]);
+                    this._elements.push(elements[i]);
                 }
             }
-            return _this;
         }
-        LinkQuery.prototype.contains = function (l) {
+        contains(l) {
             return this._elements.indexOf(l.id()) > -1;
-        };
-        LinkQuery.prototype.highlighted = function () {
-            return new LinkQuery(_super.prototype.generic_highlighted.call(this), this.g);
-        };
-        LinkQuery.prototype.visible = function () {
-            return new LinkQuery(_super.prototype.generic_visible.call(this), this.g);
-        };
-        LinkQuery.prototype.selected = function () {
-            return new LinkQuery(_super.prototype.generic_selected.call(this), this.g);
-        };
-        LinkQuery.prototype.filter = function (filter) {
-            return new LinkQuery(_super.prototype.generic_filter.call(this, filter), this.g);
-        };
-        LinkQuery.prototype.presentIn = function (t1, t2) {
-            return new LinkQuery(_super.prototype.generic_presentIn.call(this, t1, t2), this.g);
-        };
-        LinkQuery.prototype.sort = function (attributeName) {
-            return _super.prototype.generic_sort.call(this, attributeName);
-        };
-        LinkQuery.prototype.get = function (i) { return this.g._links[this._elements[i]]; };
-        LinkQuery.prototype.last = function () { return this.g._links[this._elements[this._elements.length - 1]]; };
-        LinkQuery.prototype.toArray = function () {
+        }
+        highlighted() {
+            return new LinkQuery(super.generic_highlighted(), this.g);
+        }
+        visible() {
+            return new LinkQuery(super.generic_visible(), this.g);
+        }
+        selected() {
+            return new LinkQuery(super.generic_selected(), this.g);
+        }
+        filter(filter) {
+            return new LinkQuery(super.generic_filter(filter), this.g);
+        }
+        presentIn(t1, t2) {
+            return new LinkQuery(super.generic_presentIn(t1, t2), this.g);
+        }
+        sort(attributeName) {
+            return super.generic_sort(attributeName);
+        }
+        get(i) { return this.g._links[this._elements[i]]; }
+        last() { return this.g._links[this._elements[this._elements.length - 1]]; }
+        toArray() {
             var a = [];
             for (var i = 0; i < this._elements.length; i++) {
                 a.push(this.g._links[this._elements[i]]);
             }
             return a;
-        };
-        LinkQuery.prototype.weights = function (start, end) {
+        }
+        weights(start, end) {
             var s = new NumberQuery();
             for (var i = 0; i < this._elements.length; i++) {
                 s.addAll(this.g.link(i).weights(start, end).toArray());
             }
             return s;
-        };
-        LinkQuery.prototype.createAttribute = function (attrName, f) {
+        }
+        createAttribute(attrName, f) {
             if (this.g.linkArrays[attrName] == undefined) {
                 this.g.linkArrays[attrName] = [];
                 for (var i = 0; i < this.g._links.length; i++) {
@@ -10017,8 +9943,8 @@ var networkcube;
                 this.g.linkArrays[attrName][this._elements[i]] = f(this.g._links[this._elements[i]]);
             }
             return this;
-        };
-        LinkQuery.prototype.linkTypes = function () {
+        }
+        linkTypes() {
             var linkTypes = [];
             var s;
             for (var i = 0; i < this._elements.length; i++) {
@@ -10027,8 +9953,8 @@ var networkcube;
                     linkTypes.push(s);
             }
             return linkTypes;
-        };
-        LinkQuery.prototype.sources = function () {
+        }
+        sources() {
             var nodes = [];
             var link;
             for (var i = 0; i < this._elements.length; i++) {
@@ -10037,8 +9963,8 @@ var networkcube;
                     nodes.push(link.source.id());
             }
             return new NodeQuery(nodes, this.g);
-        };
-        LinkQuery.prototype.targets = function () {
+        }
+        targets() {
             var nodes = [];
             var link;
             for (var i = 0; i < this._elements.length; i++) {
@@ -10047,73 +9973,70 @@ var networkcube;
                     nodes.push(link.target.id());
             }
             return new NodeQuery(nodes, this.g);
-        };
-        LinkQuery.prototype.intersection = function (q) {
+        }
+        intersection(q) {
             return new LinkQuery(this.generic_intersection(q)._elements, this.g);
-        };
-        LinkQuery.prototype.removeDuplicates = function () {
+        }
+        removeDuplicates() {
             return new LinkQuery(this.generic_removeDuplicates()._elements, this.g);
-        };
-        LinkQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this.g.link(this._elements[i]), i);
             }
             return this;
-        };
-        return LinkQuery;
-    }(GraphElementQuery));
+        }
+    }
     networkcube.LinkQuery = LinkQuery;
-    var NodePairQuery = (function (_super) {
-        __extends(NodePairQuery, _super);
-        function NodePairQuery(elements, g) {
-            var _this = _super.call(this, elements, g) || this;
-            _this.elementType = 'nodePair';
-            _this.elementType = 'nodePair';
+    class NodePairQuery extends GraphElementQuery {
+        constructor(elements, g) {
+            super(elements, g);
+            this.elementType = 'nodePair';
+            this.elementType = 'nodePair';
             if (elements.length > 0 && elements[0] instanceof networkcube.NodePair) {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i].id());
+                    this._elements.push(elements[i].id());
                 }
             }
             if (elements.length > 0 && typeof elements[0] == 'number') {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i]);
+                    this._elements.push(elements[i]);
                 }
             }
-            return _this;
         }
-        NodePairQuery.prototype.contains = function (n) {
+        contains(n) {
             return this._elements.indexOf(n.id()) > -1;
-        };
-        NodePairQuery.prototype.highlighted = function () {
-            return new NodePairQuery(_super.prototype.generic_highlighted.call(this), this.g);
-        };
-        NodePairQuery.prototype.visible = function () {
-            return new NodePairQuery(_super.prototype.generic_visible.call(this), this.g);
-        };
-        NodePairQuery.prototype.selected = function () {
-            return new NodePairQuery(_super.prototype.generic_selected.call(this), this.g);
-        };
-        NodePairQuery.prototype.filter = function (filter) {
-            return new NodePairQuery(_super.prototype.generic_filter.call(this, filter), this.g);
-        };
-        NodePairQuery.prototype.presentIn = function (t1, t2) {
-            return new NodePairQuery(_super.prototype.generic_presentIn.call(this, t1, t2), this.g);
-        };
-        NodePairQuery.prototype.sort = function (attributeName) {
-            return _super.prototype.generic_sort.call(this, attributeName);
-        };
-        NodePairQuery.prototype.get = function (i) { return this.g._nodePairs[this._elements[i]]; };
-        NodePairQuery.prototype.last = function () { return this.g._links[this._elements[this._elements.length - 1]]; };
-        NodePairQuery.prototype.toArray = function () {
+        }
+        highlighted() {
+            return new NodePairQuery(super.generic_highlighted(), this.g);
+        }
+        visible() {
+            return new NodePairQuery(super.generic_visible(), this.g);
+        }
+        selected() {
+            return new NodePairQuery(super.generic_selected(), this.g);
+        }
+        filter(filter) {
+            return new NodePairQuery(super.generic_filter(filter), this.g);
+        }
+        presentIn(t1, t2) {
+            return new NodePairQuery(super.generic_presentIn(t1, t2), this.g);
+        }
+        sort(attributeName) {
+            return super.generic_sort(attributeName);
+        }
+        get(i) { return this.g._nodePairs[this._elements[i]]; }
+        last() { return this.g._links[this._elements[this._elements.length - 1]]; }
+        toArray() {
             var a = [];
             for (var i = 0; i < this._elements.length; i++) {
                 a.push(this.g._nodePairs[this._elements[i]]);
             }
             return a;
-        };
-        NodePairQuery.prototype.createAttribute = function (attrName, f) {
+        }
+        createAttribute(attrName, f) {
             if (this.g.nodePairArrays[attrName] == undefined) {
                 this.g.nodePairArrays[attrName] = [];
                 for (var i = 0; i < this.g._nodePairs.length; i++) {
@@ -10124,81 +10047,78 @@ var networkcube;
                 this.g.nodePairArrays[attrName][this._elements[i]] = f(this.g._nodePairs[this._elements[i]]);
             }
             return this;
-        };
-        NodePairQuery.prototype.intersection = function (q) {
+        }
+        intersection(q) {
             return new NodePairQuery(this.generic_intersection(q)._elements, this.g);
-        };
-        NodePairQuery.prototype.removeDuplicates = function () {
+        }
+        removeDuplicates() {
             return new NodePairQuery(this.generic_removeDuplicates()._elements, this.g);
-        };
-        NodePairQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this.g.nodePair(this._elements[i]), i);
             }
             return this;
-        };
-        return NodePairQuery;
-    }(GraphElementQuery));
+        }
+    }
     networkcube.NodePairQuery = NodePairQuery;
-    var TimeQuery = (function (_super) {
-        __extends(TimeQuery, _super);
-        function TimeQuery(elements, g) {
-            var _this = _super.call(this, elements, g) || this;
-            _this.elementType = 'time';
-            _this.elementType = 'time';
+    class TimeQuery extends GraphElementQuery {
+        constructor(elements, g) {
+            super(elements, g);
+            this.elementType = 'time';
+            this.elementType = 'time';
             if (elements.length > 0 && elements[0] instanceof networkcube.Time) {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i].id());
+                    this._elements.push(elements[i].id());
                 }
             }
             if (elements.length > 0 && typeof elements[0] == 'number') {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i]);
+                    this._elements.push(elements[i]);
                 }
             }
-            return _this;
         }
-        TimeQuery.prototype.contains = function (t) {
+        contains(t) {
             return this._elements.indexOf(t.id()) > -1;
-        };
-        TimeQuery.prototype.highlighted = function () {
-            return new TimeQuery(_super.prototype.generic_highlighted.call(this), this.g);
-        };
-        TimeQuery.prototype.visible = function () {
-            return new TimeQuery(_super.prototype.generic_visible.call(this), this.g);
-        };
-        TimeQuery.prototype.selected = function () {
-            return new TimeQuery(_super.prototype.generic_selected.call(this), this.g);
-        };
-        TimeQuery.prototype.filter = function (filter) {
-            return new TimeQuery(_super.prototype.generic_filter.call(this, filter), this.g);
-        };
-        TimeQuery.prototype.presentIn = function (t1, t2) {
-            return new TimeQuery(_super.prototype.generic_presentIn.call(this, t1, t2), this.g);
-        };
-        TimeQuery.prototype.sort = function (attributeName) {
-            return _super.prototype.generic_sort.call(this, attributeName);
-        };
-        TimeQuery.prototype.links = function () {
+        }
+        highlighted() {
+            return new TimeQuery(super.generic_highlighted(), this.g);
+        }
+        visible() {
+            return new TimeQuery(super.generic_visible(), this.g);
+        }
+        selected() {
+            return new TimeQuery(super.generic_selected(), this.g);
+        }
+        filter(filter) {
+            return new TimeQuery(super.generic_filter(filter), this.g);
+        }
+        presentIn(t1, t2) {
+            return new TimeQuery(super.generic_presentIn(t1, t2), this.g);
+        }
+        sort(attributeName) {
+            return super.generic_sort(attributeName);
+        }
+        links() {
             var links = [];
             for (var i = 0; i < this._elements.length; i++) {
                 links = links.concat(this.g.attr('links', this._elements[i], 'time'));
             }
             return new LinkQuery(links, this.g);
-        };
-        TimeQuery.prototype.get = function (i) { return this.g._times[this._elements[i]]; };
-        TimeQuery.prototype.last = function () { return this.g._times[this._elements[this._elements.length - 1]]; };
-        TimeQuery.prototype.toArray = function () {
+        }
+        get(i) { return this.g._times[this._elements[i]]; }
+        last() { return this.g._times[this._elements[this._elements.length - 1]]; }
+        toArray() {
             var a = [];
             var allTimes = this.g._times;
             for (var i = 0; i < this._elements.length; i++) {
                 a.push(allTimes[this._elements[i]]);
             }
             return a;
-        };
-        TimeQuery.prototype.createAttribute = function (attrName, f) {
+        }
+        createAttribute(attrName, f) {
             if (this.g.timeArrays[attrName] == undefined) {
                 this.g.timeArrays[attrName] = [];
                 for (var i = 0; i < this.g._times.length; i++) {
@@ -10209,77 +10129,74 @@ var networkcube;
                 this.g.timeArrays[attrName][this._elements[i]] = f(this.g._times[this._elements[i]]);
             }
             return this;
-        };
-        TimeQuery.prototype.unixTimes = function () {
+        }
+        unixTimes() {
             var unixTimes = [];
             for (var i = 0; i < this._elements.length; i++) {
                 unixTimes.push(this.g.time(this._elements[i]).unixTime());
             }
             return unixTimes;
-        };
-        TimeQuery.prototype.intersection = function (q) {
+        }
+        intersection(q) {
             return new TimeQuery(this.generic_intersection(q)._elements, this.g);
-        };
-        TimeQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this.g.time(this._elements[i]), i);
             }
             return this;
-        };
-        return TimeQuery;
-    }(GraphElementQuery));
+        }
+    }
     networkcube.TimeQuery = TimeQuery;
-    var LocationQuery = (function (_super) {
-        __extends(LocationQuery, _super);
-        function LocationQuery(elements, g) {
-            var _this = _super.call(this, elements, g) || this;
-            _this.elementType = 'location';
-            _this.elementType = 'location';
+    class LocationQuery extends GraphElementQuery {
+        constructor(elements, g) {
+            super(elements, g);
+            this.elementType = 'location';
+            this.elementType = 'location';
             if (elements.length > 0 && elements[0] instanceof networkcube.Location) {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements = elements[i].id();
+                    this._elements = elements[i].id();
                 }
             }
             if (elements.length > 0 && typeof elements[0] == 'number') {
-                _this._elements = [];
+                this._elements = [];
                 for (var i = 0; i < elements.length; i++) {
-                    _this._elements.push(elements[i]);
+                    this._elements.push(elements[i]);
                 }
             }
-            return _this;
         }
-        LocationQuery.prototype.contains = function (l) {
+        contains(l) {
             return this._elements.indexOf(l.id()) > -1;
-        };
-        LocationQuery.prototype.highlighted = function () {
-            return new LocationQuery(_super.prototype.generic_highlighted.call(this), this.g);
-        };
-        LocationQuery.prototype.visible = function () {
-            return new LocationQuery(_super.prototype.generic_visible.call(this), this.g);
-        };
-        LocationQuery.prototype.selected = function () {
-            return new LocationQuery(_super.prototype.generic_selected.call(this), this.g);
-        };
-        LocationQuery.prototype.filter = function (filter) {
-            return new LocationQuery(_super.prototype.generic_filter.call(this, filter), this.g);
-        };
-        LocationQuery.prototype.presentIn = function (t1, t2) {
-            return new LocationQuery(_super.prototype.generic_presentIn.call(this, t1, t2), this.g);
-        };
-        LocationQuery.prototype.sort = function (attributeName) {
-            return _super.prototype.generic_sort.call(this, attributeName);
-        };
-        LocationQuery.prototype.get = function (i) { return this.g._locations[this._elements[i]]; };
-        LocationQuery.prototype.last = function () { return this.g._locations[this._elements[this._elements.length - 1]]; };
-        LocationQuery.prototype.toArray = function () {
+        }
+        highlighted() {
+            return new LocationQuery(super.generic_highlighted(), this.g);
+        }
+        visible() {
+            return new LocationQuery(super.generic_visible(), this.g);
+        }
+        selected() {
+            return new LocationQuery(super.generic_selected(), this.g);
+        }
+        filter(filter) {
+            return new LocationQuery(super.generic_filter(filter), this.g);
+        }
+        presentIn(t1, t2) {
+            return new LocationQuery(super.generic_presentIn(t1, t2), this.g);
+        }
+        sort(attributeName) {
+            return super.generic_sort(attributeName);
+        }
+        get(i) { return this.g._locations[this._elements[i]]; }
+        last() { return this.g._locations[this._elements[this._elements.length - 1]]; }
+        toArray() {
             var a = [];
             for (var i = 0; i < this._elements.length; i++) {
                 a.push(this.g._locations[this._elements[i]]);
             }
             return a;
-        };
-        LocationQuery.prototype.createAttribute = function (attrName, f) {
+        }
+        createAttribute(attrName, f) {
             if (this.g.locationArrays[attrName] == undefined) {
                 this.g.locationArrays[attrName] = [];
                 for (var i = 0; i < this.g._locations.length; i++) {
@@ -10290,21 +10207,20 @@ var networkcube;
                 this.g.locationArrays[attrName][this._elements[i]] = f(this.g._locations[this._elements[i]]);
             }
             return this;
-        };
-        LocationQuery.prototype.intersection = function (q) {
+        }
+        intersection(q) {
             return new LocationQuery(this.generic_intersection(q)._elements, this.g);
-        };
-        LocationQuery.prototype.removeDuplicates = function () {
+        }
+        removeDuplicates() {
             return new LocationQuery(this.generic_removeDuplicates()._elements, this.g);
-        };
-        LocationQuery.prototype.forEach = function (f) {
+        }
+        forEach(f) {
             for (var i = 0; i < this._elements.length; i++) {
                 f(this.g.location(this._elements[i]), i);
             }
             return this;
-        };
-        return LocationQuery;
-    }(GraphElementQuery));
+        }
+    }
     networkcube.LocationQuery = LocationQuery;
     function getBulkAttributes(attrName, ids, type, g, t1, t2) {
         var a = [];
@@ -10331,39 +10247,36 @@ var networkcube;
         }
         return a;
     }
-    var Motif = (function () {
-        function Motif(nodes, links) {
+    class Motif {
+        constructor(nodes, links) {
             this.nodes = [];
             this.links = [];
             this.times = [];
             this.nodes = nodes.slice(0);
             this.links = links.slice(0);
         }
-        Motif.prototype.print = function () {
+        print() {
             console.log('nodes:', this.nodes.length, 'links:', this.links.length);
-        };
-        return Motif;
-    }());
+        }
+    }
     networkcube.Motif = Motif;
-    var MotifTemplate = (function () {
-        function MotifTemplate(nodes, links) {
+    class MotifTemplate {
+        constructor(nodes, links) {
             this.nodes = [];
             this.links = [];
             this.nodes = nodes.slice(0);
             this.links = links.slice(0);
         }
-        return MotifTemplate;
-    }());
+    }
     networkcube.MotifTemplate = MotifTemplate;
-    var MotifSequence = (function () {
-        function MotifSequence() {
+    class MotifSequence {
+        constructor() {
             this.motifs = [];
         }
-        MotifSequence.prototype.push = function (m) {
+        push(m) {
             this.motifs.push(m);
-        };
-        return MotifSequence;
-    }());
+        }
+    }
     networkcube.MotifSequence = MotifSequence;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -10389,8 +10302,8 @@ var networkcube;
         return value;
     }
     networkcube.dgraphReplacer = dgraphReplacer;
-    var DynamicGraph = (function () {
-        function DynamicGraph() {
+    class DynamicGraph {
+        constructor() {
             this.BOOKMARK_COLORS = d3.scale.category10();
             this.selectionColor_pointer = 0;
             this.minWeight = 10000000;
@@ -10434,7 +10347,7 @@ var networkcube;
             this.nodeTypeArrays_NAME = "nodeTypeArrays_NAME";
             this.locationArrays_NAME = "locationArrays_NAME";
         }
-        DynamicGraph.prototype.attr = function (field, id, type) {
+        attr(field, id, type) {
             var r;
             try {
                 r = this.attributeArrays[type][field][id];
@@ -10443,8 +10356,8 @@ var networkcube;
                 r = undefined;
             }
             return r;
-        };
-        DynamicGraph.prototype.standardArrayReplacer = function (key, value) {
+        }
+        standardArrayReplacer(key, value) {
             if (value instanceof DynamicGraph) {
                 console.log("standardReplacer found a DynamicGraph property", key);
                 return networkcube.DGRAPH_SUB;
@@ -10452,16 +10365,16 @@ var networkcube;
             else if (key == 'selections')
                 return undefined;
             return value;
-        };
-        DynamicGraph.timeReviver = function (k, v, s) {
+        }
+        static timeReviver(k, v, s) {
             if (k == '') {
                 return networkcube.copyPropsShallow(v, new networkcube.Time(v.id, s));
             }
             else {
                 return dgraphReviver(s, k, v);
             }
-        };
-        DynamicGraph.nodeArrayReviver = function (k, v, s) {
+        }
+        static nodeArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new NodeArray());
@@ -10478,8 +10391,8 @@ var networkcube;
                 default:
                     return v;
             }
-        };
-        DynamicGraph.linkArrayReviver = function (k, v, s) {
+        }
+        static linkArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new LinkArray());
@@ -10488,16 +10401,16 @@ var networkcube;
                 default:
                     return v;
             }
-        };
-        DynamicGraph.nodePairArrayReviver = function (k, v, s) {
+        }
+        static nodePairArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new NodePairArray());
                 default:
                     return v;
             }
-        };
-        DynamicGraph.timeArrayReviver = function (k, v, s) {
+        }
+        static timeArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new TimeArray());
@@ -10507,32 +10420,32 @@ var networkcube;
                 default:
                     return v;
             }
-        };
-        DynamicGraph.linkTypeArrayReviver = function (k, v, s) {
+        }
+        static linkTypeArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new LinkTypeArray());
                 default:
                     return v;
             }
-        };
-        DynamicGraph.nodeTypeArrayReviver = function (k, v, s) {
+        }
+        static nodeTypeArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new NodeTypeArray());
                 default:
                     return v;
             }
-        };
-        DynamicGraph.locationArrayReviver = function (k, v, s) {
+        }
+        static locationArrayReviver(k, v, s) {
             switch (k) {
                 case '':
                     return networkcube.copyPropsShallow(v, new LocationArray());
                 default:
                     return v;
             }
-        };
-        DynamicGraph.prototype.loadDynamicGraph = function (dataMgr, dataSetName) {
+        }
+        loadDynamicGraph(dataMgr, dataSetName) {
             this.clearSelections();
             this.name = dataSetName;
             var thisGraph = this;
@@ -10578,8 +10491,8 @@ var networkcube;
             };
             this.createGraphObjects(true, true);
             this.createSelections(true);
-        };
-        DynamicGraph.prototype.saveDynamicGraph = function (dataMgr) {
+        }
+        saveDynamicGraph(dataMgr) {
             dataMgr.saveToStorage(this.name, this.gran_min_NAME, this.gran_min);
             dataMgr.saveToStorage(this.name, this.gran_max_NAME, this.gran_max);
             dataMgr.saveToStorage(this.name, this.minWeight_NAME, this.minWeight);
@@ -10592,8 +10505,8 @@ var networkcube;
             dataMgr.saveToStorage(this.name, this.linkTypeArrays_NAME, this.linkTypeArrays, this.standardArrayReplacer);
             dataMgr.saveToStorage(this.name, this.nodeTypeArrays_NAME, this.nodeTypeArrays, this.standardArrayReplacer);
             dataMgr.saveToStorage(this.name, this.locationArrays_NAME, this.locationArrays, this.standardArrayReplacer);
-        };
-        DynamicGraph.prototype.debugCompareTo = function (other) {
+        }
+        debugCompareTo(other) {
             var result = true;
             if (this.name != other.name) {
                 console.log("name different");
@@ -10693,8 +10606,8 @@ var networkcube;
                 result = false;
             }
             return result;
-        };
-        DynamicGraph.prototype.initDynamicGraph = function (data) {
+        }
+        initDynamicGraph(data) {
             this.clearSelections();
             console.log('[dynamicgraph.ts] Create dynamic graph for ', data.name, data);
             this.name = data.name;
@@ -11032,8 +10945,8 @@ var networkcube;
             console.log('>>>this.nodeArrays["neighbors"][0]', this.nodeArrays['neighbors'][0]);
             this.createGraphObjects(true, true);
             this.createSelections(false);
-        };
-        DynamicGraph.prototype.createSelections = function (shouldCreateArrays) {
+        }
+        createSelections(shouldCreateArrays) {
             if (shouldCreateArrays) {
                 if (!('nodeArrays' in this && this.nodeArrays)) {
                     this.nodeArrays = new NodeArray();
@@ -11123,8 +11036,8 @@ var networkcube;
             if (linkSelections.length == 1)
                 linkSelections[0].color = '#444';
             this.currentSelection_id = 0;
-        };
-        DynamicGraph.prototype.createGraphObjects = function (shouldCreateTimes, shouldCreateLinkTypes) {
+        }
+        createGraphObjects(shouldCreateTimes, shouldCreateLinkTypes) {
             console.log('[DynamicNetwork:createGraph()] >>> ');
             var d = Date.now();
             if (this.locationArrays && 'id' in this.locationArrays) {
@@ -11170,30 +11083,22 @@ var networkcube;
                     this._times.push(new networkcube.Time(i, this));
             }
             console.log('[DynamicNetwork:getGraph()] <<< ', Date.now() - d, 'msec');
-        };
-        DynamicGraph.prototype.nodeAttr = function (attr, id) {
+        }
+        nodeAttr(attr, id) {
             return this.attr(attr, id, 'node');
-        };
-        DynamicGraph.prototype.linkAttr = function (attr, id) {
+        }
+        linkAttr(attr, id) {
             return this.attr(attr, id, 'link');
-        };
-        DynamicGraph.prototype.pairAttr = function (attr, id) {
+        }
+        pairAttr(attr, id) {
             return this.attr(attr, id, 'nodePair');
-        };
-        DynamicGraph.prototype.timeAttr = function (attr, id) {
+        }
+        timeAttr(attr, id) {
             return this.attr(attr, id, 'time');
-        };
-        Object.defineProperty(DynamicGraph.prototype, "startTime", {
-            get: function () { return this._times[0]; },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(DynamicGraph.prototype, "endTime", {
-            get: function () { return this._times[this._times.length - 1]; },
-            enumerable: true,
-            configurable: true
-        });
-        DynamicGraph.prototype.highlight = function (action, idCompound) {
+        }
+        get startTime() { return this._times[0]; }
+        get endTime() { return this._times[this._times.length - 1]; }
+        highlight(action, idCompound) {
             if (action == 'reset') {
                 this.highlightArrays.nodeIds = [];
                 this.highlightArrays.linkIds = [];
@@ -11227,8 +11132,8 @@ var networkcube;
                     }
                 }
             }
-        };
-        DynamicGraph.prototype.selection = function (action, idCompound, selectionId) {
+        }
+        selection(action, idCompound, selectionId) {
             if (selectionId == undefined)
                 selectionId = this.currentSelection_id;
             var selection = this.getSelection(selectionId);
@@ -11242,19 +11147,19 @@ var networkcube;
                 this.selection('add', idCompound, selectionId);
             }
             else if (action == 'add') {
-                idCompound.linkIds.forEach(function (v, i, arr) { return self.addToSelectionByTypeAndId(selection, 'link', v); });
-                idCompound.nodeIds.forEach(function (v, i, arr) { return self.addToSelectionByTypeAndId(selection, 'node', v); });
-                idCompound.timeIds.forEach(function (v, i, arr) { return self.addToSelectionByTypeAndId(selection, 'time', v); });
-                idCompound.nodePairIds.forEach(function (v, i, arr) { return self.addToSelectionByTypeAndId(selection, 'nodePair', v); });
+                idCompound.linkIds.forEach((v, i, arr) => self.addToSelectionByTypeAndId(selection, 'link', v));
+                idCompound.nodeIds.forEach((v, i, arr) => self.addToSelectionByTypeAndId(selection, 'node', v));
+                idCompound.timeIds.forEach((v, i, arr) => self.addToSelectionByTypeAndId(selection, 'time', v));
+                idCompound.nodePairIds.forEach((v, i, arr) => self.addToSelectionByTypeAndId(selection, 'nodePair', v));
             }
             else if (action == 'remove') {
-                idCompound.linkIds.forEach(function (v, i, arr) { return self.removeFromSelectionByTypeAndId(selection, 'link', v); });
-                idCompound.nodeIds.forEach(function (v, i, arr) { return self.removeFromSelectionByTypeAndId(selection, 'node', v); });
-                idCompound.timeIds.forEach(function (v, i, arr) { return self.removeFromSelectionByTypeAndId(selection, 'time', v); });
-                idCompound.nodePairIds.forEach(function (v, i, arr) { return self.removeFromSelectionByTypeAndId(selection, 'nodePair', v); });
+                idCompound.linkIds.forEach((v, i, arr) => self.removeFromSelectionByTypeAndId(selection, 'link', v));
+                idCompound.nodeIds.forEach((v, i, arr) => self.removeFromSelectionByTypeAndId(selection, 'node', v));
+                idCompound.timeIds.forEach((v, i, arr) => self.removeFromSelectionByTypeAndId(selection, 'time', v));
+                idCompound.nodePairIds.forEach((v, i, arr) => self.removeFromSelectionByTypeAndId(selection, 'nodePair', v));
             }
-        };
-        DynamicGraph.prototype.addToAttributeArraysSelection = function (selection, type, id) {
+        }
+        addToAttributeArraysSelection(selection, type, id) {
             var elementSelections = this.attributeArrays[type].selections[id];
             for (var i = 0; i < elementSelections.length; i++) {
                 if (elementSelections[i].priority > selection.priority) {
@@ -11263,18 +11168,18 @@ var networkcube;
                 }
             }
             this.attributeArrays[type].selections[id].push(selection);
-        };
-        DynamicGraph.prototype.removeFromAttributeArraysSelection = function (selection, type, id) {
+        }
+        removeFromAttributeArraysSelection(selection, type, id) {
             var arr = this.attributeArrays[type].selections[id];
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i] == selection)
                     this.attributeArrays[type].selections[id].splice(i, 1);
             }
-        };
-        DynamicGraph.prototype.addElementToSelection = function (selection, e) {
+        }
+        addElementToSelection(selection, e) {
             this.addToSelectionByTypeAndId(selection, e.type, e.id());
-        };
-        DynamicGraph.prototype.addToSelectionByTypeAndId = function (selection, type, id) {
+        }
+        addToSelectionByTypeAndId(selection, type, id) {
             if (type != selection.acceptedType) {
                 console.log('attempting to put object of the wrong type into a selection');
                 return;
@@ -11296,11 +11201,11 @@ var networkcube;
                     this.defaultLinkSelection.elementIds.splice(i, 1);
                 }
             }
-        };
-        DynamicGraph.prototype.removeElementFromSelection = function (selection, e) {
+        }
+        removeElementFromSelection(selection, e) {
             this.removeFromSelectionByTypeAndId(selection, e.type, e.id());
-        };
-        DynamicGraph.prototype.removeFromSelectionByTypeAndId = function (selection, type, id) {
+        }
+        removeFromSelectionByTypeAndId(selection, type, id) {
             var i = selection.elementIds.indexOf(id);
             if (i == -1)
                 return;
@@ -11316,58 +11221,58 @@ var networkcube;
                     this.addToAttributeArraysSelection(this.defaultLinkSelection, type, id);
                 }
             }
-        };
-        DynamicGraph.prototype.getSelectionsByTypeAndId = function (type, id) {
+        }
+        getSelectionsByTypeAndId(type, id) {
             return this.attributeArrays[type].selections[id];
-        };
-        DynamicGraph.prototype.filterSelection = function (selectionId, filter) {
+        }
+        filterSelection(selectionId, filter) {
             this.getSelection(selectionId).filter = filter;
-        };
-        DynamicGraph.prototype.isFiltered = function (id, type) {
+        }
+        isFiltered(id, type) {
             return this.attributeArrays[type + 's'].filter;
-        };
-        DynamicGraph.prototype.isHighlighted = function (id, type) {
+        }
+        isHighlighted(id, type) {
             return this.highlightArrays[type + 'Ids'].indexOf(id) > -1;
-        };
-        DynamicGraph.prototype.getHighlightedIds = function (type) {
+        }
+        getHighlightedIds(type) {
             return this.highlightArrays[type + 'Ids'];
-        };
-        DynamicGraph.prototype.setCurrentSelection = function (id) {
+        }
+        setCurrentSelection(id) {
             console.log('[DynamicGraph] setCurrentSelectionId ', id);
             this.currentSelection_id = id;
-        };
-        DynamicGraph.prototype.getCurrentSelection = function () {
+        }
+        getCurrentSelection() {
             return this.getSelection(this.currentSelection_id);
-        };
-        DynamicGraph.prototype.addSelection = function (id, color, acceptedType, priority) {
+        }
+        addSelection(id, color, acceptedType, priority) {
             var s = this.createSelection(acceptedType);
             s.id = id;
             s.color = color;
             s.priority = priority;
-        };
-        DynamicGraph.prototype.createSelection = function (type) {
+        }
+        createSelection(type) {
             var s = new Selection(this.selections.length, type);
             s.color = this.BOOKMARK_COLORS(this.selectionColor_pointer % 10);
             this.selectionColor_pointer++;
             this.selections.push(s);
             return s;
-        };
-        DynamicGraph.prototype.deleteSelection = function (selectionId) {
+        }
+        deleteSelection(selectionId) {
             var s = this.getSelection(selectionId);
             var idCompound = new networkcube.IDCompound();
             idCompound[s.acceptedType + 'Ids'] = s.elementIds.slice(0);
             console.log('Delete selection->remove elemeents', s.elementIds.slice(0));
             this.selection('remove', idCompound, s.id);
             this.selections.splice(this.selections.indexOf(s), 1);
-        };
-        DynamicGraph.prototype.setSelectionColor = function (id, color) {
+        }
+        setSelectionColor(id, color) {
             var s = this.getSelection(id);
             if (!s) {
                 return;
             }
             s.color = color;
-        };
-        DynamicGraph.prototype.getSelections = function (type) {
+        }
+        getSelections(type) {
             var selections = [];
             if (type) {
                 for (var i = 0; i < this.selections.length; i++) {
@@ -11379,18 +11284,18 @@ var networkcube;
             else {
                 return this.selections;
             }
-        };
-        DynamicGraph.prototype.getSelection = function (id) {
+        }
+        getSelection(id) {
             for (var i = 0; i < this.selections.length; i++) {
                 if (id == this.selections[i].id)
                     return this.selections[i];
             }
             console.error('[DynamicGraph] No selection with id ', id, 'found!');
-        };
-        DynamicGraph.prototype.clearSelections = function () {
+        }
+        clearSelections() {
             this.selections = [];
-        };
-        DynamicGraph.prototype.getTimeIdForUnixTime = function (unixTime) {
+        }
+        getTimeIdForUnixTime(unixTime) {
             var timeId;
             for (timeId = 0; timeId < this.timeArrays.length; timeId++) {
                 if (unixTime == this.timeArrays.unixTime[timeId]) {
@@ -11400,8 +11305,8 @@ var networkcube;
             }
             console.error('Time object for unix time', unixTime, 'not found!');
             return undefined;
-        };
-        DynamicGraph.prototype.addNodeOrdering = function (name, order) {
+        }
+        addNodeOrdering(name, order) {
             for (var i = 0; i < this.nodeOrders.length; i++) {
                 if (this.nodeOrders[i].name == name) {
                     console.error('Ordering', name, 'already exists');
@@ -11410,8 +11315,8 @@ var networkcube;
             }
             var o = new Ordering(name, order);
             this.nodeOrders.push(o);
-        };
-        DynamicGraph.prototype.setNodeOrdering = function (name, order) {
+        }
+        setNodeOrdering(name, order) {
             for (var i = 0; i < this.nodeOrders.length; i++) {
                 if (this.nodeOrders[i].name == name) {
                     this.nodeOrders[i].order = order;
@@ -11419,15 +11324,15 @@ var networkcube;
                 }
             }
             console.error('Ordering', name, 'does not exist');
-        };
-        DynamicGraph.prototype.removeNodeOrdering = function (name, order) {
+        }
+        removeNodeOrdering(name, order) {
             for (var i = 0; i < this.nodeOrders.length; i++) {
                 if (this.nodeOrders[i].name == name) {
                     this.nodeOrders.splice(i, 1);
                 }
             }
-        };
-        DynamicGraph.prototype.getNodeOrder = function (name) {
+        }
+        getNodeOrder(name) {
             for (var i = 0; i < this.nodeOrders.length; i++) {
                 if (this.nodeOrders[i].name == name) {
                     return this.nodeOrders[i];
@@ -11435,31 +11340,31 @@ var networkcube;
             }
             console.error('Ordering', name, 'not found!');
             return;
-        };
-        DynamicGraph.prototype.nodes = function () {
+        }
+        nodes() {
             return new networkcube.NodeQuery(this.nodeArrays.id, this);
-        };
-        DynamicGraph.prototype.links = function () {
+        }
+        links() {
             return new networkcube.LinkQuery(this.linkArrays.id, this);
-        };
-        DynamicGraph.prototype.times = function () {
+        }
+        times() {
             return new networkcube.TimeQuery(this.timeArrays.id, this);
-        };
-        DynamicGraph.prototype.locations = function () {
+        }
+        locations() {
             return new networkcube.LocationQuery(this.locationArrays.id, this);
-        };
-        DynamicGraph.prototype.nodePairs = function () {
+        }
+        nodePairs() {
             return new networkcube.NodePairQuery(this.nodePairArrays.id, this);
-        };
-        DynamicGraph.prototype.linksBetween = function (n1, n2) {
+        }
+        linksBetween(n1, n2) {
             var nodePairId = this.matrix[n1.id()][n2.id()];
             if (nodePairId == undefined)
                 nodePairId = this.matrix[n2.id()][n1.id()];
             if (nodePairId == undefined)
                 return new networkcube.LinkQuery([], this);
             return new networkcube.LinkQuery(this.nodePair(nodePairId).links().toArray(), this);
-        };
-        DynamicGraph.prototype.get = function (type, id) {
+        }
+        get(type, id) {
             if (type.indexOf('nodePair') > -1)
                 return this.nodePair(id);
             if (type.indexOf('node') > -1)
@@ -11470,8 +11375,8 @@ var networkcube;
                 return this.time(id);
             if (type.indexOf('locations') > -1)
                 return this.location(id);
-        };
-        DynamicGraph.prototype.getAll = function (type) {
+        }
+        getAll(type) {
             if (type == 'nodes')
                 return this.nodes();
             if (type == 'links')
@@ -11482,44 +11387,43 @@ var networkcube;
                 return this.nodePairs();
             if (type == 'locations')
                 return this.locations();
-        };
-        DynamicGraph.prototype.node = function (id) {
+        }
+        node(id) {
             for (var i = 0; i < this._nodes.length; i++) {
                 if (this._nodes[i].id() == id)
                     return this._nodes[i];
             }
-        };
-        DynamicGraph.prototype.link = function (id) {
+        }
+        link(id) {
             for (var i = 0; i < this._links.length; i++) {
                 if (this._links[i].id() == id)
                     return this._links[i];
             }
-        };
-        DynamicGraph.prototype.time = function (id) {
+        }
+        time(id) {
             for (var i = 0; i < this._times.length; i++) {
                 if (this._times[i].id() == id)
                     return this._times[i];
             }
-        };
-        DynamicGraph.prototype.location = function (id) {
+        }
+        location(id) {
             for (var i = 0; i < this._locations.length; i++) {
                 if (this._locations[i].id() == id)
                     return this._locations[i];
             }
-        };
-        DynamicGraph.prototype.nodePair = function (id) {
+        }
+        nodePair(id) {
             for (var i = 0; i < this._nodePairs.length; i++) {
                 if (this._nodePairs[i].id() == id)
                     return this._nodePairs[i];
             }
-        };
-        DynamicGraph.prototype.getMinGranularity = function () { return this.gran_min; };
-        DynamicGraph.prototype.getMaxGranularity = function () { return this.gran_max; };
-        return DynamicGraph;
-    }());
+        }
+        getMinGranularity() { return this.gran_min; }
+        getMaxGranularity() { return this.gran_max; }
+    }
     networkcube.DynamicGraph = DynamicGraph;
-    var Selection = (function () {
-        function Selection(id, acceptedType) {
+    class Selection {
+        constructor(id, acceptedType) {
             this.showColor = true;
             this.filter = false;
             this.priority = 0;
@@ -11529,172 +11433,142 @@ var networkcube;
             this.acceptedType = acceptedType;
             this.priority = id;
         }
-        Selection.prototype.acceptsType = function (type) {
+        acceptsType(type) {
             return this.acceptedType == type;
-        };
-        return Selection;
-    }());
+        }
+    }
     networkcube.Selection = Selection;
-    var AttributeArray = (function () {
-        function AttributeArray() {
+    class AttributeArray {
+        constructor() {
             this.id = [];
         }
-        Object.defineProperty(AttributeArray.prototype, "length", {
-            get: function () {
-                return this.id.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return AttributeArray;
-    }());
+        get length() {
+            return this.id.length;
+        }
+    }
     networkcube.AttributeArray = AttributeArray;
-    var NodeArray = (function (_super) {
-        __extends(NodeArray, _super);
-        function NodeArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.id = [];
-            _this.label = [];
-            _this.outLinks = [];
-            _this.inLinks = [];
-            _this.links = [];
-            _this.outNeighbors = [];
-            _this.inNeighbors = [];
-            _this.neighbors = [];
-            _this.selections = [];
-            _this.attributes = [];
-            _this.locations = [];
-            _this.filter = [];
-            _this.nodeType = [];
-            return _this;
+    class NodeArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.id = [];
+            this.label = [];
+            this.outLinks = [];
+            this.inLinks = [];
+            this.links = [];
+            this.outNeighbors = [];
+            this.inNeighbors = [];
+            this.neighbors = [];
+            this.selections = [];
+            this.attributes = [];
+            this.locations = [];
+            this.filter = [];
+            this.nodeType = [];
         }
-        return NodeArray;
-    }(AttributeArray));
+    }
     networkcube.NodeArray = NodeArray;
-    var LinkArray = (function (_super) {
-        __extends(LinkArray, _super);
-        function LinkArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.source = [];
-            _this.target = [];
-            _this.linkType = [];
-            _this.directed = [];
-            _this.nodePair = [];
-            _this.presence = [];
-            _this.weights = [];
-            _this.selections = [];
-            _this.filter = [];
-            _this.attributes = new Object;
-            return _this;
+    class LinkArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.source = [];
+            this.target = [];
+            this.linkType = [];
+            this.directed = [];
+            this.nodePair = [];
+            this.presence = [];
+            this.weights = [];
+            this.selections = [];
+            this.filter = [];
+            this.attributes = new Object;
         }
-        return LinkArray;
-    }(AttributeArray));
+    }
     networkcube.LinkArray = LinkArray;
-    var NodePairArray = (function (_super) {
-        __extends(NodePairArray, _super);
-        function NodePairArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.source = [];
-            _this.target = [];
-            _this.links = [];
-            _this.selections = [];
-            _this.filter = [];
-            return _this;
+    class NodePairArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.source = [];
+            this.target = [];
+            this.links = [];
+            this.selections = [];
+            this.filter = [];
         }
-        return NodePairArray;
-    }(AttributeArray));
+    }
     networkcube.NodePairArray = NodePairArray;
-    var TimeArray = (function (_super) {
-        __extends(TimeArray, _super);
-        function TimeArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.id = [];
-            _this.momentTime = [];
-            _this.label = [];
-            _this.unixTime = [];
-            _this.selections = [];
-            _this.filter = [];
-            _this.links = [];
-            return _this;
+    class TimeArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.id = [];
+            this.momentTime = [];
+            this.label = [];
+            this.unixTime = [];
+            this.selections = [];
+            this.filter = [];
+            this.links = [];
         }
-        return TimeArray;
-    }(AttributeArray));
+    }
     networkcube.TimeArray = TimeArray;
-    var LinkTypeArray = (function (_super) {
-        __extends(LinkTypeArray, _super);
-        function LinkTypeArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.name = [];
-            _this.count = [];
-            _this.color = [];
-            _this.filter = [];
-            return _this;
+    class LinkTypeArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.name = [];
+            this.count = [];
+            this.color = [];
+            this.filter = [];
         }
-        return LinkTypeArray;
-    }(AttributeArray));
+    }
     networkcube.LinkTypeArray = LinkTypeArray;
-    var NodeTypeArray = (function (_super) {
-        __extends(NodeTypeArray, _super);
-        function NodeTypeArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.name = [];
-            _this.count = [];
-            _this.color = [];
-            _this.filter = [];
-            return _this;
+    class NodeTypeArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.name = [];
+            this.count = [];
+            this.color = [];
+            this.filter = [];
         }
-        return NodeTypeArray;
-    }(AttributeArray));
+    }
     networkcube.NodeTypeArray = NodeTypeArray;
-    var LocationArray = (function (_super) {
-        __extends(LocationArray, _super);
-        function LocationArray() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.id = [];
-            _this.label = [];
-            _this.longitude = [];
-            _this.latitude = [];
-            _this.x = [];
-            _this.y = [];
-            _this.z = [];
-            _this.radius = [];
-            return _this;
+    class LocationArray extends AttributeArray {
+        constructor(...args) {
+            super(...args);
+            this.id = [];
+            this.label = [];
+            this.longitude = [];
+            this.latitude = [];
+            this.x = [];
+            this.y = [];
+            this.z = [];
+            this.radius = [];
         }
-        return LocationArray;
-    }(AttributeArray));
+    }
     networkcube.LocationArray = LocationArray;
-    var LinkType = (function () {
-        function LinkType(id, name, color) {
+    class LinkType {
+        constructor(id, name, color) {
             this.id = id;
             this.name = name;
             this.color = color;
         }
-        return LinkType;
-    }());
+    }
     networkcube.LinkType = LinkType;
-    var NodeType = (function () {
-        function NodeType(id, name, color) {
+    class NodeType {
+        constructor(id, name, color) {
             this.id = id;
             this.name = name;
             this.color = color;
         }
-        return NodeType;
-    }());
+    }
     networkcube.NodeType = NodeType;
-    var Ordering = (function () {
-        function Ordering(name, order) {
+    class Ordering {
+        constructor(name, order) {
             this.order = [];
             this.name = name;
             this.order = order;
         }
-        return Ordering;
-    }());
+    }
     networkcube.Ordering = Ordering;
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
-    var DataManager = (function () {
-        function DataManager(options) {
+    class DataManager {
+        constructor(options) {
             this.keepOnlyOneSession = false;
             this.sessionDataPrefix = "ncubesession";
             this.SEP = "_";
@@ -11706,10 +11580,10 @@ var networkcube;
                 this.keepOnlyOneSession = false;
             }
         }
-        DataManager.prototype.setOptions = function (options) {
+        setOptions(options) {
             this.keepOnlyOneSession = options.keepOnlyOneSession;
-        };
-        DataManager.prototype.clearSessionData = function (session) {
+        }
+        clearSessionData(session) {
             var searchPrefix = this.sessionDataPrefix + this.SEP + session;
             var keysToClear = [];
             console.log('clearSessionData');
@@ -11725,11 +11599,11 @@ var networkcube;
                 console.log('remove from storage', key);
                 localStorage.removeItem(key);
             }
-        };
-        DataManager.prototype.clearAllSessionData = function () {
+        }
+        clearAllSessionData() {
             this.clearSessionData('');
-        };
-        DataManager.prototype.isSessionCached = function (session, dataSetName) {
+        }
+        isSessionCached(session, dataSetName) {
             var prefix = this.sessionDataPrefix + this.SEP + session + this.SEP + dataSetName;
             var firstSessionKey = null;
             for (var i = 0; i < localStorage.length; i++) {
@@ -11739,8 +11613,8 @@ var networkcube;
                 }
             }
             return false;
-        };
-        DataManager.prototype.importData = function (session, data) {
+        }
+        importData(session, data) {
             this.session = session;
             console.log('import data set', data.name, data);
             if (!data.nodeTable && !data.linkTable) {
@@ -11788,8 +11662,8 @@ var networkcube;
             else {
                 console.log('data is not well-schematized, so not caching dynamicGraph');
             }
-        };
-        DataManager.prototype.saveToStorage = function (dataName, valueName, value, replacer) {
+        }
+        saveToStorage(dataName, valueName, value, replacer) {
             if (value == undefined) {
                 console.log('attempting to save undefined value. aborting', dataName, valueName);
                 return;
@@ -11804,8 +11678,8 @@ var networkcube;
                 + this.session
                 + this.SEP + dataName
                 + this.SEP + valueName] = stringToSave;
-        };
-        DataManager.prototype.getFromStorage = function (dataName, valueName, reviver, state) {
+        }
+        getFromStorage(dataName, valueName, reviver, state) {
             console.assert(this.session && this.session != '');
             var statefulReviver;
             if (reviver)
@@ -11829,22 +11703,22 @@ var networkcube;
             else {
                 return undefined;
             }
-        };
-        DataManager.prototype.removeFromStorage = function (dataName, valueName) {
+        }
+        removeFromStorage(dataName, valueName) {
             localStorage.removeItem(this.sessionDataPrefix
                 + this.SEP + this.session
                 + this.SEP + dataName
                 + this.SEP + valueName);
-        };
-        DataManager.prototype.getGraph = function (session, dataname) {
+        }
+        getGraph(session, dataname) {
             this.session = session;
             if (!this.dynamicGraph || this.dynamicGraph.name != dataname) {
                 this.dynamicGraph = new networkcube.DynamicGraph();
                 this.dynamicGraph.loadDynamicGraph(this, dataname);
             }
             return this.dynamicGraph;
-        };
-        DataManager.prototype.isSchemaWellDefined = function (data) {
+        }
+        isSchemaWellDefined(data) {
             console.log('isSchemaWellDefined');
             if (data.locationTable && !networkcube.isValidIndex(data.locationSchema.id))
                 return false;
@@ -11856,9 +11730,8 @@ var networkcube;
                     && networkcube.isValidIndex(data.linkSchema.target)))
                 return false;
             return true;
-        };
-        return DataManager;
-    }());
+        }
+    }
     networkcube.DataManager = DataManager;
     function getDefaultNodeSchema() {
         return new NodeSchema(0);
@@ -11872,8 +11745,8 @@ var networkcube;
         return new LocationSchema(0, 1, 2, 3, 4, 5, 6, 7, 8);
     }
     networkcube.getDefaultLocationSchema = getDefaultLocationSchema;
-    var DataSet = (function () {
-        function DataSet(params) {
+    class DataSet {
+        constructor(params) {
             this.locationTable = [];
             this.selections = [];
             this.name = params.name;
@@ -11895,72 +11768,61 @@ var networkcube;
                 this.locationSchema = params.locationSchema;
             console.log('[n3] data set created', this);
         }
-        return DataSet;
-    }());
+    }
     networkcube.DataSet = DataSet;
-    var TableSchema = (function () {
-        function TableSchema(name) {
+    class TableSchema {
+        constructor(name) {
             this.name = name;
         }
-        return TableSchema;
-    }());
+    }
     networkcube.TableSchema = TableSchema;
-    var NodeSchema = (function (_super) {
-        __extends(NodeSchema, _super);
-        function NodeSchema(id) {
-            var _this = _super.call(this, 'nodeSchema') || this;
-            _this.id = id;
-            return _this;
+    class NodeSchema extends TableSchema {
+        constructor(id) {
+            super('nodeSchema');
+            this.id = id;
         }
-        return NodeSchema;
-    }(TableSchema));
+    }
     networkcube.NodeSchema = NodeSchema;
-    var LinkSchema = (function (_super) {
-        __extends(LinkSchema, _super);
-        function LinkSchema(id, source, target) {
-            var _this = _super.call(this, 'linkSchema') || this;
-            _this.linkType = -1;
-            _this.directed = -1;
-            _this.time = -1;
-            _this.source = source;
-            _this.target = target;
-            _this.id = id;
-            return _this;
+    class LinkSchema extends TableSchema {
+        constructor(id, source, target) {
+            super('linkSchema');
+            this.linkType = -1;
+            this.directed = -1;
+            this.time = -1;
+            this.source = source;
+            this.target = target;
+            this.id = id;
         }
-        return LinkSchema;
-    }(TableSchema));
+    }
     networkcube.LinkSchema = LinkSchema;
-    var LocationSchema = (function (_super) {
-        __extends(LocationSchema, _super);
-        function LocationSchema(id, label, geoname, longitude, latitude, x, y, z, radius) {
-            var _this = _super.call(this, 'locationSchema') || this;
-            _this.geoname = -1;
-            _this.longitude = -1;
-            _this.latitude = -1;
-            _this.x = -1;
-            _this.y = -1;
-            _this.z = -1;
-            _this.radius = -1;
-            _this.id = id;
-            _this.label = label;
+    class LocationSchema extends TableSchema {
+        constructor(id, label, geoname, longitude, latitude, x, y, z, radius) {
+            super('locationSchema');
+            this.geoname = -1;
+            this.longitude = -1;
+            this.latitude = -1;
+            this.x = -1;
+            this.y = -1;
+            this.z = -1;
+            this.radius = -1;
+            this.id = id;
+            this.label = label;
             if (networkcube.isValidIndex(geoname))
-                _this.geoname = geoname;
+                this.geoname = geoname;
             if (networkcube.isValidIndex(longitude))
-                _this.longitude = longitude;
+                this.longitude = longitude;
             if (networkcube.isValidIndex(latitude))
-                _this.latitude = latitude;
+                this.latitude = latitude;
             if (networkcube.isValidIndex(x))
-                _this.x = x;
+                this.x = x;
             if (networkcube.isValidIndex(y))
-                _this.y = y;
+                this.y = y;
             if (networkcube.isValidIndex(z))
-                _this.z = z;
+                this.z = z;
             if (networkcube.isValidIndex(radius))
-                _this.radius = radius;
-            return _this;
+                this.radius = radius;
         }
-        return LocationSchema;
-    }(TableSchema));
+    }
     networkcube.LocationSchema = LocationSchema;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -12243,7 +12105,7 @@ var networkcube;
 var networkcube;
 (function (networkcube) {
     function loadDyson(url, callback) {
-        d3.json(url, function (data) {
+        d3.json(url, (data) => {
             var nodeTable = [];
             var nodeSchema = { id: 0, label: 1 };
             var nodes = data.nodes;
@@ -12284,7 +12146,7 @@ var networkcube;
             console.error('[n3] Link Schema does not have -target- attribute. Import aborted.');
             return;
         }
-        $.get(url, function (linkData) {
+        $.get(url, (linkData) => {
             var linkData = Papa.parse(linkData, {}).data;
             var nodeTable = [];
             var names = [];
@@ -12362,7 +12224,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        d3.xml(url, "application/xml", function (data) {
+        d3.xml(url, "application/xml", (data) => {
             console.log('data:', data);
             var nodes = data.documentElement.getElementsByTagName("node");
             var nodeTable = [];
@@ -12404,7 +12266,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        d3.json(url, function (data) {
+        d3.json(url, (data) => {
             if (!data)
                 return;
             var links = data.links;
@@ -12528,7 +12390,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        d3.json(url, function (data) {
+        d3.json(url, (data) => {
             console.log('data:', data);
             if (!data)
                 return;
@@ -12585,7 +12447,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        d3.json(url, function (data) {
+        d3.json(url, (data) => {
             var nodeTable = [];
             var linkTable = [];
             var nodeSchema = new networkcube.NodeSchema(0);
@@ -12630,7 +12492,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        $.get(url, function (data) {
+        $.get(url, (data) => {
             var lines = data.split('\n');
             var nodeTable = [];
             var nodeSchema = { id: 0, label: 1 };
@@ -12689,7 +12551,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        $.get(url, function (data) {
+        $.get(url, (data) => {
             var lines = data.split('\n');
             var nodeTable = [];
             var nodeSchema = { id: 0, label: 1 };
@@ -12759,7 +12621,7 @@ var networkcube;
         var linkSchema = { id: 0, source: 1, target: 2 };
         var line;
         var s, t;
-        $.get(url, function (data) {
+        $.get(url, (data) => {
             data = data.split('\n');
             var line;
             var currPersonId;
@@ -12831,7 +12693,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        $.get(url, function (data) {
+        $.get(url, (data) => {
             var lines = data.split('\n');
             var nodeTable = [];
             var nodeSchema = { id: 0, label: 1 };
@@ -12903,7 +12765,7 @@ var networkcube;
         var url = url;
         var dataset;
         var callBack = callBack;
-        $.get(url, function (data) {
+        $.get(url, (data) => {
             var lines = data.split('\n');
             var nodeTable = [];
             var nodeSchema = { id: 0, label: 1 };
@@ -12980,34 +12842,27 @@ var networkcube;
             term = terms[i].trim();
             console.log('search term', term);
             if (!type || type == 'node')
-                result.nodeIds = result.nodeIds.concat(dgraph.nodes().filter(function (e) {
-                    return e.label().toLowerCase().indexOf(term) > -1
-                        || e.nodeType().toLowerCase().indexOf(term) > -1;
-                }).ids());
+                result.nodeIds = result.nodeIds.concat(dgraph.nodes().filter((e) => e.label().toLowerCase().indexOf(term) > -1
+                    || e.nodeType().toLowerCase().indexOf(term) > -1).ids());
             if (!type || type == 'link')
-                result.linkIds = result.linkIds.concat(dgraph.links().filter(function (e) {
-                    return e.source.label().toLowerCase().indexOf(term) > -1
-                        || e.target.label().toLowerCase().indexOf(term) > -1
-                        || e.linkType().indexOf(term) > -1;
-                }).ids());
+                result.linkIds = result.linkIds.concat(dgraph.links().filter((e) => e.source.label().toLowerCase().indexOf(term) > -1
+                    || e.target.label().toLowerCase().indexOf(term) > -1
+                    || e.linkType().indexOf(term) > -1).ids());
             if (!type || type == 'locations')
-                result.locationIds = result.locationIds.concat(dgraph.locations().filter(function (e) {
-                    return e.label().toLowerCase().indexOf(term) > -1;
-                }).ids());
+                result.locationIds = result.locationIds.concat(dgraph.locations().filter((e) => e.label().toLowerCase().indexOf(term) > -1).ids());
         }
         return result;
     }
     networkcube.searchForTerm = searchForTerm;
-    var StringContainsFilter = (function () {
-        function StringContainsFilter(pattern) {
+    class StringContainsFilter {
+        constructor(pattern) {
             this.pattern = pattern;
         }
-        StringContainsFilter.prototype.test = function (word) {
+        test(word) {
             console.log('contains:', word, this.pattern);
             return word.indexOf(this.pattern) > -1;
-        };
-        return StringContainsFilter;
-    }());
+        }
+    }
 })(networkcube || (networkcube = {}));
 var networkcube;
 (function (networkcube) {
@@ -13037,11 +12892,8 @@ var networkcube;
         networkcube.MESSAGE_SELECTION_COLORING
     ];
     var messageHandlers = [];
-    var MessageHandler = (function () {
-        function MessageHandler() {
-        }
-        return MessageHandler;
-    }());
+    class MessageHandler {
+    }
     var messageHandler = new MessageHandler();
     var previousMessageId = -1;
     function addEventListener(messageType, handler) {
@@ -13056,13 +12908,12 @@ var networkcube;
     }
     networkcube.setDefaultEventListener = setDefaultEventListener;
     window.addEventListener('storage', receiveMessage, false);
-    var Message = (function () {
-        function Message(type) {
+    class Message {
+        constructor(type) {
             this.id = Math.random();
             this.type = type;
         }
-        return Message;
-    }());
+    }
     networkcube.Message = Message;
     function sendMessage(type, body) {
         var m = new Message(type);
@@ -13099,16 +12950,13 @@ var networkcube;
         }
     }
     networkcube.highlight = highlight;
-    var HighlightMessage = (function (_super) {
-        __extends(HighlightMessage, _super);
-        function HighlightMessage(action, idCompound) {
-            var _this = _super.call(this, networkcube.MESSAGE_HIGHLIGHT) || this;
-            _this.action = action;
-            _this.idCompound = idCompound;
-            return _this;
+    class HighlightMessage extends Message {
+        constructor(action, idCompound) {
+            super(networkcube.MESSAGE_HIGHLIGHT);
+            this.action = action;
+            this.idCompound = idCompound;
         }
-        return HighlightMessage;
-    }(Message));
+    }
     networkcube.HighlightMessage = HighlightMessage;
     function selection(action, compound, selectionId) {
         var g = networkcube.getDynamicGraph();
@@ -13121,17 +12969,14 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.selection = selection;
-    var SelectionMessage = (function (_super) {
-        __extends(SelectionMessage, _super);
-        function SelectionMessage(action, idCompound, selectionId) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION) || this;
-            _this.action = action;
-            _this.idCompound = idCompound;
-            _this.selectionId = selectionId;
-            return _this;
+    class SelectionMessage extends Message {
+        constructor(action, idCompound, selectionId) {
+            super(networkcube.MESSAGE_SELECTION);
+            this.action = action;
+            this.idCompound = idCompound;
+            this.selectionId = selectionId;
         }
-        return SelectionMessage;
-    }(Message));
+    }
     networkcube.SelectionMessage = SelectionMessage;
     function timeRange(startUnix, endUnix, single, propagate) {
         var m = new TimeRangeMessage(startUnix, endUnix);
@@ -13144,16 +12989,13 @@ var networkcube;
             processMessage(m);
     }
     networkcube.timeRange = timeRange;
-    var TimeRangeMessage = (function (_super) {
-        __extends(TimeRangeMessage, _super);
-        function TimeRangeMessage(start, end) {
-            var _this = _super.call(this, networkcube.MESSAGE_TIME_RANGE) || this;
-            _this.startUnix = start;
-            _this.endUnix = end;
-            return _this;
+    class TimeRangeMessage extends Message {
+        constructor(start, end) {
+            super(networkcube.MESSAGE_TIME_RANGE);
+            this.startUnix = start;
+            this.endUnix = end;
         }
-        return TimeRangeMessage;
-    }(Message));
+    }
     networkcube.TimeRangeMessage = TimeRangeMessage;
     function createSelection(type, name) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_CREATE);
@@ -13165,15 +13007,12 @@ var networkcube;
         return b;
     }
     networkcube.createSelection = createSelection;
-    var CreateSelectionMessage = (function (_super) {
-        __extends(CreateSelectionMessage, _super);
-        function CreateSelectionMessage(b) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_CREATE) || this;
-            _this.selection = b;
-            return _this;
+    class CreateSelectionMessage extends Message {
+        constructor(b) {
+            super(networkcube.MESSAGE_SELECTION_CREATE);
+            this.selection = b;
         }
-        return CreateSelectionMessage;
-    }(Message));
+    }
     networkcube.CreateSelectionMessage = CreateSelectionMessage;
     function setCurrentSelection(b) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_SET_CURRENT);
@@ -13182,15 +13021,12 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.setCurrentSelection = setCurrentSelection;
-    var SetCurrentSelectionIdMessage = (function (_super) {
-        __extends(SetCurrentSelectionIdMessage, _super);
-        function SetCurrentSelectionIdMessage(b) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_SET_CURRENT) || this;
-            _this.selectionId = b.id;
-            return _this;
+    class SetCurrentSelectionIdMessage extends Message {
+        constructor(b) {
+            super(networkcube.MESSAGE_SELECTION_SET_CURRENT);
+            this.selectionId = b.id;
         }
-        return SetCurrentSelectionIdMessage;
-    }(Message));
+    }
     networkcube.SetCurrentSelectionIdMessage = SetCurrentSelectionIdMessage;
     function showSelectionColor(selection, showColor) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_SET_COLORING_VISIBILITY);
@@ -13198,16 +13034,13 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.showSelectionColor = showSelectionColor;
-    var ShowSelectionColorMessage = (function (_super) {
-        __extends(ShowSelectionColorMessage, _super);
-        function ShowSelectionColorMessage(selection, showColor) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_SET_COLORING_VISIBILITY) || this;
-            _this.selectionId = selection.id;
-            _this.showColor = showColor;
-            return _this;
+    class ShowSelectionColorMessage extends Message {
+        constructor(selection, showColor) {
+            super(networkcube.MESSAGE_SELECTION_SET_COLORING_VISIBILITY);
+            this.selectionId = selection.id;
+            this.showColor = showColor;
         }
-        return ShowSelectionColorMessage;
-    }(Message));
+    }
     networkcube.ShowSelectionColorMessage = ShowSelectionColorMessage;
     function filterSelection(selection, filter) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_FILTER);
@@ -13215,16 +13048,13 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.filterSelection = filterSelection;
-    var FilterSelectionMessage = (function (_super) {
-        __extends(FilterSelectionMessage, _super);
-        function FilterSelectionMessage(selection, filter) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_FILTER) || this;
-            _this.selectionId = selection.id;
-            _this.filter = filter;
-            return _this;
+    class FilterSelectionMessage extends Message {
+        constructor(selection, filter) {
+            super(networkcube.MESSAGE_SELECTION_FILTER);
+            this.selectionId = selection.id;
+            this.filter = filter;
         }
-        return FilterSelectionMessage;
-    }(Message));
+    }
     networkcube.FilterSelectionMessage = FilterSelectionMessage;
     function swapPriority(s1, s2) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_PRIORITY);
@@ -13232,18 +13062,15 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.swapPriority = swapPriority;
-    var SelectionPriorityMessage = (function (_super) {
-        __extends(SelectionPriorityMessage, _super);
-        function SelectionPriorityMessage(s1, s2, p1, p2) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_PRIORITY) || this;
-            _this.selectionId1 = s1.id;
-            _this.selectionId2 = s2.id;
-            _this.priority1 = p1;
-            _this.priority2 = p2;
-            return _this;
+    class SelectionPriorityMessage extends Message {
+        constructor(s1, s2, p1, p2) {
+            super(networkcube.MESSAGE_SELECTION_PRIORITY);
+            this.selectionId1 = s1.id;
+            this.selectionId2 = s2.id;
+            this.priority1 = p1;
+            this.priority2 = p2;
         }
-        return SelectionPriorityMessage;
-    }(Message));
+    }
     networkcube.SelectionPriorityMessage = SelectionPriorityMessage;
     function deleteSelection(selection) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_DELETE);
@@ -13251,47 +13078,38 @@ var networkcube;
         distributeMessage(m);
     }
     networkcube.deleteSelection = deleteSelection;
-    var DeleteSelectionMessage = (function (_super) {
-        __extends(DeleteSelectionMessage, _super);
-        function DeleteSelectionMessage(selection) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_DELETE) || this;
-            _this.selectionId = selection.id;
-            return _this;
+    class DeleteSelectionMessage extends Message {
+        constructor(selection) {
+            super(networkcube.MESSAGE_SELECTION_DELETE);
+            this.selectionId = selection.id;
         }
-        return DeleteSelectionMessage;
-    }(Message));
+    }
     networkcube.DeleteSelectionMessage = DeleteSelectionMessage;
     function setSelectionColor(s, color) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SELECTION_COLORING);
         distributeMessage(new SelectionColorMessage(s, color));
     }
     networkcube.setSelectionColor = setSelectionColor;
-    var SelectionColorMessage = (function (_super) {
-        __extends(SelectionColorMessage, _super);
-        function SelectionColorMessage(selection, color) {
-            var _this = _super.call(this, networkcube.MESSAGE_SELECTION_COLORING) || this;
-            _this.selectionId = selection.id;
-            _this.color = color;
-            return _this;
+    class SelectionColorMessage extends Message {
+        constructor(selection, color) {
+            super(networkcube.MESSAGE_SELECTION_COLORING);
+            this.selectionId = selection.id;
+            this.color = color;
         }
-        return SelectionColorMessage;
-    }(Message));
+    }
     function search(term, type) {
         trace.event(null, 'toolFunctionUse', networkcube.MESSAGE_SEARCH_RESULT, term);
         var idCompound = networkcube.searchForTerm(term, networkcube.getDynamicGraph(), type);
         distributeMessage(new SearchResultMessage(term, idCompound));
     }
     networkcube.search = search;
-    var SearchResultMessage = (function (_super) {
-        __extends(SearchResultMessage, _super);
-        function SearchResultMessage(searchTerm, idCompound) {
-            var _this = _super.call(this, networkcube.MESSAGE_SEARCH_RESULT) || this;
-            _this.idCompound = idCompound;
-            _this.searchTerm = searchTerm;
-            return _this;
+    class SearchResultMessage extends Message {
+        constructor(searchTerm, idCompound) {
+            super(networkcube.MESSAGE_SEARCH_RESULT);
+            this.idCompound = idCompound;
+            this.searchTerm = searchTerm;
         }
-        return SearchResultMessage;
-    }(Message));
+    }
     networkcube.SearchResultMessage = SearchResultMessage;
     var MESSAGE_KEY = 'networkcube_message';
     localStorage[MESSAGE_KEY] = undefined;
@@ -13428,11 +13246,8 @@ var networkcube;
         return order;
     }
     networkcube.orderNodes = orderNodes;
-    var OrderingConfiguration = (function () {
-        function OrderingConfiguration() {
-        }
-        return OrderingConfiguration;
-    }());
+    class OrderingConfiguration {
+    }
     networkcube.OrderingConfiguration = OrderingConfiguration;
 })(networkcube || (networkcube = {}));
 var networkcube;
@@ -13574,12 +13389,12 @@ var networkcube;
         return '?session=' + session + '&datasetName=' + dataName;
     }
     networkcube.getURLString = getURLString;
-    var OrderType;
     (function (OrderType) {
         OrderType[OrderType["Local"] = 0] = "Local";
         OrderType[OrderType["Global"] = 1] = "Global";
         OrderType[OrderType["Data"] = 2] = "Data";
-    })(OrderType = networkcube.OrderType || (networkcube.OrderType = {}));
+    })(networkcube.OrderType || (networkcube.OrderType = {}));
+    var OrderType = networkcube.OrderType;
     ;
     function isTrackingEnabled() {
         var value = localStorage.getItem("NETWORKCUBE_IS_TRACKING_ENABLED");
@@ -13710,9 +13525,7 @@ var glutils;
         }
     }
     glutils.updateBuffer = updateBuffer;
-    function createText(string, x, y, z, size, color, weight, align) {
-        if (weight === void 0) { weight = 'normal'; }
-        if (align === void 0) { align = 'left'; }
+    function createText(string, x, y, z, size, color, weight = 'normal', align = 'left') {
         var textGeom = new THREE.TextGeometry(string, {
             size: size,
             height: 1,
@@ -13740,24 +13553,24 @@ var glutils;
     }
     glutils.getMousePos = getMousePos;
     var txtCanvas = document.createElement("canvas");
-    var WebGL = (function () {
-        function WebGL(params) {
+    class WebGL {
+        constructor(params) {
             this.elementQueries = [];
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
         }
-        WebGL.prototype.render = function () {
+        render() {
             for (var i = 0; i < this.elementQueries.length; i++) {
                 if (this.elementQueries[i].updateAttributes || this.elementQueries[i].updateStyle) {
                     this.elementQueries[i].set();
                 }
             }
             this.renderer.render(this.scene, this.camera);
-        };
-        WebGL.prototype.selectAll = function () {
+        }
+        selectAll() {
             return glutils.selectAll();
-        };
-        WebGL.prototype.enableZoom = function (b) {
+        }
+        enableZoom(b) {
             if (b) {
                 window.addEventListener("mousewheel", mouseWheel, false);
                 function mouseWheel(event) {
@@ -13771,15 +13584,14 @@ var glutils;
             else {
                 window.addEventListener("mousewheel", mouseWheel, false);
             }
-        };
-        WebGL.prototype.enablePanning = function (b) {
+        }
+        enablePanning(b) {
             this.interactor.isPanEnabled = b;
-        };
-        WebGL.prototype.enableHorizontalPanning = function (b) {
+        }
+        enableHorizontalPanning(b) {
             this.interactor.isHorizontalPanEnabled = b;
-        };
-        return WebGL;
-    }());
+        }
+    }
     glutils.WebGL = WebGL;
     var webgl;
     function initWebGL(parentId, width, height, params) {
@@ -13816,8 +13628,8 @@ var glutils;
         return q;
     }
     glutils.selectAll = selectAll;
-    var WebGLElementQuery = (function () {
-        function WebGLElementQuery() {
+    class WebGLElementQuery {
+        constructor() {
             this.dataElements = [];
             this.visualElements = [];
             this.children = [];
@@ -13834,11 +13646,11 @@ var glutils;
             this.IS_SHADER = false;
             this.scene = webgl.scene;
         }
-        WebGLElementQuery.prototype.data = function (arr) {
+        data(arr) {
             this.dataElements = arr.slice(0);
             return this;
-        };
-        WebGLElementQuery.prototype.append = function (shape) {
+        }
+        append(shape) {
             var elements = [];
             switch (shape) {
                 case 'circle':
@@ -13871,25 +13683,21 @@ var glutils;
             this.shape = shape;
             this.visualElements = elements;
             return this;
-        };
-        WebGLElementQuery.prototype.push = function (e) {
+        }
+        push(e) {
             this.dataElements.push(e);
             return this;
-        };
-        WebGLElementQuery.prototype.getData = function (i) {
+        }
+        getData(i) {
             return this.dataElements[this.visualElements.indexOf(i)];
-        };
-        WebGLElementQuery.prototype.getVisual = function (i) {
+        }
+        getVisual(i) {
             return this.visualElements[this.dataElements.indexOf(i)];
-        };
-        Object.defineProperty(WebGLElementQuery.prototype, "length", {
-            get: function () {
-                return this.dataElements.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        WebGLElementQuery.prototype.filter = function (f) {
+        }
+        get length() {
+            return this.dataElements.length;
+        }
+        filter(f) {
             var arr = [];
             var visArr = [];
             for (var i = 0; i < this.dataElements.length; i++) {
@@ -13902,8 +13710,8 @@ var glutils;
                 .data(arr);
             q.visualElements = visArr;
             return q;
-        };
-        WebGLElementQuery.prototype.attr = function (name, v) {
+        }
+        attr(name, v) {
             var l = this.visualElements.length;
             if (this.IS_SHADER) {
                 for (var i = 0; i < this.dataElements.length; i++) {
@@ -13920,8 +13728,8 @@ var glutils;
             }
             this.updateAttributes = true;
             return this;
-        };
-        WebGLElementQuery.prototype.style = function (name, v) {
+        }
+        style(name, v) {
             var l = this.visualElements.length;
             if (this.IS_SHADER) {
                 name = name.replace('-', '');
@@ -13936,8 +13744,8 @@ var glutils;
             }
             this.updateStyle = true;
             return this;
-        };
-        WebGLElementQuery.prototype.set = function () {
+        }
+        set() {
             if (!this.IS_SHADER)
                 return this;
             var l = this.visualElements.length;
@@ -13959,8 +13767,8 @@ var glutils;
             this.updateAttributes = false;
             this.updateStyle = false;
             return this;
-        };
-        WebGLElementQuery.prototype.text = function (v) {
+        }
+        text(v) {
             var l = this.visualElements.length;
             for (var i = 0; i < l; i++) {
                 this.visualElements[i]['text'] = v instanceof Function ? v(this.dataElements[i], i) : v;
@@ -13969,8 +13777,8 @@ var glutils;
                 setText(this.visualElements[i], this.visualElements[i]['text']);
             }
             return this;
-        };
-        WebGLElementQuery.prototype.on = function (event, f) {
+        }
+        on(event, f) {
             switch (event) {
                 case 'mouseover':
                     this.mouseOverHandler = f;
@@ -13993,8 +13801,8 @@ var glutils;
             }
             webgl.interactor.register(this, event);
             return this;
-        };
-        WebGLElementQuery.prototype.call = function (method, dataElement, event) {
+        }
+        call(method, dataElement, event) {
             var i = this.dataElements.indexOf(dataElement);
             switch (method) {
                 case 'mouseover':
@@ -14017,8 +13825,8 @@ var glutils;
                     break;
             }
             return this;
-        };
-        WebGLElementQuery.prototype.setAttr = function (element, attr, v, index) {
+        }
+        setAttr(element, attr, v, index) {
             switch (attr) {
                 case 'x':
                     element.position.x = v;
@@ -14076,16 +13884,15 @@ var glutils;
             element.geometry.verticesNeedUpdate = true;
             element.geometry.elementsNeedUpdate = true;
             element.geometry.lineDistancesNeedUpdate = true;
-        };
-        WebGLElementQuery.prototype.removeAll = function () {
+        }
+        removeAll() {
             for (var i = 0; i < this.visualElements.length; i++) {
                 if (this.visualElements[i].wireframe)
                     this.scene.remove(this.visualElements[i].wireframe);
                 this.scene.remove(this.visualElements[i]);
             }
-        };
-        return WebGLElementQuery;
-    }());
+        }
+    }
     glutils.WebGLElementQuery = WebGLElementQuery;
     function setStyle(element, attr, v, query) {
         switch (attr) {
@@ -14177,13 +13984,12 @@ var glutils;
         }
         return visualElements;
     }
-    var GroupElement = (function () {
-        function GroupElement() {
+    class GroupElement {
+        constructor() {
             this.position = { x: 0, y: 0, z: 0 };
             this.children = [];
         }
-        return GroupElement;
-    }());
+    }
     function createCirclesNoShader(dataElements, scene) {
         var material;
         var geometry;
@@ -14346,9 +14152,8 @@ var glutils;
         mesh.geometry = new THREE.ShapeGeometry(shape);
         mesh.geometry.verticesNeedUpdate = true;
     }
-    var WebGLInteractor = (function () {
-        function WebGLInteractor(scene, canvas, camera) {
-            var _this = this;
+    class WebGLInteractor {
+        constructor(scene, canvas, camera) {
             this.mouse = [];
             this.mouseStart = [];
             this.mouseDown = false;
@@ -14370,20 +14175,20 @@ var glutils;
             this.canvas = canvas;
             this.camera = camera;
             this.mouse = [0, 0];
-            canvas.addEventListener('mousemove', function (e) {
-                _this.mouseMoveHandler(e);
+            canvas.addEventListener('mousemove', (e) => {
+                this.mouseMoveHandler(e);
             });
-            canvas.addEventListener('mousedown', function (e) {
-                _this.mouseDownHandler(e);
+            canvas.addEventListener('mousedown', (e) => {
+                this.mouseDownHandler(e);
             });
-            canvas.addEventListener('mouseup', function (e) {
-                _this.mouseUpHandler(e);
+            canvas.addEventListener('mouseup', (e) => {
+                this.mouseUpHandler(e);
             });
-            canvas.addEventListener('click', function (e) {
-                _this.clickHandler(e);
+            canvas.addEventListener('click', (e) => {
+                this.clickHandler(e);
             });
         }
-        WebGLInteractor.prototype.register = function (selection, method) {
+        register(selection, method) {
             switch (method) {
                 case 'mouseover':
                     this.mouseOverSelections.push(selection);
@@ -14404,16 +14209,16 @@ var glutils;
                     this.clickSelections.push(selection);
                     break;
             }
-        };
-        WebGLInteractor.prototype.addEventListener = function (eventName, f) {
+        }
+        addEventListener(eventName, f) {
             if (eventName == 'lassoStart')
                 this.lassoStartHandler = f;
             if (eventName == 'lassoEnd')
                 this.lassoEndHandler = f;
             if (eventName == 'lassoMove')
                 this.lassoMoveHandler = f;
-        };
-        WebGLInteractor.prototype.mouseMoveHandler = function (e) {
+        }
+        mouseMoveHandler(e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             if (this.isLassoEnabled && e.which == 2) {
                 this.lassoPoints.push(this.mouse);
@@ -14460,8 +14265,8 @@ var glutils;
                     }
                 }
             }
-        };
-        WebGLInteractor.prototype.clickHandler = function (e) {
+        }
+        clickHandler(e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             var intersectedVisualElements = [];
             for (var i = 0; i < this.clickSelections.length; i++) {
@@ -14471,8 +14276,8 @@ var glutils;
                 }
             }
             this.mouseDown = false;
-        };
-        WebGLInteractor.prototype.mouseDownHandler = function (e) {
+        }
+        mouseDownHandler(e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             this.mouseStart = [e.clientX, e.clientY];
             this.cameraStart = [webgl.camera.position.x, webgl.camera.position.y];
@@ -14489,8 +14294,8 @@ var glutils;
             if (this.lassoStartHandler && e.which == 2) {
                 this.lassoStartHandler(this.lassoPoints);
             }
-        };
-        WebGLInteractor.prototype.mouseUpHandler = function (e) {
+        }
+        mouseUpHandler(e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             var intersectedVisualElements = [];
             for (var i = 0; i < this.mouseUpSelections.length; i++) {
@@ -14503,8 +14308,8 @@ var glutils;
             if (this.lassoEndHandler && e.which == 2) {
                 this.lassoEndHandler(this.lassoPoints);
             }
-        };
-        WebGLInteractor.prototype.intersect = function (selection, mousex, mousey) {
+        }
+        intersect(selection, mousex, mousey) {
             switch (selection.shape) {
                 case 'circle':
                     return this.intersectCircles(selection);
@@ -14520,8 +14325,8 @@ var glutils;
                     break;
             }
             return [];
-        };
-        WebGLInteractor.prototype.intersectCircles = function (selection) {
+        }
+        intersectCircles(selection) {
             var intersectedElements = [];
             var d;
             for (var i = 0; i < selection.dataElements.length; i++) {
@@ -14530,8 +14335,8 @@ var glutils;
                     intersectedElements.push(selection.dataElements[i]);
             }
             return intersectedElements;
-        };
-        WebGLInteractor.prototype.intersectRects = function (selection) {
+        }
+        intersectRects(selection) {
             var intersectedElements = [];
             var d;
             var e;
@@ -14542,8 +14347,8 @@ var glutils;
                     intersectedElements.push(selection.dataElements[i]);
             }
             return intersectedElements;
-        };
-        WebGLInteractor.prototype.intersectPaths = function (selection) {
+        }
+        intersectPaths(selection) {
             var intersectedElements = [];
             var e;
             var v1, v2;
@@ -14590,9 +14395,8 @@ var glutils;
             function distToSegment(p, v, w) {
                 return Math.sqrt(distToSegmentSquared(p, v, w));
             }
-        };
-        return WebGLInteractor;
-    }());
+        }
+    }
     glutils.WebGLInteractor = WebGLInteractor;
     function mouseToWorldCoordinates(mouseX, mouseY) {
         var rect = webgl.canvas.getBoundingClientRect();
@@ -14616,9 +14420,8 @@ var glutils;
         return curvePoints;
     }
     glutils.curve = curve;
-    var CheckBox = (function () {
-        function CheckBox() {
-            var _this = this;
+    class CheckBox {
+        constructor() {
             this.selected = false;
             this.frame = selectAll()
                 .data([0])
@@ -14626,16 +14429,16 @@ var glutils;
                 .attr('r', 5)
                 .style('fill', '#fff')
                 .style('stroke', '#000000')
-                .on('click', function () {
-                _this.selected = !_this.selected;
-                _this.circle.style('opacity', _this.selected ? 1 : 0);
-                if (_this.changeCallBack != undefined)
-                    _this.changeCallBack();
+                .on('click', () => {
+                this.selected = !this.selected;
+                this.circle.style('opacity', this.selected ? 1 : 0);
+                if (this.changeCallBack != undefined)
+                    this.changeCallBack();
             });
             this.circle = selectAll()
                 .data([0]);
         }
-        CheckBox.prototype.attr = function (attrName, value) {
+        attr(attrName, value) {
             switch (attrName) {
                 case 'x':
                     this.frame.attr('x', value);
@@ -14644,14 +14447,13 @@ var glutils;
                     this.frame.attr('y', value);
                     return this;
             }
-        };
-        CheckBox.prototype.on = function (eventType, fn) {
+        }
+        on(eventType, fn) {
             switch (eventType) {
                 case 'change': this.changeCallBack = fn;
             }
-        };
-        return CheckBox;
-    }());
+        }
+    }
     glutils.CheckBox = CheckBox;
 })(glutils || (glutils = {}));
 var THREEx = THREEx || {};
