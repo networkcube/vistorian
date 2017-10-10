@@ -205,7 +205,13 @@
 
                                 trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'Analyze data'); 
                                 
-                                window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
+                                var url = parent.location.href; 
+                                if(url.includes('/sites/'))
+                                {
+                                  window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "../traces/MailMeQuestionnaire2.html");
+                                } else {
+                                  window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
+                                }
 
                               }else{
                                 var Context2;
@@ -344,7 +350,16 @@
                               if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', Context4);}
                               var Context5;
                               if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', Context5);}
-                              window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
+
+                              var url = parent.location.href; 
+                              console.log('URL:', url)
+                              if(url.indexOf('/sites/') > 0)
+                              {
+                                window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "../traces/MailMeQuestionnaire2.html");
+                              } else {
+                                window.parent.$('#mailmeQuestionnaireDiv').find('iframe').attr('src', "traces/MailMeQuestionnaire2.html");
+                              }
+
                             }else{
                               trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', emailtext);
                               trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire1', formattext);
