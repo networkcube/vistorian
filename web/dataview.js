@@ -380,7 +380,6 @@ function showTable(table, elementName, isLocationTable, schema) {
     }
 }
 function timeFormatChanged() {
-    console.log('>> timeFormatChanged');
     currentNetwork.timeFormat = $('#timeFormatInput_' + currentNetwork.userNodeSchema.name).val();
     saveCurrentNetwork(false);
 }

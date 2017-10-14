@@ -663,7 +663,6 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
 
 function timeFormatChanged()
 {
-    console.log('>> timeFormatChanged')
     currentNetwork.timeFormat = $('#timeFormatInput_' + currentNetwork.userNodeSchema.name).val()
     saveCurrentNetwork(false);
 }
