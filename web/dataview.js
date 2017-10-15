@@ -364,7 +364,7 @@ function showTable(table, elementName, isLocationTable, schema) {
                         if (currentNetwork.hasOwnProperty('timeFormat')) {
                             val = "value='" + currentNetwork.timeFormat + "'";
                         }
-                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" placeholder="DD/MM/YYYY" ' + val + '"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="logos/help.png" class="inlineicon"/></a></span>');
+                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" placeholder="DD/MM/YYYY" ' + val + ' onkeyup="timeFormatChanged()"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="logos/help.png" class="inlineicon"/></a></span>');
                         cell.append(timeFormatInput);
                     }
                 }
@@ -378,6 +378,10 @@ function showTable(table, elementName, isLocationTable, schema) {
             }
         }
     }
+}
+function timeFormatChanged() {
+    currentNetwork.timeFormat = $('#timeFormatInput_' + currentNetwork.userNodeSchema.name).val();
+    saveCurrentNetwork(false);
 }
 function deleteCurrentTable() {
     storage.deleteTable(currentTable, SESSION_NAME);
