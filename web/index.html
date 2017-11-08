@@ -133,6 +133,18 @@
                         <li>help us improving the visualizations and the core-functionality of networkcube</li>
                     </ul>
 
+                    <h2>Stay updated</h2>
+
+                    Join our mailing list to get updates on the project: 
+
+                    <iframe id="forum_embed"
+                      src="javascript:void(0)"
+                      scrolling="no"
+                      frameborder="0"
+                      width="900"
+                      height="700">
+                    </iframe>
+
                     <h2>Contribute</h2>
 
                     Networkcube and the underlying library are open source.
@@ -247,7 +259,13 @@
                 © 2016 Microsoft <img src="logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="logos/logo-inria.png" height="20px">
     
 
- 
+         <script type="text/javascript">
+          document.getElementById('forum_embed').src =
+             'https://groups.google.com/forum/embed/?place=forum/vistorian'
+             + '&showsearch=true&showpopout=true&showtabs=false'
+             + '&parenturl=' + encodeURIComponent(window.location.href);
+        </script>
+
         <script type="text/javascript">
 
             var vis, biblio;
