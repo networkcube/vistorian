@@ -119,10 +119,12 @@ function init(){
     var mapOptions = {
         center: new google.maps.LatLng(48.8588589, 2.3470599),
         zoom: 5,
-        mapTypeControl:false,
-        rotateControl: false,
-        streetViewControl: false,
         zoomControl: true,
+        mapTypeControl: true,
+        scaleControl: true,
+        streetViewControl: false,
+        rotateControl: true,
+        fullscreenControl: true,
         draggableCursor: 'default',
         styles: [
             {
