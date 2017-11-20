@@ -12807,6 +12807,7 @@ var networkcube;
     networkcube.MESSAGE_SELECTION_FILTER = 'selectionFilter';
     networkcube.MESSAGE_SELECTION_PRIORITY = 'selectionPriority';
     networkcube.MESSAGE_SEARCH_RESULT = 'searchResult';
+    networkcube.MESSAGE_STATE = 'stateRecorded';
     var MESSENGER_PROPAGATE = true;
     var MESSAGE_HANDLERS = [
         networkcube.MESSAGE_HIGHLIGHT,
@@ -13044,6 +13045,19 @@ var networkcube;
         return SearchResultMessage;
     })(Message);
     networkcube.SearchResultMessage = SearchResultMessage;
+    function recordState(state) {
+        distributeMessage(new StateMessage(state));
+    }
+    networkcube.recordState = recordState;
+    var StateMessage = (function (_super) {
+        __extends(StateMessage, _super);
+        function StateMessage(state) {
+            _super.call(this, networkcube.MESSAGE_STATE);
+            this.state = state;
+        }
+        return StateMessage;
+    })(Message);
+    networkcube.StateMessage = StateMessage;
     var MESSAGE_KEY = 'networkcube_message';
     localStorage[MESSAGE_KEY] = undefined;
     function distributeMessage(message, ownView) {

@@ -682,6 +682,7 @@ declare module networkcube {
     var MESSAGE_SELECTION_FILTER: string;
     var MESSAGE_SELECTION_PRIORITY: string;
     var MESSAGE_SEARCH_RESULT: string;
+    var MESSAGE_STATE: string;
     function addEventListener(messageType: string, handler: Function): void;
     function setDefaultEventListener(handler: Function): void;
     class Message {
@@ -751,6 +752,11 @@ declare module networkcube {
         idCompound: IDCompound;
         searchTerm: string;
         constructor(searchTerm: string, idCompound: IDCompound);
+    }
+    function recordState(state: Object): void;
+    class StateMessage extends Message {
+        state: Object;
+        constructor(state: Object);
     }
     function distributeMessage(message: Message, ownView?: boolean): void;
 }
