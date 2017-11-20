@@ -490,6 +490,7 @@ function captureState() {
     json['timeStart'] = time_start;
     json['timeEnd'] = time_end;
     json['visualization'] = 'nodelink';
+    json['dataset'] = networkcube.getUrlVars()['datasetName'];
     networkcube.recordState(json);
     console.log('json', json);
     return null;

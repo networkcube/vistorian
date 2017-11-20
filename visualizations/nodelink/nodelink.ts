@@ -686,7 +686,8 @@
         json['timeEnd'] = time_end
 
         json['visualization'] = 'nodelink';
-
+        json['dataset'] = networkcube.getUrlVars()['datasetName']
+        
         networkcube.recordState(json);
 
         console.log('json', json)
