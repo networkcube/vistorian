@@ -897,7 +897,8 @@ function getFileInfos(e) {
     
     // files is a FileList of File objects. List some properties.
     var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
+    for (var i = 0, f; f = files[i]; i++)
+    {
         if (f.name.split('.')[1] != 'csv') {
             // output.push('<li style="color:#f00;"><strong>', f.name, '</strong> is not a CSV file.</li>');
             showMessage("Uploaded file is not a .csv file. Please chose another file.", 4000)

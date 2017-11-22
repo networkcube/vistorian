@@ -168,20 +168,17 @@ h1{
 }
 
 h2{
-	font-size: 20pt;
 	margin-top: 50px;
-	/*font-family: 'Helvetica Neue';*/
+	font-size: 20pt;
 	font-family: 'Poiret One', 'Helvetica Neue', sans-serif; 
 	color:#111111;
 	font-weight: bold;
-	/*text-decoration: underline;*/
-	/*font-weight: 500;*/
-	background: #fff;
 	border-radius: 2px;
 }
 
 h3{
-	font-size: 12pt;
+	font-size: 17pt;
+	font-family: 'Poiret One', 'Helvetica Neue', sans-serif; 
 	margin:5px;
 }
 
@@ -237,7 +234,7 @@ ul.dataspec{
 div.withborder{
 	/*background-color: #eee;*/
 	padding:10px;
-	border-radius: 3px;
+	border-radius: 2px;
 	margin-bottom: 10px;
 	border: 1px solid #d95f0e
 }
