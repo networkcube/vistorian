@@ -139,28 +139,10 @@ module vistorian {
         var readers: FileReader[] = [];
         for (var i = 0, f: File; f = files[i]; i++)
         {
-            // console.log(f.target.filename)
-            // d3.csv(f.name, function(data)
-            // {
-            //     console.log('>>>', data)
-            //     table = new VTable(
-            //         // eliminate spaces in the name because they will 
-            //         // interfere with creating html element ids
-            //         files[i].name.replace('.csv', '').replace(' ','_').trim(),
-            //         data
-            //     )
-            //     formatTable(table);
-
-            //     storage.saveUserTable(table, sessionid);
-            //     loadCount++;
-
-            //     console.log(loadCount, files.length);
-            //     if (loadCount == files.length)
-            //         callBack();
-            // })
-
+            // f.name = f.name.replace(/\s/g, '_');
+            console.log('f.name: ', f.name)
             var reader = new FileReader();
-            reader.filename = f.name.split('_')[0];
+            reader.filename = f.name.replace(/\s/g, '_').split('_')[0];
             readers[i] = reader;
 
             reader.onload = function(f) {
@@ -175,7 +157,7 @@ module vistorian {
                     // eliminate spaces in the name because they will 
                     // interfere with creating html element ids
                     // clean ', "'
-                    files[i].name.replace('.csv', '').replace(' ','_').trim(),
+                    files[i].name.replace('.csv', '').replace(/\s/g, '_').trim(),
                     Papa.parse(content, 
                     // {
                     //     // quotes: true,
@@ -183,7 +165,7 @@ module vistorian {
                     //     // header: true,
                     //     // newline: "\r\n"
                     // }
-                ).data
+                    ).data
                 )
                 // console.log('>', table.data[59])
 

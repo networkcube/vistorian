@@ -100,8 +100,9 @@ var vistorian;
         var fileContents = [];
         var readers = [];
         for (var i = 0, f; f = files[i]; i++) {
+            console.log('f.name: ', f.name);
             var reader = new FileReader();
-            reader.filename = f.name.split('_')[0];
+            reader.filename = f.name.replace(/\s/g, '_').split('_')[0];
             readers[i] = reader;
             reader.onload = function (f) {
                 var obj = {
@@ -111,7 +112,7 @@ var vistorian;
                 var i = readers.indexOf(f.target);
                 fileContents[i] = obj;
                 var content = fileContents[i].content.replace(', "', ',"').replace('" ,', '",');
-                table = new VTable(files[i].name.replace('.csv', '').replace(' ', '_').trim(), Papa.parse(content).data);
+                table = new VTable(files[i].name.replace('.csv', '').replace(/\s/g, '_').trim(), Papa.parse(content).data);
                 formatTable(table);
                 storage.saveUserTable(table, sessionid);
                 loadCount++;

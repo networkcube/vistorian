@@ -587,7 +587,6 @@ declare module networkcube {
         getGraph(session: string, dataname: string): DynamicGraph;
         isSchemaWellDefined(data: DataSet): boolean;
     }
-    function (): any;
     function getDefaultNodeSchema(): NodeSchema;
     function getDefaultLinkSchema(): LinkSchema;
     function getDefaultLocationSchema(): LocationSchema;

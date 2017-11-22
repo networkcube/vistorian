@@ -305,10 +305,7 @@ module networkcube {
             return true;
         }
     }
-
-    export function 
     
-
     export function getDefaultNodeSchema(): NodeSchema {
         return new NodeSchema(0);
     }
