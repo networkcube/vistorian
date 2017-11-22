@@ -84,9 +84,10 @@
                     <div id="nodeTableContainer">
                         <div class="title">
                             <p>
-                                <b>Node Table</b>
+                                <h3>Node Table</h3>
+                                <p><i>A node table describes the nodes in the network. That means that each row in the node table describes a node and its relations, or attributes.</i></p>
                             </p>
-                            Select from the list: <select id="nodetableSelect" onchange="setNodeTable(this)">
+                            Select a previously uploaded node table from the list: <select id="nodetableSelect" onchange="setNodeTable(this)">
                                 <option value="---">---</option>
                             </select>
                             or <input id="nodeTableUpload" type="file" name="file" class="inputfile" value="Upload" name="files[]" data-multiple-caption="{count} files selected"/>
@@ -106,9 +107,10 @@
                     <div id="linkTableContainer">
                         <div class="title">
                             <p>
-                                <b>Link Table</b> 
+                                <h3>Link Table</h3> 
+                                <p><i>A link table describes the links in a network. That means that each row describes a link with at least a source and target. Optional attributes include time, link type, link weight, and locations of source and target nodes while connected through this link.</i></p>                                
                             </p>
-                            Select from the list: <select id="linktableSelect" onchange="setLinkTable(this)">
+                            Select a previously uploaded link table from the list: <select id="linktableSelect" onchange="setLinkTable(this)">
                                 <option value="---">---</option>
                             </select>
                         or <input id="linkTableUpload" type="file" name="file" class="inputfile" value="Upload" name="files[]" data-multiple-caption="{count} files selected"/>
@@ -123,9 +125,10 @@
                     <div id="locationTableContainer">
                         <div class="title">
                             <p>
-                                <b>Location Table</b>
+                                <h3>Location Table</h3>                                 
+                                <p><i>A location table describes coordinates of places mentioned in the link table.</i></p>
                             </p> 
-                            Select from list: <select id="locationtableSelect" onchange="setLocationTable(this)">
+                            Select a previously uploaded location table from the list: <select id="locationtableSelect" onchange="setLocationTable(this)">
                                  <option value="---">---</option>
                            </select>
                             or 
