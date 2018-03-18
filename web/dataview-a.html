@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=UTF-8; X-Content-Type-Options=nosniff" http-equiv="Content-Type" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <title>Data view</title>
+	<!-- VS: Call to trace.js -->
+	<script type="text/javascript" src="traces/trace.js"></script>
+	
+    <link rel="stylesheet" type="text/css" href="./styles.css"/>
+    <link rel="stylesheet" type="text/css" href="./dataview_styles.css"/>
+    <link rel="stylesheet" type="text/css" href="./tablestyle.css"/>
+    <script src="../core/networkcube.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="lib/jquery-ui.css">
+    <script src="lib/jquery-ui.js"></script>
+</head>
+
+<body>
+	<!-- VS: Call to trace_test_130529 -->
+	<script type="text/javascript" src="traces/trace_test_130529.js"></script>
+	
+    <table id="main">
+        <tr>
+        <td id="menu">
+            <!-- <a href="index.html"><img width="100%" src="logos/logo-networkcube.png"/></a> -->
+            <a href="index.html"><img width="100%" src="logos/logo-vistorian.png"/></a>
+            <p id="intro">
+            This is your data view. Below you find a list of visualizations and the 
+            networks currently in your browser.
+            </p>
+
+            <div id="visualizationListDiv">
+                <h2>Visualizations</h2>
+                <ul id="visualizationList" class="nointent"></ul>
+				
+            </div>
+
+            <div id="networkListDiv">
+                <h2>
+                    Networks 
+                    <input type="button" class="menuButton hastooltip" value="New" onclick="createNetwork()""
+                    title="Create new network from one or more tables."/>
+                </h2>
+                <ul id="networkList" class="nointent"></ul>
+            </div>
+
+            <div id="tableListDiv">
+                <h2>My Data Tables
+                <input id="files" type="file" name="file" class="inputfile" value="Upload" name="files[]" data-multiple-caption="{count} files selected" multiple />
+                <label for="files" class="menuButton hastooltip" title="Upload a new table in CSV file.">
+                    Upload
+                </label>
+                </h2>
+                <ul id="tableList" class="nointent"></ul>
+            </div>
+            <div>
+                <input id="clearCacheButton" type="button" class=" hastooltip" value="Empty browser cache" title="This will remove ALL your networks and tables from your browser cache. FOREVER. Use this function if your browser is not repsponding anymore. " onclick="clearCache()"></button>
+            </div>
+        </td>
+
+        <td id="center">
+            <div id="noNetworkTables" style="display:block;">
+                <p>No tables or networks selected. Select a table or network from the list on the left.
+                </p>
+            </div>
+            <div id="networkTables" style="display:none;">
+
+                <div id="networkInfoDiv">
+                    <p class="title">Network Name: <input id="networknameInput" type="text" size="80"/>
+                    <input id="saveNetworkButton" class="tableMenuButton" type="button" value="Save" onclick="saveCurrentNetwork(false)"/>
+                    <input id="deleteNetworkButton" class="tableMenuButton" type="button" value="Delete" onclick="deleteCurrentNetwork()"/>
+                    </p>
+                </div>
+
+                <!-- Show Node table here -->
+                <div id="nodeTableContainer">
+                    <p class="title tableMenu" >Node Table:
+                    <select id="nodetableSelect" onchange="setNodeTable(this)">
+                        <option>---</option>
+                    </select>
+                    </p>
+                    <div id="nodeTableDiv"></div>
+                </div>
+
+                <!-- Show link table here -->
+                <div id="linkTableContainer">
+                    <p class="title tableMenu">Link Table: 
+                    <select id="linktableSelect" onchange="setLinkTable(this)">
+                        <option>---</option>
+                    </select>
+                    </p>
+                    <div id="linkTableDiv"></div>
+                </div>
+
+                <!-- Show location table here -->
+                <div id="locationTableContainer">
+                    <p class="title tableMenu">Select Location Table: 
+                        <select id="locationtableSelect" onchange="setLocationTable(this)">
+                            <option>---</option>
+                        </select>
+                    </p>
+                    <div id="locationTableDiv"></div>
+                </div>
+
+            </div>
+
+            <div id="individualTables" style="display:none;">
+                <div id="tableInfoDiv">
+                    <input id="deleteTableButton" type="button" value="Delete" onclick="deleteCurrentTable()"/>
+                    </p>
+                </div>
+                <div id="individualTable"></div>
+
+            </div>
+
+            <div id="chooseNetworktype" style="display:none;">
+                <h2>Create new network</h2>
+                <p>Which of the below form has your data?</p>
+
+                <h3>a) Node-Table Format:</h3>
+                <img src="figures/node-table.png" alt="" class="tablePic" onclick="setNetworkConfig('node')">
+                <br/>
+                <br/>
+                <h3>b) Link-Table Format:</h3>
+                <img src="figures/link-table.png" alt="" class="tablePic" onclick="setNetworkConfig('link')">
+                <br/>
+                <br/>
+                <h3>c) Node- and Link-Table Format:</h3>
+                <img src="figures/both-table.png" alt="" class="tablePic" onclick="setNetworkConfig('both')">
+
+            </div>
+
+        </div>
+        </tr>
+    </table>
+    <div id="footer">
+                <a class="footer" href="mailto:networkcube@microsoft.com" target="_top">Contact Us</a> |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkId=521839" title="privacy">Privacy & Cookies</a>   |
+                <a class="footer" href="https://go.microsoft.com/fwlink/?LinkID=760869" title="terms of use">Terms Of Use</a>   |
+                <a class="footer" href="http://go.microsoft.com/fwlink/?LinkId=506942" title="trademarks">Trademarks</a>   
+                © 2016 Microsoft <img src="logos/logo-microsoft.png" height="20px"> © 2016 INRIA <img src="logos/logo-inria.png" height="20px">
+    </div>
+    <script type="text/javascript" charset="utf8" src="DataTables-1.10.7/media/js/jquery.dataTables.js"></script>
+    <script src="./lib/jstorage.js"></script>
+    <script src="./classes/storage.js"></script>
+    <script src="./classes/utils.js"></script>
+    <script src="./classes/vistorian.js"></script>
+    <script type="text/javascript" src="dataview.js"></script>
+    <script>
+        
+
+        // Hack to make upload button look nice: 
+        // from: http://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+  
+        'use strict';
+
+        $(document).tooltip();
+
+        ;( function ( document, window, index )
+        {
+     
+            var inputs = document.querySelectorAll( '.inputfile' );
+            Array.prototype.forEach.call( inputs, function( input )
+            {
+                console.log('input', input)
+                var label    = input.nextElementSibling,
+                    labelVal = label.innerHTML;
+
+                input.addEventListener( 'change', function( e )
+                {
+                    console.log('>> change')
+                    var fileName = '';
+                    if( this.files && this.files.length > 1 )
+                        fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+                    else
+                        fileName = e.target.value.split( '\\' ).pop();
+
+                });
+
+                // Firefox bug fix
+                input.addEventListener( 'focus', function(){ input.classList.add( 'has-focus' ); });
+                input.addEventListener( 'blur', function(){ input.classList.remove( 'has-focus' ); });
+            });
+        }( document, window, 0 ));
+
+
+    </script>
+    
+
+</body>
