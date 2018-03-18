@@ -9,7 +9,7 @@ var NMargin = (function () {
         this.top = v;
     };
     return NMargin;
-})();
+}());
 var MatrixMenu = (function () {
     function MatrixMenu(elem, matrix) {
         this.elem = elem;
@@ -46,7 +46,7 @@ var MatrixMenu = (function () {
         $('#cellSizeBox').val(val);
     };
     return MatrixMenu;
-})();
+}());
 var MatrixTimeSlider = (function () {
     function MatrixTimeSlider(elem, matrix, width) {
         this.elem = elem;
@@ -67,7 +67,7 @@ var MatrixTimeSlider = (function () {
         this.timeSlider.set(sT, eT);
     };
     return MatrixTimeSlider;
-})();
+}());
 var CellLabel = (function () {
     function CellLabel() {
         this.cellLabelBackground = glutils.selectAll()
@@ -107,7 +107,7 @@ var CellLabel = (function () {
             .style('font-size', fw);
     };
     return CellLabel;
-})();
+}());
 var MatrixOverview = (function () {
     function MatrixOverview(svg, width, height, matrix) {
         var _this = this;
@@ -188,7 +188,7 @@ var MatrixOverview = (function () {
         this.context.attr("fill", "url(#bg)");
     };
     return MatrixOverview;
-})();
+}());
 var MatrixLabels = (function () {
     function MatrixLabels(svg, margin, matrix) {
         this.svg = svg;
@@ -285,7 +285,7 @@ var MatrixLabels = (function () {
         }
     };
     return MatrixLabels;
-})();
+}());
 var MatrixVisualization = (function () {
     function MatrixVisualization(elem, width, height, matrix) {
         var _this = this;
@@ -375,22 +375,20 @@ var MatrixVisualization = (function () {
         this.cellSize = this.matrix.cellSize;
     };
     MatrixVisualization.prototype.initWebGL = function () {
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.OrthographicCamera(this.width / -2, this.width / 2, this.height / 2, this.height / -2, 0, 1000);
-        this.scene.add(this.camera);
-        this.camera.position.x = this.width / 2;
-        this.camera.position.y = -this.height / 2;
-        this.camera.position.z = 100;
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(this.width, this.height);
-        this.renderer.setClearColor(0xffffff, 1);
+        this.webgl = glutils.initWebGL('visCanvasFO', this.width, this.height);
+        this.webgl.enablePanning(false);
+        this.webgl.camera.position.x = this.width / 2;
+        this.webgl.camera.position.y = -this.height / 2;
+        this.webgl.camera.position.z = 1000;
+        this.canvas = this.webgl.canvas;
+        this.scene = this.webgl.scene;
+        this.camera = this.webgl.camera;
+        this.renderer = this.webgl.renderer;
         this.initTextureFramebuffer();
-        this.canvas = this.renderer.domElement;
-        this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
-        this.canvas.addEventListener('mousedown', this.mouseDownHandler);
-        this.canvas.addEventListener('mouseup', this.mouseUpHandler);
-        this.canvas.addEventListener('click', this.clickHandler);
-        glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
+        this.webgl.canvas.addEventListener('mousemove', this.mouseMoveHandler);
+        this.webgl.canvas.addEventListener('mousedown', this.mouseDownHandler);
+        this.webgl.canvas.addEventListener('mouseup', this.mouseUpHandler);
+        this.webgl.canvas.addEventListener('click', this.clickHandler);
     };
     MatrixVisualization.prototype.initTextureFramebuffer = function () {
         this.bufferTexture = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
@@ -619,7 +617,7 @@ var MatrixVisualization = (function () {
         this.matrix.updateTransform(z, tr);
     };
     return MatrixVisualization;
-})();
+}());
 var Matrix = (function () {
     function Matrix() {
         var _this = this;
@@ -912,7 +910,7 @@ var Matrix = (function () {
         this.cellLabel.updateCellLabel(mx, my, val, fw);
     };
     return Matrix;
-})();
+}());
 var matrix = new Matrix();
 var vizWidth = window.innerWidth - 10;
 var vizHeight = window.innerHeight - 115;

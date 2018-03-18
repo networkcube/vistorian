@@ -125,7 +125,7 @@ function init(){
         streetViewControl: false,
         rotateControl: true,
         fullscreenControl: true,
-        draggableCursor: 'default',
+        draggableCursor: 'cooperative',
         styles: [
             {
                 "featureType": "landscape", "stylers": [
@@ -591,9 +591,6 @@ function init(){
     overlay.draw = function() 
     {
         updateGeoNodePositions()
-        var currCenter = map.getCenter();
-        google.maps.event.trigger(map, 'resize');
-        map.setCenter(currCenter);    
         // updateNodeDisplacementVectors();
         updateNodePositions();
         updateLocationMarkers();
