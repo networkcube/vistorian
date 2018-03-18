@@ -4,7 +4,7 @@
     var COLOR_DEFAULT_NODE = '#333333';
     var COLOR_HIGHLIGHT = '#ff8800';
     var LINK_OPACITY:number = .5;
-    var LINK_WIDTH:number = 1.5;
+    var LINK_WIDTH:number = 10;
     var OFFSET_LABEL = {x:5, y:4}
     var LINK_GAP:number = 2;
     var LAYOUT_TIMEOUT:number = 3000;
@@ -409,6 +409,9 @@
     
     function timeChangedHandler(m:networkcube.TimeRangeMessage){
 
+        time_start = times[0];
+        time_end = times[times.length-1];
+
         for(var i= 0 ; i < times.length ; i++){
             if(times[i].unixTime() > m.startUnix){
                 time_start = times[i-1];
@@ -421,9 +424,9 @@
                 break;
             }
         }
-        if(time_end==undefined){
-            time_end = times[times.length-1]
-        }
+        // if(time_end==undefined){
+        //     time_end = times[times.length-1]
+        // }
   
         timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();

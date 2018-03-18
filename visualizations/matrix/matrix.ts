@@ -478,40 +478,61 @@ class MatrixVisualization{
     this.cellSize = this.matrix.cellSize;
 
   }
+  webgl:glutils.WebGL;
   initWebGL(){
-    this.scene = new THREE.Scene();
-    // camera
-    this.camera = new THREE.OrthographicCamera(
-      this.width / -2,
-      this.width / 2,
-      this.height/ 2,
-      this.height / -2,
-      0, 1000)
+    this.webgl = glutils.initWebGL('visCanvasFO', this.width, this.height);
+    this.webgl.enablePanning(false);
+    this.webgl.camera.position.x = this.width/2;
+    this.webgl.camera.position.y = -this.height/2;
+    this.webgl.camera.position.z = 1000;
 
-    this.scene.add(this.camera);
-    this.camera.position.x = this.width / 2;
-    this.camera.position.y = -this.height / 2;
-    this.camera.position.z = 100;
-
-    // renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true })
-    this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xffffff, 1);
-
+    this.canvas = this.webgl.canvas;
+    this.scene = this.webgl.scene;
+    this.camera = this.webgl.camera;
+    this.renderer = this.webgl.renderer;
+    
     this.initTextureFramebuffer();
 
-    // position canvas element containing cells
-    this.canvas = this.renderer.domElement;
 
-    // set canvas listeners
-    this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
-    this.canvas.addEventListener('mousedown', this.mouseDownHandler);
-    this.canvas.addEventListener('mouseup', this.mouseUpHandler);
-    this.canvas.addEventListener('click', this.clickHandler);
+    this.webgl.canvas.addEventListener('mousemove', this.mouseMoveHandler);
+    this.webgl.canvas.addEventListener('mousedown', this.mouseDownHandler);
+    this.webgl.canvas.addEventListener('mouseup', this.mouseUpHandler);
+    this.webgl.canvas.addEventListener('click', this.clickHandler);
 
-    // init glutils renderer for D3 wrapper
-    glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
+
+    // this.scene = new THREE.Scene();
+    // // camera
+    // // this.camera = new THREE.OrthographicCamera(
+    // //   this.width / -2,
+    // //   this.width / 2,
+    // //   this.height/ 2,
+    // //   this.height / -2,
+    // //   0, 1000)
+    // // this.scene.add(this.camera);
+    // this.camera.position.x = this.width / 2;
+    // this.camera.position.y = -this.height / 2;
+    // this.camera.position.z = 100;
+
+    // // renderer
+    // this.renderer = new THREE.WebGLRenderer({ antialias: true })
+    // this.renderer.setSize(this.width, this.height);
+    // this.renderer.setClearColor(0xffffff, 1);
+
+    // this.initTextureFramebuffer();
+
+    // // position canvas element containing cells
+    // this.canvas = this.renderer.domElement;
+
+    // // set canvas listeners
+    // this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
+    // this.canvas.addEventListener('mousedown', this.mouseDownHandler);
+    // this.canvas.addEventListener('mouseup', this.mouseUpHandler);
+    // this.canvas.addEventListener('click', this.clickHandler);
+
+    // // init glutils renderer for D3 wrapper
+    // glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
   }
+
   initTextureFramebuffer() {
     this.bufferTexture = new THREE.WebGLRenderTarget( 256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
   }
@@ -1218,6 +1239,8 @@ class Matrix{
 
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
 
+      this.startTime = this.times[0];
+      this.endTime = this.times[this.times.length-1];
       for(var i= 0 ; i < this.times.length ; i++){
             if(this.times[i].unixTime() > m.startUnix){
                 this.startTime = this.times[i-1];
@@ -1229,9 +1252,6 @@ class Matrix{
               this.endTime = this.times[i-1];
               break;
           }
-      }
-      if(this.endTime==undefined){
-          this.endTime = this.times[this.times.length-1]
       }
       // this.startTime = this._dgraph.time(m.startId);
       // this.endTime = this._dgraph.time(m.endId);

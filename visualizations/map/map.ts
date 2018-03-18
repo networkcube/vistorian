@@ -125,7 +125,7 @@ function init(){
         streetViewControl: false,
         rotateControl: true,
         fullscreenControl: true,
-        draggableCursor: 'default',
+        draggableCursor: 'cooperative',
         styles: [
             {
                 "featureType": "landscape", "stylers": [
@@ -591,9 +591,6 @@ function init(){
     overlay.draw = function() 
     {
         updateGeoNodePositions()
-        var currCenter = map.getCenter();
-        google.maps.event.trigger(map, 'resize');
-        map.setCenter(currCenter);    
         // updateNodeDisplacementVectors();
         updateNodePositions();
         updateLocationMarkers();
@@ -1113,6 +1110,8 @@ function stretchVector(vec, finalLength) {
 
 function timeChangedHandler(m:networkcube.TimeRangeMessage) {
 
+    time_start = times[0];
+    time_end = times[times.length-1];
     for(var i= 0 ; i < times.length ; i++){
         if(times[i].unixTime() > m.startUnix){
             time_start = times[i-1];
@@ -1124,9 +1123,6 @@ function timeChangedHandler(m:networkcube.TimeRangeMessage) {
             time_end = times[i-1];
             break;
         }
-    }
-    if(time_end==undefined){
-        time_end = times[times.length-1]
     }
 
     timeSlider.set(m.startUnix, m.endUnix);

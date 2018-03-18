@@ -66,7 +66,7 @@ var Slider = (function () {
         this.knob.attr("cx", this.valueRange.invert(value));
     };
     return Slider;
-})();
+}());
 var networkcube;
 (function (networkcube) {
     function makeSlider(d3parent, label, width, height, value, min, max, f) {
@@ -134,7 +134,7 @@ var networkcube;
             this.clickHandler = f;
         };
         return RadioButton;
-    })();
+    }());
     networkcube.RadioButton = RadioButton;
     function makeCheckBox(d3parent, label, callback) {
         d3parent.append('input')
@@ -156,7 +156,7 @@ var TimeSlider = (function () {
         this.MARGIN_SLIDER_RIGHT = 30;
         this.MARGIN_SLIDER_LEFT = 10;
         this.TICK_GAP = 2;
-        this.TICK_LABEL_GAP = 20;
+        this.TICK_LABEL_GAP = 40;
         this.SLIDER_TOP = 25;
         this.HEIGHT = 200;
         this.callBack = undefined;
@@ -164,12 +164,54 @@ var TimeSlider = (function () {
         this.times = dgraph.times().toArray();
         this.widgetWidth = width;
         this.sliderWidth = width - this.MARGIN_SLIDER_RIGHT + 5 - this.MARGIN_SLIDER_LEFT - 5;
-        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), this.times[this.times.length - 1].unixTime(), 1);
+        var lastDummyYear = this.times[this.times.length - 1].moment();
+        var minGran = dgraph.gran_min;
+        var minGranName = '';
+        switch (minGran) {
+            case 1:
+                minGranName = 'milliseconds';
+                break;
+            case 2:
+                minGranName = 'secondss';
+                break;
+            case 3:
+                minGranName = 'minutes';
+                break;
+            case 4:
+                minGranName = 'hours';
+                break;
+            case 5:
+                minGranName = 'days';
+                break;
+            case 5:
+                minGranName = 'weeks';
+                break;
+            case 6:
+                minGranName = 'months';
+                break;
+            case 7:
+                minGranName = 'years';
+                break;
+            case 8:
+                minGranName = 'decades';
+                break;
+            case 9:
+                minGranName = 'centuries';
+                break;
+            case 10:
+                minGranName = 'millenia';
+                break;
+        }
+        console.log('minGran', minGranName);
+        lastDummyYear.add(1, minGranName);
+        console.log('unixTime', lastDummyYear.valueOf());
+        console.log('unixTime', lastDummyYear.valueOf());
+        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), lastDummyYear.valueOf(), 1);
         if (callBack)
             this.callBack = callBack;
         this.tickScale = d3.time.scale.utc()
             .range([this.MARGIN_SLIDER_LEFT, this.MARGIN_SLIDER_LEFT + this.sliderWidth])
-            .domain([new Date(dgraph.time(0).unixTime()), new Date(dgraph.times().last().unixTime())]);
+            .domain([dgraph.time(0).unixTime(), lastDummyYear.valueOf()]);
         this.tickHeightFunction = d3.scale.linear()
             .range([4, this.SLIDER_TOP - 10])
             .domain([dgraph.gran_min, dgraph.gran_max]);
@@ -298,10 +340,10 @@ var TimeSlider = (function () {
         this.slider.set(startUnix, endUnix);
     };
     return TimeSlider;
-})();
+}());
 var SmartSlider = (function () {
     function SmartSlider(x, y, width, minValue, maxValue, stepWidth, tickMarks) {
-        this.BAR_WIDTH = 5;
+        this.BAR_WIDTH = 15;
         this.RADIUS_HANDLE = 5;
         this.LEFT = 0;
         this.RIGHT = 0;
@@ -516,7 +558,7 @@ var SmartSlider = (function () {
         this.set(this.min, this.max);
     };
     return SmartSlider;
-})();
+}());
 var Timeline = (function () {
     function Timeline(webgl, network, x, y, width, height) {
         this.TICK_MIN_DIST = 13;
@@ -761,7 +803,7 @@ var Timeline = (function () {
             .text(this.timeObjects[this.highlightId].format('DD/MM/YYYY'));
     };
     return Timeline;
-})();
+}());
 var RangeSlider = (function () {
     function RangeSlider(x, y, width, minValue, maxValue, stepWidth, tickMarks) {
         this.BAR_WIDTH = 5;
@@ -974,5 +1016,5 @@ var RangeSlider = (function () {
         this.set(this.min, this.max);
     };
     return RangeSlider;
-})();
+}());
 //# sourceMappingURL=widgets.js.map

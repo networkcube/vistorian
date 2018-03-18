@@ -11,9 +11,9 @@ class TimeSlider {
     MARGIN_SLIDER_RIGHT: number = 30;
     MARGIN_SLIDER_LEFT: number = 10;
     TICK_GAP: number = 2;
-    TICK_LABEL_GAP: number = 20;
+    TICK_LABEL_GAP: number = 40;
     SLIDER_TOP: number = 25;
-    HEIGHT=200;
+    HEIGHT = 200;
 
 
     /** GLOBAL VARIABLES */
@@ -41,14 +41,42 @@ class TimeSlider {
         this.widgetWidth = width;
 
         this.sliderWidth = width - this.MARGIN_SLIDER_RIGHT + 5 - this.MARGIN_SLIDER_LEFT - 5;
-        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), this.times[this.times.length - 1].unixTime(), 1);
+        var lastDummyYear = this.times[this.times.length - 1].moment();   
+        var minGran = dgraph.gran_min;
+        var minGranName = '';
+        switch(minGran)
+        {
+            case 1: minGranName = 'milliseconds'; break;
+            case 2: minGranName = 'secondss'; break;
+            case 3: minGranName = 'minutes'; break;
+            case 4: minGranName = 'hours'; break;
+            case 5: minGranName = 'days'; break;
+            case 5: minGranName = 'weeks'; break;
+            case 6: minGranName = 'months'; break;
+            case 7: minGranName = 'years'; break;
+            case 8: minGranName = 'decades'; break;
+            case 9: minGranName = 'centuries'; break;
+            case 10: minGranName = 'millenia'; break;
+        }
+        console.log('minGran', minGranName);
+        lastDummyYear.add(1,minGranName);
+        // console.log('unixTime', this.times[this.times.length - 1].unixTime())
+        console.log('unixTime', lastDummyYear.valueOf());
+        console.log('unixTime', lastDummyYear.valueOf());
+        // this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), this.times[this.times.length - 1].unixTime(), 1);
+        this.slider = new SmartSlider(this.MARGIN_SLIDER_LEFT, this.SLIDER_TOP, this.sliderWidth, this.times[0].unixTime(), lastDummyYear.valueOf(), 1);
 
         if(callBack)
             this.callBack = callBack
 
         this.tickScale = d3.time.scale.utc()
             .range([this.MARGIN_SLIDER_LEFT, this.MARGIN_SLIDER_LEFT + this.sliderWidth])
-            .domain([new Date(dgraph.time(0).unixTime()), new Date(dgraph.times().last().unixTime())]);
+            // .domain([new Date(dgraph.time(0).unixTime()), new Date(dgraph.times().last().unixTime())]);
+            .domain([dgraph.time(0).unixTime(), lastDummyYear.valueOf()]);
+       
+        // var sdf = new Date(lastDummyYear.unix())
+        // console.log('year: ', sdf.getYear())
+
         this.tickHeightFunction = d3.scale.linear()
             .range([4, this.SLIDER_TOP - 10])
             .domain([dgraph.gran_min, dgraph.gran_max]);
