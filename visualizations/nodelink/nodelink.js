@@ -3,7 +3,7 @@ var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#333333';
 var COLOR_HIGHLIGHT = '#ff8800';
 var LINK_OPACITY = .5;
-var LINK_WIDTH = 1.5;
+var LINK_WIDTH = 10;
 var OFFSET_LABEL = { x: 5, y: 4 };
 var LINK_GAP = 2;
 var LAYOUT_TIMEOUT = 3000;
@@ -308,6 +308,8 @@ function mouseOutNode(n) {
     networkcube.highlight('reset');
 }
 function timeChangedHandler(m) {
+    time_start = times[0];
+    time_end = times[times.length - 1];
     for (var i = 0; i < times.length; i++) {
         if (times[i].unixTime() > m.startUnix) {
             time_start = times[i - 1];
@@ -319,9 +321,6 @@ function timeChangedHandler(m) {
             time_end = times[i - 1];
             break;
         }
-    }
-    if (time_end == undefined) {
-        time_end = times[times.length - 1];
     }
     timeSlider.set(m.startUnix, m.endUnix);
     updateLinks();

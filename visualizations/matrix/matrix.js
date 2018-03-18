@@ -653,6 +653,8 @@ var Matrix = (function () {
             _this.visualization.updateHighlightedLinks(highlightedLinksIds);
         };
         this.timeRangeHandler = function (m) {
+            _this.startTime = _this.times[0];
+            _this.endTime = _this.times[_this.times.length - 1];
             for (var i = 0; i < _this.times.length; i++) {
                 if (_this.times[i].unixTime() > m.startUnix) {
                     _this.startTime = _this.times[i - 1];
@@ -664,9 +666,6 @@ var Matrix = (function () {
                     _this.endTime = _this.times[i - 1];
                     break;
                 }
-            }
-            if (_this.endTime == undefined) {
-                _this.endTime = _this.times[_this.times.length - 1];
             }
             _this.timeSlider.set(m.startUnix, m.endUnix);
             _this.updateVisibleData();

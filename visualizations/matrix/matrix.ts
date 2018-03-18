@@ -1239,6 +1239,8 @@ class Matrix{
 
   timeRangeHandler = (m: networkcube.TimeRangeMessage) => {
 
+      this.startTime = this.times[0];
+      this.endTime = this.times[this.times.length-1];
       for(var i= 0 ; i < this.times.length ; i++){
             if(this.times[i].unixTime() > m.startUnix){
                 this.startTime = this.times[i-1];
@@ -1250,9 +1252,6 @@ class Matrix{
               this.endTime = this.times[i-1];
               break;
           }
-      }
-      if(this.endTime==undefined){
-          this.endTime = this.times[this.times.length-1]
       }
       // this.startTime = this._dgraph.time(m.startId);
       // this.endTime = this._dgraph.time(m.endId);
