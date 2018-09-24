@@ -1,0 +1,435 @@
+<html>
+<head>
+    <script src="../lib/jquery.js"></script>
+    <script src="../../core/networkcube.js"></script>
+<style>
+
+    body{
+      opacity: 1;
+      background-color: #fff;
+    }
+
+
+            a{text-decoration: none; color:white;}
+
+            .button1 {
+                background-color: orange; 
+                border: none;
+                color: white;
+                padding: 10px 10px;
+                text-align: left;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+            }
+
+            .button2 {
+                background-color: green;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;} 
+
+            .button3 {
+                background-color: white;
+                border: none;
+                color: black;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;}
+
+            .buttonClose {
+                background-color: #cc0000;
+                border: none;
+                color: white;}
+
+            .wrapper {
+                text-align: center;
+            }
+
+            hr {
+                display: block;
+                height: 1px;
+                border: 0;
+                border-top: 1px solid #ccc;
+                margin: 1em 0;
+                padding: 0; 
+            }
+
+</style>
+
+</head>
+
+<body>
+                    
+                    <fieldset style = "width: 750px; margin-top: 0px auto;">
+                    
+                    <button type="button" onclick="closeWindow2()" class="buttonClose" id="signup-close" style="position: absolute;right:245px;top:15px;outline:5px solid #fff" color = red>X</button>
+                    <script>
+                        function closeWindow()
+                        {
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+                        function closeWindow2()
+                        {
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#mailmeQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+                    </script>
+
+                   
+                    <!-- <button>
+                      <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><big>X</big></a>
+                    </button> -->
+
+                    <h3> <font size="5">Mail me a screenshot (Part 2: for "Analyze data")</font></h3>
+                    <p><font size="4">Answer and click CONTINUE or press ESC to skip this additional questionnaire and send the email</font></p>
+                    <hr>
+                    <h3> <font size="4">How helpful was the tool to analyze your data in this session?</font></h3>
+                    <!-- Multiple Radios (inline) -->
+                    <div class="form-group">
+                       <div class="col-md-12"> 
+                          <label class="col-md-0 control-label" for="radios"><font size="4">Not helpful</font></label>
+                          <label class="radio-inline" for="radios-1">
+                          <input type="radio" name="radios" id="radios-1" value="1">
+                          <font size="4">1</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-2">
+                          <input type="radio" name="radios" id="radios-2" value="2">
+                          <font size="4">2</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-3">
+                          <input type="radio" name="radios" id="radios-3" value="3">
+                          <font size="4">3</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-4">
+                          <input type="radio" name="radios" id="radios-4" value="4">
+                          <font size="4">4</font>
+                        </label>
+                        <label class="radio-inline" for="radios-5">
+                          <input type="radio" name="radios" id="radios-5" value="4">
+                          <font size="4">5</font>
+                        </label>
+                        <label class="radio-inline" for="radios-6">
+                          <input type="radio" name="radios" id="radios-6" value="5">
+                          <font size="4">6</font>
+                        </label>
+                        <label class="radio-inline" for="radios-7">
+                          <input type="radio" name="radios" id="radios-7" value="6">
+                          <font size="4">7</font>
+                        </label>
+                        <label class="radio-inline" for="radios-8">
+                          <input type="radio" name="radios" id="radios-8" value="7">
+                          <font size="4">8</font>
+                        </label>
+                        <label class="radio-inline" for="radios-9">
+                          <input type="radio" name="radios" id="radios-9" value="8">
+                          <font size="4">9</font>
+                        </label>
+                        <label class="radio-inline" for="radios-10">
+                          <input type="radio" name="radios" id="radios-10" value="9"/>
+                          <font size="4">10</font>
+                        </label>
+                        <label class="col-md-11 control-label" for="radios"><font size="4">Very helpful</font></label>
+                      </div>
+                     
+                    </div>
+
+                     
+                    <p> </p>
+                                                      
+                    <table> <td>
+                    <fieldset style="border:1px dashed #555555; vertical-align:top; width: 550px;">
+
+                     <h3> <font size="4">Characterize the analysis you conducted:</font></h3>
+                     <div class="checkbox">
+                        <label for="checkbox-0">
+                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" ondblclick="doubleClick(1)" onclick="toggleboxes('checkbox1')" data-ctrl="JSCtrl">
+                          <font size="4">Review data quality</font>
+                        </label>
+                      </div>
+                      <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox2" value="2" ondblclick="doubleClick(2)" onclick="toggleboxes('checkbox2')">
+                          <font size="4">Test a particular hypothesis</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox3" value="2" ondblclick="doubleClick(3)" onclick="toggleboxes('checkbox3')">
+                          <font size="4">Compare</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox4" value="2" ondblclick="doubleClick(4)" onclick="toggleboxes('checkbox4')">
+                          <font size="4">Retrieve specific details</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox5" value="2" ondblclick="doubleClick(5)" onclick="toggleboxes('checkbox5')">
+                          <font size="4">Repeat an analysis with new data</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox6" value="2" ondblclick="doubleClick(6)" onclick="toggleboxes('checkbox6')">
+                          <font size="4">Other</font>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    </td>
+
+
+                    <script>
+
+                            var checkedboxes = {
+                              checkbox1: false,
+                              checkbox2: false,
+                              checkbox3: false,
+                              checkbox4: false,
+                              checkbox5: false,
+                              checkbox6: false
+                            }
+
+                            function toggleboxes(boxName)
+                            {
+                              checkedboxes[boxName] = !checkedboxes[boxName];
+                              $('#'+boxName).toggleClass('active')
+                              console.log(checkedboxes)
+                            }  
+
+                    </script>  
+
+
+
+                    <td> 
+                        <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
+                        <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the CONTINUE button</font></p>
+                        </fieldset> 
+                    </td>
+                    </table>
+                    <hr>
+                    <!--<p><font size="4">Next you will be able to add comments in the email message</font></p>-->
+
+                    <p><font size="4">Add comments or questions:</font></p>
+                    <form>
+                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
+                    </form>
+                    
+                    <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
+                    <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
+                    <p></p>
+                    <div class="wrapper">
+                    <!-- <button id="button1id" name="button1id" class="button1">Cancel (Esc)</button> -->
+                                       
+                    <button id="button2id" name="button2id" class="button2"
+                      onclick="submitQuestionnaireResults()"><font size="3">Finish and Submit</font></button>
+                    </div>
+                    <script>
+                      function submitQuestionnaireResults()
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        email = localStorage.getItem('traces_email', $('#emailInput').val())
+                        localStorage.getItem('traces_format')
+                        localStorage.getItem('traces_addLegend')
+                        localStorage.getItem('traces_sendCopyToVistorian')
+                        var Comments = document.getElementById('comments').value;
+                        var Commentstext = String(Comments);
+                        localStorage.setItem('traces_comments', $('#comments').val())
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ND QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
+
+                        var analysisCharac1;
+                        if($('#checkbox1').is(':checked')){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
+                        
+                        var analysisCharac2;
+                        if($('#checkbox2').is(':checked')){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
+
+                         var analysisCharac3;
+                        if($('#checkbox3').is(':checked')){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
+
+                         var analysisCharac4;
+                        if($('#checkbox4').is(':checked')){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
+
+                        var analysisCharac5;
+                        if($('#checkbox5').is(':checked')){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
+
+                        var analysisCharac6;
+                        if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
+
+                      
+                        // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
+                        console.log(">>>>COMENTS:",Comments);
+                        if (Comments != ""){
+                          trace.sendmail("vanessa.serrano@iqs.url.edu", email, "[The Vistorian] Users comments or questions", Comments, "", null, null);
+                        }
+                        
+                        //window.history.back();
+                        sendEmail();
+                        closeWindow();
+                        window.parent.$('#mailmeQuestionnaireDiv2').css('visibility', 'hidden');
+
+                      }
+
+                      function doubleClick(checkboxNumber)
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        email = localStorage.getItem('traces_email', $('#emailInput').val())
+                        localStorage.getItem('traces_format')
+                        localStorage.getItem('traces_addLegend')
+                        localStorage.getItem('traces_sendCopyToVistorian')
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ND QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
+
+                        localStorage.setItem('traces_checkbox1', checkboxNumber == 1)
+                        localStorage.setItem('traces_checkbox2', checkboxNumber == 2)
+                        localStorage.setItem('traces_checkbox3', checkboxNumber == 3)
+                        localStorage.setItem('traces_checkbox4', checkboxNumber == 4)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 5)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 6)
+
+                        var analysisCharac1;
+                        if(checkboxNumber == 1){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac1);}
+                        
+                        var analysisCharac2;
+                        if(checkboxNumber == 2){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac2);}
+
+                         var analysisCharac3;
+                        if(checkboxNumber == 3){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac3);}
+
+                         var analysisCharac4;
+                        if(checkboxNumber == 4){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac4);}
+
+                        var analysisCharac5;
+                        if(checkboxNumber == 5){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac5);}
+
+                        var analysisCharac6;
+                        if(checkboxNumber == 6){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', analysisCharac6);}
+
+                      
+                        // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'MailMeQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+
+                        //window.history.back();
+                        
+                        sendEmail();
+                        closeWindow2();
+                      }
+
+                      
+                      function sendEmail()
+                        {   
+                          var cc_vistorian = '';
+                            if(localStorage.setItem('traces_sendCopyToVistorian', $('checkboxes-1').is(':checked')))
+                            {
+                              //cc_vistorian = '<input type="checkbox" name="CopyToVistorian" value="Yes"\>';
+                              cc_vistorian = "vistorian@inria.fr";
+                            }
+
+                          console.log(">>>>CC:", cc_vistorian);
+
+                          var to = email;
+
+                          var from = "vistorian@inria.fr";
+
+                          var subject = "";
+
+                          var message = "Hello,\n\nThis is your screenshot. You can find the file attached.\n\nBest,\nThe Vistorian team";
+
+                          var format = localStorage.getItem('traces_format'); 
+                          console.log('format', format);             
+                          if(format && format == 'PNG')
+                          {
+                            // var svgString = networkcube.getSVGString(window.parent.$('#visSvg'));
+                            var svgString = window.parent.$('#visFrame').find('iframe'). contents().find('#visSvg');
+                            var d3Object = d3.select(svgString.get(0));
+                            console.log('>> svgNode', d3Object.node());
+                            networkcube.getBlobFromSVGNode('vistorian-screenshot', d3Object.node(), 800, 600, function(blob, name)
+                            {
+                              console.log('SEND EMAIL WITH BLOB')
+
+                            //  trace.sendmail('vanessa.serrano@iqs.url.edu', 'benj.bach@mail.com', "test", 'message body here', true, blob, null);
+                            trace.sendmail(to, from, subject, message, cc_vistorian, blob, null);
+                            })
+                          }
+                        }
+                        
+                      //function sendEmail()
+                      //{
+                            // SEND EMAIL WITH SCREENSHOT
+                            //window.location.href = "mailto:vanessa.serrano@iqs.edu.com?subject=Mail me a screenshot";
+                            //window.location.href = "mailto:vanessa.serrano@iqs.edu?subject=Mail me a screenshot";
+                            //var emailTo = email;
+                            //var emailSub = "Mail me a screenshot";
+                            //var emailCC = "Jean-Daniel.Fekete@inria.fr, plaisant@cs.umd.edu, benj.bach@googlemail.com, vanessa.serrano@iqs.edu";
+                            //var emailCC = "vanessa.serrano@iqs.edu";
+                            //var emailBody = "%20%20%20%20%3Cb%3EMail%20obj%3A%3C%2Fb%3E%0A%20%20%20%20%3Cpre%20id%3D%22mail%22%3E%3C%2Fpre%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeTxt%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeTxt%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%3Chr%2F%3E%0A%20%20%20%20%3Ch2%3EMimeObj%3C%2Fh2%3E%0A%20%20%20%20%3Cdiv%20id%3D%22mimeObj%22%3E%3C%2Fdiv%3E%0A%0A%20%20%20%20%3Cscript%20type%3D%22application%2Fjavascript%22%3E%0A%20%20%20%20%20%20%20%20var%20originalMail%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22to%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22subject%22%3A%20%22Mail%20me%20a%20screenshot%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22fromName%22%3A%20%22Vistorian%20team%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22from%22%3A%20%22vanessaserr%40gmail.com%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22body%22%3A%20%22This%20is%20your%20screenshot.%5CnTSee%20the%20image%20attached.%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22cids%22%3A%20%5B%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22attaches%22%20%3A%20%5B%5D%0A%20%20%20%20%20%20%20%20%7D%3B%0A%20%20%20%20%20%20%20%20var%20mimeTxt%20%3D%20Mime.toMimeTxt(originalMail)%3B%0A%20%20%20%20%20%20%20%20var%20mimeObj%20%3D%20Mime.toMimeObj(mimeTxt)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mail%22%20).innerText%20%3D%20JSON.stringify(originalMail)%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeTxt%22).innerText%20%3D%20mimeTxt%3B%0A%20%20%20%20%20%20%20%20document.getElementById(%22mimeObj%22).innerText%20%3D%20JSON.stringify(mimeObj)%3B%0A%20%20%20%20%3C%2Fscript%3E";
+                            //var emailBody = "<a href="MimeEx.html">Press</a>";
+                            //var formattedBody = "Hello, \nTis is your screenshot. \nThe image is attached.";
+                            //var emailBody = "Hello,%0D%0ATis is your screenshot.%0D%0AThe image is attached.";
+                            //location.href = "mailto:"+email+'?cc='+email+'&subject='+emailSub+'&body='+ encodeURIComponent(formattedBody);
+                            //location.href = "mailto:"+email+'?cc='+emailCC+'&subject='+emailSub+'&body='+ emailBody;
+                            //"https://vanessaserr.google.com/mail/?view=cm&fs=1&to=vanessaserr@domain.com";
+                            //https://mail.google.com/mail/?view=cm&fs=1&to=email@domain.com 
+                            //MimeEx.html;
+                      //}
+
+                    </script>
+
+                    </fieldset>
+                    
+</body>
+</html>

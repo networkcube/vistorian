@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+  
+  <link rel="stylesheet" type="text/css" href="../styles.css"/>
+  <link rel="stylesheet" type="text/css" href="../dataview_styles.css"/>
+  <link rel="stylesheet" type="text/css" href="../tablestyle.css"/>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+  <script src="../lib/bootbox.min.js"></script>
+  <script src="../lib/jquery.js"></script>
+  <script src="../../core/networkcube.js"></script>
+  <script type="text/javascript">
+
+  function myFunction() {
+        bootbox.confirm({
+        message: "No Vistorian activity for more than 15 minutes. \n Still there?",
+        buttons: {
+            confirm: {
+                label: 'I am BACK',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'DONE: report on recent activity',
+                className: 'btn-warning'
+            }
+        },
+        callback: function (result) {
+            console.log('This was logged in the callback: ' + result);
+        }
+    });
+  }
+</script>
+</head>
+
+<body>
+
+<p>Click the button to display a confirm box.</p>
+
+<button onclick="myFunction()">Try it</button>
+
+</body>
+</html>

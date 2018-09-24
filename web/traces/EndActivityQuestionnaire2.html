@@ -1,0 +1,348 @@
+<html>
+<head>
+    <script src="../lib/jquery.js"></script>
+    <script src="../../core/networkcube.js"></script>
+
+<style>
+
+    body{
+      opacity: 1;
+      background-color: #fff;
+    }
+
+
+            a{text-decoration: none; color:white;}
+
+            .button1 {
+                background-color: orange; 
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+            }
+
+            .button2 {
+                background-color: green;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;} 
+
+            .buttonClose {
+                background-color: #cc0000;
+                border: none;
+                color: white;}
+
+            .wrapper {
+                text-align: center;
+            }
+
+            hr {
+                display: block;
+                height: 1px;
+                border: 0;
+                border-top: 1px solid #ccc;
+                margin: 1em 0;
+                padding: 0; 
+            }
+
+</style>
+</head>
+
+<body>
+                    
+                    <fieldset style = "width: 750px; margin-top: 0px auto;">
+                    
+                    <button type="button" onclick="closeWindow2()" class="buttonClose" id="signup-close" style="position: absolute;right:225px;top:15px;outline:5px solid #fff" color = red>X</button>
+                    <script>
+                        function closeWindow()
+                        {
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+
+                        function closeWindow2()
+                        {
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+                    </script>
+
+                   
+                    <!-- <button>
+                      <a href="javascript:void(0)" onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><big>X</big></a>
+                    </button> -->
+
+                    <h3> <font size="5">Please help us understand the context of use: (Part 2: for "Analyze data")</font></h3>
+                    <p><font size="4">Answer and click FINISH AND SUBMIT or press ESC to skip this additional questionnaire</font></p>
+                    <hr>
+                    <h3> <font size="4">How helpful was the tool to analyze your data in this session?</font></h3>
+                    <!-- Multiple Radios (inline) -->
+                    <div class="form-group">
+                       <div class="col-md-12"> 
+                          <label class="col-md-0 control-label" for="radios"><font size="4">Not helpful</font></label>
+                          <label class="radio-inline" for="radios-1">
+                          <input type="radio" name="radios" id="radios-1" value="1">
+                          <font size="4">1</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-2">
+                          <input type="radio" name="radios" id="radios-2" value="2">
+                          <font size="4">2</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-3">
+                          <input type="radio" name="radios" id="radios-3" value="3">
+                          <font size="4">3</font>
+                        </label> 
+                        <label class="radio-inline" for="radios-4">
+                          <input type="radio" name="radios" id="radios-4" value="4">
+                          <font size="4">4</font>
+                        </label>
+                        <label class="radio-inline" for="radios-5">
+                          <input type="radio" name="radios" id="radios-5" value="4">
+                          <font size="4">5</font>
+                        </label>
+                        <label class="radio-inline" for="radios-6">
+                          <input type="radio" name="radios" id="radios-6" value="5">
+                          <font size="4">6</font>
+                        </label>
+                        <label class="radio-inline" for="radios-7">
+                          <input type="radio" name="radios" id="radios-7" value="6">
+                          <font size="4">7</font>
+                        </label>
+                        <label class="radio-inline" for="radios-8">
+                          <input type="radio" name="radios" id="radios-8" value="7">
+                          <font size="4">8</font>
+                        </label>
+                        <label class="radio-inline" for="radios-9">
+                          <input type="radio" name="radios" id="radios-9" value="8">
+                          <font size="4">9</font>
+                        </label>
+                        <label class="radio-inline" for="radios-10">
+                          <input type="radio" name="radios" id="radios-10" value="9"/>
+                          <font size="4">10</font>
+                        </label>
+                        <label class="col-md-11 control-label" for="radios"><font size="4">Very helpful</font></label>
+                      </div>
+                     
+                    </div>
+
+                     
+                    <p> </p>
+                                                      
+                    <table> <td>
+                    <fieldset style="border:1px dashed #555555; vertical-align:top; width: 550px;">
+
+                     <h3> <font size="4">Characterize the analysis you conducted:</font></h3>
+                     <div class="checkbox">
+                        <label for="checkbox-0">
+                          <input type="checkbox" name="checkbox" id="checkbox1" value="1" ondblclick="doubleClick(1)" onclick="toggleboxes('checkbox1')">
+                          <font size="4">Review data quality</font>
+                        </label>
+                      </div>
+                      <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox2" value="2" ondblclick="doubleClick(2)" onclick="toggleboxes('checkbox2')">
+                          <font size="4">Test a particular hypothesis</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox3" value="2" ondblclick="doubleClick(3)" onclick="toggleboxes('checkbox3')">
+                          <font size="4">Compare</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox4" value="2" ondblclick="doubleClick(4)" onclick="toggleboxes('checkbox4')">
+                          <font size="4">Retrieve specific details</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox5" value="2" ondblclick="doubleClick(5)" onclick="toggleboxes('checkbox5')">
+                          <font size="4">Repeat an analysis with new data</font>
+                        </label>
+                      </div>
+                       <div class="checkbox">
+                        <label for="checkbox-1">
+                          <input type="checkbox" name="checkbox" id="checkbox6" value="2" ondblclick="doubleClick(6)" onclick="toggleboxes('checkbox6')">
+                          <font size="4">Other</font>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    </td>
+
+
+                    <script>
+
+                            var checkedboxes = {
+                              checkbox1: false,
+                              checkbox2: false,
+                              checkbox3: false,
+                              checkbox4: false,
+                              checkbox5: false,
+                              checkbox6: false
+                            }
+
+                            function toggleboxes(boxName)
+                            {
+                              checkedboxes[boxName] = !checkedboxes[boxName];
+                              $('#'+boxName).toggleClass('active')
+                              console.log(checkedboxes)
+                            }  
+
+                    </script>  
+
+
+
+                    <td> 
+                        <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
+                        <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the FINISH AND SUBMIT button</font></p>
+                        </fieldset> 
+                    </td>
+                    </table>
+                    <hr>
+                    <p><font size="4">Add comments:</font></p>
+                    <form>
+                      <textarea name="comments" id="comments" cols="69" rows="3"></textarea>
+                    </form>
+                    <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
+                    <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
+                    <p></p>
+                    <div class="wrapper">
+                    <!-- <button id="button1id" name="button1id" class="button1">Cancel (Esc)</button> -->
+                                       
+                    <button id="button2id" name="button2id" class="button2"
+                      onclick="submitQuestionnaireResults()"><font size="3">Finish and Submit</font></button>
+                    </div>
+                    <script>
+                      function submitQuestionnaireResults()
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        var Comments = document.getElementById('comments').value;
+                        var Commentstext = String(Comments);
+                        localStorage.setItem('traces_comments', $('#comments').val())
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ND QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
+
+                        var analysisCharac1;
+                        if($('#checkbox1').is(':checked')){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
+                        
+                        var analysisCharac2;
+                        if($('#checkbox2').is(':checked')){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
+
+                         var analysisCharac3;
+                        if($('#checkbox3').is(':checked')){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
+
+                         var analysisCharac4;
+                        if($('#checkbox4').is(':checked')){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
+
+                        var analysisCharac5;
+                        if($('#checkbox5').is(':checked')){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
+
+                        var analysisCharac6;
+                        if($('#checkbox6').is(':checked')){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
+
+                        // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Comments=' + Commentstext);
+                        console.log(Comments);
+                        closeWindow2();
+                       
+
+                        //window.history.back();
+                      }
+
+                      function doubleClick(checkboxNumber)
+                      {
+                        // GET RESULTS FROM 1ST QUESTIONNAIRE
+                        // Read stuff from local storage
+                        localStorage.getItem('traces_button1')
+                        localStorage.getItem('traces_button2')
+                        localStorage.getItem('traces_button3')
+                        localStorage.getItem('traces_button4')
+                        localStorage.getItem('traces_button5')
+
+                        // GET RESULTS FROM 2ND QUESTIONNAIRE
+                        // Read stuff from html field
+                        var helpfullScore;
+                        if($('#radios-1').is(':checked')){ helpfullScore = 1;}
+                        if($('#radios-2').is(':checked')){ helpfullScore = 2;}
+                        if($('#radios-3').is(':checked')){ helpfullScore = 3;}
+                        if($('#radios-4').is(':checked')){ helpfullScore = 4;}
+                        if($('#radios-5').is(':checked')){ helpfullScore = 5;}
+                        if($('#radios-6').is(':checked')){ helpfullScore = 6;}
+                        if($('#radios-7').is(':checked')){ helpfullScore = 7;}
+                        if($('#radios-8').is(':checked')){ helpfullScore = 8;}
+                        if($('#radios-9').is(':checked')){ helpfullScore = 9;}
+                        if($('#radios-10').is(':checked')){ helpfullScore = 10;}
+
+                        var helpfullScoretext = String(helpfullScore);
+
+                        localStorage.setItem('traces_checkbox1', checkboxNumber == 1)
+                        localStorage.setItem('traces_checkbox2', checkboxNumber == 2)
+                        localStorage.setItem('traces_checkbox3', checkboxNumber == 3)
+                        localStorage.setItem('traces_checkbox4', checkboxNumber == 4)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 5)
+                        localStorage.setItem('traces_checkbox5', checkboxNumber == 6)
+
+                        var analysisCharac1;
+                        if(checkboxNumber == 1){ analysisCharac1 = 'Review data quality'; console.log(analysisCharac1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac1);}
+                        
+                        var analysisCharac2;
+                        if(checkboxNumber == 2){ analysisCharac2 = 'Test a particular hypothesis'; console.log(analysisCharac2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac2);}
+
+                         var analysisCharac3;
+                        if(checkboxNumber == 3){ analysisCharac3 = 'Compare'; console.log(analysisCharac3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac3);}
+
+                         var analysisCharac4;
+                        if(checkboxNumber == 4){ analysisCharac4 = 'Retrieve specific details'; console.log(analysisCharac4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac4);}
+
+                        var analysisCharac5;
+                        if(checkboxNumber == 5){ analysisCharac5 = 'Repeat an analysis with new data'; console.log(analysisCharac5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac5);}
+
+                        var analysisCharac6;
+                        if(checkboxNumber == 6){ analysisCharac6 = 'Other'; console.log(analysisCharac6); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', analysisCharac6);}
+
+                      
+                        // SEND RESULTS TO THE SERVER
+                        trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'HelpfullScore=' + helpfullScoretext);
+                        console.log(helpfullScore);
+
+                        //window.history.back();
+                        closeWindow2();
+                      }
+
+                    </script>
+                    </fieldset>
+
+</body>
+</html>

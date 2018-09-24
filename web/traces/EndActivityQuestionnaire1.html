@@ -1,0 +1,269 @@
+<html>
+<head>
+  <script src="../lib/jquery.js"></script>
+  <script src="../../core/networkcube.js"></script>
+<style>
+
+    body{
+      opacity: 1;
+      background-color: #fff;
+    }
+
+    button.active{
+      background-color: orange;
+    }
+    a{text-decoration: none; color:white;}
+
+
+    .button1 {
+        background-color: orange; 
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .button2 {
+        background-color: green;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+      } 
+
+    .buttonClose {
+        background-color: #cc0000;
+        border: none;
+        color: white;}
+
+    .wrapper {
+        text-align: center;
+    }
+
+    hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0; 
+    }
+
+</style>
+
+</head> 
+<body>
+          
+                    
+                    <fieldset style = "width: 750px; margin-top: 0px auto;">
+                    
+                    <button type="button" onclick="closeWindow()" class="buttonClose" id="signup-close" style="position: absolute;right:240px;top:15px;outline:5px solid #fff"color = red>X</button>
+                    <script>
+                        function closeWindow()
+                        {
+                          window.parent.$('#endOfActivityQuestionnaireDiv').css('visibility', 'hidden');
+                        }
+                    </script>
+
+                    <h3> <font size="5">Please help us understand the context of use:</font></h3>
+                    <hr>
+                   
+                    <table> <td>
+                    <fieldset style="border:1px dashed #555555; vertical-align:top; width: 550px;">
+
+                     <h3> <small><font size="4">In this work session with the Vistorian I wanted to:</font></small></h3>
+                     
+                     
+                     <div class="click">
+
+                          <button id="button1" type="button" style="height:25px;width:125px" class="myBtn" 
+                            ondblclick="doubleClick(1)" onclick="toggleButton('button1')">
+                            <label for="my-checkbox"><font size="2">Analyze data</font></label>
+                          </button>
+                          <p></p>
+
+                          <button id="button2" type="button" style="height:25px;width:125px"
+                            ondblclick="doubleClick(2)" onclick="toggleButton('button2')">
+                            <label for="my-checkbox"><font size="2">Learn</font></label>
+                          </button>&nbsp;To see what the tool can do, read the manual, play with examples
+                          <p></p>
+                        
+                          <button id="button3" type="button" style="height:25px;width:125px"
+                           ondblclick="doubleClick(3)" onclick="toggleButton('button3')">
+                            <label for="my-checkbox"><font size="2">Demo to others</font></label>
+                          </button>&nbsp;To teach or help others get started
+                          <p></p>
+
+                          <button id="button4" type="button" style="height:25px;width:125px"
+                            ondblclick="doubleClick(4)" onclick="toggleButton('button4')">
+                            <label for="my-checkbox"><font size="2">Test the software</font></label>
+                          </button>&nbsp;To document a bug or check that is fixed
+                          <p></p>
+
+                          <button id="button5" type="button" style="height:25px;width:125px"
+                            ondblclick="doubleClick(5)" onclick="toggleButton('button5')">
+                            <label for="my-checkbox"><font size="2">Other</font></label>
+                          </button>&nbsp;You will be able to describe it later
+                          <p></p>                      
+                          <script>
+
+                            var checkedButtons = {
+                              button1: false,
+                              button2: false,
+                              button3: false,
+                              button4: false,
+                              button5: false
+                            }
+
+                            function toggleButton(buttonName)
+                            {
+                              checkedButtons[buttonName] = !checkedButtons[buttonName];
+                              $('#'+buttonName).toggleClass('active')
+                              console.log(checkedButtons)
+
+                            }  
+
+                            function doubleClick(buttonNumber)
+                            { 
+                                // STORE DATA in LOCAL STORAGE
+                                localStorage.setItem('traces_button1', buttonNumber == 1)
+                                localStorage.setItem('traces_button2', buttonNumber == 2)
+                                localStorage.setItem('traces_button3', buttonNumber == 3)
+                                localStorage.setItem('traces_button4', buttonNumber == 4)
+                                localStorage.setItem('traces_button5', buttonNumber == 5)
+
+                                // SEND RESULTS TO THE SERVER
+                                if (buttonNumber == 1) {
+
+                                trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', 'Analyze data'); 
+                                
+                                var url = parent.location.href; 
+                                if(url.includes('/sites/'))
+                                {
+                                  window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../traces/EndActivityQuestionnaire2.html");
+                                } else {
+                                  window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "traces/EndActivityQuestionnaire2.html");
+                                }
+
+                               }else{
+
+                                var Context2;
+                                if(buttonNumber == 2){Context2 = 'Learn'; console.log(Context2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context2);}
+                                var Context3;
+                                if(buttonNumber == 3){Context3 = 'Demo to others'; console.log(Context3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context3);}
+                                var Context4;
+                                if(buttonNumber == 4){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context4);}
+                                var Context5;
+                                if(buttonNumber == 5){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context5);}
+
+                                closeWindow();
+                              }
+
+                            }
+
+                          </script>  
+                       
+                    </fieldset>
+
+                    </td>
+
+                    <td> 
+                        <fieldset style="text-align:top; border:none; background-color:#f5f5f0;margin-top: 0px auto; width: 190px;">
+                        <p><font size="2">To select a single answer and submit it: double click on the answer</font></p>
+                        <p style="margin-top: -15px;"><font size="2">Ore select multiple answers then click on the CONTINUE button</font></p>
+                        </fieldset> 
+                    </td>
+                    </table>
+                    
+                    <input type="hidden" id="fieldcjkkdj" name="cm-f-cjkkdj" value="/blog/web-design/create_web_design_questions/">
+                    <input type="hidden" id="fieldqlhyuk" name="cm-f-qlhyuk" value="slide-in">  
+                    <p></p>
+                    <div class="wrapper">
+
+                    <button class="button1" onclick="submitQuestionnaireResults()"><font size="3">Skip the questionnaire (Esc)</font></button>
+                    <button class="button2" onclick="continueBtnPressed()"><font size="3">Continue</font></button>
+                    <script>
+
+                        function continueBtnPressed()
+                        { 
+                            // STORE DATA in LOCAL STORAGE
+                            localStorage.setItem('traces_button1', $('button1').is(':checked'))
+                            localStorage.setItem('traces_button2', $('button2').is(':checked'))
+                            localStorage.setItem('traces_button3', $('button3').is(':checked'))
+                            localStorage.setItem('traces_button4', $('button4').is(':checked'))
+                            localStorage.setItem('traces_button5', $('button5').is(':checked'))
+
+                            // SEND RESULTS TO THE SERVER
+                            if (checkedButtons["button1"] == true) {
+                              var Context1;
+                              if(checkedButtons["button1"] == true){Context1 = 'Analyze data'; console.log(Context1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context1);}
+                              var Context2;
+                              if(checkedButtons["button2"] == true){Context2 = 'Learn'; console.log(Context2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context2);}
+                              var Context3;
+                              if(checkedButtons["button3"] == true){Context3 = 'Demo to others'; console.log(Context3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context3);}
+                              var Context4;
+                              if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context4);}
+                              var Context5;
+                              if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire2', Context5);}
+                              var url = parent.location.href; 
+                              if(url.includes('/sites/'))
+                              {
+                                window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "../traces/EndActivityQuestionnaire2.html");
+                              } else {
+                                window.parent.$('#endOfActivityQuestionnaireDiv').find('iframe').attr('src', "traces/EndActivityQuestionnaire2.html");
+                              }
+                          }else{
+                              var Context1;
+                              if(checkedButtons["button1"] == true){Context1 = 'Analyze data'; console.log(Context1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context1);}
+                              var Context2;
+                              if(checkedButtons["button2"] == true){Context2 = 'Learn'; console.log(Context2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context2);}
+                              var Context3;
+                              if(checkedButtons["button3"] == true){Context3 = 'Demo to others'; console.log(Context3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context3);}
+                              var Context4;
+                              if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context4);}
+                              var Context5;
+                              if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context5);}
+                              closeWindow();
+                            }
+                        }
+
+
+                        function submitQuestionnaireResults()
+                        {
+                          // STORE DATA in LOCAL STORAGE
+
+                          localStorage.setItem('traces_button1', $('button1').is(':checked'))
+                          localStorage.setItem('traces_button2', $('button2').is(':checked'))
+                          localStorage.setItem('traces_button3', $('button3').is(':checked'))
+                          localStorage.setItem('traces_button4', $('button4').is(':checked'))
+                          localStorage.setItem('traces_button5', $('button5').is(':checked'))
+                          
+                          // SEND RESULTS TO THE SERVER
+                          var Context1;
+                          if(checkedButtons["button1"] == true){Context1 = 'Analyze data'; console.log(Context1); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context1);}
+                          var Context2;
+                          if(checkedButtons["button2"] == true){Context2 = 'Learn'; console.log(Context2); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context2);}
+                          var Context3;
+                          if(checkedButtons["button3"] == true){Context3 = 'Demo to others'; console.log(Context3); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context3);}
+                          var Context4;
+                          if(checkedButtons["button4"] == true){Context4 = 'Test the software'; console.log(Context4); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context4);}
+                          var Context5;
+                          if(checkedButtons["button5"] == true){Context5 = 'Other'; console.log(Context5); trace.event(null, 'MiniQuestionnaire', 'EndActivityQuestionnaire1', Context5);}
+
+                          closeWindow();
+                        }
+
+                    </script>
+
+                    </button>
+                    </div>
+                    </fieldset>
+</body>
+</html>
+            

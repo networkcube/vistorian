@@ -6,21 +6,14 @@
 <link rel="stylesheet" type="text/css" href="../styles.css">
 <link rel="stylesheet" type="text/css" href="../visview.css">
 <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
-
-<!-- VS: Call to trace.js -->
-<script type="text/javascript" src="../traces/trace.js"></script>
-    
+<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>    
 <script src="../../core/networkcube.js"></script>
 <script src="../classes/vistorian.js"></script>
-
 
 
 </head>
 <title>Node link</title>
 <body>
-	<!-- VS: Call to trace_test_130529 -->
-	<script type="text/javascript" src="../traces/trace_test_130529.js"></script>
     <table>
         <tr>
             <td width="220px">
@@ -41,9 +34,12 @@
     </div>
 	<script>
 
-        SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
+        var port_maybe =  location.port ? ":"+location.port : "";
+        SERVER = location.protocol + '//'+ window.location.hostname + port_maybe + window.location.pathname + '/';
         SERVER = SERVER.split('web/')[0]
-  
+        // SERVER = location.protocol + '//'+ window.location.hostname +  '' + window.location.pathname + '/';
+        // SERVER = SERVER.split('web/')[0]
+
        
         $( document ).ready(function() {
             var width = window.innerWidth -30;

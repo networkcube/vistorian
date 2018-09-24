@@ -7,20 +7,6 @@ and the user data.
 This API should be used in every visualization.
 */
 
-// function vistorian(){
-
-// 	function getSchema(tableName){
-// 		// return getUrlVars()[tableName]
-// 	 //        .replace('[', '')
-// 	 //        .replace(']', '')
-// 	 //        .split(',')
-// 	  var schema = getUrlVars()['schema']
-// 	  schema = schema.replace(/%22/g, '"').replace(/%20/g, '_')
-// 	  schema = JSON.parse(schema);
-// 	  return schema;
-// 	}
-// }
-
 module vistorian {
 
     // LOADING FONTS:
@@ -33,8 +19,12 @@ module vistorian {
     head.append("<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>")
     head.append("<link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet' type='text/css'>")
     head.append("<link href='https://fonts.googleapis.com/css?family=IM+Fell+English' rel='stylesheet' type='text/css'>")
-
+    head.append("<link rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>")
+    head.append('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>')
+    head.append("<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js'></script>")    
+    //head.append("<script src='../lib/bootbox.min.js'></script>")
     // append('./lib/xml2json.js');
+
     function append(url: string) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -43,7 +33,7 @@ module vistorian {
     }
 
     var tables = [];
-
+    var showMessageAgain: null;
 
     // DATA TYPES
 
@@ -154,11 +144,11 @@ module vistorian {
                 fileContents[i] = obj;
                 var content = fileContents[i].content.replace(', "', ',"').replace('" ,', '",')
                 table = new VTable(
-                    // eliminate spaces in the name because they will 
+                    // eliminate spaces in the name because they will
                     // interfere with creating html element ids
                     // clean ', "'
                     files[i].name.replace('.csv', '').replace(/\s/g, '_').trim(),
-                    Papa.parse(content, 
+                    Papa.parse(content,
                     // {
                     //     // quotes: true,
                     //     // quoteChar: '"',
@@ -223,7 +213,7 @@ module vistorian {
         // test
         // if(Number(table.data[1][0]) == NaN){
         // 	indexify = true;
-        // }	
+        // }
 
         var numCols: number = table.data[0].length;
         var emptyCols: number = 0;
@@ -287,7 +277,7 @@ module vistorian {
     var requestTimer;
     var requestsRunning: number = 0;
     var fullGeoNames = []
-   
+
    export function updateLocationTable(userLocationTable: VTable, locationSchema: networkcube.LocationSchema, callBack: Function) {
         saveCurrentNetwork(false);
         var data = userLocationTable.data;
@@ -323,7 +313,7 @@ module vistorian {
     // function updateEntryToLocationTableDariah(index: number, geoname: string, locationTable: VTable, locationSchema: networkcube.LocationSchema) {
     //     geoname = geoname.trim();
     //     fullGeoNames.push(geoname);
-    //     // get coordinates for name: 
+    //     // get coordinates for name:
     //     console.log('url', "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim())
     //     var xhr = $.ajax({
     //         url: "http://ref.dariah.eu/tgnsearch/tgnquery2.xql?ac=" + geoname.split(',')[0].trim(),
@@ -370,7 +360,7 @@ module vistorian {
 
     //                 if (validResults.length == 1) {
     //                     // if only one valid result has been returned, add this single result
-    //                     // locationTable.data.push([locationTable.data.length-1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude])	
+    //                     // locationTable.data.push([locationTable.data.length-1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude])
     //                     locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, validResults[0].longitude, validResults[0].latitude];
     //                     return;
     //                 }
@@ -411,7 +401,7 @@ module vistorian {
     //                     console.log('update', geoname, validResults[0].longitude, validResults[0].latitude);
     //                 }
     //             } else {
-    //                 // if answer is valid, means that webservice didn't find that name. 
+    //                 // if answer is valid, means that webservice didn't find that name.
     //                 if (geoname == '')
     //                     return;
     //                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
@@ -475,7 +465,7 @@ module vistorian {
 
     export function cleanTable(table: any[][]) {
         // trim entries
-        var emptyColBool = [] 
+        var emptyColBool = []
         for (var i = 0; i < table.length; i++) {
             for (var j = 0; j < table[i].length; j++) {
                 if (table[i][j] != undefined)
@@ -485,13 +475,44 @@ module vistorian {
 
     }
 
-
     export function setHeader(elementId:String, datasetname:String){
         var header = $('<a href="../index.html"><img width="100%" src="../logos/logo-networkcube.png"/></a>')
         $('#'+elementId).append(header);
         var dataname = $('\
         <p style="margin:5px;background-color:#eeeeee;border-radius:2px;padding-left:10px;padding:5px;"><b>Data:</b> '+ datasetname +'</h2>')
         $('#'+elementId).append(dataname);
+
+        // ben: This should not be necessary. this is done in vistorian.js upon loading.
+        // #traces
+        $('#'+elementId).append('\
+        <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"/>\
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>\
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>\
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>\
+        <input id="enableDisableTrackingBtn" type="button" class="enable" onclick="vistorian.enableDisableTracking()" value="Enable tracking"></input>\
+        <div id="trackingContainer">\
+        </div>\
+        ');
+
+        // console.log('networkcube.isTrackingEnabled()', networkcube.isTrackingEnabled())
+        if(networkcube.isTrackingEnabled())
+        {
+            var url = location.href;
+            $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
+            if(url.indexOf('dataview') > -1)
+            {
+                $('#trackingContainer').load('traces/questionnaires.html');
+            }else{
+                $('#trackingContainer').load('../traces/questionnaires.html');
+            }
+        }else{
+            $('#enableDisableTrackingBtn').prop('value', 'Enable tracking and screenshots').prop('class', 'enable');
+            if($('#trackingButtonsDiv'))
+            {
+                $('#trackingButtonsDiv').remove()
+            }
+        }
+        // <<< traces
 
         var vars = networkcube.getUrlVars();
 
@@ -501,9 +522,161 @@ module vistorian {
         $('#'+elementId).append('<br/><br/>');
     }
 
+    // # traces
+    export function enableDisableTracking()
+        {
+            var url = location.href;
+            var  relativePathToTracesDir = '';
+
+            if(url.indexOf('dataview') > -1)
+            {
+                relativePathToTracesDir = '';
+            }else{
+                relativePathToTracesDir = '../';
+            }
+            if(networkcube.isTrackingEnabled())
+            {
+                setupConditionalLoggingDisable(relativePathToTracesDir);
+            } else {
+                setupConditionalLogging(relativePathToTracesDir);
+            }
+        }
+        function validateEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email.toLowerCase());
+        }
+        export function setupConditionalLogging(relativePathToTracesDir:String)
+        {
+            bootbox.confirm({
+                closeButton: true,
+                size: "large",
+                class:"text-left",
+                message:
+                '<p><strong><big>Consent to tracking</big></strong>\
+                <p>When Tracking is ON, the Vistorian <strong>logs your activity</strong> (e.g. the fact that you created a node link diagram or a matrix, or used filters, or the fact that you uploaded a new file).\
+                <br> This allows us to understand how the Vistorian is used and to improve it.\
+                <p>This tracking data will be saved on a secure INRIA server which is accessible only by the Vistorian team.\
+                <br>No personal information will be collected or saved with the tracking data.\
+                <br>Your research data remains on your computer and is not saved anywhere else. In other words no-one else can see your data unless you personally email a screenshot or file to someone.\
+                <p>If you agree to be tracked we will start tracking, and\
+                <ul>\
+                <li><strong>Contact you </strong>by email with a detailed consent form and a questionnaire, and answer all your questions unless we have already done so.\
+                <li><strong>Turn on the Mail me a screenshot </strong>feature (which we hope will be useful to you, and allow us to see screenshots of the work you wish to share with us).\
+                </ul>\
+                <p>Please enter your email: <input id="userEmailInput" type="text" name="userEmail" style="width:300px" onkeyup="localStorage.setItem(\'NETWORKCUBE_USEREMAIL\', document.getElementById(\'userEmailInput\').value)"> <span id="email-error" style="color:white;">An email address is required</span></p>\
+                <p>You can turn tracking OFF at any time, and email us to request all your tracking data to be erased.\
+                <p>Thank you for agreeing to participate in our research.\
+                <p>The Vistorian Team (<a href="mailto:vistorian@inria.fr">vistorian@inria.fr</a>)\
+                <br><small>Benjamin Bach\
+                <br>Jean Daniel Fekete\
+                <br>Catherine Plaisant\
+                <br>Vanessa Serrano Molinero<small/>',
+
+                buttons: {
+                    confirm: {
+                        label: "I Agree",
+                        className:  "btn-success pull-right"
+                    },
+                    cancel: {
+                        label:  "Cancel",
+                        className:  "btn-warning pull-left"
+                    }
+                },
+                callback: function (result)
+                {
+                    if (result == true)
+                    {
+                        console.log(">>>>>>>>>>>>>>>>>>>MAIL:",localStorage.getItem("NETWORKCUBE_USEREMAIL"));
+                        if (localStorage.getItem("NETWORKCUBE_USEREMAIL")==null||!validateEmail(localStorage.getItem("NETWORKCUBE_USEREMAIL"))||localStorage.getItem("NETWORKCUBE_USEREMAIL")=="")
+                        {
+                            $('#email-error').css('color','red');
+                             document.getElementById('userEmailInput').style.borderColor="red";
+                             document.getElementById('userEmailInput').style.borderWidth = "5px";
+                             return false;
+                         }else{
+                            localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
+                            $('#trackingContainer').load(relativePathToTracesDir + 'traces/questionnaires.html');
+
+                            var d = new Date();
+                            localStorage.setItem("NETWORKCUBE_USERID", d.getTime());
+
+                            $('#enableDisableTrackingBtn')
+                                .prop('value', 'Disable tracking and screenshots')
+                                .prop('class', 'disable');
+
+                            console.log('NETWORKCUBE_USEREMAIL:', localStorage.getItem("NETWORKCUBE_USEREMAIL"));
+                            console.log('NETWORKCUBE_USERID:', localStorage.getItem("NETWORKCUBE_USERID"));
+                            trace.registerUser(localStorage.getItem("NETWORKCUBE_USEREMAIL"), localStorage.getItem("NETWORKCUBE_USERID"))
+                        }
+                    }else{
+                        localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
+                        console.log(">>>>>>>>>>>>>>>>>>>MAIL:",localStorage.getItem("NETWORKCUBE_USEREMAIL"));
+                        if($('#trackingButtonsDiv'))
+                        {
+                            $('#trackingButtonsDiv').remove()
+                        }
+                        $('#enableDisableTrackingBtn')
+                            .prop('value', 'Enable tracking and screenshots')
+                            .prop('class', 'enable');
+                    }
+                }
+            });
+        }
+        export function setupConditionalLoggingDisable(relativePathToTracesDir:String) {
+            bootbox.confirm({
+                closeButton: true,
+                size: "large",
+                class:"text-left",
+                message:
+                '<p><strong><big>Disable tracking</big></strong>\
+                <p>Please confirm that you want Tracking to be disabled.\
+                <br>Once tracking is disabled no more tracking information will be captured.  Nothing will be sent to the server.\
+                <p>You will be able to restart tracking again (and getting screenshots) if you wish.\
+                <p>The data we gathered from your past use of the Victorian is de-identified and contains no personal information.\
+                <br>If you wish this data to be removed from the server please send a personal email to vistorian@inria.fr <vistorian@inria.fr>.\
+                <p>Thank you for participating in our study.\
+                <p>The Vistorian Team (<a href="mailto:vistorian@inria.fr">vistorian@inria.fr</a>)\
+                <br><small>Benjamin Bach\
+                <br>Jean Daniel Fekete\
+                <br>Catherine Plaisant\
+                <br>Vanessa Serrano Molinero<small/>',
+                buttons: {
+                    confirm: {
+                        label: "CONFIRM",
+                        className:  "btn-success pull-right"
+                    },
+                    cancel: {
+                        label:  "Cancel",
+                        className:  "btn-warning pull-left"
+                    }
+                },
+                callback: function (result)
+                {
+                    if (result == false)
+                    {
+                        localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'true');
+                        console.log('>>> TRACKING ENABLED')
+                        $('#trackingContainer').load(relativePathToTracesDir + 'traces/questionnaires.html');
+                        $('#enableDisableTrackingBtn').prop('value', 'Disable tracking and screenshots').prop('class', 'disable');
+                    }else{
+                        localStorage.setItem("NETWORKCUBE_IS_TRACKING_ENABLED", 'false');
+                        if($('#trackingButtonsDiv'))
+                        {
+                            $('#trackingButtonsDiv').remove()
+                        }
+                        $('#enableDisableTrackingBtn')
+                            .prop('value', 'Enable tracking and screenshots')
+                            .prop('class', 'enable');
+                        localStorage.removeItem('NETWORKCUBE_USEREMAIL');
+                        console.log(">>>>>>>>>>>>>>>>>>>MAIL:",localStorage.getItem("NETWORKCUBE_USEREMAIL"));
+                    }
+            }
+        });
+    }
+    // << traces
 
     export function exportNetwork(network:vistorian.Network){
-        
+
         // // CONVERT NODES
         // var nodeTable = network.networkCubeDataSet.nodeTable;
         // var nodeSchema = network.networkCubeDataSet.nodeSchema;
@@ -513,11 +686,11 @@ module vistorian {
         //     n = new Object();
         //     for( var prop in nodeSchema){
         //         if(!prop.startsWith('name') && nodeSchema[prop] != null)
-        //             n[prop] = nodeTable[i][nodeSchema[prop]]                
+        //             n[prop] = nodeTable[i][nodeSchema[prop]]
         //     }
         //     nodes.push(n)
         // }
-    
+
         // // CONVERT LINKS
         // var linkTable = network.networkCubeDataSet.linkTable;
         // var linkSchema = network.networkCubeDataSet.linkSchema;
@@ -527,17 +700,17 @@ module vistorian {
         //     n = new Object();
         //     for( var prop in linkSchema){
         //         if(!prop.startsWith('name') && linkSchema[prop] != null)
-        //             n[prop] = linkTable[i][linkSchema[prop]]                
+        //             n[prop] = linkTable[i][linkSchema[prop]]
         //     }
         //     links.push(n)
         // }
         // var blurb = {
-        //     nodes:nodes, 
+        //     nodes:nodes,
         //     links:links
         // }
 
         var blurb = network;
-            
+
         var element = document.createElement('a');
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(blurb)));
         element.setAttribute('download', network.name + '.vistorian');
@@ -585,7 +758,7 @@ module vistorian {
         {
             vistorian.cleanTable(currentNetwork.userNodeTable.data);
         }
-        
+
         if (currentNetwork.userLinkTable)
         {
             vistorian.cleanTable(currentNetwork.userLinkTable.data);
@@ -595,7 +768,7 @@ module vistorian {
         // Start with empty normalized tables
         var normalizedNodeTable: any[] = [];
         var normalizedLinkTable: any[] = [];
-        
+
         // get standard schemas
         var normalizedNodeSchema: networkcube.NodeSchema;
         var normalizedLinkSchema: networkcube.LinkSchema;
@@ -604,7 +777,7 @@ module vistorian {
         // INITIALZE NORMALIZED SCHEMAS WITH USER'S ATTRIBUTES
 
         // INIT NODE SCHEMA
-        normalizedNodeSchema = new networkcube.NodeSchema(0);            
+        normalizedNodeSchema = new networkcube.NodeSchema(0);
 
         // required attributes
         normalizedNodeSchema.id = 0;
@@ -622,16 +795,16 @@ module vistorian {
                 && currentNetwork.userNodeSchema[p].length > 0
                 ){
                     normalizedNodeSchema[p] = nodeColCount++;
-                }   
-            }            
+                }
+            }
         }
 
         // INIT LINK SCHEMA
         normalizedLinkSchema = new networkcube.LinkSchema(0,1,2);
         // required attributes
         normalizedLinkSchema.id = 0;
-        normalizedLinkSchema.source = 1; 
-        normalizedLinkSchema.target = 2; 
+        normalizedLinkSchema.source = 1;
+        normalizedLinkSchema.target = 2;
 
         var linkColCount = 3
         if(currentNetwork.userLinkSchema)
@@ -651,7 +824,7 @@ module vistorian {
 
         }
 
- 
+
         console.log('NORMALIZED NODE SCHEMA: ', normalizedNodeSchema)
         console.log('NORMALIZED LINK SCHEMA: ', normalizedLinkSchema)
 
@@ -660,10 +833,10 @@ module vistorian {
         //  EXTRACT LOCATIONS FROM USER LOCATION TABLE, IF PRESENT
 
         var locationLabels: string[] = [];
-        if (currentNetwork.userLocationTable) 
+        if (currentNetwork.userLocationTable)
         {
             // store all locations for easy index lookup
-            for (var i = 1; i < currentNetwork.userLocationTable.data.length; i++) 
+            for (var i = 1; i < currentNetwork.userLocationTable.data.length; i++)
             {
                 locationLabels.push(currentNetwork.userLocationTable.data[i][currentNetwork.userLocationSchema.label]);
             }
@@ -673,9 +846,9 @@ module vistorian {
         ///////////////////////////////
         // PROCESS SINGLE NODE-TABLE //
         ///////////////////////////////
-    
+
         if (currentNetwork.userLinkTable == undefined
-        && currentNetwork.userNodeTable != undefined) 
+        && currentNetwork.userNodeTable != undefined)
         {
             // create link table and fill
             // console.log('nodeData', nodeData)
@@ -707,23 +880,23 @@ module vistorian {
             //     normalizedNodeSchema.location = colCount++;
             // }
 
-            // In the normalized node table, create one row for each row in the node table, 
+            // In the normalized node table, create one row for each row in the node table,
             // if name does not already exists
             var nodeLabels = []
             var nodeIds = []
-            for (var i = 1; i < userNodeTable.length; i++) 
+            for (var i = 1; i < userNodeTable.length; i++)
             {
                 newRow = [0,0];
                 id = parseInt(userNodeTable[i][userNodeSchema.id]);
                 nodeIds.push(id)
                 newRow[normalizedNodeSchema.id] = id
-                newRow[normalizedNodeSchema.label] = userNodeTable[i][userNodeSchema.label]                
+                newRow[normalizedNodeSchema.label] = userNodeTable[i][userNodeSchema.label]
                 nodeLabels.push(userNodeTable[i][userNodeSchema.label])
                 normalizedNodeTable.push(newRow);
             }
 
             // console.log('Create new links: ' + (nodeData.length * nodeSchema.relation.length), nodeData, nodeSchema.relation)
-            // create a node row for each node in a relation field 
+            // create a node row for each node in a relation field
             // that does not yet has an entry in the node table.
             // Plus, create a link in the link table.
             for (var i = 1; i < userNodeTable.length; i++) {
@@ -744,7 +917,7 @@ module vistorian {
 
                     // check if node already exist
                     rowNum = nodeLabels.indexOf(row[relCol]);
-                    
+
                     if (rowNum < 0)
                     {
                         // create new node in node table
@@ -775,8 +948,8 @@ module vistorian {
                     newLinkRow[normalizedLinkSchema.target] = targetId
                     newLinkRow[normalizedLinkSchema.linkType] = userNodeTable[0][relCol] // set column header as relation type
                     if(networkcube.isValidIndex(userNodeSchema.time))
-                        newLinkRow[normalizedLinkSchema.time] = row[userNodeSchema.time] 
-                    normalizedLinkTable.push(newLinkRow);    
+                        newLinkRow[normalizedLinkSchema.time] = row[userNodeSchema.time]
+                    normalizedLinkTable.push(newLinkRow);
                 }
             }
             // console.log('normalizedLinkTable', normalizedLinkTable)
@@ -790,9 +963,9 @@ module vistorian {
         ///////////////////////////////
 
         var nodeNames: string[] = [];
-            
-        if (currentNetwork.userNodeTable == undefined 
-        && currentNetwork.userLinkTable != undefined) 
+
+        if (currentNetwork.userNodeTable == undefined
+        && currentNetwork.userLinkTable != undefined)
         {
             // console.log('Create node table from scratch')
             var nodeLocations: number[][] = [];
@@ -821,13 +994,13 @@ module vistorian {
             {
                 // source
                 nodeName = userLinkData[i][userLinkSchema.source];
-                if (nodeNames.indexOf(nodeName) < 0) 
+                if (nodeNames.indexOf(nodeName) < 0)
                 {
                     row = [nodeNames.length, nodeName];
                     nodeNames.push(nodeName);
                     normalizedNodeTable.push(row)
                 }
-                
+
                 // target
                 nodeName = userLinkData[i][userLinkSchema.target];
                 if (nodeNames.indexOf(nodeName) < 0)
@@ -842,9 +1015,9 @@ module vistorian {
 
 
         // At this point, there is a normalzied node table
-        // if the user has not specified any link table, a normalized  
-        // link table has been created above. 
-        // If he has provided a link table, it is traversed below and 
+        // if the user has not specified any link table, a normalized
+        // link table has been created above.
+        // If he has provided a link table, it is traversed below and
         // the references to node names are put into place.
         if(currentNetwork.userLinkTable != undefined)
         {
@@ -854,7 +1027,7 @@ module vistorian {
             var linkTime: string;
             var found: boolean = true;
             var userLinkData = currentNetwork.userLinkTable.data;
-            for (var i = 1; i < userLinkData.length; i++) 
+            for (var i = 1; i < userLinkData.length; i++)
             {
                 newRow = []
                 for(var k=0 ; k<linkColCount ; k++){
@@ -871,10 +1044,10 @@ module vistorian {
 
                 sourceId = nodeNames.indexOf(userLinkData[i][userLinkSchema.source]);
                 newRow[normalizedLinkSchema.source] = sourceId;
-             
+
                 targetId = nodeNames.indexOf(userLinkData[i][userLinkSchema.target]);
                 newRow[normalizedLinkSchema.target] = targetId;
-             
+
                 normalizedLinkTable.push(newRow)
             }
 
@@ -884,7 +1057,7 @@ module vistorian {
             var timeFound: boolean = false;
 
 
-            if(networkcube.isValidIndex(userLinkSchema.location_source) 
+            if(networkcube.isValidIndex(userLinkSchema.location_source)
             || networkcube.isValidIndex(userLinkSchema.location_target))
             {
                 // set location schema index to next new column
@@ -906,7 +1079,7 @@ module vistorian {
                     }
                     // FYI: node table has now at least 4 rows (id, name, location, time)
                 }
-            
+
                 // insert locations and ev. times into node table, as found in linktable
                 for (var i = 1; i < userLinkData.length; i++)
                 {
@@ -914,7 +1087,7 @@ module vistorian {
                     // do for source location
                     nodeName = userLinkData[i][userLinkSchema.source]
                     if(networkcube.isValidIndex(userLinkSchema.location_source)
-                    && userLinkData[i][userLinkSchema.location_source] 
+                    && userLinkData[i][userLinkSchema.location_source]
                     && userLinkData[i][userLinkSchema.location_source] != '')
                     {
                         var len = normalizedNodeTable.length
@@ -926,18 +1099,18 @@ module vistorian {
                                 rowToDuplicate = undefined;
                                 if(networkcube.isValidIndex(normalizedNodeSchema.time))
                                 {
-                                    // if there is already a time but no location,  
+                                    // if there is already a time but no location,
                                     if(nodeRow[normalizedNodeSchema.time] == userLinkData[i][userLinkSchema.time])
                                     {
                                         if(nodeRow[normalizedNodeSchema.location] && nodeRow[normalizedNodeSchema.location] != '')
                                         {
                                             rowToDuplicate = undefined;
                                         }else{
-                                            rowToDuplicate = nodeRow;    
+                                            rowToDuplicate = nodeRow;
                                         }
                                         // nothing here node has already a location for this time, continue with next row.
                                         j = len; // go to end of table
-                                        break; 
+                                        break;
                                     }else{
                                         rowToDuplicate = nodeRow;
                                     }
@@ -975,7 +1148,7 @@ module vistorian {
                     // do for target location
                     nodeName = userLinkData[i][userLinkSchema.target]
                     if(networkcube.isValidIndex(userLinkSchema.location_target)
-                    && userLinkData[i][userLinkSchema.location_target] 
+                    && userLinkData[i][userLinkSchema.location_target]
                     && userLinkData[i][userLinkSchema.location_target] != '')
                     {
                         var len = normalizedNodeTable.length
@@ -987,18 +1160,18 @@ module vistorian {
                                 rowToDuplicate = undefined;
                                 if(networkcube.isValidIndex(normalizedNodeSchema.time))
                                 {
-                                    // if location is not empty, 
+                                    // if location is not empty,
                                     if(nodeRow[normalizedNodeSchema.time] == userLinkData[i][userLinkSchema.time])
                                     {
                                         if(nodeRow[normalizedNodeSchema.location] && nodeRow[normalizedNodeSchema.location] != '')
                                         {
                                             rowToDuplicate = undefined;
                                         }else{
-                                            rowToDuplicate = nodeRow;    
+                                            rowToDuplicate = nodeRow;
                                         }
                                         // nothing here node has already a location for this time, continue with next row.
                                         j = len; // go to end of table
-                                        break; 
+                                        break;
                                     }else{
                                         rowToDuplicate = nodeRow;
                                     }
@@ -1027,27 +1200,27 @@ module vistorian {
                                 newRowNode[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target]
                                 newRowNode[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time]
                                 // console.log('LOCATION INFO: ', newRowNode[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
-                   
+
                                 normalizedNodeTable.push(newRowNode);
-                            }                                
+                            }
                         }
                         if(locationLabels.indexOf(userLinkData[i][userLinkSchema.location_target]) == -1)
                         {
                             locationLabels.push(userLinkData[i][userLinkSchema.location_target])
                         }
                     }
-                } 
+                }
             } // end of checking for node times and location in link table
         } // end of link table normalization
 
 
-        
+
         // FORMAT TIMES INTO ISO STANDARD
 
-        if (currentNetwork.hasOwnProperty('timeFormat') && currentNetwork.timeFormat != undefined && currentNetwork.timeFormat.length > 0) 
+        if (currentNetwork.hasOwnProperty('timeFormat') && currentNetwork.timeFormat != undefined && currentNetwork.timeFormat.length > 0)
         {
             var format = currentNetwork.timeFormat;
-            if (normalizedLinkSchema.time != undefined && normalizedLinkSchema.time > -1) 
+            if (normalizedLinkSchema.time != undefined && normalizedLinkSchema.time > -1)
             {
                 for (var i = 0; i < normalizedLinkTable.length; i++) {
                     time = moment(normalizedLinkTable[i][normalizedLinkSchema.time], format).format(networkcube.timeFormat())
@@ -1057,7 +1230,7 @@ module vistorian {
                 }
             }
 
-            if (normalizedNodeSchema.time != undefined && normalizedNodeSchema.time > -1) 
+            if (normalizedNodeSchema.time != undefined && normalizedNodeSchema.time > -1)
             {
                 for (var i = 0; i < normalizedNodeTable.length; i++) {
                     time = moment(normalizedNodeTable[i][normalizedNodeSchema.time], format).format(networkcube.timeFormat());
@@ -1073,7 +1246,7 @@ module vistorian {
         ////////////////////////////////////////////////////////////////////
         // CREATE AND NORMALIZE LOCATION TABLE IF ANY LOCATION DATA EXITS //
         ////////////////////////////////////////////////////////////////////
-        
+
         var normalizedLocationSchema: networkcube.LocationSchema = networkcube.getDefaultLocationSchema();
         if(currentNetwork.userLocationTable)
         {
@@ -1102,7 +1275,7 @@ module vistorian {
                 normalizedLocationTable.push(row)
             }
         }
-        // if there exist any locations, check if they are 
+        // if there exist any locations, check if they are
         // listed in the location table
         if(locationLabels.length > 0)
         {
@@ -1131,7 +1304,7 @@ module vistorian {
         /// REPLACE LOCATIONS IN NODE AND LINK TABLES WITH INDICES
         // if source and target locations are available, set to indices.
         //source location
-        // if (userLinkSchema.source_location > -1) 
+        // if (userLinkSchema.source_location > -1)
         // {
         //     for(var i=1 ; i<userLinkData.length ; i++)
         //     {
@@ -1141,7 +1314,7 @@ module vistorian {
         //     }
         // }
         // //target location
-        // if (userLinkSchema.target_location > -1) 
+        // if (userLinkSchema.target_location > -1)
         // {
         //     for(var i=1 ; i<userLinkData.length ; i++)
         //     {
@@ -1151,7 +1324,7 @@ module vistorian {
         //     }
         // }
 
-        if (normalizedNodeSchema.location > -1) 
+        if (normalizedNodeSchema.location > -1)
         {
             for(var i=0 ; i<normalizedNodeTable.length ; i++)
             {

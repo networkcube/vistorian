@@ -2,7 +2,7 @@
     "version": "1.5.0-alpha",
     "compilerOptions": {
         "target": "es5",
-        "module": "commonjs",
+        "module": "system",
         "declaration": true,
         "noImplicitAny": false,
         "removeComments": true,
@@ -15,7 +15,6 @@
     },
     "files": [
         "./lib/jquery.ts",
-        "./lib/d3.min.ts",
         "./lib/netClustering.ts",
         "./lib/chroma.min.ts",
         "./lib/lz-string.min.ts",
