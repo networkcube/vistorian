@@ -3,7 +3,7 @@ var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#333333';
 var COLOR_HIGHLIGHT = '#ff8800';
 var LINK_OPACITY = .5;
-var LINK_WIDTH = 10;
+var LINK_WIDTH = 1.5;
 var OFFSET_LABEL = { x: 5, y: 4 };
 var LINK_GAP = 2;
 var LAYOUT_TIMEOUT = 3000;
@@ -322,6 +322,7 @@ function timeChangedHandler(m) {
             break;
         }
     }
+    trace.event('nodelink', 'filter', 'time-slider', { 'start': time_start, 'end': time_end });
     timeSlider.set(m.startUnix, m.endUnix);
     updateLinks();
     updateNodes();

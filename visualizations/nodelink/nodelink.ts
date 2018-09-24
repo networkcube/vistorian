@@ -4,7 +4,7 @@
     var COLOR_DEFAULT_NODE = '#333333';
     var COLOR_HIGHLIGHT = '#ff8800';
     var LINK_OPACITY:number = .5;
-    var LINK_WIDTH:number = 10;
+    var LINK_WIDTH:number = 1.5;
     var OFFSET_LABEL = {x:5, y:4}
     var LINK_GAP:number = 2;
     var LAYOUT_TIMEOUT:number = 3000;
@@ -428,6 +428,10 @@
         //     time_end = times[times.length-1]
         // }
   
+        // #traces
+        trace.event('nodelink', 'filter', 'time-slider', {'start': time_start, 'end': time_end});
+        // << #traces
+
         timeSlider.set(m.startUnix, m.endUnix);
         updateLinks();
         updateNodes();
