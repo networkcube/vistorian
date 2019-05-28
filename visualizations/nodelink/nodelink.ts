@@ -40,7 +40,13 @@
     var nodePairs = dgraph.nodePairs();
     var links = dgraph.links().toArray();
     var nodeLength = nodes.length;
-    
+
+    //When a row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bc = new BroadcastChannel('row_hovered_over');
+    bc.onmessage = function (ev) {
+        updateLinks(ev.data.id)
+    };
+
 
     // states
     // var mouseDownNode = undefined;
@@ -496,14 +502,18 @@
                                 ? 'visible' : 'hidden')    
 
     }
-    
-    function updateLinks()
+
+    //Optional parameter highlightId used to highlight specific link on receiving hoverover message.
+    function updateLinks(highlightId?: number)
     {
         visualLinks
             .style('stroke', function(d){
                 var color = networkcube.getPriorityColor(d);            
                 if(!color)
                     color = COLOR_DEFAULT_LINK;
+                if(highlightId && highlightId == d._id) {
+                    return 'black';
+                }
                 return color;
             })
             .style('opacity', d=>{
@@ -512,7 +522,10 @@
                 || !d.source.isVisible() 
                 || !d.target.isVisible()) 
                     return 0;
-                if(d.presentIn(time_start, time_end)){    
+                if(d.presentIn(time_start, time_end)){
+                    if(highlightId && highlightId == d._id) {
+                        return 1;
+                    }
                     return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ? 
                         Math.min(1, LINK_OPACITY + .2) : LINK_OPACITY;
                 }else{

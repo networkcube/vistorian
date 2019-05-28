@@ -1,3 +1,4 @@
+/// <reference path="../../core/networkcube.d.ts"/>
 var _this = this;
 var COLOR_DEFAULT_LINK = '#999999';
 var COLOR_DEFAULT_NODE = '#333333';
@@ -19,6 +20,7 @@ var TIMELINE_HEIGHT = 50;
 var currentLayout = 'forceDirected';
 var positions = new Object();
 positions['forceDirected'] = [];
+// get dynamic graph
 var dgraph = networkcube.getDynamicGraph();
 var times = dgraph.times().toArray();
 var time_start = times[0];
@@ -28,6 +30,13 @@ var nodesOrderedByDegree = dgraph.nodes().toArray().sort(function (n1, n2) { ret
 var nodePairs = dgraph.nodePairs();
 var links = dgraph.links().toArray();
 var nodeLength = nodes.length;
+//When a row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+var bc = new BroadcastChannel('row_hovered_over');
+bc.onmessage = function (ev) {
+    updateLinks(ev.data.id);
+};
+// states
+// var mouseDownNode = undefined;
 var hiddenLabels = [];
 var LABELING_STRATEGY = 1;
 var linkWeightScale = d3.scale.linear().range([0, LINK_WIDTH]);
@@ -36,6 +45,7 @@ linkWeightScale.domain([
     dgraph.links().weights().max()
 ]);
 networkcube.setDefaultEventListener(updateEvent);
+// MENU
 var menuDiv = d3.select('#menuDiv');
 networkcube.makeSlider(menuDiv, 'Link Opacity', SLIDER_WIDTH, SLIDER_HEIGHT, LINK_OPACITY, 0, 1, function (value) {
     LINK_OPACITY = value;
@@ -71,6 +81,7 @@ function makeDropdown(d3parent, name, values, callback) {
         callback(e.options[e.selectedIndex].value);
     });
 }
+// TIMELINE
 var timeSvg = d3.select('#timelineDiv')
     .append('svg')
     .attr('width', width)
@@ -104,6 +115,7 @@ var svg = d3.select('#visSvg')
     panOffsetGlobal[1] += panOffsetLocal[1];
 })
     .on('wheel', function () {
+    // zoom 
     d3.event.preventDefault();
     d3.event.stopPropagation();
     var globalZoom = 1 + d3.event.wheelDelta / 1000;
@@ -127,6 +139,7 @@ var nodeLabels;
 var nodeLabelOutlines;
 var visualLinks;
 var layout;
+// line function for curved links
 var lineFunction = d3.svg.line()
     .x(function (d) { return d.x; })
     .y(function (d) { return d.y; })
@@ -145,6 +158,7 @@ layout = d3.layout.force()
     _this.updateNodes();
     _this.updateLinks();
     _this.updateLayout();
+    // package layout coordinates
     var coords = [];
     for (var i = 0; i < nodes.length; i++) {
         coords.push({ x: nodes[i].x, y: nodes[i].y });
@@ -152,9 +166,12 @@ layout = d3.layout.force()
     networkcube.sendMessage('layout', { coords: coords });
 })
     .start();
+// show layout-message    
 showMessage('Calculating<br/>layout');
 init();
 function init() {
+    // CREATE NODES:
+    // node circles
     var _this = this;
     console.log(nodes.length);
     visualNodes = nodeLayer.selectAll('nodes')
@@ -177,6 +194,7 @@ function init() {
         }
         networkcube.selection('add', { nodes: [d] });
     });
+    // node labels 
     nodeLabelOutlines = labelLayer.selectAll('.nodeLabelOutlines')
         .data(nodes)
         .enter()
@@ -194,6 +212,7 @@ function init() {
         .text(function (d) { return d.label(); })
         .style('font-size', 12)
         .attr('visibility', 'hidden');
+    // CREATE LINKS
     calculateCurvedLinks();
     visualLinks = linkLayer.selectAll('visualLinks')
         .data(links)
@@ -223,6 +242,7 @@ function init() {
     updateLayout();
 }
 function updateLayout() {
+    // update node positions
     visualNodes
         .attr('cx', function (d, i) { return d.x; })
         .attr('cy', function (d, i) { return d.y; });
@@ -232,10 +252,13 @@ function updateLayout() {
     nodeLabelOutlines
         .attr('x', function (d, i) { return d.x + OFFSET_LABEL.x; })
         .attr('y', function (d, i) { return d.y + OFFSET_LABEL.y; });
+    // update link positions
     calculateCurvedLinks();
     visualLinks
         .attr('d', function (d) { return lineFunction(d.path); });
+    // update nodelabel visibility after layout update.
     updateLabelVisibility();
+    // webgl.render();
 }
 function getLabelWidth(n) {
     return n.label().length * 8.5 + 10;
@@ -248,7 +271,7 @@ function getNodeRadius(n) {
 }
 function updateLabelVisibility() {
     hiddenLabels = [];
-    if (LABELING_STRATEGY == 0) {
+    if (LABELING_STRATEGY == 0) { // automatic
         var n1, n2;
         for (var i = 0; i < nodesOrderedByDegree.length; i++) {
             n1 = nodesOrderedByDegree[i];
@@ -268,15 +291,16 @@ function updateLabelVisibility() {
             }
         }
     }
-    else if (LABELING_STRATEGY == 1) {
+    else if (LABELING_STRATEGY == 1) { // hide all
         hiddenLabels = nodes.slice(0);
     }
-    else if (LABELING_STRATEGY == 2) {
+    else if (LABELING_STRATEGY == 2) { // show all
         hiddenLabels = [];
     }
-    else if (LABELING_STRATEGY == 3) {
+    else if (LABELING_STRATEGY == 3) { // neighbors of highligted nodes
         hiddenLabels = nodes.slice(0);
     }
+    // render;
     nodeLabels.attr('visibility', function (n) { return hiddenLabels.indexOf(n) > -1 ? 'hidden' : 'visible'; });
     nodeLabelOutlines.attr('visibility', function (n) { return hiddenLabels.indexOf(n) > -1 ? 'hidden' : 'visible'; });
 }
@@ -301,12 +325,18 @@ function isHidingNode(n1, n2) {
     var n1s = n1.y - getLabelHeight(n1) / 2 - LABELDISTANCE;
     return n1w < n2.x && n1e > n2.x && n1n < n2.y && n1s > n2.y;
 }
+/////////////////////
+//// INTERACTION ////
+/////////////////////
 function mouseOverNode(n) {
     networkcube.highlight('set', { nodes: [n] });
 }
 function mouseOutNode(n) {
     networkcube.highlight('reset');
 }
+/////////////////
+//// UPDATES ////
+/////////////////
 function timeChangedHandler(m) {
     time_start = times[0];
     time_end = times[times.length - 1];
@@ -322,6 +352,9 @@ function timeChangedHandler(m) {
             break;
         }
     }
+    // if(time_end==undefined){
+    //     time_end = times[times.length-1]
+    // }
     timeSlider.set(m.startUnix, m.endUnix);
     updateLinks();
     updateNodes();
@@ -380,12 +413,16 @@ function updateNodes() {
         || (LABELING_STRATEGY == 3 && e.neighbors().highlighted().length > 0)
         ? 'visible' : 'hidden'; });
 }
-function updateLinks() {
+//Optional parameter highlightId used to highlight specific link on receiving hoverover message.
+function updateLinks(highlightId) {
     visualLinks
         .style('stroke', function (d) {
         var color = networkcube.getPriorityColor(d);
         if (!color)
             color = COLOR_DEFAULT_LINK;
+        if (highlightId && highlightId == d._id) {
+            return 'black';
+        }
         return color;
     })
         .style('opacity', function (d) {
@@ -395,6 +432,9 @@ function updateLinks() {
             || !d.target.isVisible())
             return 0;
         if (d.presentIn(time_start, time_end)) {
+            if (highlightId && highlightId == d._id) {
+                return 1;
+            }
             return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ?
                 Math.min(1, LINK_OPACITY + .2) : LINK_OPACITY;
         }
@@ -422,6 +462,7 @@ function calculateCurvedLinks() {
         }
         else {
             links = multiLink.links().toArray();
+            // Draw self-links as back-link
             if (multiLink.source == multiLink.target) {
                 var minGap = getNodeRadius(multiLink.source) / 2 + 4;
                 for (var j = 0; j < links.length; j++) {
@@ -433,14 +474,17 @@ function calculateCurvedLinks() {
                         { x: multiLink.source.x, y: -multiLink.source.y },
                     ];
                 }
+                // non-self links
             }
             else {
                 dir = {
                     x: multiLink.target.x - multiLink.source.x,
                     y: multiLink.target.y - multiLink.source.y
                 };
+                // normalize
                 offset = stretchVector([-dir.y, dir.x], LINK_GAP);
                 offset2 = stretchVector([dir.x, dir.y], LINK_GAP);
+                // calculate paths
                 for (var j = 0; j < links.length; j++) {
                     links[j]['path'] = [
                         { x: multiLink.source.x, y: multiLink.source.y },
@@ -466,6 +510,42 @@ function stretchVector(vec, finalLength) {
     }
     return vec;
 }
+// var visualLassoPoints:svg.WebGLElementQuery;
+// function lassoMoveHandler(lassoPoints:number[][]){
+//     if(visualLassoPoints != undefined)
+//         visualLassoPoints.removeAll();
+//     visualLassoPoints = svg.selectAll('visualLassoPoints')
+//         .data(lassoPoints)
+//         .append('circle')
+//             .attr('r', 1)
+//             .style('fill', '#ff9999')
+//             .attr('x', (d)=>d[0])
+//             .attr('y', (d)=>d[1])
+// }
+// function lassoEndHandler(lassoPoints:number[][]){
+//     if(visualLassoPoints != undefined)
+//         visualLassoPoints.removeAll();
+//     var selectedNodes = []
+//     for(var i=0 ; i <nodes.length ; i++){
+//         if(networkcube.isPointInPolyArray(lassoPoints, [nodes[i].x, nodes[i].y]))
+//             selectedNodes.push(nodes[i])
+//     }   
+//     console.log('Selected nodes:', selectedNodes.length)
+//     // get links in selection
+//     var selectedLinks = []
+//     var incidentLinks = [];
+//     for(var i=0 ; i <selectedNodes.length ; i++){
+//         for(var j=i+1 ; j <selectedNodes.length ; j++){
+//             // incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).presentIn(time_start,time_end).toArray() 
+//             incidentLinks = dgraph.linksBetween(selectedNodes[i], selectedNodes[j]).toArray() 
+//             selectedLinks = selectedLinks.concat(incidentLinks);
+//         }   
+//     }   
+//     console.log('Selected links:', selectedLinks.length)
+//     if(selectedNodes.length > 0){
+//         networkcube.selection('set', {nodes:selectedNodes, links:selectedLinks})
+//     }
+// }
 function showMessage(message) {
     if ($('#messageBox'))
         $('#messageBox').remove();
