@@ -41,10 +41,16 @@
     var links = dgraph.links().toArray();
     var nodeLength = nodes.length;
 
-    //When a row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
-    var bc = new BroadcastChannel('row_hovered_over');
-    bc.onmessage = function (ev) {
+    //When a link row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcLink = new BroadcastChannel('row_hovered_over_link');
+    bcLink.onmessage = function (ev) {
         updateLinks(ev.data.id)
+    };
+
+    //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcNode = new BroadcastChannel('row_hovered_over_node');
+    bcNode.onmessage = function (ev) {
+        updateNodes(ev.data.id)
     };
 
 
@@ -452,11 +458,14 @@
 
     }
     
-    function updateNodes(){
+    function updateNodes(highlightId?: number){
         visualNodes
             .style('fill', d=>{
                 var color;
-                if(d.isHighlighted()){
+                if(highlightId && highlightId == d._id){
+                    color = COLOR_HIGHLIGHT;
+                }
+                else if(d.isHighlighted()){
                     color = COLOR_HIGHLIGHT;
                 }else{
                     color = networkcube.getPriorityColor(d);            
