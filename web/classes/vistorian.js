@@ -1,18 +1,10 @@
 /// <reference path="./storage.ts"/>
 /// <reference path="../../core/networkcube.d.ts"/>
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 /*
 Convenient class that provides an API to the vistorian "framework"
 and the user data.
@@ -51,75 +43,73 @@ var vistorian;
     }
     var tables = [];
     // DATA TYPES
-    var VTable = /** @class */ (function () {
+    var VTable = (function () {
         function VTable(name, data) {
             this.name = name;
             this.data = data;
         }
         return VTable;
-    }());
+    })();
     vistorian.VTable = VTable;
-    var VTableSchema = /** @class */ (function () {
+    var VTableSchema = (function () {
         function VTableSchema(name) {
             this.name = name;
         }
         return VTableSchema;
-    }());
+    })();
     vistorian.VTableSchema = VTableSchema;
-    var VNodeSchema = /** @class */ (function (_super) {
+    var VNodeSchema = (function (_super) {
         __extends(VNodeSchema, _super);
         function VNodeSchema() {
-            var _this = _super.call(this, 'userNodeSchema') || this;
-            _this.relation = []; // relationships defined in a node table (e.g. father, mother..)
-            _this.location = -1; // location of node
-            _this.id = 0;
-            _this.label = -1;
-            _this.time = -1;
-            _this.nodeType = -1;
-            return _this;
+            _super.call(this, 'userNodeSchema');
+            this.relation = []; // relationships defined in a node table (e.g. father, mother..)
+            this.location = -1; // location of node
+            this.id = 0;
+            this.label = -1;
+            this.time = -1;
+            this.nodeType = -1;
         }
         ;
         return VNodeSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VNodeSchema = VNodeSchema;
-    var VLinkSchema = /** @class */ (function (_super) {
+    var VLinkSchema = (function (_super) {
         __extends(VLinkSchema, _super);
         function VLinkSchema() {
-            var _this = _super.call(this, 'userLinkSchema') || this;
-            _this.location_source = -1; // location of source node
-            _this.location_target = -1; // location of target node
-            _this.id = 0;
-            _this.source = -1;
-            _this.target = -1;
-            _this.weight = -1;
-            _this.time = -1;
-            _this.linkType = -1;
-            return _this;
+            _super.call(this, 'userLinkSchema');
+            this.location_source = -1; // location of source node
+            this.location_target = -1; // location of target node
+            this.id = 0;
+            this.source = -1;
+            this.target = -1;
+            this.weight = -1;
+            this.time = -1;
+            this.linkType = -1;
+            this.directed = -1;
         }
         ;
         return VLinkSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLinkSchema = VLinkSchema;
-    var VLocationSchema = /** @class */ (function (_super) {
+    var VLocationSchema = (function (_super) {
         __extends(VLocationSchema, _super);
         function VLocationSchema() {
-            var _this = _super.call(this, 'userLocationSchema') || this;
-            _this.id = 0;
-            _this.label = 1;
-            _this.geoname = 2;
-            _this.longitude = 3;
-            _this.latitude = 4;
-            return _this;
+            _super.call(this, 'userLocationSchema');
+            this.id = 0;
+            this.label = 1;
+            this.geoname = 2;
+            this.longitude = 3;
+            this.latitude = 4;
         }
         ;
         return VLocationSchema;
-    }(VTableSchema));
+    })(VTableSchema);
     vistorian.VLocationSchema = VLocationSchema;
     // this represents a network the user created, including
     // - the originally formatted tables
     // - the node and edge schemas on those tables
     // - the networkcube data set with the normalized tables
-    var Network = /** @class */ (function () {
+    var Network = (function () {
         function Network(id) {
             // networkCubeDataSet: networkcube.DataSet;
             this.networkConfig = 'both';
@@ -129,7 +119,7 @@ var vistorian;
             this.ready = false;
         }
         return Network;
-    }());
+    })();
     vistorian.Network = Network;
     // FUNCTIONS
     function loadCSV(files, callBack, sessionid) {
@@ -425,7 +415,6 @@ var vistorian;
                 if (geoname == '')
                     return;
                 locationTable.data[rowIndex] = [rowIndex - 1, userLocationLabel, geoname, undefined, undefined];
-                // console.log('update', geoname, undefined, undefined);
             }
         })
             .always(function () {
@@ -658,7 +647,6 @@ var vistorian;
                     else {
                         // targetId = nodeIds[rowNum]
                         targetId = rowNum;
-                        // targetId = nodeLabels.indexOf(row[relCol]);
                     }
                     // create entry in link table
                     newLinkRow = [];
@@ -675,7 +663,6 @@ var vistorian;
                     normalizedLinkTable.push(newLinkRow);
                 }
             }
-            // console.log('normalizedLinkTable', normalizedLinkTable)
         }
         ///////////////////////////////
         // PROCESS SINGLE LINK-TABLE //
@@ -769,7 +756,6 @@ var vistorian;
                     for (var i = 0; i < normalizedNodeTable.length; i++) {
                         normalizedNodeTable[i].push('');
                     }
-                    // FYI: node table has now at least 4 rows (id, name, location, time)
                 }
                 // insert locations and ev. times into node table, as found in linktable
                 for (var i = 1; i < userLinkData.length; i++) {
@@ -867,7 +853,6 @@ var vistorian;
                             if (rowToDuplicate[normalizedNodeSchema.location] == '') {
                                 rowToDuplicate[normalizedNodeSchema.location] = userLinkData[i][userLinkSchema.location_target];
                                 rowToDuplicate[normalizedNodeSchema.time] = userLinkData[i][userLinkSchema.time];
-                                // console.log('LOCATION INFO: ', rowToDuplicate[normalizedNodeSchema.label], rowToDuplicate[normalizedNodeSchema.location], rowToDuplicate[normalizedNodeSchema.time])
                             }
                             else {
                                 // duplicate
@@ -993,6 +978,7 @@ var vistorian;
         dataset.locationTable = normalizedLocationTable;
         dataset.locationSchema = normalizedLocationSchema;
         dataset.timeFormat = currentNetwork.timeFormat;
+        dataset.directed = currentNetwork.directed;
         if (currentNetwork.userLocationTable) {
             currentNetwork.userLocationTable.data = [];
             currentNetwork.userLocationTable.data.push(['Id', 'User Name', 'Geoname', 'Longitude', 'Latitude']);

@@ -92,6 +92,7 @@ function createNetwork() {
     var id = new Date().getTime();
     currentNetwork = new vistorian.Network(id);
     currentNetwork.name = 'Network-' + currentNetwork.id;
+    currentNetwork.directed = false;
     storage.saveNetwork(currentNetwork, SESSION_NAME);
     // saveCurrentNetwork(true);
     // $('#chooseNetworktype').css('display', 'block')
@@ -525,7 +526,18 @@ function showTable(table, elementName, isLocationTable, schema) {
                         fieldName = field;
                         fieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
                 }
-                option = $('<option value=' + field + '>' + fieldName + '</option>');
+                if (field == 'directed') {
+                    option = $('<option value=' + field + ' class=directionField style=display:block>' + fieldName + '</option>');
+                }
+                else if (field == 'source') {
+                    option = $('<option value=' + field + ' class=sourceField>' + fieldName + '</option>');
+                }
+                else if (field == 'target') {
+                    option = $('<option value=' + field + ' class=targetField>' + fieldName + '</option>');
+                }
+                else {
+                    option = $('<option value=' + field + '>' + fieldName + '</option>');
+                }
                 select.append(option);
                 if (i == 0 && field == 'id') {
                     $(option).attr('selected', 'selected');
@@ -718,12 +730,10 @@ function checkTimeFormatting(network) {
     var corruptedNodeTimes = [];
     if (network.userNodeTable && network.userNodeTable && network.userNodeSchema && network.userNodeSchema['timeFormat']) {
         corruptedNodeTimes = vistorian.checkTime(network.userNodeTable, network.userNodeSchema['time'], network.userNodeSchema['timeFormat']);
-        // console.log('corruptedTimes', corruptedNodeTimes);
     }
     var corruptedLinkTimes = [];
     if (network.userLinkTable && network.userLinkSchema && network.userLinkSchema['timeFormat']) {
         corruptedLinkTimes = vistorian.checkTime(network.userLinkTable, network.userLinkSchema['time'], network.userLinkSchema['timeFormat']);
-        // console.log('corruptedTimes', corruptedLinkTimes);
     }
     // return corruptedNodeTimes.length > 0 || corruptedLinkTimes.length > 0;
     return false;
@@ -869,6 +879,39 @@ function replaceCellContents(tableId) {
     saveCellChanges();
     saveCurrentNetwork(false);
     showMessage('Replaced ' + replaceCount + ' occurrences of ' + replace_pattern + ' with ' + replace_value + '.', 2000);
+}
+var directedCheckboxToggle = false;
+function directedCheckboxClick() {
+    $("input[type=checkbox]").attr("checked", !directedCheckboxToggle);
+    directedCheckboxToggle = !directedCheckboxToggle;
+    var directionFields = document.getElementsByClassName('directionField');
+    var sourceFields = document.getElementsByClassName('sourceField');
+    var targetFields = document.getElementsByClassName('targetField');
+    if (directedCheckboxToggle) {
+        currentNetwork.directed = true;
+        for (var i = 0; i < directionFields.length; i++) {
+            directionFields[i].style.display = 'none';
+        }
+        for (var i = 0; i < sourceFields.length; i++) {
+            sourceFields[i].innerHTML = 'Source Node';
+        }
+        for (var i = 0; i < targetFields.length; i++) {
+            targetFields[i].innerHTML = 'Target Node';
+        }
+    }
+    else {
+        currentNetwork.directed = false;
+        for (var i = 0; i < directionFields.length; i++) {
+            directionFields[i].style.display = 'block';
+        }
+        for (var i = 0; i < sourceFields.length; i++) {
+            sourceFields[i].innerHTML = 'Node 1';
+        }
+        for (var i = 0; i < targetFields.length; i++) {
+            targetFields[i].innerHTML = 'Node 2';
+        }
+    }
+    saveCurrentNetwork(true);
 }
 /** Extracts locations from node and link tabe**/
 function extractLocations() {

@@ -365,6 +365,7 @@ declare module networkcube {
         maxWeight: number;
         _nodes: Node[];
         _links: Link[];
+        directed: boolean;
         _nodePairs: NodePair[];
         _locations: Location[];
         _times: Time[];
@@ -387,6 +388,7 @@ declare module networkcube {
         attr(field: string, id: number, type: string): any;
         gran_min_NAME: string;
         gran_max_NAME: string;
+        directed_NAME: string;
         minWeight_NAME: string;
         maxWeight_NAME: string;
         matrix_NAME: string;
@@ -600,6 +602,7 @@ declare module networkcube {
         locationSchema: LocationSchema;
         selections: Selection[];
         timeFormat: string;
+        directed: boolean;
         constructor(params?: any);
     }
     class TableSchema {

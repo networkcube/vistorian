@@ -116,9 +116,12 @@
                         or <input id="linkTableUpload" type="file" name="file" class="inputfile" value="Upload" name="files[]" data-multiple-caption="{count} files selected"/>
                             <label for="linkTableUpload" class="menuButton hastooltip" title="Upload a new table in CSV file.">
                                 Upload new link table
-                            </label> 
+                            </label>
+                            <p>
+                            <input type="checkbox" name="directedCheckbox" onclick="directedCheckboxClick()">Directed
+                            </p>
                         </div>
-                       <div id="linkTableDiv" class="tableDiv"></div>
+                        <div id="linkTableDiv" class="tableDiv"></div>
                     </div>
 
                     <!-- Show location table here -->

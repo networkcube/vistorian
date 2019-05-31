@@ -45,7 +45,6 @@ var storage;
             saveTableNames(tableNames, sessionid);
         }
         else {
-            // console.log('\tTable', table.name, 'found. Replace table')
         }
         $.jStorage.set(sessionid + SEP + SESSION_TABLE + SEP + table.name, table);
         // console.log('\tTable', table.name, 'added.', getTableNames(sessionid).length + ' tables stored.', getUserTable(table.name, sessionid))
@@ -118,7 +117,6 @@ var storage;
         if (!found) {
             networkIds.push(network.id);
             saveNetworkIds(networkIds, sessionid);
-            // console.log('Save imported networkId', network.id)
         }
         // console.log('save network', network)
         $.jStorage.set(sessionid + SEP + SESSION_NETWORK + SEP + network.id, network);
