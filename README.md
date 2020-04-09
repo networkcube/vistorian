@@ -1,4 +1,4 @@
-# Networkcube
+# Vistorian / Networkcube
 
 Networkcube is a java script / (Typescript) library and a programming framework for interactive network visualizations with:
 
@@ -8,30 +8,30 @@ Networkcube is a java script / (Typescript) library and a programming framework 
 * temporal information on links (weigth, existence)
 * geographical positions attached to nodes
 
-Networkcube is currently has been build with two goals in mind: 
+The Vistorian is an application based on 'networkcube' and has been build with two goals in mind: 
 
 * Ready-to-use visualizations that can be embedded in any web environment, e.g. to provide state-of-the-art visualizations to a specific group of stateholders or in a specific domain. 
 * Rapidly prototype, deploy, and mature novel network visualizations. 
 * Browser-based: networkcube runs entirely in the browser and does not use any server. None of your data is transmitted over the network nor stored on any server.
 
-Networkcube is designed for research and is currently in a prorotype phase. However, the code is open and contributions are welcome. Please read the [Wiki](Home) for more information or contact us: benj.bach@gmail.com.
+Vistorian is designed for research and is currently in a prorotype phase. However, the code is open and contributions are welcome. Please read the [Wiki](Home) for more information or contact us: benj.bach@gmail.com.
 
-Each visualization in networkcube is its individual model and runs in an iFrame. Visualizations are hosted here on github and can be integrated in any website. So, the only thing your website has to care is importing a user's data into the browser (https://github.com/networkcube/networkcube/wiki/Importing-Data).
+Each visualization in Vistorian is its individual model and runs in an iFrame. Visualizations are hosted here on github and can be integrated in any website. So, the only thing your website has to care is importing a user's data into the browser (https://github.com/networkcube/networkcube/wiki/Importing-Data).
 
 ## Demos and Example Projects
 
-Networkcube has been used in the following projects:
+Vistorian has been used in the following projects:
 
-* Vistorian (http://vistorian.net): A visualization platform for the social network visualization.
-* ConnectoScope: A visualization platform for brain connectivity in neuroscience
+* A stable version at [http://vistorian.net](http://vistorian.net)
+* The latest version pointing to the master in this repo under [https://networkcube.github.io/vistorian](https://networkcube.github.io/vistorian).
 
-A ready-to-use version can be found on http://networkcube.net.
-
+<!--
 ## Using Networkcube in your projects
 
 * Include the following link into your website: https://networkcube.github.io/networkcube/core/networkcube.js
 
 * Learn how to import data (https://github.com/networkcube/networkcube/wiki/Importing-Data) and how to use the network API (https://github.com/networkcube/networkcube/wiki/Query-API)
+-->
 
 ## Components
 
@@ -45,7 +45,6 @@ server and program the backend. Technically, this is possible. Eventually this m
 Visualizations are referenced via a URL and can hence sit anywhere in the internet. Once the visualization code is loaded
 all it needs to do is to query the data from the local storage.
 * A **messenger to send events between all the visualizations** in your browser: be they in windows, tabs, or iFrames. Messages pass simple interaction events such as node selection or changes to a time slider for temporal navigation.
-
 
 
 ## Technical Specifications
