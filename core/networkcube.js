@@ -1,3 +1,4 @@
+/*! jQuery v1.11.1 | (c) 2005, 2014 jQuery Foundation, Inc. | jquery.org/license */
 !function (a, b) { "object" == typeof module && "object" == typeof module.exports ? module.exports = a.document ? b(a, !0) : function (a) { if (!a.document)
     throw new Error("jQuery requires a window with a document"); return b(a); } : b(a); }("undefined" != typeof window ? window : this, function (a, b) {
     var c = [], d = c.slice, e = c.concat, f = c.push, g = c.indexOf, h = {}, i = h.toString, j = h.hasOwnProperty, k = {}, l = "1.11.1", m = function (a, b) { return new m.fn.init(a, b); }, n = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, o = /^-ms-/, p = /-([\da-z])/gi, q = function (a, b) { return b.toUpperCase(); };
@@ -2682,6 +2683,8 @@ var netClustering = {
         }
     }
     function addClosestPairByCommunity(tree, deltaQ, a) {
+        //  Newman"s communities algorithm, http://arxiv.org/abs/cond-mat/0309508v1
+        //  Find the largest deltaQ for each row, and overall
         var n = tree.length;
         var H = {};
         for (var hash in deltaQ) {
@@ -3033,6 +3036,39 @@ var netClustering = {
         return groups;
     }
 })();
+/**
+ * @license
+ *
+ * chroma.js - JavaScript library for color conversions
+ *
+ * Copyright (c) 2011-2015, Gregor Aisch
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. The name Gregor Aisch may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL GREGOR AISCH OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 (function () {
     var Color, DEG2RAD, LAB_CONSTANTS, PI, PITHIRD, RAD2DEG, TWOPI, _guess_formats, _guess_formats_sorted, _input, _interpolators, abs, atan2, bezier, blend, blend_f, brewer, burn, chroma, clip_rgb, cmyk2rgb, colors, cos, css2rgb, darken, dodge, each, floor, hex2rgb, hsi2rgb, hsl2css, hsl2rgb, hsv2rgb, interpolate, interpolate_hsx, interpolate_lab, interpolate_num, interpolate_rgb, lab2lch, lab2rgb, lab_xyz, lch2lab, lch2rgb, lighten, limit, log, luminance_x, m, max, multiply, normal, num2rgb, overlay, pow, rgb2cmyk, rgb2css, rgb2hex, rgb2hsi, rgb2hsl, rgb2hsv, rgb2lab, rgb2lch, rgb2luminance, rgb2num, rgb2temperature, rgb2xyz, rgb_xyz, rnd, root, round, screen, sin, sqrt, temperature2rgb, type, unpack, w3cx11, xyz_lab, xyz_rgb, slice = [].slice;
     type = (function () {
@@ -5699,6 +5735,7 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
     var je = a;
     return je;
 });
+// setOps.js MIT License © 2014 James Abney http://github.com/jabney
 (function (so) {
     'use strict';
     var uidList = [], uid;
@@ -5775,6 +5812,11 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
         return min === 3 && max === 3;
     };
 })(window.setOps = window.setOps || Object.create(null));
+/*!
+    Papa Parse
+    v4.1.0
+    https://github.com/mholt/PapaParse
+*/
 (function (global) {
     "use strict";
     var IS_WORKER = !global.document, LOADED_SYNC = false, AUTO_SCRIPT_PATH;
@@ -6798,6 +6840,10 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
             return decompose;
         };
         function science_lin_decomposeTred2(d, e, V) {
+            // This is derived from the Algol procedures tred2 by
+            // Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+            // Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+            // Fortran subroutine in EISPACK.
             var n = V.length;
             for (var j = 0; j < n; j++)
                 d[j] = V[n - 1][j];
@@ -6882,6 +6928,10 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
             e[0] = 0;
         }
         function science_lin_decomposeTql2(d, e, V) {
+            // This is derived from the Algol procedures tql2, by
+            // Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+            // Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+            // Fortran subroutine in EISPACK.
             var n = V.length;
             for (var i = 1; i < n; i++)
                 e[i - 1] = e[i];
@@ -6968,6 +7018,10 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
             }
         }
         function science_lin_decomposeOrthes(H, V) {
+            // This is derived from the Algol procedures orthes and ortran,
+            // by Martin and Wilkinson, Handbook for Auto. Comp.,
+            // Vol.ii-Linear Algebra, and the corresponding
+            // Fortran subroutines in EISPACK.
             var n = H.length;
             var ort = [];
             var low = 0;
@@ -7027,6 +7081,10 @@ var LZString = function () { function o(o, r) { if (!t[o]) {
             }
         }
         function science_lin_decomposeHqr2(d, e, H, V) {
+            // This is derived from the Algol procedure hqr2,
+            // by Martin and Wilkinson, Handbook for Auto. Comp.,
+            // Vol.ii-Linear Algebra, and the corresponding
+            // Fortran subroutine in EISPACK.
             var nn = H.length, n = nn - 1, low = 0, high = nn - 1, eps = 1e-12, exshift = 0, p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
             var norm = 0;
             for (var i = 0; i < nn; i++) {
@@ -8558,6 +8616,8 @@ var colorSchemes;
         '#b15928'
     ];
 })(colorSchemes || (colorSchemes = {}));
+/// <reference path='../scripts/three.d.ts' />
+/// <reference path='./dynamicgraph.ts' />
 var networkcube;
 (function (networkcube) {
     function getPriorityColor(element) {
@@ -9006,6 +9066,8 @@ var networkcube;
         return new Blob([ia], { type: mimeString });
     }
 })(networkcube || (networkcube = {}));
+/// <reference path="./utils.ts" />    
+/// <reference path="./dynamicGraph.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -10148,6 +10210,12 @@ var networkcube;
     })();
     networkcube.MotifSequence = MotifSequence;
 })(networkcube || (networkcube = {}));
+/// <reference path="./colors.ts" />
+/// <reference path="../scripts/moment.d.ts" />
+/// <reference path="./utils.ts" />
+/// <reference path="./datamanager.ts" />
+/// <reference path="../scripts/d3.d.ts" />
+/// <reference path="./queries.ts" />
 var networkcube;
 (function (networkcube) {
     networkcube.GRANULARITY = ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'century', 'millenium'];
@@ -10205,6 +10273,7 @@ var networkcube;
             this.selections = [];
             this.gran_min_NAME = "gran_min";
             this.gran_max_NAME = "gran_max_NAME";
+            this.directed_NAME = "directed_NAME";
             this.minWeight_NAME = "minWeight_NAME";
             this.maxWeight_NAME = "maxWeight_NAME";
             this.matrix_NAME = "matrix_NAME";
@@ -10321,6 +10390,7 @@ var networkcube;
             this.gran_min = dataMgr.getFromStorage(this.name, this.gran_min_NAME);
             console.log('this.gran_min', this.gran_min);
             this.gran_max = dataMgr.getFromStorage(this.name, this.gran_max_NAME);
+            this.directed = dataMgr.getFromStorage(this.name, this.directed_NAME);
             this.minWeight = dataMgr.getFromStorage(this.name, this.minWeight_NAME);
             this.maxWeight = dataMgr.getFromStorage(this.name, this.maxWeight_NAME);
             this.matrix = dataMgr.getFromStorage(this.name, this.matrix_NAME);
@@ -10364,6 +10434,7 @@ var networkcube;
         DynamicGraph.prototype.saveDynamicGraph = function (dataMgr) {
             dataMgr.saveToStorage(this.name, this.gran_min_NAME, this.gran_min);
             dataMgr.saveToStorage(this.name, this.gran_max_NAME, this.gran_max);
+            dataMgr.saveToStorage(this.name, this.directed_NAME, this.directed);
             dataMgr.saveToStorage(this.name, this.minWeight_NAME, this.minWeight);
             dataMgr.saveToStorage(this.name, this.maxWeight_NAME, this.maxWeight);
             dataMgr.saveToStorage(this.name, this.matrix_NAME, this.matrix);
@@ -10378,6 +10449,7 @@ var networkcube;
         DynamicGraph.prototype.delete = function (dataMgr) {
             dataMgr.removeFromStorage(this.name, this.gran_min_NAME);
             dataMgr.removeFromStorage(this.name, this.gran_max_NAME);
+            dataMgr.removeFromStorage(this.name, this.directed_NAME);
             dataMgr.removeFromStorage(this.name, this.minWeight_NAME);
             dataMgr.removeFromStorage(this.name, this.maxWeight_NAME);
             dataMgr.removeFromStorage(this.name, this.matrix_NAME);
@@ -10401,6 +10473,10 @@ var networkcube;
             }
             if (this.gran_max != other.gran_max) {
                 console.log("gran_max different", this.gran_max, other.gran_max);
+                result = false;
+            }
+            if (this.directed != other.directed) {
+                console.log("directed different", this.directed, other.directed);
                 result = false;
             }
             if (this._nodes.length != other._nodes.length
@@ -10493,6 +10569,7 @@ var networkcube;
         DynamicGraph.prototype.initDynamicGraph = function (data) {
             this.clearSelections();
             this.name = data.name;
+            this.directed = data.directed;
             this.gran_min = 0;
             this.gran_max = 0;
             if (networkcube.isValidIndex(data.linkSchema.time)) {
@@ -10780,21 +10857,6 @@ var networkcube;
                 if (this.nodePairArrays.links[nodePairId].indexOf(linkId) == -1) {
                     this.nodePairArrays.links[nodePairId].push(linkId);
                     this.linkArrays.nodePair[linkId] = nodePairId;
-                }
-                if (this.linkArrays.directed[i]) {
-                    nodePairId = this.matrix[t][s];
-                    if (!nodePairId) {
-                        nodePairId = this.nodePairArrays.id.length;
-                        this.matrix[t][s] = nodePairId;
-                        this.nodePairArrays.id.push(nodePairId);
-                        this.nodePairArrays.source.push(t);
-                        this.nodePairArrays.target.push(s);
-                        this.nodePairArrays.links.push(networkcube.doubleArray(this._times.length));
-                    }
-                    if (this.nodePairArrays.links[nodePairId].indexOf(linkId) == -1) {
-                        this.nodePairArrays.links[nodePairId].push(linkId);
-                        this.linkArrays.nodePair[linkId] = nodePairId;
-                    }
                 }
                 if (networkcube.isValidIndex(data.linkSchema.linkType)) {
                     typeName = data.linkTable[i][data.linkSchema.linkType];
@@ -11478,6 +11540,8 @@ var networkcube;
     })();
     networkcube.Ordering = Ordering;
 })(networkcube || (networkcube = {}));
+/// <reference path="./dynamicgraph.ts"/>
+/// <reference path="../scripts/lz-string.d.ts" />
 var networkcube;
 (function (networkcube) {
     var DataManager = (function () {
@@ -11606,7 +11670,13 @@ var networkcube;
                 + this.SEP + valueName];
             if (storedResult && storedResult != "undefined") {
                 var parseText;
-                if ("\"'[{0123456789".indexOf(storedResult[0]) >= 0)
+                if (storedResult == "true") {
+                    parseText = true;
+                }
+                else if (storedResult == "false") {
+                    parseText = false;
+                }
+                else if ("\"'[{0123456789".indexOf(storedResult[0]) >= 0)
                     parseText = storedResult;
                 else
                     parseText = LZString.decompress(storedResult);
@@ -11667,6 +11737,7 @@ var networkcube;
             this.name = params.name;
             this.nodeTable = params.nodeTable;
             this.linkTable = params.linkTable;
+            this.directed = params.directed;
             if (params.nodeSchema == undefined)
                 this.nodeSchema = getDefaultNodeSchema();
             else
@@ -12007,6 +12078,7 @@ var networkcube;
     }
     networkcube.findTriangles = findTriangles;
 })(networkcube || (networkcube = {}));
+/// <reference path="./dynamicgraph.ts" />
 var networkcube;
 (function (networkcube) {
     function findDegree(nodes) {
@@ -12756,6 +12828,7 @@ var networkcube;
     }
     networkcube.downloadText = downloadText;
 })(networkcube || (networkcube = {}));
+/// <reference path='./dynamicgraph.ts' />
 var networkcube;
 (function (networkcube) {
     function searchForTerm(term, dgraph, type) {
@@ -12794,6 +12867,10 @@ var networkcube;
         return StringContainsFilter;
     })();
 })(networkcube || (networkcube = {}));
+/// <reference path="./dynamicgraph.ts" />
+/// <reference path="./utils.ts" />
+/// <reference path="./search.ts" />
+/// <reference path="../scripts/jquery.d.ts" />
 var networkcube;
 (function (networkcube) {
     networkcube.MESSAGE_HIGHLIGHT = 'highlight';
@@ -13133,6 +13210,7 @@ var networkcube;
         }
     }
 })(networkcube || (networkcube = {}));
+/// <reference path="./dynamicgraph.ts" />
 var networkcube;
 (function (networkcube) {
     function orderNodes(graph, config) {
@@ -13186,6 +13264,10 @@ var networkcube;
     })();
     networkcube.OrderingConfiguration = OrderingConfiguration;
 })(networkcube || (networkcube = {}));
+/// <reference path="./datamanager.ts" />
+/// <reference path="./dynamicgraph.ts" />
+/// <reference path="./utils.ts" />
+/// <reference path="../scripts/jquery.d.ts" />
 var networkcube;
 (function (networkcube) {
     networkcube.TIME_FORMAT = 'YYYY-MM-DD hh:mm:ss';
@@ -13491,6 +13573,8 @@ var glutils;
             txtCanvas.setAttribute('id', 'textCanvas');
         }
         WebGL.prototype.render = function () {
+            // var d = new Date();
+            // var begin = d.getTime()
             for (var i = 0; i < this.elementQueries.length; i++) {
                 if (this.elementQueries[i].updateAttributes || this.elementQueries[i].updateStyle) {
                     this.elementQueries[i].set();
