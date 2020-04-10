@@ -296,9 +296,10 @@
 
 
             // Load demo data
-            $.get("https://raw.githubusercontent.com/networkcube/vistorian/master/demo/demo_scientists.vistorian",
+            $.get("https://raw.githubusercontent.com/networkcube/vistorian/master/web/demo/demo_scientists.vistorian",
                 function (data)
                 {   
+                    console.log('data', data)
                     vistorian.importData(JSON.parse(data), 0);            
                     vistorian.importIntoNetworkcube(JSON.parse(data), 0) 
                 });
