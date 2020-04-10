@@ -201,16 +201,6 @@ function init(){
         $('#weirdDiv').parent().parent().css('width', window.innerWidth * Math.random());
     });
 
-    var bcNode = new BroadcastChannel('row_hovered_over_node');
-    bcNode.onmessage = function (ev) {
-        updateNodes(ev.data.id);
-    };
-
-    var bcLink = new BroadcastChannel('row_hovered_over_link');
-    bcLink.onmessage = function (ev) {
-        updateLinks(ev.data.id);
-    };
-
     var lastPanUpdate: number = window.performance.now();
     map.addListener('center_changed', function(e) {
 
@@ -794,23 +784,17 @@ function updateGeoNodePositions() {
     }    
 }
 
-function updateLinks(highlightId?: number) {
+function updateLinks() {
 
     visualLinks
         .transition().duration(100)
         .style('stroke', function(d) {
             var color = networkcube.getPriorityColor(d);
-            if(highlightId && highlightId == d._id){
-                return 'orange';
-            }
             if (!color)
                 color = COLOR_DEFAULT_LINK;
             return color;
         })
         .attr('opacity', d => {
-            if(highlightId && highlightId == d._id){
-                return 1;
-            }
             var visible = d.isVisible();
             if (!visible || !d.presentIn(time_start, time_end))
                 return 0;            
@@ -838,10 +822,7 @@ function updateLinks(highlightId?: number) {
             } else {
                 d3.select(this).attr('stroke-dasharray', '0')
             }
-            if(highlightId && highlightId == d._id){
-                weight *=3;
-            }
-            else if(d.isHighlighted())
+            if(d.isHighlighted())
                 weight *=2;
             return weight;
         })
@@ -849,7 +830,7 @@ function updateLinks(highlightId?: number) {
 }
 
 var visibleLabels = []
-function updateNodes(highlightId?: number) {
+function updateNodes() {
 
     visibleLabels = [];
 
@@ -866,15 +847,12 @@ function updateNodes(highlightId?: number) {
         .classed('highlighted', (n) => 
             n.node.isHighlighted() 
             || n.node.links().highlighted().length > 0
-            || n.node.neighbors().highlighted().length > 0
+            || n.node.neighbors().highlighted().length > 0 
             )
         .style('fill', d => {
             var color;
             if (d.node.isHighlighted()) {
                 color = COLOR_HIGHLIGHT;
-            }
-            else if(highlightId && highlightId == d.node._id){
-                return 'orange';
             } else {
                 color = networkcube.getPriorityColor(d.node);
             }
@@ -883,9 +861,6 @@ function updateNodes(highlightId?: number) {
             return color;
         })
         .style('opacity', (d)=>{
-            if(highlightId && highlightId == d.node._id){
-                return 1;
-            }
                         if (!d.node.isVisible())
                 return 0;
             return d.timeIds[0] <= time_end.id() && d.timeIds[d.timeIds.length-1] >= time_start.id() ? 

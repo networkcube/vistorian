@@ -1,14 +1,6 @@
-/// <reference path="../../core/scripts/three.d.ts"/>
-/// <reference path="../../core/helper/glutils.ts"/>
-/// <reference path="../../core/networkcube.d.ts" />
-/// <reference path="../../core/scripts/jquery.d.ts"/>
-/// <reference path="../../core/scripts/d3.d.ts"/>
-/// <reference path="../widgets/widgets.d.ts" />
 var COLOR_HIGHLIGHT = 0x000000;
 var COLOR_SELECTION = 0xff0000;
-// let COLOR_CELL_DEFAULT = 0x000000;
-// let COLOR_CELL_FILTER = 0xdddddd;
-var NMargin = /** @class */ (function () {
+var NMargin = (function () {
     function NMargin(v) {
         this.setMargin(v);
     }
@@ -18,7 +10,7 @@ var NMargin = /** @class */ (function () {
     };
     return NMargin;
 }());
-var MatrixMenu = /** @class */ (function () {
+var MatrixMenu = (function () {
     function MatrixMenu(elem, matrix) {
         this.elem = elem;
         this.matrix = matrix;
@@ -31,8 +23,6 @@ var MatrixMenu = /** @class */ (function () {
         this.elem.append('<label>Label ordering:</label>');
         var orderingMenu = $("#networkcube-matrix-menu")
             .append('<select id="labelOrdering"></select>');
-        //$("#networkcube-matrix-menu").append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix"  onclick="trace_help()">Manual</a>');
-        // VS: Clicks on Manual
         $("#networkcube-matrix-menu")
             .append('<a class="manual-button" target="_blank" href="https://github.com/networkcube/networkcube/wiki/Visualization-Manual#matrix-visualization-matrix" onclick="trace_help()">Manual</a>');
         $('#labelOrdering').change(this.reorderHandler);
@@ -43,7 +33,6 @@ var MatrixMenu = /** @class */ (function () {
         $('#labelOrdering').append('<option value="similarity">Similarity</option>');
         this.elem.append('<input value="Re-run" id="reorderBtn" type="button"/>');
         $('#reorderBtn').click(this.reorderHandler);
-        //$('#dataName').text(this.matrix.dgraphName());
     };
     MatrixMenu.prototype.updateCellSize = function () {
         var value = $('#cellSizeBox').val();
@@ -58,7 +47,7 @@ var MatrixMenu = /** @class */ (function () {
     };
     return MatrixMenu;
 }());
-var MatrixTimeSlider = /** @class */ (function () {
+var MatrixTimeSlider = (function () {
     function MatrixTimeSlider(elem, matrix, width) {
         this.elem = elem;
         this.matrix = matrix;
@@ -79,7 +68,7 @@ var MatrixTimeSlider = /** @class */ (function () {
     };
     return MatrixTimeSlider;
 }());
-var CellLabel = /** @class */ (function () {
+var CellLabel = (function () {
     function CellLabel() {
         this.cellLabelBackground = glutils.selectAll()
             .data([{ id: 0 }])
@@ -116,16 +105,10 @@ var CellLabel = /** @class */ (function () {
             .text(val ? val : 0)
             .attr('z', 2)
             .style('font-size', fw);
-        // this.cellLabelBackground
-        //   .attr('x', mx + 10)
-        //   .attr('y', -my + 11)
-        //   .attr("width",70)
-        //   .attr("height", 22)
-        //   .style('opacity', .8);
     };
     return CellLabel;
 }());
-var MatrixOverview = /** @class */ (function () {
+var MatrixOverview = (function () {
     function MatrixOverview(svg, width, height, matrix) {
         var _this = this;
         this.zoomed = function () {
@@ -166,7 +149,6 @@ var MatrixOverview = /** @class */ (function () {
             .attr("fill", this.focusColor)
             .attr("fill-opacity", .2);
         this.zoom = d3.behavior.zoom()
-            // .scaleExtent([0.2, 4])
             .on('zoom', this.zoomed);
         this.focus.call(this.zoom);
     };
@@ -207,20 +189,14 @@ var MatrixOverview = /** @class */ (function () {
     };
     return MatrixOverview;
 }());
-var MatrixLabels = /** @class */ (function () {
+var MatrixLabels = (function () {
     function MatrixLabels(svg, margin, matrix) {
         this.svg = svg;
         this.matrix = matrix;
         this.margin = margin;
         this.cellSize = 0;
-        //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
-        var bcNode = new BroadcastChannel('row_hovered_over_node');
-        var self = this;
-        bcNode.onmessage = function (ev) {
-            self.updateHighlightedNodes([ev.data.id]);
-        };
     }
-    MatrixLabels.prototype.updateData = function (leftNodes, topNodes, cellSize, nodeOrder, leftLabelOffset, topLabelOffset, bbox, highlightId) {
+    MatrixLabels.prototype.updateData = function (leftNodes, topNodes, cellSize, nodeOrder, leftLabelOffset, topLabelOffset, bbox) {
         var _this = this;
         this.cellSize = cellSize;
         var labelsLeft = this.svg.selectAll('.labelsLeft')
@@ -301,16 +277,16 @@ var MatrixLabels = /** @class */ (function () {
             return 100;
         })
             .style('font-size', Math.min(this.cellSize, 20));
-        for (var i = 0; i < highlightedLinks.length; i++) {
-            d3.selectAll('#nodeLabel_left_' + highlightedLinks[i])
+        for (var i_1 = 0; i_1 < highlightedLinks.length; i_1++) {
+            d3.selectAll('#nodeLabel_left_' + highlightedLinks[i_1])
                 .style('font-weight', 900);
-            d3.selectAll('#nodeLabel_top_' + highlightedLinks[i])
+            d3.selectAll('#nodeLabel_top_' + highlightedLinks[i_1])
                 .style('font-weight', 900);
         }
     };
     return MatrixLabels;
 }());
-var MatrixVisualization = /** @class */ (function () {
+var MatrixVisualization = (function () {
     function MatrixVisualization(elem, width, height, matrix) {
         var _this = this;
         this.mouseMoveHandler = function (e) {
@@ -386,12 +362,6 @@ var MatrixVisualization = /** @class */ (function () {
         this.cellSelectionFrames = networkcube.array(undefined, matrix.numberOfLinks());
         this.linkWeightScale = d3.scale.linear().range([0.1, 1])
             .domain([0, matrix.maxWeight()]);
-        //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
-        var bcNode = new BroadcastChannel('row_hovered_over_link');
-        var self = this;
-        bcNode.onmessage = function (ev) {
-            self.updateHighlightedLinks([ev.data.id]);
-        };
         this.init();
     }
     MatrixVisualization.prototype.init = function () {
@@ -399,7 +369,6 @@ var MatrixVisualization = /** @class */ (function () {
         this.elem.node().appendChild(this.canvas);
         this.view = d3.select(this.canvas);
         this.zoom = d3.behavior.zoom()
-            //.scaleExtent([0.2, 4])
             .on('zoom', this.zoomed);
         this.view.call(this.zoom);
         this.initGeometry();
@@ -420,32 +389,6 @@ var MatrixVisualization = /** @class */ (function () {
         this.webgl.canvas.addEventListener('mousedown', this.mouseDownHandler);
         this.webgl.canvas.addEventListener('mouseup', this.mouseUpHandler);
         this.webgl.canvas.addEventListener('click', this.clickHandler);
-        // this.scene = new THREE.Scene();
-        // // camera
-        // // this.camera = new THREE.OrthographicCamera(
-        // //   this.width / -2,
-        // //   this.width / 2,
-        // //   this.height/ 2,
-        // //   this.height / -2,
-        // //   0, 1000)
-        // // this.scene.add(this.camera);
-        // this.camera.position.x = this.width / 2;
-        // this.camera.position.y = -this.height / 2;
-        // this.camera.position.z = 100;
-        // // renderer
-        // this.renderer = new THREE.WebGLRenderer({ antialias: true })
-        // this.renderer.setSize(this.width, this.height);
-        // this.renderer.setClearColor(0xffffff, 1);
-        // this.initTextureFramebuffer();
-        // // position canvas element containing cells
-        // this.canvas = this.renderer.domElement;
-        // // set canvas listeners
-        // this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
-        // this.canvas.addEventListener('mousedown', this.mouseDownHandler);
-        // this.canvas.addEventListener('mouseup', this.mouseUpHandler);
-        // this.canvas.addEventListener('click', this.clickHandler);
-        // // init glutils renderer for D3 wrapper
-        // glutils.setWebGL(this.scene, this.camera, this.renderer, this.canvas);
     };
     MatrixVisualization.prototype.initTextureFramebuffer = function () {
         this.bufferTexture = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.NearestMipMapNearestFilter, magFilter: THREE.LinearFilter });
@@ -456,11 +399,10 @@ var MatrixVisualization = /** @class */ (function () {
         var attributes = {
             customColor: { type: 'c', value: [] }
         };
-        // SHADERS
         this.shaderMaterial = new THREE.ShaderMaterial({
             attributes: attributes,
             vertexShader: vertexShaderProgram,
-            fragmentShader: fragmentShaderProgram
+            fragmentShader: fragmentShaderProgram,
         });
         this.shaderMaterial.blending = THREE.NormalBlending;
         this.shaderMaterial.depthTest = true;
@@ -473,7 +415,6 @@ var MatrixVisualization = /** @class */ (function () {
         var begin = d.getTime();
         this.renderer.render(this.scene, this.camera);
         d = new Date();
-        // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
     };
     MatrixVisualization.prototype.updateData = function (data, nrows, ncols, cellSize, offset, scale, tr, getImageData) {
         this.data = data;
@@ -494,8 +435,8 @@ var MatrixVisualization = /** @class */ (function () {
                     this.scene.remove(frame);
                 }
         }
-        for (var i = 0; i < this.guideLines.length; i++) {
-            this.scene.remove(this.guideLines[i]);
+        for (var i_2 = 0; i_2 < this.guideLines.length; i_2++) {
+            this.scene.remove(this.guideLines[i_2]);
         }
         this.vertexPositions = [];
         this.vertexColors = [];
@@ -506,7 +447,6 @@ var MatrixVisualization = /** @class */ (function () {
                 this.addCell(row, col, data[row][col]);
             }
         }
-        // CREATE + ADD MESH
         this.geometry.addAttribute('position', new THREE.BufferAttribute(glutils.makeBuffer3f(this.vertexPositions), 3));
         this.geometry.addAttribute('customColor', new THREE.BufferAttribute(glutils.makeBuffer4f(this.vertexColors), 4));
         this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
@@ -516,31 +456,8 @@ var MatrixVisualization = /** @class */ (function () {
         if (getImageData) {
             var smallDim = Math.min(this.height, this.width);
             this.resizeCanvas(smallDim, smallDim);
-            //
-            // this.renderer.render(this.scene, this.camera, this.bufferTexture);
-            // // Read the contents of the framebuffer
-            //
-            // console.log(this.bufferTexture);
-            // // this.bufferTexture.__webglTexture.flipY = false;
-            //
-            // var dat = new Uint8Array(this.bufferTexture.width * this.bufferTexture.height * 4);
-            //
-            //
-            // this.renderer.readRenderTargetPixels(this.bufferTexture, 0, 0, this.bufferTexture.width, this.bufferTexture.height, dat);
-            //
-            // // Create a 2D canvas to store the result
-            // var canvas = document.createElement('canvas');
-            // canvas.width = this.bufferTexture.width;
-            // canvas.height = this.bufferTexture.height;
-            // var context = canvas.getContext('2d');
-            //
-            // // Copy the pixels to a 2D canvas
-            // var imageData = context.createImageData(this.bufferTexture.width, this.bufferTexture.height);
-            // imageData.data.set(dat);
-            // context.putImageData(imageData, 0, 0, 0, 0, canvas.width, canvas.height);
             this.matrix.hideCellLabel();
             this.render();
-            // let imgData = this.canvas.toDataURL();
             var imgData = this.canvas.toDataURL();
             this.matrix.updateOverviewImage(imgData);
             this.resizeCanvas(this.width, this.height);
@@ -589,9 +506,6 @@ var MatrixVisualization = /** @class */ (function () {
             if (!this.linksPos[row][col])
                 this.linksPos[row][col] = [];
             this.linksPos[row][col].push(e.id());
-            //x = this.cellSize/2 + row * this.cellSize - this.cellSize / 2 + seg * j + seg / 2;
-            //y = this.cellSize/2 + col * this.cellSize;
-            //this.paintCell(e.id(), x, y, seg, [color.r, color.g, color.b, alpha], meanWeight>0);
         }
     };
     MatrixVisualization.prototype.paintCell = function (id, x, y, w, color, positive) {
@@ -605,7 +519,6 @@ var MatrixVisualization = /** @class */ (function () {
         else {
             glutils.addBufferedDiamond(this.vertexPositions, x, -y, 0, w - 1, h - 1, this.vertexColors, color);
         }
-        // highlight frame
         frame = glutils.createRectFrame(w - 1, h - 1, COLOR_HIGHLIGHT, 1);
         frame.position.x = x;
         frame.position.y = -y;
@@ -614,7 +527,6 @@ var MatrixVisualization = /** @class */ (function () {
         if (!this.cellHighlightFrames[id])
             this.cellHighlightFrames[id] = [];
         this.cellHighlightFrames[id].push(highlightFrames);
-        // selection frame
         frame = glutils.createRectFrame(w - 1, h - 1, COLOR_SELECTION, 2);
         frame.position.x = x;
         frame.position.y = -y;
@@ -626,7 +538,6 @@ var MatrixVisualization = /** @class */ (function () {
         this.guideLines = [];
         if (!this.data)
             return;
-        // console.log("update guidelines")
         var w = this.ncols * this.cellSize;
         var h = this.nrows * this.cellSize;
         var geometry1 = new THREE.Geometry();
@@ -637,7 +548,7 @@ var MatrixVisualization = /** @class */ (function () {
         var mat = new THREE.LineBasicMaterial({ color: 0xeeeeee, linewidth: 1 });
         var x, y;
         var j = 0;
-        for (var i = 0; i <= h; i += this.cellSize) {
+        for (var i_3 = 0; i_3 <= h; i_3 += this.cellSize) {
             pos = j * this.cellSize + this.offset[1];
             m = new THREE.Line(geometry1, mat);
             m.position.set(0, -pos, 0);
@@ -646,7 +557,7 @@ var MatrixVisualization = /** @class */ (function () {
             j++;
         }
         j = 0;
-        for (var i = 0; i <= w; i += this.cellSize) {
+        for (var i_4 = 0; i_4 <= w; i_4 += this.cellSize) {
             pos = j * this.cellSize + this.offset[0];
             m = new THREE.Line(geometry2, mat);
             m.position.set(pos, 0, 0);
@@ -665,7 +576,6 @@ var MatrixVisualization = /** @class */ (function () {
                     var id_1 = _a[_i];
                     this.toHoverLinks.push(id_1);
                 }
-                //this.render();
             }
         }
     };
@@ -708,7 +618,7 @@ var MatrixVisualization = /** @class */ (function () {
     };
     return MatrixVisualization;
 }());
-var Matrix = /** @class */ (function () {
+var Matrix = (function () {
     function Matrix() {
         var _this = this;
         this.updateEvent = function () {
@@ -716,33 +626,28 @@ var Matrix = /** @class */ (function () {
             var highlightedLinksIds = [];
             var highlightedLinks = _this._dgraph.links().highlighted().toArray();
             if (highlightedLinks.length > 0) {
-                for (var i = 0; i < highlightedLinks.length; i++) {
-                    if (!highlightedLinks[i].isVisible())
+                for (var i_5 = 0; i_5 < highlightedLinks.length; i_5++) {
+                    if (!highlightedLinks[i_5].isVisible())
                         continue;
-                    highlightedNodesIds.push(highlightedLinks[i].source.id());
-                    highlightedNodesIds.push(highlightedLinks[i].target.id());
-                    highlightedLinksIds.push(highlightedLinks[i].id());
+                    highlightedNodesIds.push(highlightedLinks[i_5].source.id());
+                    highlightedNodesIds.push(highlightedLinks[i_5].target.id());
+                    highlightedLinksIds.push(highlightedLinks[i_5].id());
                 }
             }
             else {
                 var highlightedNodes = _this._dgraph.nodes().highlighted().toArray();
-                for (var i = 0; i < highlightedNodes.length; i++) {
-                    var node = highlightedNodes[i];
+                for (var i_6 = 0; i_6 < highlightedNodes.length; i_6++) {
+                    var node = highlightedNodes[i_6];
                     if (node.isVisible()) {
                         for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {
                             var link = _a[_i];
                             var neighbor = link.source.id() == node.id() ? link.target : link.source;
                             if (neighbor.isVisible())
-                                // &&
-                                //this.nodeOrder[neighbor.id()] >= this.bbox.x0 &&
-                                //  this.nodeOrder[neighbor.id()] <= this.bbox.x1){
                                 highlightedLinksIds.push(link.id());
-                            //}
                         }
                     }
                 }
             }
-            // show/hide visible/filtered links
             _this.updateVisibleData();
             _this.labels.updateHighlightedNodes(highlightedNodesIds);
             _this.visualization.updateHighlightedLinks(highlightedLinksIds);
@@ -762,9 +667,6 @@ var Matrix = /** @class */ (function () {
                     break;
                 }
             }
-            // this.startTime = this._dgraph.time(m.startId);
-            // this.endTime = this._dgraph.time(m.endId);
-            // this.timeSlider.set(this.startTime, this.endTime);
             _this.timeSlider.set(m.startUnix, m.endUnix);
             _this.updateVisibleData();
         };
@@ -809,7 +711,6 @@ var Matrix = /** @class */ (function () {
     };
     Matrix.prototype.setVis = function (matrixVis) {
         this.visualization = matrixVis;
-        // this.overview.setCanvasRatio(this.visualization.width/this.visualization.height);
         this.resetTransform();
     };
     Matrix.prototype.setLabels = function (matrixLabels) {
@@ -867,15 +768,15 @@ var Matrix = /** @class */ (function () {
         if (orderType == 'alphanumerical') {
             var nodes2 = this._dgraph.nodes().visible().sort('label').toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_7 = 0; i_7 < nodes2.length; i_7++) {
+                this.nodeOrder[nodes2[i_7].id()] = i_7;
             }
         }
         else if (orderType == 'reverse-alpha') {
             var nodes2 = this._dgraph.nodes().visible().sort('label', false).toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_8 = 0; i_8 < nodes2.length; i_8++) {
+                this.nodeOrder[nodes2[i_8].id()] = i_8;
             }
         }
         else if (orderType == 'degree') {
@@ -884,8 +785,8 @@ var Matrix = /** @class */ (function () {
                 return n.neighbors().length;
             })
                 .sort('degree').toArray();
-            for (var i = 0; i < nodes2.length; i++) {
-                this.nodeOrder[nodes2[i].id()] = i;
+            for (var i_9 = 0; i_9 < nodes2.length; i_9++) {
+                this.nodeOrder[nodes2[i_9].id()] = i_9;
             }
         }
         else if (orderType == 'similarity') {
@@ -899,26 +800,13 @@ var Matrix = /** @class */ (function () {
         else {
             var visibleNodes = this._dgraph.nodes().visible().toArray();
             this.nodeOrder = [];
-            for (var i = 0; i < visibleNodes.length; i++) {
-                this.nodeOrder[visibleNodes[i].id()] = i;
+            for (var i_10 = 0; i_10 < visibleNodes.length; i_10++) {
+                this.nodeOrder[visibleNodes[i_10].id()] = i_10;
             }
         }
         this.resetTransform();
     };
     Matrix.prototype.longestLabelLength = function () {
-        // let longestLabelNode;
-        // if(this.dgraph){
-        //   longestLabelNode = this.dgraph.nodes().toArray().reduce(
-        //     function(p, v, i, arr) {
-        //       if (p == null || p.label() == null ||
-        //         (v.label() && v.label().length > p.label().length))
-        //         return v;
-        //       else
-        //         return p;
-        //     });
-        // }
-        // this.labelLength = longestLabelNode ? longestLabelNode.label().length+8 : 8;
-        // this.labelLength = Math.min(this.labelLength, 30);
         this.labelLength = 30;
     };
     Matrix.prototype.calculatePlotMargin = function () {
@@ -934,7 +822,6 @@ var Matrix = /** @class */ (function () {
     };
     Matrix.prototype.updateVisibleData = function () {
         var _this = this;
-        // console.log("updateVis");
         this.updateVisibleBox();
         var leftNodes = this.dgraph.nodes().visible().toArray();
         leftNodes = leftNodes.filter(function (d) {
@@ -949,8 +836,8 @@ var Matrix = /** @class */ (function () {
         var visibleData = {};
         var row, col;
         var node;
-        for (var i = 0; i < leftNodes.length; i++) {
-            node = leftNodes[i];
+        for (var i_11 = 0; i_11 < leftNodes.length; i_11++) {
+            node = leftNodes[i_11];
             if (node.isVisible()) {
                 row = this.nodeOrder[node.id()] - this.bbox.y0;
                 for (var _i = 0, _a = node.links().toArray(); _i < _a.length; _i++) {

@@ -250,16 +250,10 @@ module networkcube {
                 + this.SEP + valueName];
 
             if (storedResult && storedResult != "undefined") {
-                // we try to detect whether the string was compressed or not. Given that it is
+                // we try to detect whether the string was compressed or not. Given that it is 
                 // JSON, we would expect it to begin with either a quote, a bracket, or a curly-brace
                 var parseText;
-                if(storedResult == "true"){
-                    parseText = true;
-                }
-                else if(storedResult == "false"){
-                    parseText = false;
-                }
-                else if ("\"'[{0123456789".indexOf(storedResult[0]) >= 0)
+                if ("\"'[{0123456789".indexOf(storedResult[0]) >= 0)
                     parseText = storedResult;
                 else
                     parseText = LZString.decompress(storedResult);
@@ -333,7 +327,6 @@ module networkcube {
         locationSchema: LocationSchema;
         selections: Selection[] = [] //predefined selections (not link type)
         timeFormat: string;
-        directed: boolean;
 
         // constructor(name:string, nodeTable:any[], linkTable:any[], nodeSchema:NodeSchema, linkSchema:LinkSchema, locationTable?:any, locationSchema?:LocationSchema){
         constructor(params?) {
@@ -343,7 +336,6 @@ module networkcube {
             this.name = params.name;
             this.nodeTable = params.nodeTable;
             this.linkTable = params.linkTable;
-            this.directed = params.directed;
 
             if (params.nodeSchema == undefined)
                 this.nodeSchema = getDefaultNodeSchema();

@@ -84,7 +84,6 @@ module vistorian {
         weight: number = -1;
         time: number = -1;
         linkType: number = -1;
-        directed: number = -1;
         constructor() {
             super('userLinkSchema')
         };
@@ -117,7 +116,6 @@ module vistorian {
         networkConfig:string = 'both';
         timeFormat: string;
         ready:boolean // placeholder indicating if network is complete and ready to be visualized.
-        directed:boolean
 
         constructor(id: number) {
             this.id = id;
@@ -1175,7 +1173,6 @@ module vistorian {
         dataset.locationTable = normalizedLocationTable;
         dataset.locationSchema = normalizedLocationSchema;
         dataset.timeFormat = currentNetwork.timeFormat;
-        dataset.directed = currentNetwork.directed;
 
         if(currentNetwork.userLocationTable)
         {

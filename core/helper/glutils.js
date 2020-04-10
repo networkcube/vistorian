@@ -1,7 +1,7 @@
 var glutils;
 (function (glutils) {
     function makeAlphaBuffer(array, stretch) {
-        var buffer = new Float32Array(array.length * stretch); // three components per vertex
+        var buffer = new Float32Array(array.length * stretch);
         for (var i = 0; i < array.length; i++) {
             for (var j = 0; j < stretch; j++) {
                 buffer[i * stretch + j] = array[i];
@@ -59,7 +59,7 @@ var glutils;
             new THREE.Vector3(-w, -h, 0)
         ];
         var material = new THREE.LineBasicMaterial({
-            color: color
+            color: color,
         });
         return new THREE.Line(geom, material);
     }
@@ -81,13 +81,13 @@ var glutils;
         ];
         var material = new THREE.LineBasicMaterial({
             color: color,
-            linewidth: lineThickness
+            linewidth: lineThickness,
         });
         return new THREE.Line(geom, material);
     }
     glutils.createDiagonalCross = createDiagonalCross;
     function makeBuffer3f(array) {
-        var buffer = new Float32Array(array.length * 3); // three components per vertex
+        var buffer = new Float32Array(array.length * 3);
         for (var i = 0; i < array.length; i++) {
             buffer[i * 3 + 0] = array[i][0];
             buffer[i * 3 + 1] = array[i][1];
@@ -97,7 +97,7 @@ var glutils;
     }
     glutils.makeBuffer3f = makeBuffer3f;
     function makeBuffer4f(array) {
-        var buffer = new Float32Array(array.length * 4); // three components per vertex
+        var buffer = new Float32Array(array.length * 4);
         for (var i = 0; i < array.length; i++) {
             buffer[i * 4 + 0] = array[i][0];
             buffer[i * 4 + 1] = array[i][1];
@@ -144,36 +144,24 @@ var glutils;
         };
     }
     glutils.getMousePos = getMousePos;
-    /////////////////////////////
-    /// QUERY LAYER FOR WEBGL ///
-    /////////////////////////////    
-    // SETUP
     var txtCanvas = document.createElement("canvas");
-    var WebGL = /** @class */ (function () {
+    var WebGL = (function () {
         function WebGL(params) {
             this.elementQueries = [];
             txtCanvas = document.createElement("canvas");
             txtCanvas.setAttribute('id', 'textCanvas');
         }
         WebGL.prototype.render = function () {
-            // var d = new Date();
-            // var begin = d.getTime()
-            // check which webgl groups must be updated
             for (var i = 0; i < this.elementQueries.length; i++) {
                 if (this.elementQueries[i].updateAttributes || this.elementQueries[i].updateStyle) {
                     this.elementQueries[i].set();
                 }
             }
             this.renderer.render(this.scene, this.camera);
-            // d = new Date();
-            // console.log('>>>> RENDERED ', (d.getTime() - begin), ' ms.');
         };
         WebGL.prototype.selectAll = function () {
             return glutils.selectAll();
         };
-        ///////////////////////
-        // RENDER PARAMETERS //
-        ///////////////////////
         WebGL.prototype.enableZoom = function (b) {
             if (b) {
                 window.addEventListener("mousewheel", mouseWheel, false);
@@ -205,14 +193,12 @@ var glutils;
         webgl.scene = new THREE.Scene();
         webgl.scene.add(webgl.camera);
         webgl.camera.position.z = 100;
-        // renderer
         webgl.renderer = new THREE.WebGLRenderer({
             antialias: true,
             preserveDrawingBuffer: true
         });
         webgl.renderer.setSize(width, height);
         webgl.renderer.setClearColor(0xffffff, 1);
-        // position canvas element containing cells
         webgl.canvas = webgl.renderer.domElement;
         $("#" + parentId).append(webgl.canvas);
         webgl.interactor = new WebGLInteractor(webgl.scene, webgl.canvas, webgl.camera);
@@ -229,25 +215,21 @@ var glutils;
         webgl.renderer = renderer;
     }
     glutils.setWebGL = setWebGL;
-    // INTERACTION
-    /// SELECTIONS in the style of D3
     function selectAll() {
         var q = new glutils.WebGLElementQuery();
         webgl.elementQueries.push(q);
         return q;
     }
     glutils.selectAll = selectAll;
-    var WebGLElementQuery = /** @class */ (function () {
+    var WebGLElementQuery = (function () {
         function WebGLElementQuery() {
             this.dataElements = [];
             this.visualElements = [];
             this.children = [];
-            // attribute arrays
             this.x = [];
             this.y = [];
             this.z = [];
             this.r = [];
-            // style arrays
             this.fill = [];
             this.stroke = [];
             this.strokewidth = [];
@@ -264,12 +246,9 @@ var glutils;
         WebGLElementQuery.prototype.append = function (shape) {
             var elements = [];
             switch (shape) {
-                // case 'circle': elements = createCirclesNoShader(this.dataElements, this.scene); break
                 case 'circle':
                     createCirclesWithBuffers(this, this.scene);
                     break;
-                // case 'circle': elements = createCircles(this.dataElements, this.scene); break
-                // case 'g': elements = createG(this.dataElements, this.scene); break
                 case 'path':
                     elements = createPaths(this.dataElements, this.scene);
                     break;
@@ -287,7 +266,6 @@ var glutils;
                     break;
                 default: console.error('Shape', shape, 'does not exist.');
             }
-            // init position arrays
             if (!this.IS_SHADER) {
                 for (var i = 0; i < elements.length; i++) {
                     this.x.push(0);
@@ -330,7 +308,6 @@ var glutils;
             q.visualElements = visArr;
             return q;
         };
-        // geometric attributes
         WebGLElementQuery.prototype.attr = function (name, v) {
             var l = this.visualElements.length;
             if (this.IS_SHADER) {
@@ -349,7 +326,6 @@ var glutils;
             this.updateAttributes = true;
             return this;
         };
-        // style attributes
         WebGLElementQuery.prototype.style = function (name, v) {
             var l = this.visualElements.length;
             if (this.IS_SHADER) {
@@ -366,8 +342,6 @@ var glutils;
             this.updateStyle = true;
             return this;
         };
-        // called after all visual attributes have been set
-        // method that passes updated values to the shaders 
         WebGLElementQuery.prototype.set = function () {
             if (!this.IS_SHADER)
                 return this;
@@ -401,7 +375,6 @@ var glutils;
             }
             return this;
         };
-        // interaction
         WebGLElementQuery.prototype.on = function (event, f) {
             switch (event) {
                 case 'mouseover':
@@ -466,19 +439,19 @@ var glutils;
                     break;
                 case 'x1':
                     setX1(element, v);
-                    break; // lines only
+                    break;
                 case 'y1':
                     setY1(element, v);
-                    break; // lines only
+                    break;
                 case 'x2':
                     setX2(element, v);
-                    break; // lines only
+                    break;
                 case 'y2':
                     setY2(element, v);
-                    break; // lines only
+                    break;
                 case 'r':
                     element.scale.set(v, v, v);
-                    break; // circles only
+                    break;
                 case 'width':
                     element.scale.setX(v);
                     break;
@@ -519,9 +492,6 @@ var glutils;
         return WebGLElementQuery;
     }());
     glutils.WebGLElementQuery = WebGLElementQuery;
-    ///////////////
-    /// METHODS /// 
-    ///////////////
     function setStyle(element, attr, v, query) {
         switch (attr) {
             case 'fill':
@@ -560,7 +530,6 @@ var glutils;
         if (element.hasOwnProperty('wireframe'))
             element.wireframe.material.needsUpdate = true;
     }
-    // var textCtx
     function setText(mesh, text, parConfig) {
         var config = parConfig;
         if (config == undefined) {
@@ -581,8 +550,6 @@ var glutils;
         context.textBaseline = "middle";
         context.fillStyle = config.color;
         context.font = SIZE + "pt Helvetica";
-        // context.clearColor(1.0, 1.0, 0.0, 1.0)
-        // context.clear(gl.COLOR_BUFFER_BIT)
         context.fillText(text, 0, txtCanvas.height / 2);
         var tex = new THREE.Texture(txtCanvas);
         tex.minFilter = THREE.LinearFilter;
@@ -591,64 +558,11 @@ var glutils;
         mesh.material.map = tex;
         mesh.material.transparent = true;
         mesh.material.needsUpdate = true;
-        // adjust mesh geometry
         mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
         mesh.geometry.needsUpdate = true;
         mesh.geometry.verticesNeedUpdate = true;
         mesh.needsUpdate = true;
     }
-    // function setText(mesh:any, text:string, parConfig?:Object){
-    //     var SIZE = 10
-    //     var MARGIN = 2
-    //     var config = parConfig;            
-    //     if(config == undefined){
-    //         config = {};
-    //     }
-    //     if(config.color == undefined)        
-    //        config.color = '#000000'
-    //     var canvas = document.createElement("canvas");
-    //     var context = canvas.getContext("2d");
-    //     context.font = SIZE + "pt Arial";
-    //     var textWidth = context.measureText(text).width;
-    //     canvas.width = textWidth + MARGIN;
-    //     canvas.height = SIZE + MARGIN;
-    //     context = canvas.getContext("2d");
-    //     context.font = SIZE + "pt Arial";
-    //     // if(backGroundColor) {
-    //     //     context.fillStyle = backGroundColor;
-    //     //     context.fillRect(canvas.width / 2 - textWidth / 2 - backgroundMargin / 2, canvas.height / 2 - size / 2 - +backgroundMargin / 2, textWidth + backgroundMargin, size + backgroundMargin);
-    //     // }
-    //     context.textAlign = "left";
-    //     context.textBaseline = "middle";
-    //     context.fillStyle = config.color;;
-    //     context.fillText(text, canvas.width / 2, canvas.height / 2);
-    //     // context.strokeStyle = "black";
-    //     // context.strokeRect(0, 0, canvas.width, canvas.height);
-    //     var texture = new THREE.Texture(canvas);
-    //     texture.needsUpdate = true;
-    //     var material = new THREE.MeshBasicMaterial({
-    //         map : texture
-    //     });
-    //     // tex.minFilter = THREE.LinearFilter
-    //     // tex.flipY = true;
-    //     // tex.needsUpdate = true;
-    //     mesh.material.map = texture;
-    //     mesh.material.transparent = true;
-    //     mesh.material.needsUpdate = true;
-    //     // adjust mesh geometry
-    //     mesh.geometry = new THREE.PlaneGeometry(WIDTH, SIZE);
-    //     mesh.geometry.needsUpdate = true;
-    //     mesh.geometry.verticesNeedUpdate = true;
-    //     mesh.needsUpdate = true;
-    //     return mesh;
-    //     // var mesh = new THREE.Mesh(new THREE.PlaneGeometry(canvas.width, canvas.height), material);
-    //     // // mesh.overdraw = true;
-    //     // mesh.doubleSided = true;
-    //     // mesh.position.x = x - canvas.width;
-    //     // mesh.position.y = y - canvas.height;
-    //     // mesh.position.z = z;
-    //     // return mesh;
-    // }
     function setX1(mesh, v) {
         mesh.geometry.vertices[0].x = v;
     }
@@ -661,25 +575,14 @@ var glutils;
     function setY2(mesh, v) {
         mesh.geometry.vertices[1].y = v;
     }
-    /////////////////////
-    /// CREATE SHAPES /// 
-    /////////////////////
-    // function fillCurve(color){
-    //     var shape = new THREE.Shape(line.getSpacedPoints(100));
-    //     var geometry = new THREE.ShapeGeometry( shape );
-    //     var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: 0xeeeeee } )] );
-    //     for(var i=0 ; i < this.visualElements.length ; i++){
-    //     }
-    // }
     function createG(dataElements, scene) {
         var visualElements = [];
-        // create group element for every data element
         for (var i = 0; i < dataElements.length; i++) {
             visualElements.push(new GroupElement());
         }
         return visualElements;
     }
-    var GroupElement = /** @class */ (function () {
+    var GroupElement = (function () {
         function GroupElement() {
             this.position = { x: 0, y: 0, z: 0 };
             this.children = [];
@@ -703,7 +606,6 @@ var glutils;
         }
         return visualElements;
     }
-    // SHADERS
     var vertexShaderProgram = "\
         attribute vec4 customColor;\
         varying vec4 vColor;\
@@ -737,10 +639,8 @@ var glutils;
         var vertexPositionBuffer = [];
         var vertexColorBuffer = [];
         var geometry = new THREE.BufferGeometry();
-        // geometry.vertices.push(new THREE.Vector3(10, -10,0))
         addBufferedRect([], 0, 0, 0, 10, 10, [], [0, 0, 1, .5]);
         for (var i = 0; i < dataElements.length; i++) {
-            // addBufferedCirlce(vertexPositionBuffer, Math.random()*10,Math.random()*10,0,2, vertexColorBuffer, [0,0,1,.5] )
             query.x.push(0);
             query.y.push(0);
             query.z.push(0);
@@ -750,8 +650,6 @@ var glutils;
             query.strokewidth.push(1);
             query.opacity.push(1);
         }
-        // geometry = new THREE.BufferGeometry();
-        // CREATE + ADD MESH
         geometry.addAttribute('position', new THREE.BufferAttribute(makeBuffer3f([]), 3));
         geometry.addAttribute('customColor', new THREE.BufferAttribute(makeBuffer4f([]), 4));
         query.mesh = new THREE.Mesh(geometry, shaderMaterial);
@@ -759,92 +657,6 @@ var glutils;
         scene.add(query.mesh);
         return query;
     }
-    // create circles using vertex shaders
-    // attach shaders to current body
-    // var circleVertexShader = '\
-    //     uniform vec3 color;\
-    //     varying vec3 vColor; \
-    //     void main() {\
-    //         vColor = color;\
-    //         gl_PointSize = 10.0;\
-    //         gl_Position = vec4(position ,1.0);\
-    //     }'
-    // var circleFragmentShader = '\
-    //     varying vec3 vColor;\
-    //     void main() {\
-    //         gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.1);\
-    //     }'
-    // function createCircles(dataElements:any[], scene:THREE.Scene){
-    //     var circleShaderUniforms = {
-    //         color: { type: 'c', value: new THREE.Color( 0xff0000 )  }
-    //     }
-    //     var circleShaderMaterial = new THREE.ShaderMaterial({
-    //         // attributes: circleShaderAttributes,
-    //         uniforms: circleShaderUniforms,
-    //         vertexShader: circleVertexShader,
-    //         fragmentShader: circleFragmentShader,
-    //         blending: THREE.NormalBlending,
-    //         depthTest: true,
-    //         transparent: true,
-    //         side: THREE.DoubleSide,
-    //         // linewidth: 2
-    //     });
-    //     this.IS_SHADER = true;
-    //     var visualElements = []
-    //     var c;   
-    //     var vertexPositionBuffer = []
-    //     // var vertexColorBuffer = []
-    //     var geometry = new THREE.BufferGeometry();
-    //     for(var i=0 ; i < dataElements.length ; i++){
-    //         // geometry.vertices.push(new THREE.Vector3(Math.random(), -Math.random(),0))
-    //         vertexPositionBuffer.push([Math.random()*  300, -Math.random()* 300, 0.2])
-    //         // vertexColorBuffer.push([0,1,0])
-    //     }
-    //     // console.log('vertexPositionBuffer', vertexPositionBuffer, vertexPositionBuffer.length)
-    //     // console.log('vertexColorBuffer', vertexColorBuffer, vertexColorBuffer.length)
-    //     // var shaderMaterial = new THREE.ShaderMaterial();
-    //     geometry.addAttribute( 'position', new THREE.BufferAttribute( vertexPositionBuffer, 1));
-    //     // geometry.addAttribute( 'customColor', new THREE.BufferAttribute( vertexColorBuffer, 1));
-    //     // geometry.dynamic = true;
-    //     var mesh = new THREE.Mesh(geometry, circleShaderMaterial);
-    //     visualElements.push(mesh);
-    //     mesh.position.set(0,0,0)
-    //     scene.add(mesh);    
-    //     return visualElements;
-    // }
-    // below code works somehow
-    // function createCircles(dataElements:any[], scene:THREE.Scene){
-    //     var circleShaderUniforms = {
-    //         color: { type: 'c', value: new THREE.Color( 0xff0000 )  }
-    //     }
-    //     var circleShaderMaterial = new THREE.ShaderMaterial({
-    //         // attributes: circleShaderAttributes,
-    //         uniforms: circleShaderUniforms,
-    //         vertexShader: circleVertexShader,
-    //         fragmentShader: circleFragmentShader,
-    //         blending: THREE.NormalBlending,
-    //         depthTest: true,
-    //         transparent: true,
-    //         side: THREE.DoubleSide,
-    //         // linewidth: 2
-    //     });
-    //     // this.IS_SHADER = true;
-    //     var visualElements = []
-    //     var c;   
-    //     // var vertexPositionBuffer = []
-    //     // var vertexColorBuffer = []
-    //     var geometry;
-    //      for(var i=0 ; i < dataElements.length ; i++){
-    //         geometry = new THREE.CircleGeometry(1, 1);
-    //         geometry.dynamic = true;
-    //         c = new THREE.Mesh( geometry, circleShaderMaterial );
-    //         visualElements.push(c);
-    //         c.position.set(0,0,1)
-    //         c.scale.set(1,1, 1)
-    //         scene.add(c);    
-    //     }
-    //     return visualElements;
-    // }
     function createRectangles(dataElements, scene) {
         var material;
         var geometry;
@@ -892,12 +704,6 @@ var glutils;
         var c, p;
         for (var i = 0; i < dataElements.length; i++) {
             geometry = new THREE.Geometry();
-            // geometry.vertices.push(
-            //     new THREE.Vector3(5, 0, 0 ),
-            //     new THREE.Vector3( 15, 3, 0 ),
-            //     new THREE.Vector3( 15, -3, 0 )
-            // );
-            // geometry.faces.push(new THREE.Face3(0, 1, 2)); 
             c = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, side: THREE.DoubleSide }));
             c.doubleSided = true;
             c.position.set(0, 0, 0);
@@ -945,10 +751,7 @@ var glutils;
         mesh.geometry = new THREE.ShapeGeometry(shape);
         mesh.geometry.verticesNeedUpdate = true;
     }
-    ///////////////////
-    /// INTERACTION /// 
-    ///////////////////
-    var WebGLInteractor = /** @class */ (function () {
+    var WebGLInteractor = (function () {
         function WebGLInteractor(scene, canvas, camera) {
             var _this = this;
             this.mouse = [];
@@ -984,13 +787,6 @@ var glutils;
             canvas.addEventListener('click', function (e) {
                 _this.clickHandler(e);
             });
-            // not really working in iFrames..
-            // window.addEventListener('keyDown', (e)=>{
-            //     this.keyDownHandler(e);
-            // })
-            // window.addEventListener('keyUp', (e)=>{
-            //     this.keyUpHandler(e);
-            // })
         }
         WebGLInteractor.prototype.register = function (selection, method) {
             switch (method) {
@@ -1022,7 +818,6 @@ var glutils;
             if (eventName == 'lassoMove')
                 this.lassoMoveHandler = f;
         };
-        // Event handlers
         WebGLInteractor.prototype.mouseMoveHandler = function (e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             if (this.isLassoEnabled && e.which == 2) {
@@ -1032,7 +827,6 @@ var glutils;
             }
             else {
                 var intersectedVisualElements = [];
-                // remove previous highlighting
                 for (var i = 0; i < this.lastIntersectedSelections.length; i++) {
                     for (var j = 0; j < this.lastIntersectedElements[i].length; j++) {
                         this.lastIntersectedSelections[i].call('mouseout', this.lastIntersectedElements[i][j]);
@@ -1041,9 +835,7 @@ var glutils;
                 this.lastIntersectedSelections = [];
                 this.lastIntersectedElements = [];
                 var nothingIntersected = true;
-                // call mouseover on all elements with a mouse over handler
                 for (var i = 0; i < this.mouseOverSelections.length; i++) {
-                    // If selecton is SHADER, check manually
                     intersectedVisualElements = this.intersect(this.mouseOverSelections[i], this.mouse[0], this.mouse[1]);
                     if (intersectedVisualElements.length > 0) {
                         this.lastIntersectedElements.push(intersectedVisualElements);
@@ -1055,17 +847,14 @@ var glutils;
                     if (intersectedVisualElements.length > 0)
                         nothingIntersected = false;
                 }
-                // call mousemove on all elements with a mouse move handler
                 for (var i = 0; i < this.mouseMoveSelections.length; i++) {
                     intersectedVisualElements = this.intersect(this.mouseMoveSelections[i], this.mouse[0], this.mouse[1]);
-                    // console.log('intersectedVisualElements', intersectedVisualElements, this.mouseMoveSelections[i])
                     for (var j = 0; j < intersectedVisualElements.length; j++) {
                         this.mouseMoveSelections[i].call('mousemove', intersectedVisualElements[j], e);
                     }
                     if (intersectedVisualElements.length > 0)
                         nothingIntersected = false;
                 }
-                // if nothing intersected pan:
                 if (nothingIntersected && this.mouseDown) {
                     if (this.isPanEnabled) {
                         this.panOffset = [e.clientX - this.mouseStart[0], e.clientY - this.mouseStart[1]];
@@ -1080,7 +869,6 @@ var glutils;
         WebGLInteractor.prototype.clickHandler = function (e) {
             this.mouse = mouseToWorldCoordinates(e.clientX, e.clientY);
             var intersectedVisualElements = [];
-            // call mouseclick on all elements with a mouse over handler
             for (var i = 0; i < this.clickSelections.length; i++) {
                 intersectedVisualElements = this.intersect(this.clickSelections[i], this.mouse[0], this.mouse[1]);
                 for (var j = 0; j < intersectedVisualElements.length; j++) {
@@ -1121,13 +909,6 @@ var glutils;
                 this.lassoEndHandler(this.lassoPoints);
             }
         };
-        // keyDownHandler(e){
-        //     console.log('e', e)
-        //     // this.keyDown 
-        // }    
-        // keyUpHandler(e){
-        //     this.keyDown = undefined;
-        // }    
         WebGLInteractor.prototype.intersect = function (selection, mousex, mousey) {
             switch (selection.shape) {
                 case 'circle':
@@ -1145,7 +926,6 @@ var glutils;
             }
             return [];
         };
-        // returns list of data elements 
         WebGLInteractor.prototype.intersectCircles = function (selection) {
             var intersectedElements = [];
             var d;
@@ -1169,7 +949,6 @@ var glutils;
             return intersectedElements;
         };
         WebGLInteractor.prototype.intersectPaths = function (selection) {
-            // console.log('intersect paths')
             var intersectedElements = [];
             var e;
             var v1, v2;
@@ -1220,11 +999,10 @@ var glutils;
         return WebGLInteractor;
     }());
     glutils.WebGLInteractor = WebGLInteractor;
-    // Calculate intersection
     function mouseToWorldCoordinates(mouseX, mouseY) {
         var rect = webgl.canvas.getBoundingClientRect();
         var x = webgl.camera.position.x + webgl.camera.left / webgl.camera.zoom + (mouseX - rect.left) / webgl.camera.zoom;
-        var y = webgl.camera.position.y + webgl.camera.top / webgl.camera.zoom - (mouseY - rect.top) / webgl.camera.zoom; // this.mouse[1] *= -1
+        var y = webgl.camera.position.y + webgl.camera.top / webgl.camera.zoom - (mouseY - rect.top) / webgl.camera.zoom;
         return [x, y];
     }
     glutils.mouseToWorldCoordinates = mouseToWorldCoordinates;
@@ -1234,21 +1012,16 @@ var glutils;
             if (!isNaN(points[i].x))
                 arrayPoints.push([points[i].x, points[i].y]);
         }
-        // console.log('arrayPoints', arrayPoints)
-        var spline = new BSpline(arrayPoints, 3); //making BSpline
+        var spline = new BSpline(arrayPoints, 3);
         var curvePoints = [];
         for (var t = 0; t <= 1; t += 0.01) {
             var p = spline.calcAt(t);
             curvePoints.push({ x: p[0], y: p[1] });
         }
-        // console.log('\curvePoints', curvePoints.length)
         return curvePoints;
     }
     glutils.curve = curve;
-    ///////////////////
-    /// UI ELEMENTS ///
-    ///////////////////
-    var CheckBox = /** @class */ (function () {
+    var CheckBox = (function () {
         function CheckBox() {
             var _this = this;
             this.selected = false;
@@ -1266,21 +1039,14 @@ var glutils;
             });
             this.circle = selectAll()
                 .data([0]);
-            // .append('circle')
-            //     .attr('r', 3)
-            //     .attr('z', 1)
-            //     .style('fill', '#000000')
-            //     .style('opacity', 0)
         }
         CheckBox.prototype.attr = function (attrName, value) {
             switch (attrName) {
                 case 'x':
                     this.frame.attr('x', value);
-                    // this.circle.attr('x', value); 
                     return this;
                 case 'y':
                     this.frame.attr('y', value);
-                    // this.circle.attr('y', value); 
                     return this;
             }
         };
@@ -1294,15 +1060,6 @@ var glutils;
     glutils.CheckBox = CheckBox;
 })(glutils || (glutils = {}));
 var THREEx = THREEx || {};
-//////////////////////////////////////////////////////////////////////////////////
-//		Constructor							//
-//////////////////////////////////////////////////////////////////////////////////
-/**
- * create a dynamic texture with a underlying canvas
- *
- * @param {Number} width  width of the canvas
- * @param {Number} height height of the canvas
- */
 THREEx.DynamicTexture = function (width, height) {
     var canvas = document.createElement('canvas');
     canvas.width = width;
@@ -1313,17 +1070,7 @@ THREEx.DynamicTexture = function (width, height) {
     var texture = new THREE.Texture(canvas);
     this.texture = texture;
 };
-//////////////////////////////////////////////////////////////////////////////////
-//		methods								//
-//////////////////////////////////////////////////////////////////////////////////
-/**
- * clear the canvas
- *
- * @param  {String*} fillStyle 		the fillStyle to clear with, if not provided, fallback on .clearRect
- * @return {THREEx.DynamicTexture}      the object itself, for chained texture
- */
 THREEx.DynamicTexture.prototype.clear = function (fillStyle) {
-    // depends on fillStyle
     if (fillStyle !== undefined) {
         this.context.fillStyle = fillStyle;
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -1331,36 +1078,19 @@ THREEx.DynamicTexture.prototype.clear = function (fillStyle) {
     else {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    // make the texture as .needsUpdate
     this.texture.needsUpdate = true;
-    // for chained API 
     return this;
 };
-/**
- * draw text
- *
- * @param  {String}		text	the text to display
- * @param  {Number|undefined}	x	if provided, it is the x where to draw, if not, the text is centered
- * @param  {Number}		y	the y where to draw the text
- * @param  {String*} 		fillStyle the fillStyle to clear with, if not provided, fallback on .clearRect
- * @param  {String*} 		contextFont the font to use
- * @return {THREEx.DynamicTexture}	the object itself, for chained texture
- */
 THREEx.DynamicTexture.prototype.drawText = function (text, x, y, fillStyle, contextFont) {
-    // set font if needed
     if (contextFont !== undefined)
         this.context.font = contextFont;
-    // if x isnt provided 
     if (x === undefined || x === null) {
         var textSize = this.context.measureText(text);
         x = (this.canvas.width - textSize.width) / 2;
     }
-    // actually draw the text
     this.context.fillStyle = fillStyle;
     this.context.fillText(text, x, y);
-    // make the texture as .needsUpdate
     this.texture.needsUpdate = true;
-    // for chained API 
     return this;
 };
 THREEx.DynamicTexture.prototype.drawTextCooked = function (text, options) {
@@ -1371,17 +1101,14 @@ THREEx.DynamicTexture.prototype.drawTextCooked = function (text, options) {
         margin: options.margin !== undefined ? options.margin : 0.1,
         lineHeight: options.lineHeight !== undefined ? options.lineHeight : 0.1,
         align: options.align !== undefined ? options.align : 'left',
-        fillStyle: options.fillStyle !== undefined ? options.fillStyle : 'black'
+        fillStyle: options.fillStyle !== undefined ? options.fillStyle : 'black',
     };
     context.save();
     context.fillStyle = params.fillStyle;
     var y = (params.lineHeight + params.margin) * canvas.height;
     while (text.length > 0) {
-        // compute the text for specifically this line
         var maxText = computeMaxTextLength(text);
-        // update the remaining text
         text = text.substr(maxText.length);
-        // compute x based on params.align
         var textSize = context.measureText(maxText);
         if (params.align === 'left') {
             var x = params.margin * canvas.width;
@@ -1394,15 +1121,11 @@ THREEx.DynamicTexture.prototype.drawTextCooked = function (text, options) {
         }
         else
             console.assert(false);
-        // actually draw the text at the proper position
         this.context.fillText(maxText, x, y);
-        // goto the next line
         y += params.lineHeight * canvas.height;
     }
     context.restore();
-    // make the texture as .needsUpdate
     this.texture.needsUpdate = true;
-    // for chained API
     return this;
     function computeMaxTextLength(text) {
         var maxText = '';
@@ -1416,21 +1139,11 @@ THREEx.DynamicTexture.prototype.drawTextCooked = function (text, options) {
         return maxText;
     }
 };
-/**
- * execute the drawImage on the internal context
- * the arguments are the same the official context2d.drawImage
- */
-THREEx.DynamicTexture.prototype.drawImage = function ( /* same params as context2d.drawImage */) {
-    // call the drawImage
+THREEx.DynamicTexture.prototype.drawImage = function () {
     this.context.drawImage.apply(this.context, arguments);
-    // make the texture as .needsUpdate
     this.texture.needsUpdate = true;
-    // for chained API 
     return this;
 };
-//////////////////
-/// VECTOR OPS ///
-//////////////////
 var geometry;
 (function (geometry) {
     function length(v1) {

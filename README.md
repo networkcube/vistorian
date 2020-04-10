@@ -1,4 +1,4 @@
-# Vistorian & Networkcube
+# Vistorian / Networkcube
 
 Networkcube is a java script / (Typescript) library and a programming framework for interactive network visualizations with:
 
