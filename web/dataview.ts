@@ -128,6 +128,7 @@ function createNetwork() {
 
     currentNetwork = new vistorian.Network(id);
     currentNetwork.name = 'Network-' + currentNetwork.id;
+    currentNetwork.directed = false;
     storage.saveNetwork(currentNetwork,SESSION_NAME);
     // saveCurrentNetwork(true);
 
@@ -151,6 +152,7 @@ function setNodeTable(list)
         unshowTable('#nodeTableDiv');
         currentNetwork.userNodeTable = undefined;
     }
+    updateNetworkStatusIndication();
 }
 
 function setLinkTable(list) {
@@ -163,6 +165,7 @@ function setLinkTable(list) {
         unshowTable('#linkTableDiv');
         currentNetwork.userLinkTable = undefined;
     }
+    updateNetworkStatusIndication();
 }
 
 function setLocationTable(list) {
@@ -417,6 +420,16 @@ function updateNetworkStatusIndication()
             .text('Ready for visualization. Select a visualization from the menu on the top.')
             .css('color', '#fff')
             .css('background', '#2b0')
+    }else if("userNodeTable" in currentNetwork && currentNetwork.userNodeTable && currentNetwork.userNodeTable.data.length == 1){
+        $('#networkStatus')
+            .text('Network not ready for visualization. Uploaded node table is empty.')
+            .css('background', '#f63')
+            .css('color', '#fff')
+    }else if("userLinkTable" in currentNetwork && currentNetwork.userLinkTable && currentNetwork.userLinkTable.data.length == 1){
+        $('#networkStatus')
+            .text('Network not ready for visualization. Uploaded link table is empty.')
+            .css('background', '#f63')
+            .css('color', '#fff')
     }else{
         $('#networkStatus')
             .text('Network not ready for visualization. Table or Schema specifications missing.')
@@ -453,6 +466,19 @@ function unshowNetwork() {
 function unshowTable(elementName: string) {
     $(elementName).empty();
 }
+
+function linkRowMouseOver(tableRow: any){
+    var rowID = tableRow.id - 1; //indexed from 1 in showTable function
+    var bc = new BroadcastChannel('row_hovered_over_link');
+    bc.postMessage({"id": rowID});
+}
+
+function nodeRowMouseOver(tableRow: any){
+    var rowID = tableRow.id - 1; //indexed from 1 in showTable function
+    var bc = new BroadcastChannel('row_hovered_over_node');
+    bc.postMessage({"id": rowID});
+}
+
 
 var currentTable: vistorian.VTable;
 
@@ -541,7 +567,22 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
 
     // Load data into html table
     for (var r = 1; r < Math.min(data.length, DATA_TABLE_MAX_LENGTH); r++) {
-        tr = $('<tr></tr>').addClass('tablerow')
+        if(elementName == "#nodeTableDiv"){
+            tr = $('<tr></tr>').addClass('tablerow').attr({
+                'onmouseover': 'nodeRowMouseOver(this)',
+                'id': r
+            });
+        }
+        else if(elementName == "#linkTableDiv"){
+            tr = $('<tr></tr>').addClass('tablerow').attr({
+                'onmouseover': 'linkRowMouseOver(this)',
+                'id': r
+            });
+        }
+        else{
+            tr = $('<tr></tr>').addClass('tablerow');
+        }
+
         tBody.append(tr);
         for (var c = 0; c < data[r].length; c++) {
             td = $('<td></td>').attr('contenteditable', 'true');
@@ -626,9 +667,18 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
                         fieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);    
                 }    
                     
-                    
-
-                option = $('<option value='+field+'>' + fieldName + '</option>');
+                if(field == 'directed'){
+                    option = $('<option value='+field+' class=directionField style=display:block>' + fieldName + '</option>');
+                }
+                else if(field == 'source'){
+                    option = $('<option value='+field+' class=sourceField>' + fieldName + '</option>');
+                }
+                else if(field == 'target'){
+                    option = $('<option value='+field+' class=targetField>' + fieldName + '</option>');
+                }
+                else{
+                    option = $('<option value='+field+'>' + fieldName + '</option>');
+                }
                 select.append(option);
 
                 if (i == 0 && field == 'id') {
@@ -643,7 +693,7 @@ function showTable(table: vistorian.VTable, elementName: string, isLocationTable
                         if (currentNetwork.hasOwnProperty('timeFormat')) {
                             val = "value='"+currentNetwork.timeFormat+"'";
                         }
-                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" placeholder="DD/MM/YYYY" '+val+' onkeyup="timeFormatChanged()"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="logos/help.png" class="inlineicon"/></a></span>');
+                        timeFormatInput = $('<span class="nobr"><input title="Enter a date pattern" type="text" size="12" id="timeFormatInput_' + schema.name + '" value="DD/MM/YYYY" '+val+' onkeyup="timeFormatChanged()"></input><a href="http://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Details of the date pattern syntax"><img src="logos/help.png" class="inlineicon"/></a></span>');
                         cell.append(timeFormatInput);
                     }
                 }
@@ -910,43 +960,64 @@ function getFileInfos(e) {
 
     uploadFiles(loadTableList);
 }
+
+//Checks if uploaded file ends in ".csv", returns boolean
+function checkFileType(filesToUpload: any){
+    if(!filesToUpload.length){
+        return false;
+    }
+    var filename = filesToUpload[0].name;
+    if(filename.substr(filename.length -4) != ".csv"){
+        $('#networkStatus')
+            .text('Incorrect format, file must be CSV.')
+            .css('background', '#f63')
+            .css('color', '#fff')
+        return false;
+    }
+    return true
+}
+
 function uploadNodeTable(e)
 {
     filesToUpload = [e.target.files[0]];
-    uploadFiles(()=>{
-        var tables = storage.getUserTables(SESSION_NAME)
-        var lastTable = tables[tables.length-1];
+    if(checkFileType(filesToUpload)) {
 
-        $('#nodetableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
-        $('#nodetableSelect').val(lastTable.name);
+        uploadFiles(() => {
+            var tables = storage.getUserTables(SESSION_NAME)
+            var lastTable = tables[tables.length - 1];
 
-        setNodeTable({value: lastTable.name})
-        showTable(currentNetwork.userNodeTable, '#nodeTableDiv', false, currentNetwork.userNodeSchema);
-        saveCurrentNetwork(false);
+            $('#nodetableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+            $('#nodetableSelect').val(lastTable.name);
 
-        loadTableList();
+            setNodeTable({value: lastTable.name})
+            showTable(currentNetwork.userNodeTable, '#nodeTableDiv', false, currentNetwork.userNodeSchema);
+            saveCurrentNetwork(false);
 
-    });
-        
+            loadTableList();
+
+        });
+    }
 }
 function uploadLinkTable(e)
 {
     filesToUpload = [e.target.files[0]];
-    uploadFiles(()=>{
-        var tables = storage.getUserTables(SESSION_NAME)
-        var lastTable = tables[tables.length-1];
+    if(checkFileType(filesToUpload)) {
+        uploadFiles(() => {
+            var tables = storage.getUserTables(SESSION_NAME)
+            var lastTable = tables[tables.length - 1];
 
-        $('#linktableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
-        $('#linktableSelect').val(lastTable.name);
+            $('#linktableSelect').append('<option value="' + lastTable.name + '">' + lastTable.name + '</option>')
+            $('#linktableSelect').val(lastTable.name);
 
-        setLinkTable({value: lastTable.name})
-        showTable(currentNetwork.userLinkTable, '#linkTableDiv', false, currentNetwork.userLinkSchema);
-        saveCurrentNetwork(false);
+            setLinkTable({value: lastTable.name})
+            showTable(currentNetwork.userLinkTable, '#linkTableDiv', false, currentNetwork.userLinkSchema);
+            saveCurrentNetwork(false);
 
-        var element = document.getElementById('leaveCode');
-    
-        loadTableList();
-    });
+            var element = document.getElementById('leaveCode');
+
+            loadTableList();
+        });
+    }
 }
 
 function uploadFiles(handler:Function)
@@ -1032,6 +1103,43 @@ function replaceCellContents(tableId) {
     saveCellChanges();
     saveCurrentNetwork(false);
     showMessage('Replaced '+ replaceCount+ ' occurrences of '+ replace_pattern+ ' with '+ replace_value+ '.' , 2000);
+}
+
+var directedCheckboxToggle = false;
+function directedCheckboxClick(){
+    $("input[type=checkbox]").attr("checked",!directedCheckboxToggle);
+    directedCheckboxToggle = !directedCheckboxToggle;
+
+    var directionFields = document.getElementsByClassName('directionField');
+    var sourceFields = document.getElementsByClassName('sourceField');
+    var targetFields = document.getElementsByClassName('targetField');
+
+    if(directedCheckboxToggle){
+        currentNetwork.directed = true;
+        for (var i = 0; i < directionFields.length; i ++) {
+            directionFields[i].style.display = 'none';
+        }
+        for (var i = 0; i < sourceFields.length; i ++) {
+            sourceFields[i].innerHTML = 'Source Node';
+        }
+        for (var i = 0; i < targetFields.length; i ++) {
+            targetFields[i].innerHTML = 'Target Node';
+        }
+    }else{
+        currentNetwork.directed = false;
+        for (var i = 0; i < directionFields.length; i ++) {
+            directionFields[i].style.display = 'block';
+        }
+        for (var i = 0; i < sourceFields.length; i ++) {
+            sourceFields[i].innerHTML = 'Node 1';
+        }
+        for (var i = 0; i < targetFields.length; i ++) {
+            targetFields[i].innerHTML = 'Node 2';
+        }
+    }
+    saveCurrentNetwork(true);
+
+
 }
 
 /** Extracts locations from node and link tabe**/

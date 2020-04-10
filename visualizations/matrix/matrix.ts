@@ -300,12 +300,19 @@ class MatrixLabels{
     this.matrix = matrix;
     this.margin = margin;
     this.cellSize = 0;
+
+    //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcNode = new BroadcastChannel('row_hovered_over_node');
+    var self = this;
+    bcNode.onmessage = function (ev) {
+      self.updateHighlightedNodes([ev.data.id]);
+    };
   }
 
   updateData(leftNodes: networkcube.Node[], topNodes: networkcube.Node[],
              cellSize: number, nodeOrder: number[],
              leftLabelOffset: number, topLabelOffset: number,
-             bbox: Box){
+             bbox: Box, highlightId?: number){
 
     this.cellSize = cellSize;
 
@@ -464,6 +471,14 @@ class MatrixVisualization{
     this.cellSelectionFrames = networkcube.array(undefined,  matrix.numberOfLinks());
     this.linkWeightScale = d3.scale.linear().range([0.1, 1])
       .domain([0, matrix.maxWeight()]);
+
+    //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcNode = new BroadcastChannel('row_hovered_over_link');
+    var self = this;
+    bcNode.onmessage = function (ev) {
+      self.updateHighlightedLinks([ev.data.id]);
+    };
+
     this.init();
   }
   init(){

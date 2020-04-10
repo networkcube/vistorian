@@ -4,7 +4,7 @@
     var COLOR_DEFAULT_NODE = '#333333';
     var COLOR_HIGHLIGHT = '#ff8800';
     var LINK_OPACITY:number = .5;
-    var LINK_WIDTH:number = 10;
+    var LINK_WIDTH:number = 1;
     var OFFSET_LABEL = {x:5, y:4}
     var LINK_GAP:number = 2;
     var LAYOUT_TIMEOUT:number = 3000;
@@ -33,14 +33,29 @@
     var times = dgraph.times().toArray();
     var time_start = times[0];
     var time_end = times[times.length-1];
-    
+    var directed = dgraph.directed;
+
     var nodes:networkcube.Node[] = dgraph.nodes().toArray();
     var nodesOrderedByDegree = dgraph.nodes().toArray().sort((n1,n2)=> n2.neighbors().length - n1.neighbors().length);
     
     var nodePairs = dgraph.nodePairs();
     var links = dgraph.links().toArray();
+    var linkArrays = dgraph.linkArrays;
+    links = addDirectionToLinks(links, linkArrays);
     var nodeLength = nodes.length;
-    
+
+    //When a link row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcLink = new BroadcastChannel('row_hovered_over_link');
+    bcLink.onmessage = function (ev) {
+        updateLinks(ev.data.id)
+    };
+
+    //When a node row is hovered over in dataview.ts, a message is received here to highlight the corresponding link.
+    var bcNode = new BroadcastChannel('row_hovered_over_node');
+    bcNode.onmessage = function (ev) {
+        updateNodes(ev.data.id)
+    };
+
 
     // states
     // var mouseDownNode = undefined;
@@ -97,6 +112,21 @@
         }) 
    }
 
+   function addDirectionToLinks(links, linkArrays) {
+       for(var i=0 ; i <links.length ; i++){
+           var directionValue = linkArrays.directed[i];
+
+           if (["yes","true"].indexOf(directionValue) > -1 || directed){
+               links[i].directed = true;
+           }
+           //else if(["no","false"].indexOf(directionValue) > -1) {links[i].directed = false;}
+           else{
+               links[i].directed = false;
+           }
+       }
+        return links;
+   }
+
         
     
     
@@ -116,7 +146,8 @@
 
     
     $('#visDiv').append('<svg id="visSvg" width="'+(width-20)+'" height="'+(height-20)+'"></svg>');
-    
+
+    console.log(dgraph);
     var mouseStart:number[];
     var panOffsetLocal:number []= [0,0];
     var panOffsetGlobal:number []= [0,0];
@@ -176,7 +207,26 @@
     var lineFunction = d3.svg.line()
         .x(function(d) { return d.x; })
         .y(function(d) { return d.y; })
-        .interpolate("linear");    
+        .interpolate("linear");
+
+    function marker(color) {
+
+        svg.append("svg:defs").append("svg:marker")
+            .attr("id", color.replace("#", ""))
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 12)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto") //auto-start-reverse to flip
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .style("fill", color);
+
+
+        return "url(" + color + ")";
+    };
+
 
     for(var i=0 ; i <nodes.length ; i++){
         nodes[i]['width'] = getNodeRadius(nodes[i])*2;
@@ -446,11 +496,14 @@
 
     }
     
-    function updateNodes(){
+    function updateNodes(highlightId?: number){
         visualNodes
             .style('fill', d=>{
                 var color;
-                if(d.isHighlighted()){
+                if(highlightId && highlightId == d._id){
+                    color = COLOR_HIGHLIGHT;
+                }
+                else if(d.isHighlighted()){
                     color = COLOR_HIGHLIGHT;
                 }else{
                     color = networkcube.getPriorityColor(d);            
@@ -496,23 +549,42 @@
                                 ? 'visible' : 'hidden')    
 
     }
-    
-    function updateLinks()
+
+    //Optional parameter highlightId used to highlight specific link on receiving hoverover message.
+    function updateLinks(highlightId?: number)
     {
         visualLinks
+            .attr('marker-end',function (d) {
+                if(d.directed){
+                    var color = networkcube.getPriorityColor(d);
+                    if(!color)
+                        color = COLOR_DEFAULT_LINK;
+                    if(highlightId && highlightId == d._id) {
+                        return 'black';
+                    }
+                    return marker(color);
+                }
+            })
             .style('stroke', function(d){
-                var color = networkcube.getPriorityColor(d);            
+                var color = networkcube.getPriorityColor(d);
                 if(!color)
                     color = COLOR_DEFAULT_LINK;
+                if(highlightId && highlightId == d._id) {
+                    return 'black';
+                }
                 return color;
             })
             .style('opacity', d=>{
                 var visible = d.isVisible();
-                if(!visible 
+                var visible = d.isVisible();
+                if(!visible
                 || !d.source.isVisible() 
                 || !d.target.isVisible()) 
                     return 0;
-                if(d.presentIn(time_start, time_end)){    
+                if(d.presentIn(time_start, time_end)){
+                    if(highlightId && highlightId == d._id) {
+                        return 1;
+                    }
                     return d.isHighlighted() || d.source.isHighlighted() || d.target.isHighlighted() ? 
                         Math.min(1, LINK_OPACITY + .2) : LINK_OPACITY;
                 }else{
@@ -523,7 +595,6 @@
                 var w = linkWeightScale(d.weights(time_start, time_end).mean());    
                 return d.isHighlighted()?w*2 : w;        
             })
-                             
 
     }
     
@@ -536,8 +607,8 @@
             if(multiLink.links().length < 2){
                 multiLink.links().toArray()[0]['path'] = [
                     {x: multiLink.source.x, y: multiLink.source.y},
-                    {x: multiLink.source.x, y: multiLink.source.y},
-                    {x: multiLink.target.x, y: multiLink.target.y},
+                    // {x: multiLink.source.x, y: multiLink.source.y},
+                    // {x: multiLink.target.x, y: multiLink.target.y},
                     {x: multiLink.target.x, y: multiLink.target.y}]
             }else{
                 links = multiLink.links().toArray();
