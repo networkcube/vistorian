@@ -42,7 +42,7 @@ module networkcube {
      * @return {[type]}          [description]
      */
     export function importData(sessionName: string, data: DataSet) {
-        console.log('[n3] Import data', data.name);
+        console.log('[n3] Import data >>>', data.name);
         session = sessionName;
         dataManager.importData(sessionName, data);
     }
