@@ -1,64 +1,46 @@
 # Vistorian / Networkcube
 
-Networkcube is a java script / (Typescript) library and a programming framework for interactive network visualizations with:
+Vistorian (in previous versions of the code called `networkcube`) is an open-source java script / Typescript library and a programming framework for interactive visualization of networks with the following features:
 
 * different link types
 * multiple links between nodes
 * link weights
-* temporal information on links (weigth, existence)
-* geographical positions attached to nodes
+* link direction
+* temporal information on links (weigth, presence)
+* geographical positions attached to nodes that can change over time.
 
-The Vistorian is an application based on 'networkcube' and has been build with two goals in mind: 
+## Main Features:
+The vistorian framework provides a range of packages and functionality:
 
-* Ready-to-use visualizations that can be embedded in any web environment, e.g. to provide state-of-the-art visualizations to a specific group of stateholders or in a specific domain. 
-* Rapidly prototype, deploy, and mature novel network visualizations. 
-* Browser-based: networkcube runs entirely in the browser and does not use any server. None of your data is transmitted over the network nor stored on any server.
+* **Ready-to-use visualizations** that can be embedded in any web environment, e.g. to provide state-of-the-art visualizations to a specific group of stateholders or in a specific domain. Those visualizations are: 
+  * **Node-link visualization**, 
+  * **Adjacency matrix**, 
+  * **Time-arc visualization** to visualize frequency and topology of links over time 
+  * **Map** with overlaid node-link network. 
+* **Graph API** to query dynamic, geographic, and multivariate networks with the above-mentioned data features. 
+* **Importers** of a range of data types (GML, Paject, Matrix, CSV, JSON, ... )
+* **Synchronized views** when, e.g., highlighting a node across all visualizations currently open in the browser. Visualizations can be spread across browser tabs and windows. 
 
-Vistorian is designed for research and is currently in a prorotype phase. However, the code is open and contributions are welcome. Please read the [Wiki](Home) for more information or contact us: benj.bach@gmail.com.
+## Design Rationales:
 
-Each visualization in Vistorian is its individual model and runs in an iFrame. Visualizations are hosted here on github and can be integrated in any website. So, the only thing your website has to care is importing a user's data into the browser (https://github.com/networkcube/networkcube/wiki/Importing-Data).
-
-## Demos and Example Projects
-
-Vistorian has been used in the following projects:
-
-* A stable version at [http://vistorian.net](http://vistorian.net)
-* The latest version pointing to the master in this repo under [https://networkcube.github.io/vistorian](https://networkcube.github.io/vistorian).
-
-<!--
-## Using Networkcube in your projects
-
-* Include the following link into your website: https://networkcube.github.io/networkcube/core/networkcube.js
-
-* Learn how to import data (https://github.com/networkcube/networkcube/wiki/Importing-Data) and how to use the network API (https://github.com/networkcube/networkcube/wiki/Query-API)
--->
-
-## Components
-
-The Networkcube framework conists of the following components and features: 
-
-* Methods for **loading network data** from various formats, e.g. csv, json, GEDCOM, etc.
-* Importing data into the **local storage** of your browser. Data is not uploaded onto any server, unless you provide the 
-server and program the backend. Technically, this is possible. Eventually this means that once you the visualization(s) with your data show up on your screen, no internet connection is necessary anymore. Data and events are handled completely locally on your machine.
-* an **API to query the network** you stored in the local storage, such as link weights for a certain period, a node's neighbors, links of a certain type. etc.
-* an initial **set of common state-of-the-art network visualizations** including Node-Link diagrams, Adjacency Matrices, Dynamic Ego network visualization, and a geographical Map.
-Visualizations are referenced via a URL and can hence sit anywhere in the internet. Once the visualization code is loaded
-all it needs to do is to query the data from the local storage.
-* A **messenger to send events between all the visualizations** in your browser: be they in windows, tabs, or iFrames. Messages pass simple interaction events such as node selection or changes to a time slider for temporal navigation.
+* **Browser-based**: the Vistorian runs entirely in the browser and does not use any server. None of your data is transmitted over the network nor stored on any server.
+* **Modular**: the vistorian has a set of `npm` packages can be included into your application. Each package has its own repository and package versions.
+  * `vistorian-core`: core functionality for loading and storing networks, querying the graph, etc.
+  * `vistorian-web`: a fully implemented web-application using all Vistorian packages. 
+  * `vistorian-node`: an interactive node-link diagram implementation with time-slider and interactive filtering
+  * `vistoeian-matrix`: a interactive adjacency matrix with different matrix ordering mechanisms, timeslider, and filtering mechanisms
+  * `vistorian-dynamicego`: a time-arc visualization to show links over time.
+  * `vistorian-map`: a geographic map visualization with overlaid links and nodes. Nodes can change positions over time.  
+  * `vistorian-bookmarkbrowser`: a menu widget that provides for search and lists all types of links and nodes in the networks. Allows for filtering (hiding) nodes and links by their type.  
+* Vistorian is **designed for research** 
+* Vistorian is **open Source** and currently in a prorotype phase. Fork the repositories and contribute to its development. Get involved: [vistorian@inria.fr](mailto:vistorian@inria.fr).
 
 
 ## Technical Specifications
 
 * Networkcube is written in TypeScript (https://www.typescriptlang.org), a typed language that compiles into 
 JavaScript.  
+* All Vistorian is available as `npm`-packages with the same name as in this repo.
 * Data is stored in the browser's local storage, which currently is limited to 5MB. For projects on using larger networks, contact us.
-* Networkcube and the visualizations are optimized for Google Chrome. They have *not* been tested on other browsers. (Feel free to do so and let us know what happens).
-* Visualizations are generally written in WebGL using the THREE.js library (http://threejs.org). Certain parts of the visualizations are implemented in D3.
-
-## Run your own networkcube instance for development
-
-1. Clone this git
-2. Place it on a http server.
-3. Navigate to `<your_serverpath>/networkcube/web/index.html`* to run the local demo and test if all is working fine.
-
-* On my machine this looks like `http://localhost/~bbach/networkcube/web` 
+* Vistorian and its visualizations are developed and tested on the Google Chrome browser. They may just work fine on other browsers and platforms but have *not* been tested. Feel free to do so and let us know what happens.
+* Visualizations are generally written in D3 or WebGL using the THREE.js library (http://threejs.org).
