@@ -6,7 +6,7 @@ Vistorian (in previous versions of the code called `networkcube`) is an open-sou
 * multiple links between nodes
 * link weights
 * link direction
-* temporal information on links (weigth, presence)
+* temporal information on links (weight / presence)
 * geographical positions attached to nodes that can change over time.
 
 ## Main Features:
