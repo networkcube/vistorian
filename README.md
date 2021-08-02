@@ -34,7 +34,7 @@ The vistorian framework provides a range of packages and functionality:
   * `vistorian-bookmarkbrowser`: a menu widget that provides for search and lists all types of links and nodes in the networks. Allows for filtering (hiding) nodes and links by their type.  
 * Vistorian is **designed for research** 
 * Vistorian is **open Source** and currently in a prorotype phase. Fork the repositories and contribute to its development. Get involved: [vistorian@inria.fr](mailto:vistorian@inria.fr).
-
+* **Create bespoke visualizations** and grow the set of visualizations for the vistorian. Read more on the wiki page [Creating Visualizations](Create Bespoke Visualizations)
 
 ## Technical Specifications
 
@@ -44,3 +44,17 @@ JavaScript.
 * Data is stored in the browser's local storage, which currently is limited to 5MB. For projects on using larger networks, contact us.
 * Vistorian and its visualizations are developed and tested on the Google Chrome browser. They may just work fine on other browsers and platforms but have *not* been tested. Feel free to do so and let us know what happens.
 * Visualizations are generally written in D3 or WebGL using the THREE.js library (http://threejs.org).
+
+# More info
+
+Check the Wiki page and our blog for the following topics: 
+
+* [Prepare your data](https://vistorian.github.io/formattingdata.html)
+* [Node and Link Schemas](Node and Link Schemas)
+* [Graph Query API](Graph Query API)
+* [Messages API](Messages API)
+* [Widget API](Widget API)
+* [Visualizations](https://vistorian.github.io/visualizations.html)
+* [Import data](Importing Data)
+* [Development](Development)
+* [Create Bespoke Visualizations for the Vistorian](Create Bespoke Visualizations)
