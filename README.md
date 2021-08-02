@@ -50,7 +50,7 @@ JavaScript.
 Check the Wiki page and our blog for the following topics: 
 
 * [Prepare your data](https://vistorian.github.io/formattingdata.html)
-* [Node and Link Schemas](../../wiki/Node and Link Schemas)
+* [Node and Link Schemas](../../wiki/Node-and-Link-Schemas)
 * [Graph Query API](Graph Query API)
 * [Messages API](Messages API)
 * [Widget API](Widget API)
