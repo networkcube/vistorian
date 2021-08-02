@@ -52,11 +52,11 @@ JavaScript.
 Check the Wiki page and our blog for the following topics: 
 
 * [Prepare your data](https://vistorian.github.io/formattingdata.html)
+* [Import data](../../wiki/Importing-Data)
 * [Node and Link Schemas](../../wiki/Node-and-Link-Schemas)
 * [Graph Query API](../../wiki/Graph-Query-API)
 * [Messages API](../../wiki/Messages-API)
 * [Widget API](../../wiki/Widget-API)
 * [Visualizations](https://vistorian.github.io/visualizations.html)
-* [Import data](../../wiki/Importing-Data)
 * [Developing with the Vistorian](../../wiki/Development)
 * [Create Bespoke Visualizations for the Vistorian](../../wiki/Create-Bespoke-Visualizations)
