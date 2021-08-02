@@ -21,7 +21,7 @@ The vistorian framework provides a range of packages and functionality:
 * **Importers** of a range of data types (GML, Paject, Matrix, CSV, JSON, ... )
 * **Synchronized views** when, e.g., highlighting a node across all visualizations currently open in the browser. Visualizations can be spread across browser tabs and windows. 
 
-## Design Rationales:
+## Design Rationale:
 
 * **Browser-based**: the Vistorian runs entirely in the browser and does not use any server. None of your data is transmitted over the network nor stored on any server.
 * **Modular**: the vistorian has a set of `npm` packages can be included into your application. Each package has its own repository and package versions.
