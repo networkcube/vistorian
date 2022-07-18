@@ -1,3 +1,7 @@
+> **Note**
+> The latest code for the Vistorian project is now kept in the [vistorian-monorepo](https://github.com/networkcube/vistorian-monorepo) repository.
+
+
 # Vistorian (previous Networkcube)
 
 Vistorian (in previous versions of the code called `networkcube`) is an open-source java script / Typescript library and a programming framework for interactive visualization of networks with the following features:
