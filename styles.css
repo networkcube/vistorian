@@ -6,7 +6,6 @@ h1{
 	font-weight: 200;
 	font-family: 'Comfortaa', 'Helvetica Neue', sans-serif;	
 }
-}
 h2{
 	font-weight: 200;
 }
@@ -30,6 +29,8 @@ div#main{
 	color: #555;
 	margin-right:20px;
 	margin-top: 20px;
+	margin-top: 10px;
+ 	text-decoration: underline;
 }
 
 .exportPNG-button{

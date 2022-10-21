@@ -16,6 +16,8 @@ module networkcube {
     export var MESSAGE_SELECTION_FILTER = 'selectionFilter';
     export var MESSAGE_SELECTION_PRIORITY = 'selectionPriority'
     export var MESSAGE_SEARCH_RESULT = 'searchResult';
+    export var MESSAGE_STATE = 'stateRecorded';
+    
 
     var MESSENGER_PROPAGATE: boolean = true;
 
@@ -365,7 +367,24 @@ module networkcube {
     }
 
 
-
+       /// CAPTURE STATE
+ 
+ 
+     export function recordState(state:Object)
+     {
+         distributeMessage(new StateMessage(state));
+     }
+     
+     export class StateMessage extends Message{
+         state:Object;
+         constructor(state:Object)
+         {
+             super(MESSAGE_STATE);
+             this.state = state;
+         }
+     }
+ 
+ 
 
 
 
@@ -416,71 +435,6 @@ module networkcube {
             if (m.type == MESSAGE_HIGHLIGHT) {
                 var m2: HighlightMessage = <HighlightMessage>m;
                 graph.highlight(m2.action, m2.idCompound);
-            // } else
-            //     if (m.type == MESSAGE_SELECTION) {
-            //         var m3: SelectionMessage = <SelectionMessage>m;
-            //         var compound = cloneCompound(m3.idCompound)
-            //         graph.selection(m3.action, compound, m3.selectionId);
-            //     } else
-            //         if (m.type == MESSAGE_TIME_RANGE) {
-            //             // this type is a view message. no adjustments on the graph necessary.
-            //         } else
-            //             if (m.type == MESSAGE_SELECTION_SET_COLORING_VISIBILITY) {
-            //                 var m4: ShowSelectionColorMessage = <ShowSelectionColorMessage>m;
-            //                 graph.getSelection(m4.selectionId).showColor = m4.showColor;
-            //             } else
-            //                 if (m.type == MESSAGE_SELECTION_PRIORITY) {
-            //                     var m5: SelectionPriorityMessage = <SelectionPriorityMessage>m;
-            //                     graph.getSelection(m5.selectionId1).priority = m5.priority1;
-            //                     graph.getSelection(m5.selectionId2).priority = m5.priority2;
-            //                     var linkElements = graph.getLinks().selected().elements;
-            //                     for (var i = 0; i < linkElements.length; i++) {
-            //                         linkElements[i].getSelections().sort(sortByPriority)
-            //                     }
-            //                     var nodeElements = graph.getNodes().selected().elements;
-            //                     for (var i = 0; i < nodeElements.length; i++) {
-            //                         nodeElements[i].getSelections().sort(sortByPriority)
-            //                     }
-            //                     // elements = graph.getTimes().selected().elements;
-            //                     // for(var i=0 ; i<elements.length ; i++){
-            //                     //     elements[i].getSelections().sort(sortByPriority)
-            //                     // }
-            //                     var nodePairElements = graph.getNodePairs().selected().elements;
-            //                     for (var i = 0; i < nodePairElements.length; i++) {
-            //                         nodePairElements[i].getSelections().sort(sortByPriority)
-            //                     }
-            //                 } else
-            //                     // if(m.type == MESSAGE_FILTER){
-            //                     //     var m6:FilterM = <SelectionPriorityMessage>m;
-            //                     //     graph.filter(m.idCompound, filter)
-            //                     // }else
-            //                     if (m.type == MESSAGE_SELECTION_FILTER) {
-            //                         var m6: FilterSelectionMessage = <FilterSelectionMessage>m;
-            //                         graph.filterSelection(m6.selectionId, m6.filter);
-            //                     } else
-            //                         // test messages that don't require a message handler
-            //                         if (m.type == MESSAGE_SELECTION_CREATE) {
-            //                             var m7: CreateSelectionMessage = <CreateSelectionMessage>m;
-            //                             graph.addSelection(m7.selection.id, m7.selection.color, m7.selection.acceptedType, m7.selection.priority);
-            //                         } else
-            //                             if (m.type == MESSAGE_SELECTION_SET_CURRENT) {
-            //                                 var m8: SetCurrentSelectionIdMessage = <SetCurrentSelectionIdMessage>m;
-            //                                 graph.setCurrentSelection(m8.selectionId);
-            //                             } else
-            //                                 if (m.type == MESSAGE_SELECTION_DELETE) {
-            //                                     var m10: DeleteSelectionMessage = <DeleteSelectionMessage>m;
-            //                                     graph.deleteSelection(m10.selectionId);
-            //                                 } else
-            //                                     if (m.type == MESSAGE_SEARCH_RESULT) {
-            //                                         var m11: SearchResultMessage = <SearchResultMessage>m;
-            //                                         graph.highlight('set', m11.idCompound);
-            //                                     } else
-            //                                         if (m.type == MESSAGE_SELECTION_COLORING) {
-            //                                             var m12: SelectionColorMessage = <SelectionColorMessage>m;
-            //                                             graph.getSelection(m12.selectionId).color = m12.color;
-            //                                         }
-// 
-// 
             }else
             if(m.type == MESSAGE_SELECTION){
                 var m3:SelectionMessage = <SelectionMessage>m;
@@ -506,19 +460,11 @@ module networkcube {
                 for(var i=0 ; i<nodeElements.length ; i++){
                     nodeElements[i].getSelections().sort(sortByPriority)
                 }
-                // elements = graph.getTimes().selected().elements;
-                // for(var i=0 ; i<elements.length ; i++){
-                //     elements[i].getSelections().sort(sortByPriority)
-                // }
                 var nodePairElements = graph.nodePairs().selected().toArray();
                 for(var i=0 ; i<nodePairElements.length ; i++){
                     nodePairElements[i].getSelections().sort(sortByPriority)
                 }
             }else
-            // if(m.type == MESSAGE_FILTER){
-            //     var m6:FilterM = <SelectionPriorityMessage>m;
-            //     graph.filter(m.idCompound, filter)
-            // }else
             if(m.type == MESSAGE_SELECTION_FILTER){
                 var m6:FilterSelectionMessage = <FilterSelectionMessage>m;
                 graph.filterSelection(m6.selectionId, m6.filter);

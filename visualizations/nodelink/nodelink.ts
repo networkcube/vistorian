@@ -654,3 +654,53 @@
     
 
 
+    //////////////
+    /// STATES ///
+    //////////////  
+
+
+    d3.select('#captureButton')
+    .on('click', ()=>
+    {
+        captureState();    
+    })
+
+
+    // Returns an object that captures the current visualization state
+    function captureState()
+    {
+        /// capture states
+        var json = {};
+        // node positions, nodes[i].x
+        var nodePosX = []
+        var nodePosY = []
+        for(var i=0 ; i<nodes.length ; i++){
+            nodePosX.push(nodes[i].x)
+            nodePosY.push(nodes[i].y)
+        }
+        json['nodePosX'] = nodePosX
+        json['nodePosY'] = nodePosY
+
+        // link visibility
+        
+
+        // current time: time_start, time_end
+        json['timeStart'] = time_start
+        json['timeEnd'] = time_end
+
+        json['visualization'] = 'nodelink';
+        json['dataset'] = networkcube.getUrlVars()['datasetName']
+        
+        networkcube.recordState(json);
+
+        console.log('json', json)
+        return null;
+    }
+
+
+    // Restores the state passed by the string.
+    function restoreState(json:String){
+        /// restore state
+    }
+
+

@@ -12,7 +12,6 @@
         "suppressImplicitAnyIndexErrors": true
     },
     "files": [
-        "../networkcube/core/networkcube.d.ts",
         "./classes/storage.ts",
         "./classes/utils.ts",
         "./classes/vistorian.ts",

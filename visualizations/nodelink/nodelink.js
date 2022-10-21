@@ -475,3 +475,27 @@ function unshowMessage() {
     if ($('#messageBox'))
         $('#messageBox').remove();
 }
+d3.select('#captureButton')
+    .on('click', function () {
+    captureState();
+});
+function captureState() {
+    var json = {};
+    var nodePosX = [];
+    var nodePosY = [];
+    for (var i = 0; i < nodes.length; i++) {
+        nodePosX.push(nodes[i].x);
+        nodePosY.push(nodes[i].y);
+    }
+    json['nodePosX'] = nodePosX;
+    json['nodePosY'] = nodePosY;
+    json['timeStart'] = time_start;
+    json['timeEnd'] = time_end;
+    json['visualization'] = 'nodelink';
+    json['dataset'] = networkcube.getUrlVars()['datasetName'];
+    networkcube.recordState(json);
+    console.log('json', json);
+    return null;
+}
+function restoreState(json) {
+}
